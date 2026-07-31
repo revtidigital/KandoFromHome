@@ -110,33 +110,10 @@ export const LandingPage: React.FC = () => {
   };
 
   return (
-    <div style={{
-      width: '100vw',
-      height: '100vh',
-      minHeight: '100vh',
-      maxHeight: '100vh',
-      margin: 0,
-      padding: 0,
-      background: '#020924',
-      color: 'white',
-      fontFamily: 'Outfit, sans-serif',
-      position: 'relative',
-      overflow: 'hidden',
-      boxSizing: 'border-box'
-    }}>
+    <div className="landing-wrapper">
       
-      {/* ── BACKGROUND LAYER: FAMILY PHOTO ON RIGHT 52% ── */}
-      <div style={{
-        position: 'absolute',
-        top: 0,
-        right: 0,
-        bottom: 0,
-        width: '54%',
-        height: '100%',
-        zIndex: 1,
-        pointerEvents: 'none',
-        overflow: 'hidden'
-      }}>
+      {/* ── BACKGROUND LAYER: FAMILY PHOTO ON RIGHT ── */}
+      <div className="landing-bg-image">
         <img 
           src="/clean_right_family.png" 
           alt="Yamaha Family DIY Craft Wall"
@@ -156,41 +133,20 @@ export const LandingPage: React.FC = () => {
       </div>
 
       {/* ── BACKGROUND GLOW ON LEFT ── */}
-      <div style={{
-        position: 'absolute',
-        top: '15%',
-        left: '8%',
-        width: '580px',
-        height: '580px',
-        background: 'radial-gradient(circle, rgba(0, 120, 255, 0.4) 0%, rgba(0, 70, 200, 0.12) 55%, transparent 75%)',
-        filter: 'blur(60px)',
-        pointerEvents: 'none',
-        zIndex: 2
-      }} />
+      <div className="landing-bg-glow" />
 
       {/* ── FOREGROUND CONTENT CONTAINER ── */}
-      <div style={{
-        position: 'relative',
-        zIndex: 10,
-        width: '100%',
-        height: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        padding: '24px 56px 18px 56px',
-        boxSizing: 'border-box',
-        overflow: 'hidden'
-      }}>
+      <div className="landing-container">
 
         {/* HEADER */}
-        <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', flexShrink: 0 }}>
+        <header className="landing-header">
           
           {/* YAMAHA BRAND LOGO */}
           <div onClick={() => handleSelectLanguage('en')} style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
-            <YamahaEmblem size={46} />
+            <YamahaEmblem size={42} />
             <div>
-              <div style={{ fontWeight: 900, fontSize: '1.5rem', letterSpacing: '1.2px', color: 'white', lineHeight: 1 }}>YAMAHA</div>
-              <div style={{ fontSize: '0.78rem', color: '#CBD5E1', fontStyle: 'italic', fontFamily: 'Caveat, cursive', marginTop: '1px' }}>Revs Your Heart</div>
+              <div style={{ fontWeight: 900, fontSize: '1.4rem', letterSpacing: '1.2px', color: 'white', lineHeight: 1 }}>YAMAHA</div>
+              <div style={{ fontSize: '0.75rem', color: '#CBD5E1', fontStyle: 'italic', fontFamily: 'Caveat, cursive', marginTop: '1px' }}>Revs Your Heart</div>
             </div>
           </div>
 
@@ -200,7 +156,7 @@ export const LandingPage: React.FC = () => {
               <div style={{ fontSize: '0.62rem', color: 'white', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase' }}>
                 YAMAHA DAY 2026
               </div>
-              <div style={{ fontSize: '1.6rem', fontWeight: 900, color: 'white', letterSpacing: '1.2px', lineHeight: 1 }}>
+              <div style={{ fontSize: '1.5rem', fontWeight: 900, color: 'white', letterSpacing: '1.2px', lineHeight: 1 }}>
                 KANDO
               </div>
               <div style={{
@@ -212,7 +168,7 @@ export const LandingPage: React.FC = () => {
               </div>
             </div>
             <div style={{ paddingTop: '2px' }}>
-              <svg width="32" height="36" viewBox="0 0 32 36" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="30" height="34" viewBox="0 0 32 36" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="2,14 16,2 30,14" />
                 <rect x="5" y="14" width="22" height="18" rx="1" />
                 <rect x="12" y="22" width="8" height="10" rx="1" />
@@ -223,42 +179,20 @@ export const LandingPage: React.FC = () => {
         </header>
 
         {/* MAIN BODY AREA — FULL LEFT HALF (52% WIDTH, MAX 720PX) */}
-        <main style={{
-          flex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'flex-start',
-          width: '100%',
-          margin: '6px 0'
-        }}>
+        <main className="landing-main">
           
-          <div style={{
-            width: '52%',
-            maxWidth: '720px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            textAlign: 'center',
-            gap: '16px'
-          }}>
+          <div className="landing-content-col">
             
             {/* HEADLINE */}
             <div style={{ width: '100%', textAlign: 'center' }}>
-              <h1 style={{
-                fontSize: '2.8rem', fontWeight: 800, fontFamily: 'Outfit, sans-serif',
-                color: 'white', lineHeight: 1.05, margin: 0
-              }}>
+              <h1 className="landing-title-main">
                 Create Your
               </h1>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginTop: '0px' }}>
-                <span style={{
-                  fontFamily: 'Caveat, cursive', fontSize: '5.2rem', color: '#FFFFFF',
-                  fontWeight: 700, lineHeight: 0.95,
-                  textShadow: '0 0 32px rgba(0,200,255,0.85), 0 0 10px rgba(255,255,255,0.9)'
-                }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginTop: '0px' }}>
+                <span className="landing-title-script">
                   Kando Moment
                 </span>
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#FFD700" strokeWidth="2.2"
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#FFD700" strokeWidth="2.2"
                   strokeLinecap="round" strokeLinejoin="round"
                   style={{ transform: 'rotate(10deg)', marginTop: '4px', flexShrink: 0 }}>
                   <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
@@ -266,7 +200,7 @@ export const LandingPage: React.FC = () => {
               </div>
               <div style={{ display: 'flex', justifyContent: 'center', marginTop: '4px' }}>
                 <div style={{
-                  width: '260px', height: '3px',
+                  width: '220px', height: '3px',
                   background: 'linear-gradient(90deg, rgba(255,215,0,0.1) 0%, #FFD700 40%, rgba(255,215,0,0.1) 100%)',
                   borderRadius: '2px'
                 }} />
@@ -275,7 +209,7 @@ export const LandingPage: React.FC = () => {
 
             {/* SUBTITLE DESCRIPTION */}
             <div>
-              <p style={{ fontSize: '1.05rem', color: '#E2E8F0', lineHeight: 1.5, fontWeight: 400, margin: 0 }}>
+              <p className="landing-subtitle">
                 A feeling of joy, pride and togetherness.<br />
                 This Yamaha Day, create a special moment with your family<br />
                 and share it with Yamaha.
@@ -297,8 +231,8 @@ export const LandingPage: React.FC = () => {
                 <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.25)' }} />
               </div>
 
-              {/* 3 LANGUAGE CARDS — WIDE & PROMINENT */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px' }}>
+              {/* 3 LANGUAGE CARDS */}
+              <div className="landing-lang-grid">
                 {[
                   {
                     lang: 'en' as Language,
@@ -328,7 +262,7 @@ export const LandingPage: React.FC = () => {
                   <div
                     key={card.lang}
                     onClick={() => handleSelectLanguage(card.lang)}
-                    className="glow-card"
+                    className="glow-card landing-lang-card"
                     style={{
                       background: card.bg,
                       border: `1.5px solid ${card.border}`,
@@ -339,14 +273,13 @@ export const LandingPage: React.FC = () => {
                       alignItems: 'center',
                       textAlign: 'center',
                       justifyContent: 'space-between',
-                      height: '175px',
                       boxSizing: 'border-box',
                       cursor: 'pointer',
                       boxShadow: `0 8px 24px ${card.shadow}`
                     }}
                   >
                     {/* VECTOR ICON */}
-                    <div style={{ height: '54px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <div style={{ height: '52px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                       {card.iconComponent}
                     </div>
 
@@ -381,7 +314,7 @@ export const LandingPage: React.FC = () => {
             {/* CURSIVE SLOGAN BELOW CARDS */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', marginTop: '4px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <svg width="26" height="20" viewBox="0 0 32 24" fill="none" stroke="#FFD700" strokeWidth="2">
+                <svg width="24" height="18" viewBox="0 0 32 24" fill="none" stroke="#FFD700" strokeWidth="2">
                   <circle cx="16" cy="6" r="4" /><path d="M10 20c0-3.3 2.7-6 6-6s6 2.7 6 6" />
                   <circle cx="7" cy="8" r="3" /><path d="M2 20c0-2.8 2.2-5 5-5" />
                   <circle cx="25" cy="8" r="3" /><path d="M25 15c2.8 0 5 2.2 5 5" />
@@ -390,7 +323,7 @@ export const LandingPage: React.FC = () => {
                   <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
                 </svg>
               </div>
-              <p style={{ fontFamily: 'Caveat, cursive', fontSize: '1.55rem', color: '#FFD700', fontWeight: 600, letterSpacing: '0.5px', margin: 0, textAlign: 'center', lineHeight: 1.2 }}>
+              <p className="landing-slogan">
                 Behind every Yamaha action<br />is a family that inspires it.
               </p>
             </div>
