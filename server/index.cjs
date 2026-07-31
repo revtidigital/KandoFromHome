@@ -112,6 +112,7 @@ const Form1Schema = new mongoose.Schema({
   empId: { type: String, required: true },
   photo1Url: { type: String, required: true },
   photo2Url: { type: String },
+  videoUrl: { type: String },
   ceoReflection: { type: String },
   language: { type: String, default: 'en' },
   submittedAt: { type: Date, default: Date.now },
@@ -121,7 +122,8 @@ const Form1Schema = new mongoose.Schema({
 const Form2Schema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   empId: { type: String, required: true },
-  videoUrl: { type: String, required: true },
+  videoUrl: { type: String, default: '' },
+  ceoReflection: { type: String },
   language: { type: String, default: 'en' },
   submittedAt: { type: Date, default: Date.now },
   ip: { type: String }
@@ -209,7 +211,8 @@ app.get('/api/check-submission', async (req, res) => {
 // Form 1 Submission
 app.post('/api/submissions/form1', upload.fields([
   { name: 'photo1', maxCount: 1 },
-  { name: 'photo2', maxCount: 1 }
+  { name: 'photo2', maxCount: 1 },
+  { name: 'video', maxCount: 1 }
 ]), async (req, res) => {
   try {
     const { empId, empName, email, phone, city, familyMembers, ceoReflection, language } = req.body || {};
@@ -227,6 +230,9 @@ app.post('/api/submissions/form1', upload.fields([
     }
     if (req.files['photo2'] && req.files['photo2'][0].size > 10 * 1024 * 1024) {
       return res.status(400).json({ error: 'Photo 2 exceeds 10MB limit.' });
+    }
+    if (req.files['video'] && req.files['video'][0].size > 40 * 1024 * 1024) {
+      return res.status(400).json({ error: 'Video exceeds maximum size limit of 40MB.' });
     }
 
     const cleanEmpId = empId.toString().trim();
@@ -253,6 +259,13 @@ app.post('/api/submissions/form1', upload.fields([
 
     let photo1Url = `/uploads/${req.files['photo1'][0].filename}`;
     let photo2Url = req.files['photo2'] ? `/uploads/${req.files['photo2'][0].filename}` : '';
+    let videoUrl = '';
+
+    if (req.files['video']) {
+      videoUrl = `/uploads/${req.files['video'][0].filename}`;
+      const r2Vid = await uploadFileToR2(req.files['video'][0].path, req.files['video'][0].filename, req.files['video'][0].mimetype);
+      if (r2Vid) videoUrl = r2Vid;
+    }
 
     // Stream uploads to Cloudflare R2 Bucket if credentials configured
     const r2P1 = await uploadFileToR2(req.files['photo1'][0].path, req.files['photo1'][0].filename, req.files['photo1'][0].mimetype);
@@ -270,6 +283,7 @@ app.post('/api/submissions/form1', upload.fields([
       empId,
       photo1Url,
       photo2Url,
+      videoUrl,
       ceoReflection: ceoReflection || '',
       language: language || 'en',
       ip
@@ -287,18 +301,20 @@ app.post('/api/submissions/form1', upload.fields([
 // Form 2 Submission
 app.post('/api/submissions/form2', upload.single('video'), async (req, res) => {
   try {
-    const { empId, empName, email, phone, city, familyMembers, language } = req.body || {};
+    const { empId, empName, email, phone, city, familyMembers, ceoReflection, language } = req.body || {};
 
     if (!empId || !empName || !email) {
       return res.status(400).json({ error: 'Missing required user details.' });
     }
 
-    if (!req.file) {
-      return res.status(400).json({ error: 'Video file is required.' });
-    }
-
-    if (req.file.size > 40 * 1024 * 1024) {
-      return res.status(400).json({ error: 'Video exceeds maximum size limit of 40MB.' });
+    let videoUrl = '';
+    if (req.file) {
+      if (req.file.size > 40 * 1024 * 1024) {
+        return res.status(400).json({ error: 'Video exceeds maximum size limit of 40MB.' });
+      }
+      videoUrl = `/uploads/${req.file.filename}`;
+      const r2Vid = await uploadFileToR2(req.file.path, req.file.filename, req.file.mimetype);
+      if (r2Vid) videoUrl = r2Vid;
     }
 
     const cleanEmpId = empId.toString().trim();
@@ -323,15 +339,13 @@ app.post('/api/submissions/form2', upload.single('video'), async (req, res) => {
       return res.status(400).json({ error: 'Form 2 has already been submitted by this user.' });
     }
 
-    let videoUrl = `/uploads/${req.file.filename}`;
-    const r2Vid = await uploadFileToR2(req.file.path, req.file.filename, req.file.mimetype);
-    if (r2Vid) videoUrl = r2Vid;
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
 
     const submission = await Form2.create({
       userId: user._id,
       empId,
       videoUrl,
+      ceoReflection: ceoReflection || '',
       language: language || 'en',
       ip
     });

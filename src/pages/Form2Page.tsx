@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { FileVideo, AlertTriangle, X, CheckCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle } from 'lucide-react';
 
 export const Form2Page: React.FC = () => {
   const { t, formData, setFormData, navigateTo, language, apiBaseUrl } = useApp();
@@ -9,33 +9,9 @@ export const Form2Page: React.FC = () => {
   const [duplicateError, setDuplicateError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [videoPreview, setVideoPreview] = useState<string | null>(null);
   const [dataConsent, setDataConsent] = useState(true);
 
   const [rawPhone, setRawPhone] = useState(formData.phone ? formData.phone.replace(/^\+\d+\s*/, '') : '');
-
-  // Video File Change Handler with Max 40MB Limit (Req 4 & 17)
-  const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Validate size limit: Max 40MB for video
-    const MAX_VIDEO_SIZE = 40 * 1024 * 1024; // 40MB
-    if (file.size > MAX_VIDEO_SIZE) {
-      setErrors(prev => ({ ...prev, video: 'Video size exceeds maximum allowed limit of 40MB.' }));
-      return;
-    }
-
-    setErrors(prev => ({ ...prev, video: '' }));
-    const objectUrl = URL.createObjectURL(file);
-    setFormData(prev => ({ ...prev, video: file }));
-    setVideoPreview(objectUrl);
-  };
-
-  const handleRemoveVideo = () => {
-    setFormData(prev => ({ ...prev, video: null }));
-    setVideoPreview(null);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -297,40 +273,26 @@ export const Form2Page: React.FC = () => {
           </div>
         </div>
 
-        {/* VIDEO UPLOAD SECTION (Max 1 video, Max 40MB limit) */}
+        {/* CEO QUESTION & REFLECTION SECTION */}
         <div style={{ marginBottom: '32px' }}>
-          <h2 style={{ fontSize: '1.25rem', color: '#00E5FF', marginBottom: '8px', fontWeight: 700 }}>
-            {t.sec2UploadVideoTitle}
+          <h2 style={{ fontSize: '1.15rem', color: '#00E5FF', marginBottom: '8px', fontWeight: 700 }}>
+            2. {t.ceoQuestionTitle}
           </h2>
-          <p style={{ color: '#94A3B8', fontSize: '0.85rem', marginBottom: '20px' }}>
-            {t.sec2UploadVideoDesc}
+          <p style={{ color: '#E2E8F0', fontStyle: 'italic', fontSize: '0.9rem', marginBottom: '14px', lineHeight: 1.5 }}>
+            {t.ceoQuestionText}
           </p>
 
-          {videoPreview ? (
-            <div style={{ position: 'relative', borderRadius: '16px', overflow: 'hidden', border: '1.5px solid #00E5FF', background: 'black' }}>
-              <video src={videoPreview} controls style={{ width: '100%', maxHeight: '360px', display: 'block' }} />
-              <button
-                type="button"
-                onClick={handleRemoveVideo}
-                style={{ position: 'absolute', top: '12px', right: '12px', background: 'rgba(0,0,0,0.8)', border: 'none', borderRadius: '50%', padding: '8px', color: 'white', cursor: 'pointer' }}
-              >
-                <X size={18} />
-              </button>
-            </div>
-          ) : (
-            <label style={{
-              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-              height: '220px', borderRadius: '16px', border: '2px dashed rgba(0, 229, 255, 0.4)',
-              background: 'rgba(0, 229, 255, 0.04)', cursor: 'pointer', textAlign: 'center', padding: '24px'
-            }}>
-              <FileVideo size={40} color="#00E5FF" />
-              <span style={{ fontSize: '1rem', color: 'white', marginTop: '12px', fontWeight: 700 }}>Click to select Kando Video</span>
-              <span style={{ fontSize: '0.8rem', color: '#94A3B8', marginTop: '4px' }}>All video formats supported (Strict Max Limit: 40MB)</span>
-              <input type="file" accept="video/*" onChange={handleVideoChange} style={{ display: 'none' }} />
-            </label>
-          )}
-
-          {errors.video && <p style={{ color: '#EF4444', fontSize: '0.8rem', marginTop: '6px' }}>{errors.video}</p>}
+          <textarea
+            rows={5}
+            value={formData.ceoReflection}
+            onChange={e => setFormData(prev => ({ ...prev, ceoReflection: e.target.value }))}
+            placeholder={t.reflectionPlaceholder}
+            style={{
+              width: '100%', padding: '14px', borderRadius: '12px', boxSizing: 'border-box',
+              background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.2)',
+              color: 'white', outline: 'none', resize: 'vertical', fontSize: '0.95rem'
+            }}
+          />
         </div>
 
         {/* CONSENTS & SUBMIT */}
@@ -353,7 +315,7 @@ export const Form2Page: React.FC = () => {
             alignItems: 'center', justifyContent: 'center', gap: '8px'
           }}
         >
-          {isSubmitting ? 'Uploading Video...' : 'SUBMIT FORM 2'}
+          {isSubmitting ? 'Submitting...' : 'SUBMIT FORM 2'}
           <CheckCircle size={18} />
         </button>
 

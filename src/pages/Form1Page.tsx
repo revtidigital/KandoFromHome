@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { Upload, Image as ImageIcon, AlertTriangle, X, CheckCircle } from 'lucide-react';
+import { Upload, Image as ImageIcon, FileVideo, AlertTriangle, X, CheckCircle } from 'lucide-react';
 
 export const Form1Page: React.FC = () => {
   const { t, formData, setFormData, navigateTo, language, apiBaseUrl } = useApp();
@@ -11,11 +11,30 @@ export const Form1Page: React.FC = () => {
 
   const [photo1Preview, setPhoto1Preview] = useState<string | null>(null);
   const [photo2Preview, setPhoto2Preview] = useState<string | null>(null);
+  const [videoPreview, setVideoPreview] = useState<string | null>(null);
+  const [video, setVideo] = useState<File | null>(null);
 
   const [dataConsent, setDataConsent] = useState(true);
   const [mediaConsent, setMediaConsent] = useState(true);
 
   const [rawPhone, setRawPhone] = useState(formData.phone ? formData.phone.replace(/^\+\d+\s*/, '') : '');
+
+  const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 40 * 1024 * 1024) {
+      setErrors(prev => ({ ...prev, video: 'Video size exceeds 40MB limit.' }));
+      return;
+    }
+    setErrors(prev => ({ ...prev, video: '' }));
+    setVideo(file);
+    setVideoPreview(URL.createObjectURL(file));
+  };
+
+  const handleRemoveVideo = () => {
+    setVideo(null);
+    setVideoPreview(null);
+  };
 
   // File Upload Handler with Max 10MB per Image Limit (Req 4)
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>, field: 'photo1' | 'photo2') => {
@@ -142,6 +161,7 @@ export const Form1Page: React.FC = () => {
 
       if (formData.photo1) body.append('photo1', formData.photo1);
       if (formData.photo2) body.append('photo2', formData.photo2);
+      if (video) body.append('video', video);
 
       const submitRes = await fetch(`${apiBaseUrl}/api/submissions/form1`, {
         method: 'POST',
@@ -382,6 +402,37 @@ export const Form1Page: React.FC = () => {
               {errors.photo2 && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.photo2}</p>}
             </div>
 
+          </div>
+
+          {/* OPTIONAL VIDEO UPLOAD IN FORM 1 */}
+          <div style={{ marginTop: '20px' }}>
+            <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>
+              {t.sec2UploadVideoTitle}
+            </label>
+            {videoPreview ? (
+              <div style={{ position: 'relative', borderRadius: '14px', overflow: 'hidden', border: '1.5px solid #00E5FF', background: 'black' }}>
+                <video src={videoPreview} controls style={{ width: '100%', maxHeight: '260px', display: 'block' }} />
+                <button
+                  type="button"
+                  onClick={handleRemoveVideo}
+                  style={{ position: 'absolute', top: '8px', right: '8px', background: 'rgba(0,0,0,0.8)', border: 'none', borderRadius: '50%', padding: '6px', color: 'white', cursor: 'pointer' }}
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            ) : (
+              <label style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                height: '140px', borderRadius: '12px', border: '2px dashed rgba(0, 229, 255, 0.4)',
+                background: 'rgba(0, 229, 255, 0.04)', cursor: 'pointer', textAlign: 'center', padding: '16px'
+              }}>
+                <FileVideo size={32} color="#00E5FF" />
+                <span style={{ fontSize: '0.85rem', color: '#CBD5E1', marginTop: '8px', fontWeight: 600 }}>Click to select Kando Video (Max 40MB)</span>
+                <span style={{ fontSize: '0.75rem', color: '#64748B' }}>Accepted formats: MP4, WEBM, MOV</span>
+                <input type="file" accept="video/*" onChange={handleVideoChange} style={{ display: 'none' }} />
+              </label>
+            )}
+            {errors.video && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.video}</p>}
           </div>
         </div>
 
