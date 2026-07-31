@@ -157,12 +157,12 @@ export const Form2Page: React.FC = () => {
   };
 
   return (
-    <div className="container" style={{ padding: '40px 20px', maxWidth: '850px' }}>
-      <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-        <h1 className="heading-font" style={{ fontSize: '2.2rem', color: 'white', marginBottom: '8px' }}>
+    <div className="container" style={{ padding: '24px 12px', maxWidth: '850px', width: '100%', boxSizing: 'border-box' }}>
+      <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+        <h1 className="heading-font" style={{ fontSize: 'clamp(1.6rem, 4vw, 2.2rem)', color: 'white', marginBottom: '8px' }}>
           {t.form2Title}
         </h1>
-        <p style={{ color: '#A0B2D6', fontSize: '1rem' }}>
+        <p style={{ color: '#A0B2D6', fontSize: '0.95rem' }}>
           {t.form2Subtitle}
         </p>
       </div>
@@ -172,28 +172,28 @@ export const Form2Page: React.FC = () => {
           background: 'rgba(239, 68, 68, 0.15)',
           border: '1.5px solid #EF4444',
           borderRadius: '12px',
-          padding: '16px',
-          marginBottom: '24px',
+          padding: '14px',
+          marginBottom: '20px',
           display: 'flex',
           alignItems: 'center',
           gap: '12px',
           color: '#FCA5A5'
         }}>
-          <AlertTriangle color="#EF4444" size={24} />
-          <span style={{ fontSize: '0.95rem', fontWeight: 600 }}>{duplicateError}</span>
+          <AlertTriangle color="#EF4444" size={24} style={{ flexShrink: 0 }} />
+          <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>{duplicateError}</span>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="glass-card form-card-panel" style={{ borderRadius: '20px' }}>
+      <form onSubmit={handleSubmit} className="glass-card form-card-panel" style={{ borderRadius: '20px', width: '100%', boxSizing: 'border-box' }}>
         
         {/* PERSONAL DETAILS SECTION */}
-        <div style={{ marginBottom: '32px' }}>
-          <h2 style={{ fontSize: '1.25rem', color: '#00E5FF', marginBottom: '20px', fontWeight: 700 }}>
+        <div style={{ marginBottom: '28px' }}>
+          <h2 style={{ fontSize: '1.15rem', color: '#00E5FF', marginBottom: '16px', fontWeight: 700 }}>
             1. Employee & Family Details
           </h2>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '20px' }}>
-            <div>
+          <div className="form-fields-grid">
+            <div style={{ minWidth: 0 }}>
               <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>{t.fullName} *</label>
               <input
                 type="text"
@@ -201,7 +201,7 @@ export const Form2Page: React.FC = () => {
                 onChange={e => setFormData(prev => ({ ...prev, empName: e.target.value }))}
                 placeholder="e.g. Priya Sundaram"
                 style={{
-                  width: '100%', padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
+                  width: '100%', minWidth: 0, padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
                   background: 'rgba(255,255,255,0.06)', border: errors.empName ? '1px solid #EF4444' : '1px solid rgba(255,255,255,0.2)',
                   color: 'white', outline: 'none'
                 }}
@@ -209,7 +209,7 @@ export const Form2Page: React.FC = () => {
               {errors.empName && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.empName}</p>}
             </div>
 
-            <div>
+            <div style={{ minWidth: 0 }}>
               <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>{t.empId} *</label>
               <input
                 type="text"
@@ -217,7 +217,7 @@ export const Form2Page: React.FC = () => {
                 onChange={e => setFormData(prev => ({ ...prev, empId: e.target.value }))}
                 placeholder="e.g. YMI-2281"
                 style={{
-                  width: '100%', padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
+                  width: '100%', minWidth: 0, padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
                   background: 'rgba(255,255,255,0.06)', border: errors.empId ? '1px solid #EF4444' : '1px solid rgba(255,255,255,0.2)',
                   color: 'white', outline: 'none'
                 }}
@@ -225,7 +225,7 @@ export const Form2Page: React.FC = () => {
               {errors.empId && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.empId}</p>}
             </div>
 
-            <div>
+            <div style={{ minWidth: 0 }}>
               <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>{t.officialEmail} *</label>
               <input
                 type="email"
@@ -233,7 +233,7 @@ export const Form2Page: React.FC = () => {
                 onChange={e => setFormData(prev => ({ ...prev, email: e.target.value }))}
                 placeholder="name@yamaha-motor.co.in"
                 style={{
-                  width: '100%', padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
+                  width: '100%', minWidth: 0, padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
                   background: 'rgba(255,255,255,0.06)', border: errors.email ? '1px solid #EF4444' : '1px solid rgba(255,255,255,0.2)',
                   color: 'white', outline: 'none'
                 }}
@@ -241,16 +241,17 @@ export const Form2Page: React.FC = () => {
               {errors.email && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.email}</p>}
             </div>
 
-            <div>
+            <div style={{ minWidth: 0 }}>
               <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>{t.phoneNumber} * (10 Digits)</label>
-              <div style={{ display: 'flex', gap: '8px' }}>
+              <div style={{ display: 'flex', gap: '6px', minWidth: 0, width: '100%' }}>
                 <select
                   value={countryCode}
                   onChange={e => setCountryCode(e.target.value)}
                   style={{
-                    padding: '12px 10px', borderRadius: '10px',
+                    padding: '12px 6px', borderRadius: '10px',
                     background: '#040F2B', border: '1px solid rgba(255,255,255,0.2)',
-                    color: '#00E5FF', fontWeight: 700, outline: 'none', cursor: 'pointer', fontSize: '0.9rem'
+                    color: '#00E5FF', fontWeight: 700, outline: 'none', cursor: 'pointer', fontSize: '0.85rem',
+                    flexShrink: 0, width: '85px'
                   }}
                 >
                   {COUNTRY_CODES.map(c => (
@@ -266,16 +267,16 @@ export const Form2Page: React.FC = () => {
                   onChange={e => setRawPhone(e.target.value.replace(/\D/g, ''))}
                   placeholder="9444123456"
                   style={{
-                    flex: 1, padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
+                    flex: 1, minWidth: 0, width: '100%', padding: '12px 12px', borderRadius: '10px', boxSizing: 'border-box',
                     background: 'rgba(255,255,255,0.06)', border: errors.phone ? '1px solid #EF4444' : '1px solid rgba(255,255,255,0.2)',
-                    color: 'white', outline: 'none', fontSize: '0.95rem'
+                    color: 'white', outline: 'none', fontSize: '0.9rem'
                   }}
                 />
               </div>
               {errors.phone && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.phone}</p>}
             </div>
 
-            <div>
+            <div style={{ minWidth: 0 }}>
               <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>{t.cityLocation} *</label>
               <input
                 type="text"
@@ -283,7 +284,7 @@ export const Form2Page: React.FC = () => {
                 onChange={e => setFormData(prev => ({ ...prev, city: e.target.value }))}
                 placeholder="e.g. Chennai Plant"
                 style={{
-                  width: '100%', padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
+                  width: '100%', minWidth: 0, padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
                   background: 'rgba(255,255,255,0.06)', border: errors.city ? '1px solid #EF4444' : '1px solid rgba(255,255,255,0.2)',
                   color: 'white', outline: 'none'
                 }}
@@ -291,7 +292,7 @@ export const Form2Page: React.FC = () => {
               {errors.city && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.city}</p>}
             </div>
 
-            <div>
+            <div style={{ minWidth: 0 }}>
               <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>{t.familyMembersCount}</label>
               <input
                 type="number"
@@ -299,9 +300,8 @@ export const Form2Page: React.FC = () => {
                 max="20"
                 value={formData.familyMembers}
                 onChange={e => setFormData(prev => ({ ...prev, familyMembers: e.target.value }))}
-                placeholder="e.g. 3"
                 style={{
-                  width: '100%', padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
+                  width: '100%', minWidth: 0, padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
                   background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.2)',
                   color: 'white', outline: 'none'
                 }}
