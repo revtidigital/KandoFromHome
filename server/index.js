@@ -257,12 +257,12 @@ app.post('/api/submissions/form1', upload.fields([
       return res.status(400).json({ error: 'Form 1 has already been submitted by this user.' });
     }
 
-    let photo1Url = `/uploads/${req.files['photo1'][0].filename}`;
-    let photo2Url = req.files['photo2'] ? `/uploads/${req.files['photo2'][0].filename}` : '';
+    let photo1Url = `${R2_PUBLIC_URL}/uploads/${req.files['photo1'][0].filename}`;
+    let photo2Url = req.files['photo2'] ? `${R2_PUBLIC_URL}/uploads/${req.files['photo2'][0].filename}` : '';
     let videoUrl = '';
 
     if (req.files['video']) {
-      videoUrl = `/uploads/${req.files['video'][0].filename}`;
+      videoUrl = `${R2_PUBLIC_URL}/uploads/${req.files['video'][0].filename}`;
       const r2Vid = await uploadFileToR2(req.files['video'][0].path, req.files['video'][0].filename, req.files['video'][0].mimetype);
       if (r2Vid) videoUrl = r2Vid;
     }
@@ -312,7 +312,7 @@ app.post('/api/submissions/form2', upload.single('video'), async (req, res) => {
       if (req.file.size > 40 * 1024 * 1024) {
         return res.status(400).json({ error: 'Video exceeds maximum size limit of 40MB.' });
       }
-      videoUrl = `/uploads/${req.file.filename}`;
+      videoUrl = `${R2_PUBLIC_URL}/uploads/${req.file.filename}`;
       const r2Vid = await uploadFileToR2(req.file.path, req.file.filename, req.file.mimetype);
       if (r2Vid) videoUrl = r2Vid;
     }
