@@ -212,7 +212,7 @@ app.post('/api/submissions/form1', upload.fields([
   { name: 'photo2', maxCount: 1 }
 ]), async (req, res) => {
   try {
-    const { empId, empName, email, phone, city, familyMembers, ceoReflection, language } = req.body;
+    const { empId, empName, email, phone, city, familyMembers, ceoReflection, language } = req.body || {};
     
     if (!empId || !empName || !email) {
       return res.status(400).json({ error: 'Missing required user details.' });
@@ -287,7 +287,7 @@ app.post('/api/submissions/form1', upload.fields([
 // Form 2 Submission
 app.post('/api/submissions/form2', upload.single('video'), async (req, res) => {
   try {
-    const { empId, empName, email, phone, city, familyMembers, language } = req.body;
+    const { empId, empName, email, phone, city, familyMembers, language } = req.body || {};
 
     if (!empId || !empName || !email) {
       return res.status(400).json({ error: 'Missing required user details.' });
