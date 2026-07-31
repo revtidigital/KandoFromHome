@@ -60,7 +60,7 @@ async function uploadFileToR2(filePath, fileName, mimeType, userFolder) {
   if (!r2Client) return null;
   try {
     const fileBuffer = fs.readFileSync(filePath);
-    const folder = userFolder || 'uploads';
+    const folder = userFolder ? `uploads/${userFolder}` : 'uploads';
     const key = `${folder}/${Date.now()}-${fileName}`;
     const command = new PutObjectCommand({
       Bucket: R2_BUCKET,
