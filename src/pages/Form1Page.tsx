@@ -14,16 +14,16 @@ export const Form1Page: React.FC = () => {
   const [videoPreview, setVideoPreview] = useState<string | null>(null);
   const [video, setVideo] = useState<File | null>(null);
 
-  const [dataConsent, setDataConsent] = useState(true);
-  const [mediaConsent, setMediaConsent] = useState(true);
+  const [dataConsent, setDataConsent] = useState(false);
+  const [mediaConsent, setMediaConsent] = useState(false);
 
   const [rawPhone, setRawPhone] = useState(formData.phone ? formData.phone.replace(/^\+\d+\s*/, '') : '');
 
   const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 40 * 1024 * 1024) {
-      setErrors(prev => ({ ...prev, video: 'Video size exceeds 40MB limit.' }));
+    if (file.size > 50 * 1024 * 1024) {
+      setErrors(prev => ({ ...prev, video: 'Video size exceeds 50MB limit.' }));
       return;
     }
     setErrors(prev => ({ ...prev, video: '' }));
@@ -41,10 +41,10 @@ export const Form1Page: React.FC = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate size limit: Max 10MB per image
-    const MAX_PHOTO_SIZE = 10 * 1024 * 1024; // 10MB
+    // Validate size limit: Max 50MB per image
+    const MAX_PHOTO_SIZE = 50 * 1024 * 1024; // 50MB
     if (file.size > MAX_PHOTO_SIZE) {
-      setErrors(prev => ({ ...prev, [field]: 'Photo size exceeds 10MB limit. Please choose a smaller image.' }));
+      setErrors(prev => ({ ...prev, [field]: 'Photo size exceeds 50MB limit. Please choose a smaller image.' }));
       return;
     }
 
@@ -461,15 +461,45 @@ export const Form1Page: React.FC = () => {
         </div>
 
         {/* CONSENTS & SUBMIT */}
-        <div style={{ marginBottom: '28px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', color: '#CBD5E1', fontSize: '0.85rem' }}>
-            <input type="checkbox" checked={dataConsent} onChange={e => setDataConsent(e.target.checked)} style={{ accentColor: '#00E5FF' }} />
-            I agree to the Terms & Conditions and Privacy Policy. *
-          </label>
-          <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', color: '#CBD5E1', fontSize: '0.85rem' }}>
-            <input type="checkbox" checked={mediaConsent} onChange={e => setMediaConsent(e.target.checked)} style={{ accentColor: '#00E5FF' }} />
-            I grant Yamaha permission to feature my submission photos in internal publications.
-          </label>
+        <div style={{ marginBottom: '28px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {/* Terms & Conditions */}
+          <div>
+            <label style={{
+              display: 'flex', alignItems: 'flex-start', gap: '12px', cursor: 'pointer',
+              padding: '12px', borderRadius: '10px',
+              border: errors.dataConsent ? '1px solid #EF4444' : '1px solid rgba(255,255,255,0.1)',
+              background: errors.dataConsent ? 'rgba(239,68,68,0.05)' : 'rgba(255,255,255,0.02)'
+            }}>
+              <input type="checkbox" checked={dataConsent}
+                onChange={e => { setDataConsent(e.target.checked); if (e.target.checked) setErrors(prev => ({ ...prev, dataConsent: '' })); }}
+                style={{ accentColor: '#00E5FF', width: '18px', height: '18px', flexShrink: 0, marginTop: '2px' }} />
+              <span style={{ color: '#CBD5E1', fontSize: '0.87rem', lineHeight: 1.5 }}>
+                I agree to the Terms &amp; Conditions and Privacy Policy. *
+              </span>
+            </label>
+            {errors.dataConsent && (
+              <p style={{ color: '#EF4444', fontSize: '0.78rem', marginTop: '5px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <AlertTriangle size={13} /> {errors.dataConsent}
+              </p>
+            )}
+          </div>
+
+          {/* Media Consent */}
+          <div>
+            <label style={{
+              display: 'flex', alignItems: 'flex-start', gap: '12px', cursor: 'pointer',
+              padding: '12px', borderRadius: '10px',
+              border: errors.mediaConsent ? '1px solid #EF4444' : '1px solid rgba(255,255,255,0.1)',
+              background: errors.mediaConsent ? 'rgba(239,68,68,0.05)' : 'rgba(255,255,255,0.02)'
+            }}>
+              <input type="checkbox" checked={mediaConsent}
+                onChange={e => { setMediaConsent(e.target.checked); if (e.target.checked) setErrors(prev => ({ ...prev, mediaConsent: '' })); }}
+                style={{ accentColor: '#00E5FF', width: '18px', height: '18px', flexShrink: 0, marginTop: '2px' }} />
+              <span style={{ color: '#CBD5E1', fontSize: '0.87rem', lineHeight: 1.5 }}>
+                I grant Yamaha permission to feature my submission photos in internal publications.
+              </span>
+            </label>
+          </div>
         </div>
 
         <button
@@ -481,7 +511,8 @@ export const Form1Page: React.FC = () => {
             border: 'none', color: 'white', fontSize: '1.05rem', fontWeight: 800,
             cursor: isSubmitting ? 'not-allowed' : 'pointer',
             boxShadow: '0 6px 20px rgba(0, 198, 255, 0.4)', display: 'flex',
-            alignItems: 'center', justifyContent: 'center', gap: '8px'
+            alignItems: 'center', justifyContent: 'center', gap: '8px',
+            opacity: isSubmitting ? 0.7 : 1
           }}
         >
           {isSubmitting ? 'Submitting...' : 'SUBMIT FORM 1'}

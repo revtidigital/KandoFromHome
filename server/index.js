@@ -104,7 +104,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  limits: { fileSize: 45 * 1024 * 1024 } // 45MB max buffer
+  limits: { fileSize: 55 * 1024 * 1024 } // 55MB max buffer
 });
 
 // MongoDB Connection
@@ -140,8 +140,11 @@ const Form1Schema = new mongoose.Schema({
 const Form2Schema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   empId: { type: String, required: true },
-  videoUrl: { type: String, default: '' },
-  ceoReflection: { type: String },
+  companyName: { type: String, default: '' },
+  department: { type: String, default: '' },
+  location: { type: String, default: '' },
+  thoughts: { type: String, default: '' },
+  optionalFileUrl: { type: String, default: '' },
   language: { type: String, default: 'en' },
   submittedAt: { type: Date, default: Date.now },
   ip: { type: String }
@@ -249,14 +252,14 @@ app.post('/api/submissions/form1', upload.fields([
       return res.status(400).json({ error: 'Video file is required.' });
     }
 
-    if (req.files['photo1'][0].size > 10 * 1024 * 1024) {
-      return res.status(400).json({ error: 'Photo 1 exceeds 10MB limit.' });
+    if (req.files['photo1'][0].size > 50 * 1024 * 1024) {
+      return res.status(400).json({ error: 'Photo 1 exceeds 50MB limit.' });
     }
-    if (req.files['photo2'][0].size > 10 * 1024 * 1024) {
-      return res.status(400).json({ error: 'Photo 2 exceeds 10MB limit.' });
+    if (req.files['photo2'][0].size > 50 * 1024 * 1024) {
+      return res.status(400).json({ error: 'Photo 2 exceeds 50MB limit.' });
     }
-    if (req.files['video'][0].size > 40 * 1024 * 1024) {
-      return res.status(400).json({ error: 'Video exceeds maximum size limit of 40MB.' });
+    if (req.files['video'][0].size > 50 * 1024 * 1024) {
+      return res.status(400).json({ error: 'Video exceeds maximum size limit of 50MB.' });
     }
 
     const cleanEmpId = empId.toString().trim();
@@ -325,39 +328,42 @@ app.post('/api/submissions/form1', upload.fields([
   }
 });
 
-// Form 2 Submission
-app.post('/api/submissions/form2', upload.single('video'), async (req, res) => {
+// Form 2 Submission — Chairman Invites Your Thoughts
+app.post('/api/submissions/form2', upload.single('optionalFile'), async (req, res) => {
   try {
-    const { empId, empName, email, phone, city, familyMembers, ceoReflection, language } = req.body || {};
+    const { empId, empName, email, phone, companyName, department, location, thoughts, language } = req.body || {};
 
     if (!empId || !empName || !email) {
-      return res.status(400).json({ error: 'Missing required user details.' });
+      return res.status(400).json({ error: 'Missing required user details (empId, empName, email).' });
     }
-
-    const cleanEmpId2 = empId ? empId.toString().trim() : '';
-    const userFolder2 = getUserFolder(cleanEmpId2, empName, phone);
-
-    let videoUrl = '';
-    if (req.file) {
-      if (req.file.size > 40 * 1024 * 1024) {
-        return res.status(400).json({ error: 'Video exceeds maximum size limit of 40MB.' });
-      }
-      videoUrl = `${R2_PUBLIC_URL}/${userFolder2}/${req.file.filename}`;
-      const r2Vid = await uploadFileToR2(req.file.path, req.file.filename, req.file.mimetype, userFolder2);
-      if (r2Vid) videoUrl = r2Vid;
+    if (!thoughts || !thoughts.trim()) {
+      return res.status(400).json({ error: 'Please share your thoughts (required).' });
+    }
+    if (thoughts.trim().length > 2000) {
+      return res.status(400).json({ error: 'Thoughts must be 2000 characters or less.' });
     }
 
     const cleanEmpId = empId.toString().trim();
     const cleanEmail = email.toString().trim().toLowerCase();
+    const userFolder2 = getUserFolder(cleanEmpId, empName, phone);
 
-    // Enforce Employee ID Uniqueness
+    let optionalFileUrl = '';
+    if (req.file) {
+      if (req.file.size > 50 * 1024 * 1024) {
+        return res.status(400).json({ error: 'File exceeds maximum size limit of 50MB.' });
+      }
+      optionalFileUrl = `${R2_PUBLIC_URL}/${userFolder2}/${req.file.filename}`;
+      const r2File = await uploadFileToR2(req.file.path, req.file.filename, req.file.mimetype, userFolder2);
+      if (r2File) optionalFileUrl = r2File;
+    }
+
     let user = await User.findOne({ empId: cleanEmpId });
     if (!user) {
       const emailUser = await User.findOne({ email: cleanEmail });
       if (emailUser && emailUser.empId !== cleanEmpId) {
         return res.status(400).json({ error: `Email address "${email}" is already registered under Employee ID (${emailUser.empId}).` });
       }
-      user = await User.create({ empId: cleanEmpId, empName: empName.trim(), email: cleanEmail, phone, city, familyMembers: Number(familyMembers) || 1 });
+      user = await User.create({ empId: cleanEmpId, empName: empName.trim(), email: cleanEmail, phone: phone || '', city: location || '', familyMembers: 1 });
     } else {
       if (user.email.toLowerCase() !== cleanEmail) {
         return res.status(400).json({ error: `Employee ID "${cleanEmpId}" is already registered to another employee (${user.empName}). Each Employee ID must be unique!` });
@@ -373,9 +379,12 @@ app.post('/api/submissions/form2', upload.single('video'), async (req, res) => {
 
     const submission = await Form2.create({
       userId: user._id,
-      empId,
-      videoUrl,
-      ceoReflection: ceoReflection || '',
+      empId: cleanEmpId,
+      companyName: (companyName || '').trim(),
+      department: (department || '').trim(),
+      location: (location || '').trim(),
+      thoughts: thoughts.trim(),
+      optionalFileUrl,
       language: language || 'en',
       ip
     });
