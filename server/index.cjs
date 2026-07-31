@@ -56,11 +56,12 @@ if (R2_ACCESS_KEY_ID && R2_SECRET_ACCESS_KEY) {
   console.log('Cloudflare R2 Storage initialized for bucket:', R2_BUCKET);
 }
 
-async function uploadFileToR2(filePath, fileName, mimeType) {
+async function uploadFileToR2(filePath, fileName, mimeType, userFolder) {
   if (!r2Client) return null;
   try {
     const fileBuffer = fs.readFileSync(filePath);
-    const key = `uploads/${Date.now()}-${fileName}`;
+    const folder = userFolder || 'uploads';
+    const key = `${folder}/${Date.now()}-${fileName}`;
     const command = new PutObjectCommand({
       Bucket: R2_BUCKET,
       Key: key,
@@ -73,6 +74,23 @@ async function uploadFileToR2(filePath, fileName, mimeType) {
     console.error('Cloudflare R2 Upload Error:', err);
     return null;
   }
+}
+
+// Generate user-specific R2 folder name
+// Format: empId_INITIALS (e.g. YMI-101_RS) or last4phone_INITIALS (e.g. 7896_RS)
+function getUserFolder(empId, empName, phone) {
+  const initials = (empName || 'U')
+    .trim()
+    .split(/\s+/)
+    .filter(function(w) { return w.length > 0; })
+    .map(function(w) { return w[0].toUpperCase(); })
+    .join('');
+  if (empId && empId.trim()) {
+    return empId.trim() + '_' + initials;
+  }
+  const digits = (phone || '').replace(/\D/g, '');
+  const last4 = digits.slice(-4) || '0000';
+  return last4 + '_' + initials;
 }
 
 // Multer Storage Configuration
@@ -263,22 +281,25 @@ app.post('/api/submissions/form1', upload.fields([
       return res.status(400).json({ error: 'Form 1 has already been submitted by this user.' });
     }
 
-    let photo1Url = `${R2_PUBLIC_URL}/uploads/${req.files['photo1'][0].filename}`;
-    let photo2Url = req.files['photo2'] ? `${R2_PUBLIC_URL}/uploads/${req.files['photo2'][0].filename}` : '';
+    // User-specific R2 folder: empId_INITIALS or last4phone_INITIALS
+    const userFolder = getUserFolder(cleanEmpId, empName, phone);
+
+    let photo1Url = `${R2_PUBLIC_URL}/${userFolder}/${req.files['photo1'][0].filename}`;
+    let photo2Url = req.files['photo2'] ? `${R2_PUBLIC_URL}/${userFolder}/${req.files['photo2'][0].filename}` : '';
     let videoUrl = '';
 
     if (req.files['video']) {
-      videoUrl = `${R2_PUBLIC_URL}/uploads/${req.files['video'][0].filename}`;
-      const r2Vid = await uploadFileToR2(req.files['video'][0].path, req.files['video'][0].filename, req.files['video'][0].mimetype);
+      videoUrl = `${R2_PUBLIC_URL}/${userFolder}/${req.files['video'][0].filename}`;
+      const r2Vid = await uploadFileToR2(req.files['video'][0].path, req.files['video'][0].filename, req.files['video'][0].mimetype, userFolder);
       if (r2Vid) videoUrl = r2Vid;
     }
 
     // Stream uploads to Cloudflare R2 Bucket if credentials configured
-    const r2P1 = await uploadFileToR2(req.files['photo1'][0].path, req.files['photo1'][0].filename, req.files['photo1'][0].mimetype);
+    const r2P1 = await uploadFileToR2(req.files['photo1'][0].path, req.files['photo1'][0].filename, req.files['photo1'][0].mimetype, userFolder);
     if (r2P1) photo1Url = r2P1;
 
     if (req.files['photo2']) {
-      const r2P2 = await uploadFileToR2(req.files['photo2'][0].path, req.files['photo2'][0].filename, req.files['photo2'][0].mimetype);
+      const r2P2 = await uploadFileToR2(req.files['photo2'][0].path, req.files['photo2'][0].filename, req.files['photo2'][0].mimetype, userFolder);
       if (r2P2) photo2Url = r2P2;
     }
 
@@ -313,13 +334,16 @@ app.post('/api/submissions/form2', upload.single('video'), async (req, res) => {
       return res.status(400).json({ error: 'Missing required user details.' });
     }
 
+    const cleanEmpId2 = empId ? empId.toString().trim() : '';
+    const userFolder2 = getUserFolder(cleanEmpId2, empName, phone);
+
     let videoUrl = '';
     if (req.file) {
       if (req.file.size > 40 * 1024 * 1024) {
         return res.status(400).json({ error: 'Video exceeds maximum size limit of 40MB.' });
       }
-      videoUrl = `${R2_PUBLIC_URL}/uploads/${req.file.filename}`;
-      const r2Vid = await uploadFileToR2(req.file.path, req.file.filename, req.file.mimetype);
+      videoUrl = `${R2_PUBLIC_URL}/${userFolder2}/${req.file.filename}`;
+      const r2Vid = await uploadFileToR2(req.file.path, req.file.filename, req.file.mimetype, userFolder2);
       if (r2Vid) videoUrl = r2Vid;
     }
 
