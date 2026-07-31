@@ -361,6 +361,34 @@ body {
   padding: 0 20px;
 }
 
+/* ── HEADER & FORM RESPONSIVE SYSTEM ── */
+.site-header {
+  background: rgba(2, 11, 42, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.site-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 72px;
+  padding: 0 24px;
+}
+
+.form-card-panel {
+  padding: 36px 28px;
+}
+
+.ceo-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 24px;
+}
+
 /* ── TABLET & MOBILE MEDIA QUERIES ── */
 @media (max-width: 992px) {
   .landing-container {
@@ -374,6 +402,33 @@ body {
     width: 100%;
     max-width: 100%;
     margin: 0 auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .site-header-inner {
+    height: auto;
+    min-height: 64px;
+    padding: 10px 16px;
+    gap: 8px;
+  }
+  .header-divider {
+    display: none !important;
+  }
+  .header-subtitle {
+    display: none !important;
+  }
+  .form-card-panel {
+    padding: 24px 16px !important;
+  }
+  .ceo-card {
+    display: flex !important;
+    flex-direction: column !important;
+    text-align: center !important;
+    padding: 24px 16px !important;
+  }
+  .container {
+    padding: 0 12px !important;
   }
 }
 

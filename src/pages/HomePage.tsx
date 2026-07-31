@@ -87,8 +87,8 @@ export const HomePage: React.FC = () => {
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-          gap: '28px'
+          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+          gap: '24px'
         }}>
           
           {/* FORM 1 CARD */}
@@ -207,14 +207,11 @@ export const HomePage: React.FC = () => {
       </div>
 
       {/* CEO MESSAGE SECTION */}
-      <div className="glass-panel" style={{
-        padding: '36px',
+      <div className="glass-panel ceo-card" style={{
+        padding: '32px 24px',
         marginBottom: '40px',
         background: 'linear-gradient(135deg, rgba(8, 22, 60, 0.9) 0%, rgba(3, 13, 40, 0.95) 100%)',
         border: '1px solid rgba(255, 255, 255, 0.15)',
-        display: 'grid',
-        gridTemplateColumns: 'auto 1fr',
-        gap: '24px',
         alignItems: 'center'
       }}>
         <div style={{

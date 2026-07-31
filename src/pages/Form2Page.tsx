@@ -184,7 +184,7 @@ export const Form2Page: React.FC = () => {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="glass-card" style={{ padding: '36px 28px', borderRadius: '20px' }}>
+      <form onSubmit={handleSubmit} className="glass-card form-card-panel" style={{ borderRadius: '20px' }}>
         
         {/* PERSONAL DETAILS SECTION */}
         <div style={{ marginBottom: '32px' }}>
