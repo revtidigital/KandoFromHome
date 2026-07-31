@@ -99,7 +99,18 @@ export const Form2Page: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      // 1. Check if user already submitted Form 2 (1 User 1-Time Submission Validation Req 4)
+      // 1. Check if Employee ID is already registered under a different email (Unique Employee ID Check)
+      const empIdCheck = await fetch(`${apiBaseUrl}/api/check-empid?empId=${encodeURIComponent(formData.empId.trim())}&email=${encodeURIComponent(formData.email.trim())}`);
+      if (empIdCheck.ok) {
+        const empIdData = await empIdCheck.json();
+        if (empIdData.exists && !empIdData.isSameUser) {
+          setDuplicateError(`Employee ID "${formData.empId.trim()}" is already registered to another candidate (${empIdData.registeredName}). Each Employee ID must be unique!`);
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
+      // 2. Check if user already submitted Form 2 (1 User 1-Time Submission Validation Req 4)
       const checkRes = await fetch(`${apiBaseUrl}/api/check-submission?empId=${encodeURIComponent(formData.empId.trim())}&email=${encodeURIComponent(formData.email.trim())}`);
       if (checkRes.ok) {
         const checkData = await checkRes.json();

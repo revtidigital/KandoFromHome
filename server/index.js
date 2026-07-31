@@ -118,6 +118,27 @@ async function recordAuditLog(req, detail, username = 'SuperAdmin') {
 
 // ── API ROUTES ──
 
+// Check if Employee ID already exists (Unique Employee ID API)
+app.get('/api/check-empid', async (req, res) => {
+  try {
+    const { empId, email } = req.query;
+    if (!empId) return res.json({ exists: false });
+
+    const user = await User.findOne({ empId: empId.toString().trim() });
+    if (!user) return res.json({ exists: false });
+
+    const isSameUser = email && user.email.toLowerCase() === email.toString().trim().toLowerCase();
+    res.json({
+      exists: true,
+      isSameUser,
+      registeredName: user.empName,
+      registeredEmail: user.email
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Check if user already submitted
 app.get('/api/check-submission', async (req, res) => {
   try {
@@ -167,9 +188,21 @@ app.post('/api/submissions/form1', upload.fields([
       return res.status(400).json({ error: 'Photo 2 exceeds 10MB limit.' });
     }
 
-    let user = await User.findOne({ empId });
+    const cleanEmpId = empId.toString().trim();
+    const cleanEmail = email.toString().trim().toLowerCase();
+
+    // Enforce Employee ID Uniqueness
+    let user = await User.findOne({ empId: cleanEmpId });
     if (!user) {
-      user = await User.create({ empId, empName, email, phone, city, familyMembers: Number(familyMembers) || 1 });
+      const emailUser = await User.findOne({ email: cleanEmail });
+      if (emailUser && emailUser.empId !== cleanEmpId) {
+        return res.status(400).json({ error: `Email address "${email}" is already registered under Employee ID (${emailUser.empId}).` });
+      }
+      user = await User.create({ empId: cleanEmpId, empName: empName.trim(), email: cleanEmail, phone, city, familyMembers: Number(familyMembers) || 1 });
+    } else {
+      if (user.email.toLowerCase() !== cleanEmail) {
+        return res.status(400).json({ error: `Employee ID "${cleanEmpId}" is already registered to another employee (${user.empName}). Each Employee ID must be unique!` });
+      }
     }
 
     const existingF1 = await Form1.findOne({ userId: user._id });
@@ -218,9 +251,21 @@ app.post('/api/submissions/form2', upload.single('video'), async (req, res) => {
       return res.status(400).json({ error: 'Video exceeds maximum size limit of 40MB.' });
     }
 
-    let user = await User.findOne({ empId });
+    const cleanEmpId = empId.toString().trim();
+    const cleanEmail = email.toString().trim().toLowerCase();
+
+    // Enforce Employee ID Uniqueness
+    let user = await User.findOne({ empId: cleanEmpId });
     if (!user) {
-      user = await User.create({ empId, empName, email, phone, city, familyMembers: Number(familyMembers) || 1 });
+      const emailUser = await User.findOne({ email: cleanEmail });
+      if (emailUser && emailUser.empId !== cleanEmpId) {
+        return res.status(400).json({ error: `Email address "${email}" is already registered under Employee ID (${emailUser.empId}).` });
+      }
+      user = await User.create({ empId: cleanEmpId, empName: empName.trim(), email: cleanEmail, phone, city, familyMembers: Number(familyMembers) || 1 });
+    } else {
+      if (user.email.toLowerCase() !== cleanEmail) {
+        return res.status(400).json({ error: `Employee ID "${cleanEmpId}" is already registered to another employee (${user.empName}). Each Employee ID must be unique!` });
+      }
     }
 
     const existingF2 = await Form2.findOne({ userId: user._id });
