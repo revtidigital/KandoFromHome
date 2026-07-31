@@ -44,39 +44,43 @@ export const Form2Page: React.FC = () => {
 
     // 1. Employee ID Validation
     if (!formData.empId.trim()) {
-      newErrors.empId = 'Employee ID is required.';
+      newErrors.empId = t.errEmpIdRequired;
     }
 
     // 2. Full Name Validation
     if (!formData.empName.trim()) {
-      newErrors.empName = 'Full Employee Name is required.';
+      newErrors.empName = t.errEmpNameRequired;
     }
 
     // 3. Email Format Validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!formData.email.trim() || !emailRegex.test(formData.email.trim())) {
-      newErrors.email = 'Please enter a valid email address (e.g. name@yamaha-motor.co.in).';
+    if (!formData.email.trim()) {
+      newErrors.email = t.errEmailRequired;
+    } else if (!emailRegex.test(formData.email.trim())) {
+      newErrors.email = t.errEmailInvalid;
     }
 
     // 4. Phone 10-Digit Validation (without +91)
     const digitsOnly = rawPhone.replace(/\D/g, '');
-    if (!digitsOnly || digitsOnly.length !== 10) {
-      newErrors.phone = 'Phone number must be exactly 10 digits without country code.';
+    if (!digitsOnly) {
+      newErrors.phone = t.errPhoneRequired;
+    } else if (digitsOnly.length !== 10) {
+      newErrors.phone = t.errPhone10Digits;
     }
 
     // 5. City Validation
     if (!formData.city.trim()) {
-      newErrors.city = 'City / Plant Location is required.';
+      newErrors.city = t.errCityRequired;
     }
 
     // 6. Video File Validation
     if (!formData.video) {
-      newErrors.video = 'Video file is required (Max 40MB).';
+      newErrors.video = t.errVideoRequired;
     }
 
     // 7. Consent Validation
     if (!dataConsent) {
-      newErrors.dataConsent = 'You must accept the data privacy policy.';
+      newErrors.dataConsent = t.errConsentRequired;
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -179,7 +183,7 @@ export const Form2Page: React.FC = () => {
         {/* PERSONAL DETAILS SECTION */}
         <div style={{ marginBottom: '28px' }}>
           <h2 style={{ fontSize: '1.15rem', color: '#00E5FF', marginBottom: '16px', fontWeight: 700 }}>
-            1. Employee & Family Details
+            {t.sec1EmployeeDetailsTitle}
           </h2>
 
           <div className="form-fields-grid">
@@ -296,10 +300,10 @@ export const Form2Page: React.FC = () => {
         {/* VIDEO UPLOAD SECTION (Max 1 video, Max 40MB limit) */}
         <div style={{ marginBottom: '32px' }}>
           <h2 style={{ fontSize: '1.25rem', color: '#00E5FF', marginBottom: '8px', fontWeight: 700 }}>
-            2. Upload Kando Video (Max 1 Video, Max 40MB) *
+            {t.sec2UploadVideoTitle}
           </h2>
           <p style={{ color: '#94A3B8', fontSize: '0.85rem', marginBottom: '20px' }}>
-            Upload 1 video of your family making the DIY Craft Wall (MP4, WEBM, MOV, etc. Max 40MB limit).
+            {t.sec2UploadVideoDesc}
           </p>
 
           {videoPreview ? (

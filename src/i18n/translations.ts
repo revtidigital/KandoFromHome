@@ -138,6 +138,27 @@ export interface Translations {
   termsSec3Body: string;
   termsSec4Title: string;
   termsSec4Body: string;
+
+  // Section Headings & Upload Labels
+  sec1EmployeeDetailsTitle: string;
+  sec2UploadPhotosTitle: string;
+  sec2UploadPhotosDesc: string;
+  photo1Label: string;
+  photo2Label: string;
+  sec2UploadVideoTitle: string;
+  sec2UploadVideoDesc: string;
+
+  // Validation Error Messages
+  errEmpNameRequired: string;
+  errEmpIdRequired: string;
+  errEmailRequired: string;
+  errEmailInvalid: string;
+  errPhoneRequired: string;
+  errPhone10Digits: string;
+  errCityRequired: string;
+  errPhoto1Required: string;
+  errVideoRequired: string;
+  errConsentRequired: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -277,7 +298,28 @@ export const translations: Record<Language, Translations> = {
     termsSec3Title: "3. Originality & Safety",
     termsSec3Body: "All submissions must feature original DIY craft assembly completed by the employee and their family. Uploaded content must adhere to corporate conduct guidelines and contain no inappropriate material.",
     termsSec4Title: "4. Shortlisting & Recognition",
-    termsSec4Body: "Entries will be evaluated by the Yamaha Day 2026 Admin Committee based on creativity, family participation, and reflection alignment with Yamaha's spirit of Kando."
+    termsSec4Body: "Entries will be evaluated by the Yamaha Day 2026 Admin Committee based on creativity, family participation, and reflection alignment with Yamaha's spirit of Kando.",
+
+    // Section Headings & Upload Labels
+    sec1EmployeeDetailsTitle: "1. Employee & Family Details",
+    sec2UploadPhotosTitle: "2. Upload Photos (Max 2 Photos, Max 10MB each)",
+    sec2UploadPhotosDesc: "Upload up to 2 high-resolution photos of your family Kando DIY Wall (All image formats supported).",
+    photo1Label: "Photo 1 (Required, Max 10MB) *",
+    photo2Label: "Photo 2 (Optional, Max 10MB)",
+    sec2UploadVideoTitle: "2. Upload Kando Video (Max 1 Video, Max 40MB) *",
+    sec2UploadVideoDesc: "Upload 1 video of your family making the DIY Craft Wall (MP4, WEBM, MOV, etc. Max 40MB limit).",
+
+    // Validation Error Messages
+    errEmpNameRequired: "Full Employee Name is required.",
+    errEmpIdRequired: "Employee ID is required.",
+    errEmailRequired: "Official Yamaha Email address is required.",
+    errEmailInvalid: "Please enter a valid email address (e.g. name@yamaha-motor.co.in).",
+    errPhoneRequired: "Mobile phone number is required.",
+    errPhone10Digits: "Phone number must be exactly 10 digits without country code.",
+    errCityRequired: "City / Plant Location is required.",
+    errPhoto1Required: "At least 1 Kando DIY Wall Photo is required.",
+    errVideoRequired: "Kando DIY Video submission is required.",
+    errConsentRequired: "You must agree to data processing consent to submit."
   },
 
   hi: {
@@ -416,7 +458,28 @@ export const translations: Record<Language, Translations> = {
     termsSec3Title: "3. मौलिकता और सुरक्षा",
     termsSec3Body: "सभी सबमिशन में कर्मचारी और उनके परिवार द्वारा पूरी की गई मूल DIY क्राफ्ट असेंबली होनी चाहिए।",
     termsSec4Title: "4. शॉर्टलिस्टिंग और मान्यता",
-    termsSec4Body: "प्रविष्टियों का मूल्यांकन यामाहा डे 2026 एडमिन समिति द्वारा रचनात्मकता और पारिवारिक भागीदारी के आधार पर किया जाएगा।"
+    termsSec4Body: "प्रविष्टियों का मूल्यांकन यामाहा डे 2026 एडमिन समिति द्वारा रचनात्मकता और पारिवारिक भागीदारी के आधार पर किया जाएगा।",
+
+    // Section Headings & Upload Labels
+    sec1EmployeeDetailsTitle: "1. कर्मचारी और परिवार विवरण",
+    sec2UploadPhotosTitle: "2. तस्वीरें अपलोड करें (अधिकतम 2 तस्वीरें, 10MB प्रत्येक)",
+    sec2UploadPhotosDesc: "अपने परिवार की कांदो DIY वॉल की 2 उच्च-गुणवत्ता वाली तस्वीरें अपलोड करें (सभी फोटो प्रारूप समर्थित)।",
+    photo1Label: "फोटो 1 (अनिवार्य, अधिकतम 10MB) *",
+    photo2Label: "फोटो 2 (वैकल्पिक, अधिकतम 10MB)",
+    sec2UploadVideoTitle: "2. कांदो वीडियो अपलोड करें (अधिकतम 1 वीडियो, 40MB) *",
+    sec2UploadVideoDesc: "DIY क्राफ्ट वॉल बनाते हुए अपने परिवार का 1 वीडियो अपलोड करें (MP4, WEBM, MOV, अधिकतम 40MB limit)।",
+
+    // Validation Error Messages
+    errEmpNameRequired: "कर्मचारी का पूरा नाम आवश्यक है।",
+    errEmpIdRequired: "कर्मचारी आईडी आवश्यक है।",
+    errEmailRequired: "आधिकारिक यामाहा ईमेल पता आवश्यक है।",
+    errEmailInvalid: "कृपया एक वैध ईमेल पता दर्ज करें (उदा. name@yamaha-motor.co.in)।",
+    errPhoneRequired: "मोबाइल फोन नंबर आवश्यक है।",
+    errPhone10Digits: "फोन नंबर बिना कंट्री कोड के ठीक 10 अंकों का होना चाहिए।",
+    errCityRequired: "शहर / प्लांट स्थान आवश्यक है।",
+    errPhoto1Required: "कम से कम 1 कांदो DIY वॉल फोटो अनिवार्य है।",
+    errVideoRequired: "कांदो DIY वीडियो जमा करना अनिवार्य है।",
+    errConsentRequired: "सबमिट करने के लिए आपको डेटा प्रोसेसिंग सहमति स्वीकार करनी होगी।"
   },
 
   ta: {
@@ -555,6 +618,27 @@ export const translations: Record<Language, Translations> = {
     termsSec3Title: "3. பாதுகாப்பு",
     termsSec3Body: "அனைத்து சமர்ப்பிப்புகளும் அசல் படைப்புகளாக இருக்க வேண்டும்.",
     termsSec4Title: "4. அங்கீகாரம்",
-    termsSec4Body: "சிறந்த படைப்புகளுக்கு யமஹா தினத்தில் அங்கீகாரம் வழங்கப்படும்."
+    termsSec4Body: "சிறந்த படைப்புகளுக்கு யமஹா தினத்தில் அங்கீகாரம் வழங்கப்படும்.",
+
+    // Section Headings & Upload Labels
+    sec1EmployeeDetailsTitle: "1. ஊழியர் மற்றும் குடும்ப விவரங்கள்",
+    sec2UploadPhotosTitle: "2. புகைப்படங்களைப் பதிவேற்றவும் (அதிகபட்சம் 2 புகைப்படங்கள், தலா 10MB)",
+    sec2UploadPhotosDesc: "உங்கள் குடும்ப காண்டோ DIY சுவரின் 2 உயர்தர புகைப்படங்களைப் பதிவேற்றவும்.",
+    photo1Label: "புகைப்படம் 1 (தேவை, அதிகபட்சம் 10MB) *",
+    photo2Label: "புகைப்படம் 2 (விருப்பத்தேர்வு, அதிகபட்சம் 10MB)",
+    sec2UploadVideoTitle: "2. காண்டோ வீடியோவைப் பதிவேற்றவும் (அதிகபட்சம் 1 வீடியோ, 40MB) *",
+    sec2UploadVideoDesc: "DIY கைவினைச் சுவரை உருவாக்கும் உங்கள் குடும்பத்தின் 1 வீடியோவைப் பதிவேற்றவும் (MP4, WEBM, MOV, 40MB).",
+
+    // Validation Error Messages
+    errEmpNameRequired: "ஊழியரின் முழு பெயர் தேவை.",
+    errEmpIdRequired: "ஊழியர் ஐடி தேவை.",
+    errEmailRequired: "அதிகாரப்பூர்வ யமஹா மின்னஞ்சல் முகவரி தேவை.",
+    errEmailInvalid: "செல்லுபடியாகும் மின்னஞ்சல் முகவரியை உள்ளிடவும் (எ.கா. name@yamaha-motor.co.in).",
+    errPhoneRequired: "கைபேசி எண் தேவை.",
+    errPhone10Digits: "தொலைபேசி எண் சரியாக 10 இலக்கங்களாக இருக்க வேண்டும்.",
+    errCityRequired: "நகரம் / ஆலை இருப்பிடம் தேவை.",
+    errPhoto1Required: "குறைந்தது 1 காண்டோ DIY சுவர் புகைப்படம் தேவை.",
+    errVideoRequired: "காண்டோ DIY வீடியோ சமர்ப்பிப்பு தேவை.",
+    errConsentRequired: "சமர்ப்பிக்க தரவு செயலாக்க ஒப்புதலை ஏற்க வேண்டும்."
   }
 };

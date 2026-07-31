@@ -58,39 +58,43 @@ export const Form1Page: React.FC = () => {
 
     // 1. Employee ID Validation
     if (!formData.empId.trim()) {
-      newErrors.empId = 'Employee ID is required.';
+      newErrors.empId = t.errEmpIdRequired;
     }
 
     // 2. Full Name Validation
     if (!formData.empName.trim()) {
-      newErrors.empName = 'Full Employee Name is required.';
+      newErrors.empName = t.errEmpNameRequired;
     }
 
     // 3. Email Format Validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!formData.email.trim() || !emailRegex.test(formData.email.trim())) {
-      newErrors.email = 'Please enter a valid email address (e.g. name@yamaha-motor.co.in).';
+    if (!formData.email.trim()) {
+      newErrors.email = t.errEmailRequired;
+    } else if (!emailRegex.test(formData.email.trim())) {
+      newErrors.email = t.errEmailInvalid;
     }
 
     // 4. Phone 10-Digit Validation (without +91)
     const digitsOnly = rawPhone.replace(/\D/g, '');
-    if (!digitsOnly || digitsOnly.length !== 10) {
-      newErrors.phone = 'Phone number must be exactly 10 digits without country code.';
+    if (!digitsOnly) {
+      newErrors.phone = t.errPhoneRequired;
+    } else if (digitsOnly.length !== 10) {
+      newErrors.phone = t.errPhone10Digits;
     }
 
     // 5. City Validation
     if (!formData.city.trim()) {
-      newErrors.city = 'City / Plant Location is required.';
+      newErrors.city = t.errCityRequired;
     }
 
     // 6. Photo Validation
     if (!formData.photo1) {
-      newErrors.photo1 = 'At least Photo 1 is required.';
+      newErrors.photo1 = t.errPhoto1Required;
     }
 
     // 7. Privacy Policy Consent
     if (!dataConsent) {
-      newErrors.dataConsent = 'You must accept the data privacy policy.';
+      newErrors.dataConsent = t.errConsentRequired;
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -198,7 +202,7 @@ export const Form1Page: React.FC = () => {
         {/* PERSONAL DETAILS SECTION */}
         <div style={{ marginBottom: '28px' }}>
           <h2 style={{ fontSize: '1.15rem', color: '#00E5FF', marginBottom: '16px', fontWeight: 700 }}>
-            1. Employee & Family Details
+            {t.sec1EmployeeDetailsTitle}
           </h2>
 
           <div className="form-fields-grid">
@@ -316,10 +320,10 @@ export const Form1Page: React.FC = () => {
         {/* MEDIA ASSETS UPLOAD SECTION */}
         <div style={{ marginBottom: '28px' }}>
           <h2 style={{ fontSize: '1.15rem', color: '#00E5FF', marginBottom: '8px', fontWeight: 700 }}>
-            2. Upload Photos (Max 2 Photos, Max 10MB each)
+            {t.sec2UploadPhotosTitle}
           </h2>
           <p style={{ color: '#94A3B8', fontSize: '0.85rem', marginBottom: '16px' }}>
-            Upload up to 2 high-resolution photos of your family Kando DIY Wall (All image formats supported).
+            {t.sec2UploadPhotosDesc}
           </p>
 
           <div className="form-photos-grid">
@@ -327,7 +331,7 @@ export const Form1Page: React.FC = () => {
             {/* PHOTO 1 */}
             <div>
               <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>
-                Photo 1 (Required, Max 10MB) *
+                {t.photo1Label}
               </label>
               {photo1Preview ? (
                 <div style={{ position: 'relative', height: '160px', borderRadius: '12px', overflow: 'hidden', border: '1.5px solid #00E5FF' }}>
@@ -354,7 +358,7 @@ export const Form1Page: React.FC = () => {
             {/* PHOTO 2 */}
             <div>
               <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>
-                Photo 2 (Optional, Max 10MB)
+                {t.photo2Label}
               </label>
               {photo2Preview ? (
                 <div style={{ position: 'relative', height: '160px', borderRadius: '12px', overflow: 'hidden', border: '1.5px solid #00E5FF' }}>
