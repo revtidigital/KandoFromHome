@@ -34,6 +34,47 @@ if (!fs.existsSync(uploadsDir)) {
 }
 app.use('/uploads', express.static(uploadsDir));
 
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+
+// Cloudflare R2 Configuration
+const R2_ACCOUNT_ID = process.env.R2_ACCOUNT_ID || 'b272577e002d6d57aafa1d19eac41046';
+const R2_BUCKET = process.env.R2_BUCKET || 'kandosfromhome';
+const R2_ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID || '';
+const R2_SECRET_ACCESS_KEY = process.env.R2_SECRET_ACCESS_KEY || '';
+const R2_PUBLIC_URL = process.env.R2_PUBLIC_URL || `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${R2_BUCKET}`;
+
+let r2Client = null;
+if (R2_ACCESS_KEY_ID && R2_SECRET_ACCESS_KEY) {
+  r2Client = new S3Client({
+    region: 'auto',
+    endpoint: `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+    credentials: {
+      accessKeyId: R2_ACCESS_KEY_ID,
+      secretAccessKey: R2_SECRET_ACCESS_KEY
+    }
+  });
+  console.log('Cloudflare R2 Storage initialized for bucket:', R2_BUCKET);
+}
+
+async function uploadFileToR2(filePath, fileName, mimeType) {
+  if (!r2Client) return null;
+  try {
+    const fileBuffer = fs.readFileSync(filePath);
+    const key = `uploads/${Date.now()}-${fileName}`;
+    const command = new PutObjectCommand({
+      Bucket: R2_BUCKET,
+      Key: key,
+      Body: fileBuffer,
+      ContentType: mimeType
+    });
+    await r2Client.send(command);
+    return `${R2_PUBLIC_URL}/${key}`;
+  } catch (err) {
+    console.error('Cloudflare R2 Upload Error:', err);
+    return null;
+  }
+}
+
 // Multer Storage Configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadsDir),
@@ -210,8 +251,17 @@ app.post('/api/submissions/form1', upload.fields([
       return res.status(400).json({ error: 'Form 1 has already been submitted by this user.' });
     }
 
-    const photo1Url = `/uploads/${req.files['photo1'][0].filename}`;
-    const photo2Url = req.files['photo2'] ? `/uploads/${req.files['photo2'][0].filename}` : '';
+    let photo1Url = `/uploads/${req.files['photo1'][0].filename}`;
+    let photo2Url = req.files['photo2'] ? `/uploads/${req.files['photo2'][0].filename}` : '';
+
+    // Stream uploads to Cloudflare R2 Bucket if credentials configured
+    const r2P1 = await uploadFileToR2(req.files['photo1'][0].path, req.files['photo1'][0].filename, req.files['photo1'][0].mimetype);
+    if (r2P1) photo1Url = r2P1;
+
+    if (req.files['photo2']) {
+      const r2P2 = await uploadFileToR2(req.files['photo2'][0].path, req.files['photo2'][0].filename, req.files['photo2'][0].mimetype);
+      if (r2P2) photo2Url = r2P2;
+    }
 
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
 
@@ -273,7 +323,9 @@ app.post('/api/submissions/form2', upload.single('video'), async (req, res) => {
       return res.status(400).json({ error: 'Form 2 has already been submitted by this user.' });
     }
 
-    const videoUrl = `/uploads/${req.file.filename}`;
+    let videoUrl = `/uploads/${req.file.filename}`;
+    const r2Vid = await uploadFileToR2(req.file.path, req.file.filename, req.file.mimetype);
+    if (r2Vid) videoUrl = r2Vid;
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
 
     const submission = await Form2.create({
