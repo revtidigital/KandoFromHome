@@ -1,0 +1,236 @@
+:root {
+  --yamaha-navy: #020B2A;
+  --yamaha-navy-light: #081745;
+  --yamaha-blue: #0052CC;
+  --yamaha-blue-glow: #00BFFF;
+  --yamaha-red: #E60012;
+  --text-main: #FFFFFF;
+  --text-muted: #A0B2D6;
+  
+  --card-bg: rgba(10, 25, 68, 0.7);
+  --card-border: rgba(255, 255, 255, 0.15);
+  
+  --english-color: #00C6FF;
+  --hindi-color: #00E5FF;
+  --tamil-color: #A855F7;
+  
+  --font-heading: 'Outfit', 'Noto Sans Devanagari', 'Noto Sans Tamil', sans-serif;
+  --font-body: 'Inter', 'Noto Sans Devanagari', 'Noto Sans Tamil', sans-serif;
+  --font-script: 'Caveat', cursive;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--yamaha-navy);
+  color: var(--text-main);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.5;
+  background-image: 
+    radial-gradient(circle at 20% 20%, rgba(0, 85, 255, 0.25) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(138, 43, 226, 0.2) 0%, transparent 50%),
+    linear-gradient(135deg, #01071A 0%, #06133B 50%, #030D2B 100%);
+  background-attachment: fixed;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #020B24;
+}
+::-webkit-scrollbar-thumb {
+  background: #1A346E;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #0052CC;
+}
+
+/* Typography Utilities */
+.script-font {
+  font-family: var(--font-script);
+  line-height: 1;
+}
+
+.heading-font {
+  font-family: var(--font-heading);
+}
+
+/* Glassmorphism Card */
+.glass-panel {
+  background: rgba(8, 22, 60, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+}
+
+/* Glowing Card Border */
+.glow-card {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glow-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 191, 255, 0.3);
+}
+
+/* Base Buttons */
+.btn-primary {
+  background: linear-gradient(90deg, #0052CC 0%, #0088FF 100%);
+  color: white;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 20px rgba(0, 82, 204, 0.4);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(90deg, #0066FF 0%, #00A3FF 100%);
+  box-shadow: 0 6px 25px rgba(0, 136, 255, 0.6);
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 10px 24px;
+  border-radius: 50px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.25s ease;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Language Pill Buttons */
+.lang-pill-btn {
+  width: 100%;
+  padding: 10px 16px;
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Inputs & Form Styling */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.form-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: rgba(4, 14, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: white;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.25s ease;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: #00E5FF;
+  box-shadow: 0 0 15px rgba(0, 229, 255, 0.25);
+  background: rgba(6, 20, 60, 0.9);
+}
+
+.form-input::placeholder, .form-textarea::placeholder {
+  color: rgba(160, 178, 214, 0.5);
+}
+
+/* Checkbox container */
+.checkbox-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.checkbox-container input {
+  display: none;
+}
+
+.custom-checkbox {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+  transition: all 0.2s ease;
+}
+
+.checkbox-container input:checked + .custom-checkbox {
+  background: #0052CC;
+  border-color: #00E5FF;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Responsive grid layouts */
+.container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
