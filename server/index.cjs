@@ -411,13 +411,17 @@ app.get('/api/admin/users', async (req, res) => {
           submittedAt: f1.submittedAt,
           photo1Url: f1.photo1Url,
           photo2Url: f1.photo2Url,
-          ceoReflection: f1.ceoReflection,
-          language: f1.language
+          videoUrl: f1.videoUrl || '',
+          ceoReflection: f1.ceoReflection || '',
+          language: f1.language,
+          ip: f1.ip || ''
         } : null,
         form2: f2 ? {
           submittedAt: f2.submittedAt,
-          videoUrl: f2.videoUrl,
-          language: f2.language
+          videoUrl: f2.videoUrl || '',
+          ceoReflection: f2.ceoReflection || '',
+          language: f2.language,
+          ip: f2.ip || ''
         } : null
       };
     }));

@@ -607,15 +607,16 @@ export const AdminDashboardPage: React.FC = () => {
 
             <div style={{ background: '#040F2B', border: '1.5px solid #00E5FF', borderRadius: '24px', padding: '32px', boxShadow: '0 0 30px rgba(0,229,255,0.15)' }}>
               
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
+              {/* Header */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
                 <div>
                   <h1 style={{ fontSize: '2rem', color: '#00E5FF', fontWeight: 900, margin: 0 }}>
                     {selectedUserForProfile.empName}
                   </h1>
-                  <p style={{ color: '#94A3B8', fontSize: '0.9rem', marginTop: '4px' }}>Employee ID: {selectedUserForProfile.empId}</p>
+                  <p style={{ color: '#94A3B8', fontSize: '0.9rem', marginTop: '4px' }}>Employee ID: <strong style={{ color: 'white' }}>{selectedUserForProfile.empId}</strong></p>
                 </div>
 
-                {/* Tag Selection on Profile Page */}
+                {/* Tag Selection */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <span style={{ fontSize: '0.85rem', color: '#94A3B8', fontWeight: 700 }}>Classification Tag:</span>
                   <select
@@ -634,63 +635,131 @@ export const AdminDashboardPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* BASIC DEMOGRAPHICS */}
-              <div style={{ background: '#091A44', padding: '24px', borderRadius: '16px', marginBottom: '28px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', fontSize: '0.9rem' }}>
-                <div><strong style={{ color: '#00E5FF' }}>Email:</strong> {selectedUserForProfile.email}</div>
-                <div><strong style={{ color: '#00E5FF' }}>Phone:</strong> {selectedUserForProfile.phone || 'N/A'}</div>
-                <div><strong style={{ color: '#00E5FF' }}>City Location:</strong> {selectedUserForProfile.city || 'N/A'}</div>
-                <div><strong style={{ color: '#00E5FF' }}>Family Members:</strong> {selectedUserForProfile.familyMembers || 1}</div>
-                <div><strong style={{ color: '#00E5FF' }}>Registration Timestamp:</strong> {selectedUserForProfile.createdAt ? new Date(selectedUserForProfile.createdAt).toLocaleString() : '2026-07-31'}</div>
+              {/* ── SECTION A: USER PROFILE DETAILS ── */}
+              <div style={{ marginBottom: '28px' }}>
+                <h3 style={{ fontSize: '0.8rem', fontWeight: 800, color: '#64748B', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '12px' }}>
+                  👤 Profile Details
+                </h3>
+                <div style={{ background: '#091A44', padding: '20px', borderRadius: '14px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px', fontSize: '0.9rem' }}>
+                  <div><span style={{ color: '#64748B', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>Email</span><br /><span style={{ color: '#E2E8F0' }}>{selectedUserForProfile.email}</span></div>
+                  <div><span style={{ color: '#64748B', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>Phone</span><br /><span style={{ color: '#E2E8F0' }}>{selectedUserForProfile.phone || 'N/A'}</span></div>
+                  <div><span style={{ color: '#64748B', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>City / Location</span><br /><span style={{ color: '#E2E8F0' }}>{selectedUserForProfile.city || 'N/A'}</span></div>
+                  <div><span style={{ color: '#64748B', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>Family Members</span><br /><span style={{ color: '#E2E8F0' }}>{selectedUserForProfile.familyMembers || 1}</span></div>
+                  <div><span style={{ color: '#64748B', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>Registered At</span><br /><span style={{ color: '#E2E8F0' }}>{selectedUserForProfile.createdAt ? new Date(selectedUserForProfile.createdAt).toLocaleString() : '—'}</span></div>
+                  <div><span style={{ color: '#64748B', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>Tags</span><br /><span style={{ color: '#A855F7', fontWeight: 700 }}>{selectedUserForProfile.tags?.length > 0 ? selectedUserForProfile.tags.join(', ') : 'None'}</span></div>
+                </div>
               </div>
 
-              {/* FORM 1 SUBMISSION BREAKDOWN (Only rendered if Form 1 submitted) */}
-              {selectedUserForProfile.form1 && (
-                <div style={{ marginBottom: '28px', background: '#06133B', padding: '24px', borderRadius: '18px', border: '1px solid rgba(255,255,255,0.1)' }}>
-                  <h3 style={{ fontSize: '1.2rem', color: '#4ADE80', fontWeight: 800, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <ImageIcon size={20} /> Form 1 Submission Details (DIY Photos)
+              {/* ── SECTION B: FORM 1 DETAILS ── */}
+              {selectedUserForProfile.form1 ? (
+                <div style={{ marginBottom: '28px', background: '#06133B', padding: '24px', borderRadius: '18px', border: '1px solid rgba(74, 222, 128, 0.3)' }}>
+                  <h3 style={{ fontSize: '1.1rem', color: '#4ADE80', fontWeight: 800, marginBottom: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <ImageIcon size={20} /> Form 1 — Photos & Video Submission
+                    <span style={{ marginLeft: 'auto', fontSize: '0.75rem', color: '#64748B', fontWeight: 400 }}>
+                      Submitted: {new Date(selectedUserForProfile.form1.submittedAt).toLocaleString()}
+                    </span>
                   </h3>
-                  <div>
-                    <div style={{ fontSize: '0.85rem', color: '#CBD5E1', marginBottom: '14px' }}>
-                      Submitted Timestamp: <strong>{new Date(selectedUserForProfile.form1.submittedAt).toLocaleString()}</strong>
+
+                  {/* Meta info row */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px', marginBottom: '18px', fontSize: '0.85rem' }}>
+                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '10px' }}>
+                      <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Language</div>
+                      <div style={{ color: '#E2E8F0' }}>{selectedUserForProfile.form1.language === 'hi' ? 'Hindi' : selectedUserForProfile.form1.language === 'ta' ? 'Tamil' : 'English'}</div>
                     </div>
-                    {selectedUserForProfile.form1.ceoReflection && (
-                      <div style={{ background: 'rgba(255,255,255,0.04)', padding: '14px', borderRadius: '10px', color: '#E2E8F0', marginBottom: '16px' }}>
-                        <div style={{ fontSize: '0.75rem', color: '#00E5FF', fontWeight: 700, marginBottom: '4px' }}>FAMILY DIY CREATION REFLECTION:</div>
-                        <p style={{ margin: 0, fontStyle: 'italic' }}>"{selectedUserForProfile.form1.ceoReflection}"</p>
-                      </div>
-                    )}
-                    <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                      {selectedUserForProfile.form1.photo1Url && (
-                        <div onClick={() => setMediaModal({ type: 'image', url: selectedUserForProfile.form1.photo1Url, title: 'Form 1 Photo 1' })} style={{ cursor: 'pointer', border: '1px solid #00E5FF', borderRadius: '10px', padding: '10px 16px', color: '#00E5FF', fontSize: '0.85rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(0,229,255,0.1)' }}>
-                          <ImageIcon size={16} /> View Uploaded Photo 1
-                        </div>
-                      )}
-                      {selectedUserForProfile.form1.photo2Url && (
-                        <div onClick={() => setMediaModal({ type: 'image', url: selectedUserForProfile.form1.photo2Url, title: 'Form 1 Photo 2' })} style={{ cursor: 'pointer', border: '1px solid #00E5FF', borderRadius: '10px', padding: '10px 16px', color: '#00E5FF', fontSize: '0.85rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(0,229,255,0.1)' }}>
-                          <ImageIcon size={16} /> View Uploaded Photo 2
-                        </div>
-                      )}
+                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '10px' }}>
+                      <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Submitted IP</div>
+                      <div style={{ color: '#E2E8F0', fontFamily: 'monospace' }}>{selectedUserForProfile.form1.ip || 'N/A'}</div>
+                    </div>
+                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '10px' }}>
+                      <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Photo 1</div>
+                      <div style={{ color: selectedUserForProfile.form1.photo1Url ? '#4ADE80' : '#EF4444', fontWeight: 700 }}>{selectedUserForProfile.form1.photo1Url ? '✓ Uploaded' : '✗ Missing'}</div>
+                    </div>
+                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '10px' }}>
+                      <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Photo 2</div>
+                      <div style={{ color: selectedUserForProfile.form1.photo2Url ? '#4ADE80' : '#EF4444', fontWeight: 700 }}>{selectedUserForProfile.form1.photo2Url ? '✓ Uploaded' : '✗ Missing'}</div>
+                    </div>
+                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '10px' }}>
+                      <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Video</div>
+                      <div style={{ color: selectedUserForProfile.form1.videoUrl ? '#4ADE80' : '#EF4444', fontWeight: 700 }}>{selectedUserForProfile.form1.videoUrl ? '✓ Uploaded' : '✗ Missing'}</div>
                     </div>
                   </div>
+
+                  {/* CEO Reflection */}
+                  {selectedUserForProfile.form1.ceoReflection && (
+                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '16px', borderRadius: '12px', marginBottom: '18px' }}>
+                      <div style={{ fontSize: '0.72rem', color: '#4ADE80', fontWeight: 800, textTransform: 'uppercase', marginBottom: '8px' }}>Reflection Message (Form 1)</div>
+                      <p style={{ margin: 0, color: '#E2E8F0', fontStyle: 'italic', lineHeight: 1.6 }}>"{selectedUserForProfile.form1.ceoReflection}"</p>
+                    </div>
+                  )}
+
+                  {/* Media Buttons */}
+                  <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                    {selectedUserForProfile.form1.photo1Url && (
+                      <button onClick={() => setMediaModal({ type: 'image', url: selectedUserForProfile.form1.photo1Url, title: 'Form 1 — Photo 1' })}
+                        style={{ cursor: 'pointer', border: '1px solid #4ADE80', borderRadius: '10px', padding: '10px 18px', color: '#4ADE80', fontSize: '0.85rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(74,222,128,0.08)', outline: 'none' }}>
+                        <ImageIcon size={16} /> View Photo 1
+                      </button>
+                    )}
+                    {selectedUserForProfile.form1.photo2Url && (
+                      <button onClick={() => setMediaModal({ type: 'image', url: selectedUserForProfile.form1.photo2Url, title: 'Form 1 — Photo 2' })}
+                        style={{ cursor: 'pointer', border: '1px solid #4ADE80', borderRadius: '10px', padding: '10px 18px', color: '#4ADE80', fontSize: '0.85rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(74,222,128,0.08)', outline: 'none' }}>
+                        <ImageIcon size={16} /> View Photo 2
+                      </button>
+                    )}
+                    {selectedUserForProfile.form1.videoUrl && (
+                      <button onClick={() => setMediaModal({ type: 'video', url: selectedUserForProfile.form1.videoUrl, title: 'Form 1 — Kando Video' })}
+                        style={{ cursor: 'pointer', border: '1px solid #00E5FF', borderRadius: '10px', padding: '10px 18px', color: '#00E5FF', fontSize: '0.85rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(0,229,255,0.08)', outline: 'none' }}>
+                        <FileVideo size={16} /> Watch Video
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div style={{ marginBottom: '28px', background: '#06133B', padding: '20px', borderRadius: '18px', border: '1px solid rgba(239,68,68,0.3)', color: '#EF4444', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <ImageIcon size={20} /> Form 1 not yet submitted
                 </div>
               )}
 
-              {/* FORM 2 SUBMISSION BREAKDOWN (Only rendered if Form 2 submitted) */}
-              {selectedUserForProfile.form2 && (
-                <div style={{ background: '#06133B', padding: '24px', borderRadius: '18px', border: '1px solid rgba(255,255,255,0.1)' }}>
-                  <h3 style={{ fontSize: '1.2rem', color: '#C084FC', fontWeight: 800, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <FileVideo size={20} /> Form 2 Submission Details (Video)
+              {/* ── SECTION C: FORM 2 DETAILS ── */}
+              {selectedUserForProfile.form2 ? (
+                <div style={{ background: '#06133B', padding: '24px', borderRadius: '18px', border: '1px solid rgba(168, 85, 247, 0.3)' }}>
+                  <h3 style={{ fontSize: '1.1rem', color: '#C084FC', fontWeight: 800, marginBottom: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <FileVideo size={20} /> Form 2 — CEO Reflection Submission
+                    <span style={{ marginLeft: 'auto', fontSize: '0.75rem', color: '#64748B', fontWeight: 400 }}>
+                      Submitted: {new Date(selectedUserForProfile.form2.submittedAt).toLocaleString()}
+                    </span>
                   </h3>
-                  <div>
-                    <div style={{ fontSize: '0.85rem', color: '#CBD5E1', marginBottom: '14px' }}>
-                      Submitted Timestamp: <strong>{new Date(selectedUserForProfile.form2.submittedAt).toLocaleString()}</strong>
+
+                  {/* Meta info row */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px', marginBottom: '18px', fontSize: '0.85rem' }}>
+                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '10px' }}>
+                      <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Language</div>
+                      <div style={{ color: '#E2E8F0' }}>{selectedUserForProfile.form2.language === 'hi' ? 'Hindi' : selectedUserForProfile.form2.language === 'ta' ? 'Tamil' : 'English'}</div>
                     </div>
-                    {selectedUserForProfile.form2.videoUrl && (
-                      <div style={{ maxWidth: '640px', borderRadius: '14px', overflow: 'hidden', border: '1.5px solid #A855F7' }}>
-                        <video controls src={`${apiBaseUrl}${selectedUserForProfile.form2.videoUrl}`} style={{ width: '100%', display: 'block' }} />
-                      </div>
-                    )}
+                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '10px' }}>
+                      <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Submitted IP</div>
+                      <div style={{ color: '#E2E8F0', fontFamily: 'monospace' }}>{selectedUserForProfile.form2.ip || 'N/A'}</div>
+                    </div>
                   </div>
+
+                  {/* CEO Reflection */}
+                  {selectedUserForProfile.form2.ceoReflection && (
+                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '16px', borderRadius: '12px', marginBottom: '18px' }}>
+                      <div style={{ fontSize: '0.72rem', color: '#C084FC', fontWeight: 800, textTransform: 'uppercase', marginBottom: '8px' }}>CEO Reflection Answer (Form 2)</div>
+                      <p style={{ margin: 0, color: '#E2E8F0', fontStyle: 'italic', lineHeight: 1.6 }}>"{selectedUserForProfile.form2.ceoReflection}"</p>
+                    </div>
+                  )}
+
+                  {/* Form 2 video (if any) */}
+                  {selectedUserForProfile.form2.videoUrl && (
+                    <div style={{ maxWidth: '640px', borderRadius: '14px', overflow: 'hidden', border: '1.5px solid #A855F7' }}>
+                      <video controls src={selectedUserForProfile.form2.videoUrl} style={{ width: '100%', display: 'block' }} />
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div style={{ background: '#06133B', padding: '20px', borderRadius: '18px', border: '1px solid rgba(239,68,68,0.3)', color: '#EF4444', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <FileVideo size={20} /> Form 2 not yet submitted
                 </div>
               )}
 
