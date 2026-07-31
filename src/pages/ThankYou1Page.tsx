@@ -1,6 +1,6 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
-import { CheckCircle2, Home, Video } from 'lucide-react';
+import { CheckCircle2, Home } from 'lucide-react';
 
 export const ThankYou1Page: React.FC = () => {
   const { t, formData, navigateTo } = useApp();
@@ -65,41 +65,15 @@ export const ThankYou1Page: React.FC = () => {
           </div>
         </div>
 
-        {/* Voluntary Form 2 Note */}
-        <div style={{
-          background: 'rgba(255, 255, 255, 0.04)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          borderRadius: '16px',
-          padding: '20px',
-          marginBottom: '36px',
-          textAlign: 'left'
-        }}>
-          <h4 style={{ color: '#00E5FF', fontSize: '0.95rem', fontWeight: 700, marginBottom: '4px' }}>
-            Submission Complete!
-          </h4>
-          <p style={{ color: '#CBD5E1', fontSize: '0.88rem', lineHeight: 1.5 }}>
-            Form 1 submission is complete. If you also wish to submit a family video, you may optionally fill out Form 2. Form 2 is completely voluntary and independent.
-          </p>
-        </div>
-
-        {/* Responsive Action Buttons */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '16px' }}>
+        {/* Return to Home */}
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
           <button 
             onClick={() => navigateTo('home')}
             className="btn-primary"
-            style={{ padding: '14px 28px', fontSize: '1rem', background: 'linear-gradient(90deg, #00E5FF 0%, #0088FF 100%)', color: '#020B2A' }}
+            style={{ padding: '14px 32px', fontSize: '1rem', background: 'linear-gradient(90deg, #00E5FF 0%, #0088FF 100%)', color: '#020B2A' }}
           >
             <Home size={18} />
             <span>Return to Home</span>
-          </button>
-
-          <button 
-            onClick={() => navigateTo('form2')}
-            className="btn-secondary"
-            style={{ padding: '14px 28px', fontSize: '1rem', border: '1px solid rgba(168, 85, 247, 0.5)', color: '#D8B4FE' }}
-          >
-            <Video size={18} color="#A855F7" />
-            <span>Optionally Submit Form 2 (Video)</span>
           </button>
         </div>
 
