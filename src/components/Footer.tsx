@@ -1,6 +1,6 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
-import { Heart, ShieldCheck, FileText, Lock } from 'lucide-react';
+import { Heart, ShieldCheck, FileText } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   const { navigateTo, t } = useApp();
@@ -44,7 +44,7 @@ export const Footer: React.FC = () => {
             </p>
           </div>
 
-          {/* Links */}
+          {/* Links — Admin Portal Option Removed as requested */}
           <div style={{
             display: 'flex',
             flexWrap: 'wrap',
@@ -75,14 +75,6 @@ export const Footer: React.FC = () => {
             >
               <FileText size={14} />
               {t.terms}
-            </button>
-            <span style={{ color: 'rgba(255,255,255,0.2)' }}>•</span>
-            <button 
-              onClick={() => navigateTo('admin-dashboard')} 
-              style={{ background: 'none', border: 'none', color: '#00E5FF', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
-            >
-              <Lock size={14} />
-              {t.adminPortal}
             </button>
           </div>
 

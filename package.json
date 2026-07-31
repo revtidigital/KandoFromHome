@@ -10,13 +10,26 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "archiver": "^8.0.0",
     "canvas-confetti": "^1.9.4",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.8",
     "lucide-react": "^1.28.0",
+    "mongoose": "^9.9.0",
+    "multer": "^2.2.0",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@types/archiver": "^8.0.0",
     "@types/canvas-confetti": "^1.9.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/multer": "^2.2.0",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",

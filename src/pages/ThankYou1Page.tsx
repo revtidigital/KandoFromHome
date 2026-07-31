@@ -1,6 +1,6 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
-import { CheckCircle2, ArrowRight, FileCheck } from 'lucide-react';
+import { CheckCircle2, Home, Video } from 'lucide-react';
 
 export const ThankYou1Page: React.FC = () => {
   const { t, formData, navigateTo } = useApp();
@@ -8,15 +8,16 @@ export const ThankYou1Page: React.FC = () => {
   return (
     <div className="container" style={{ padding: '60px 20px', maxWidth: '750px', textAlign: 'center' }}>
       <div className="glass-panel animate-fade-in" style={{
-        padding: '48px 36px',
-        border: '1px solid rgba(0, 229, 255, 0.4)',
-        boxShadow: '0 0 40px rgba(0, 229, 255, 0.15)'
+        padding: '48px 32px',
+        border: '1.5px solid rgba(0, 229, 255, 0.4)',
+        boxShadow: '0 0 50px rgba(0, 229, 255, 0.15)',
+        borderRadius: '24px'
       }}>
         
         {/* Animated Check Icon */}
         <div style={{
-          width: '80px',
-          height: '80px',
+          width: '84px',
+          height: '84px',
           borderRadius: '50%',
           background: 'rgba(0, 229, 255, 0.15)',
           border: '2px solid #00E5FF',
@@ -25,33 +26,33 @@ export const ThankYou1Page: React.FC = () => {
           alignItems: 'center',
           justifyContent: 'center',
           margin: '0 auto 24px auto',
-          boxShadow: '0 0 25px rgba(0, 229, 255, 0.4)'
+          boxShadow: '0 0 30px rgba(0, 229, 255, 0.4)'
         }}>
-          <CheckCircle2 size={44} />
+          <CheckCircle2 size={48} />
         </div>
 
         <h1 className="heading-font" style={{ fontSize: '2.2rem', color: 'white', marginBottom: '12px' }}>
-          {t.thankYou1Title}
+          {t.thankYou1Title || 'Form 1 Submitted Successfully!'}
         </h1>
 
         <p style={{ color: '#A0B2D6', fontSize: '1.05rem', marginBottom: '32px', lineHeight: 1.6 }}>
-          {t.thankYou1Subtitle}
+          {t.thankYou1Subtitle || 'Your DIY Kit photos and employee details have been safely registered with Yamaha.'}
         </p>
 
         {/* Reference ID Card */}
         <div style={{
-          background: 'rgba(2, 11, 42, 0.8)',
-          border: '1px dashed #00E5FF',
-          borderRadius: '16px',
-          padding: '20px',
-          maxWidth: '450px',
+          background: 'rgba(2, 11, 42, 0.85)',
+          border: '1.5px dashed #00E5FF',
+          borderRadius: '18px',
+          padding: '24px',
+          maxWidth: '480px',
           margin: '0 auto 36px auto'
         }}>
-          <div style={{ fontSize: '0.85rem', color: '#A0B2D6', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '6px' }}>
-            {t.refIdLabel}
+          <div style={{ fontSize: '0.85rem', color: '#A0B2D6', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>
+            {t.refIdLabel || 'Form 1 Submission Reference ID'}
           </div>
           <div style={{
-            fontSize: '1.8rem',
+            fontSize: '1.9rem',
             fontWeight: 800,
             color: '#00E5FF',
             letterSpacing: '2px',
@@ -59,42 +60,48 @@ export const ThankYou1Page: React.FC = () => {
           }}>
             {formData.refId || 'KANDO-2026-8942'}
           </div>
-          <div style={{ fontSize: '0.75rem', color: '#64748B', marginTop: '4px' }}>
-            Submitted by: {formData.empName || 'Yamaha Employee'} ({formData.empId || 'YMI-1049'})
+          <div style={{ fontSize: '0.85rem', color: '#64748B', marginTop: '6px' }}>
+            Submitted by: <strong style={{ color: '#CBD5E1' }}>{formData.empName || 'Yamaha Employee'}</strong> ({formData.empId || 'YMI-1049'})
           </div>
         </div>
 
-        {/* Next Step Box */}
+        {/* Voluntary Form 2 Note */}
         <div style={{
-          background: 'rgba(168, 85, 247, 0.12)',
-          border: '1px solid rgba(168, 85, 247, 0.3)',
+          background: 'rgba(255, 255, 255, 0.04)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
           borderRadius: '16px',
           padding: '20px',
           marginBottom: '36px',
-          textAlign: 'left',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '16px'
+          textAlign: 'left'
         }}>
-          <FileCheck size={28} color="#A855F7" style={{ flexShrink: 0 }} />
-          <div>
-            <h4 style={{ color: '#C084FC', fontSize: '1.05rem', fontWeight: 700, marginBottom: '2px' }}>
-              Final Step Required: Form 2
-            </h4>
-            <p style={{ color: '#E2E8F0', fontSize: '0.9rem' }}>
-              Please answer the reflection question posed by our CEO to finalize your campaign entry and download your certificate.
-            </p>
-          </div>
+          <h4 style={{ color: '#00E5FF', fontSize: '0.95rem', fontWeight: 700, marginBottom: '4px' }}>
+            Submission Complete!
+          </h4>
+          <p style={{ color: '#CBD5E1', fontSize: '0.88rem', lineHeight: 1.5 }}>
+            Form 1 submission is complete. If you also wish to submit a family video, you may optionally fill out Form 2. Form 2 is completely voluntary and independent.
+          </p>
         </div>
 
-        <button 
-          onClick={() => navigateTo('form2')}
-          className="btn-primary"
-          style={{ padding: '16px 36px', fontSize: '1.1rem', background: 'linear-gradient(90deg, #A855F7 0%, #0088FF 100%)' }}
-        >
-          <span>{t.proceedToForm2Btn}</span>
-          <ArrowRight size={20} />
-        </button>
+        {/* Responsive Action Buttons */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '16px' }}>
+          <button 
+            onClick={() => navigateTo('home')}
+            className="btn-primary"
+            style={{ padding: '14px 28px', fontSize: '1rem', background: 'linear-gradient(90deg, #00E5FF 0%, #0088FF 100%)', color: '#020B2A' }}
+          >
+            <Home size={18} />
+            <span>Return to Home</span>
+          </button>
+
+          <button 
+            onClick={() => navigateTo('form2')}
+            className="btn-secondary"
+            style={{ padding: '14px 28px', fontSize: '1rem', border: '1px solid rgba(168, 85, 247, 0.5)', color: '#D8B4FE' }}
+          >
+            <Video size={18} color="#A855F7" />
+            <span>Optionally Submit Form 2 (Video)</span>
+          </button>
+        </div>
 
       </div>
     </div>

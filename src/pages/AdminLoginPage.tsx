@@ -3,7 +3,7 @@ import { useApp } from '../context/AppContext';
 import { Lock, LogIn, AlertCircle } from 'lucide-react';
 
 export const AdminLoginPage: React.FC = () => {
-  const { setIsAdminLoggedIn, navigateTo, addAuditLog } = useApp();
+  const { setIsAdminLoggedIn, navigateTo } = useApp();
 
   const [username, setUsername] = useState('admin');
   const [password, setPassword] = useState('');
@@ -13,7 +13,6 @@ export const AdminLoginPage: React.FC = () => {
     e.preventDefault();
     if (username === 'admin' && (password === 'yamaha2026' || password === 'admin' || password === '123456')) {
       setIsAdminLoggedIn(true);
-      addAuditLog('LOGIN', `Admin user "${username}" logged in successfully.`);
       navigateTo('admin-dashboard');
     } else {
       setError('Invalid admin credentials. Use admin / yamaha2026');

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
-import { Sparkles, Calendar, Award, ArrowRight, Heart, Video, UserCheck } from 'lucide-react';
+import { Sparkles, Calendar, Award, ArrowRight, Heart, Video, UserCheck, Image as ImageIcon, FileVideo } from 'lucide-react';
 
 export const HomePage: React.FC = () => {
   const { t, navigateTo } = useApp();
@@ -64,28 +64,145 @@ export const HomePage: React.FC = () => {
             {t.homeHeroDesc}
           </p>
 
-          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#FFD700', fontSize: '0.9rem', fontWeight: 600 }}>
+            <Calendar size={16} />
+            <span>{t.submissionDeadlineText}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* ── TWO SEPARATE FORM SUBMISSION CARDS (Req 1) ── */}
+      <div style={{ marginBottom: '48px' }}>
+        <h2 className="heading-font" style={{
+          fontSize: '1.8rem',
+          textAlign: 'center',
+          color: 'white',
+          marginBottom: '10px'
+        }}>
+          {t.chooseSubmissionFormTitle}
+        </h2>
+        <p style={{ textAlign: 'center', color: '#94A3B8', fontSize: '0.95rem', marginBottom: '32px' }}>
+          {t.chooseSubmissionFormDesc}
+        </p>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+          gap: '28px'
+        }}>
+          
+          {/* FORM 1 CARD */}
+          <div className="glass-panel glow-card" style={{
+            padding: '32px',
+            borderRadius: '20px',
+            border: '1.5px solid #00E5FF',
+            background: 'linear-gradient(180deg, rgba(0,77,90,0.4) 0%, rgba(1,43,51,0.6) 100%)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between'
+          }}>
+            <div>
+              <div style={{
+                width: '56px',
+                height: '56px',
+                borderRadius: '14px',
+                background: 'rgba(0, 229, 255, 0.2)',
+                border: '1.5px solid #00E5FF',
+                color: '#00E5FF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '20px'
+              }}>
+                <ImageIcon size={28} />
+              </div>
+              
+              <div style={{ fontSize: '0.8rem', color: '#00E5FF', fontWeight: 800, letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>
+                {t.form1Badge}
+              </div>
+
+              <h3 style={{ fontSize: '1.4rem', color: 'white', fontWeight: 800, marginBottom: '12px' }}>
+                {t.form1CardTitle}
+              </h3>
+
+              <p style={{ fontSize: '0.95rem', color: '#E2E8F0', lineHeight: 1.6, marginBottom: '24px' }}>
+                {t.form1CardDesc}
+              </p>
+            </div>
+
             <button 
               onClick={() => navigateTo('form1')}
               className="btn-primary"
-              style={{ padding: '14px 32px', fontSize: '1.05rem' }}
+              style={{ width: '100%', justifyContent: 'center', padding: '14px', fontSize: '1rem' }}
             >
-              <span>{t.startSubmissionBtn}</span>
+              <span>{t.form1CardBtn}</span>
               <ArrowRight size={18} />
             </button>
-
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              color: '#FFD700',
-              fontSize: '0.9rem',
-              fontWeight: 600
-            }}>
-              <Calendar size={16} />
-              <span>{t.submissionDeadlineText}</span>
-            </div>
           </div>
+
+          {/* FORM 2 CARD */}
+          <div className="glass-panel glow-card" style={{
+            padding: '32px',
+            borderRadius: '20px',
+            border: '1.5px solid #A855F7',
+            background: 'linear-gradient(180deg, rgba(53,18,89,0.4) 0%, rgba(26,6,51,0.6) 100%)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between'
+          }}>
+            <div>
+              <div style={{
+                width: '56px',
+                height: '56px',
+                borderRadius: '14px',
+                background: 'rgba(168, 85, 247, 0.2)',
+                border: '1.5px solid #A855F7',
+                color: '#C084FC',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '20px'
+              }}>
+                <FileVideo size={28} />
+              </div>
+
+              <div style={{ fontSize: '0.8rem', color: '#C084FC', fontWeight: 800, letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>
+                {t.form2Badge}
+              </div>
+
+              <h3 style={{ fontSize: '1.4rem', color: 'white', fontWeight: 800, marginBottom: '12px' }}>
+                {t.form2CardTitle}
+              </h3>
+
+              <p style={{ fontSize: '0.95rem', color: '#E2E8F0', lineHeight: 1.6, marginBottom: '24px' }}>
+                {t.form2CardDesc}
+              </p>
+            </div>
+
+            <button 
+              onClick={() => navigateTo('form2')}
+              style={{
+                width: '100%',
+                justifyContent: 'center',
+                padding: '14px',
+                fontSize: '1rem',
+                borderRadius: '30px',
+                background: 'linear-gradient(90deg, #A855F7 0%, #7E22CE 100%)',
+                border: 'none',
+                color: 'white',
+                fontWeight: 700,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                cursor: 'pointer',
+                boxShadow: '0 0 20px rgba(168, 85, 247, 0.4)'
+              }}
+            >
+              <span>{t.form2CardBtn}</span>
+              <ArrowRight size={18} />
+            </button>
+          </div>
+
         </div>
       </div>
 

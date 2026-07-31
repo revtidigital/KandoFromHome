@@ -43,13 +43,15 @@ const MainRouter: React.FC = () => {
     }
   };
 
+  const isFooterDisabled = currentView === 'landing' || currentView === 'admin-dashboard' || currentView === 'admin-login';
+
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Header />
       <main style={{ flex: 1 }}>
         {renderView()}
       </main>
-      {currentView !== 'landing' && <Footer />}
+      {!isFooterDisabled && <Footer />}
     </div>
   );
 };

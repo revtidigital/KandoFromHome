@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { Language } from '../i18n/translations';
 import { translations } from '../i18n/translations';
 
@@ -11,10 +11,17 @@ export interface SubmissionRecord {
   phone: string;
   city: string;
   familyMembers: number;
-  videoUrl: string;
-  photo1Url: string;
-  photo2Url: string;
-  ceoReflection: string;
+  tags?: string[];
+  form1?: {
+    photo1Url: string;
+    photo2Url?: string;
+    ceoReflection?: string;
+    submittedAt: string;
+  };
+  form2?: {
+    videoUrl: string;
+    submittedAt: string;
+  };
   status: 'Pending' | 'Shortlisted' | 'Featured' | 'Flagged';
   submittedAt: string;
   language: Language;
@@ -23,9 +30,9 @@ export interface SubmissionRecord {
 export interface AuditLog {
   id: string;
   timestamp: string;
-  adminUser: string;
-  action: string;
-  details: string;
+  username: string;
+  ip: string;
+  detail: string;
 }
 
 interface AppContextType {
@@ -51,120 +58,54 @@ interface AppContextType {
   setFormData: React.Dispatch<React.SetStateAction<AppContextType['formData']>>;
   
   submissions: SubmissionRecord[];
-  updateSubmissionStatus: (id: string, status: SubmissionRecord['status']) => void;
+  fetchSubmissions: (page?: number, search?: string, tag?: string) => Promise<void>;
+  updateUserTags: (id: string, tags: string[]) => Promise<void>;
   auditLogs: AuditLog[];
-  addAuditLog: (action: string, details: string) => void;
+  fetchAuditLogs: () => Promise<void>;
   
   isAdminLoggedIn: boolean;
   setIsAdminLoggedIn: (val: boolean) => void;
   
-  navigateTo: (view: string) => void;
+  allUsers: any[];
+  setAllUsers: React.Dispatch<React.SetStateAction<any[]>>;
+  customTags: string[];
+  setCustomTags: React.Dispatch<React.SetStateAction<string[]>>;
+  addAuditLog: (detail: string) => void;
+
+  navigateTo: (view: string, langOverride?: Language) => void;
+  apiBaseUrl: string;
 }
-
-const initialSubmissions: SubmissionRecord[] = [
-  {
-    id: 'sub-1',
-    refId: 'KANDO-2026-8942',
-    empId: 'YMI-1049',
-    empName: 'Rahul Sharma',
-    email: 'rahul.sharma@yamaha-motor.co.in',
-    phone: '+91 98765 43210',
-    city: 'Surajpur',
-    familyMembers: 4,
-    videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-happy-family-decorating-a-christmas-tree-41525-large.mp4',
-    photo1Url: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&q=80&w=800',
-    photo2Url: 'https://images.unsplash.com/photo-1542037104857-ffbb0b9155fb?auto=format&fit=crop&q=80&w=800',
-    ceoReflection: 'Working together with my wife and 2 kids on the Yamaha craft wall brought immense joy. We learned about Kando together and felt proud to be part of the Yamaha family.',
-    status: 'Shortlisted',
-    submittedAt: '2026-07-28 10:30 AM',
-    language: 'en'
-  },
-  {
-    id: 'sub-2',
-    refId: 'KANDO-2026-7721',
-    empId: 'YMI-2281',
-    empName: 'Priya Sundaram',
-    email: 'priya.sundaram@yamaha-motor.co.in',
-    phone: '+91 94441 23456',
-    city: 'Chennai',
-    familyMembers: 3,
-    videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-family-playing-together-in-the-living-room-41530-large.mp4',
-    photo1Url: 'https://images.unsplash.com/photo-1581579438747-1dc8d1e05dd8?auto=format&fit=crop&q=80&w=800',
-    photo2Url: 'https://images.unsplash.com/photo-1591604466107-ec97de577aff?auto=format&fit=crop&q=80&w=800',
-    ceoReflection: 'சென்னை ஆலையில் நான் பணியாற்றி வரும் வேளையில், எனது குடும்பத்துடன் இந்த DIY கிட்டினைச் செய்தது மிகுந்த மகிழ்ச்சியளித்தது.',
-    status: 'Featured',
-    submittedAt: '2026-07-28 11:15 AM',
-    language: 'ta'
-  },
-  {
-    id: 'sub-3',
-    refId: 'KANDO-2026-6410',
-    empId: 'YMI-3304',
-    empName: 'Amitabh Verma',
-    email: 'amitabh.verma@yamaha-motor.co.in',
-    phone: '+91 98112 99887',
-    city: 'Gurgaon',
-    familyMembers: 5,
-    videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-hands-crafting-paper-shapes-42931-large.mp4',
-    photo1Url: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&q=80&w=800',
-    photo2Url: 'https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&q=80&w=800',
-    ceoReflection: 'बच्चों ने यामाहा लोगो और दिल के आकार के कटआउट्स को बहुत उत्साह के साथ चिपकाया। यह अनुभव हमारे लिए वास्तव में कांदो का अहसास था।',
-    status: 'Pending',
-    submittedAt: '2026-07-29 02:40 PM',
-    language: 'hi'
-  },
-  {
-    id: 'sub-4',
-    refId: 'KANDO-2026-5290',
-    empId: 'YMI-4112',
-    empName: 'Karthik Subramanian',
-    email: 'karthik.s@yamaha-motor.co.in',
-    phone: '+91 97890 12345',
-    city: 'Kanchipuram',
-    familyMembers: 4,
-    videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-family-celebrating-together-41532-large.mp4',
-    photo1Url: 'https://images.unsplash.com/photo-1536640712-4d4c36ff0e4e?auto=format&fit=crop&q=80&w=800',
-    photo2Url: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&q=80&w=800',
-    ceoReflection: 'Very inspiring event! The DIY wall decoration is now proudly displayed in our living room.',
-    status: 'Shortlisted',
-    submittedAt: '2026-07-29 04:10 PM',
-    language: 'en'
-  },
-  {
-    id: 'sub-5',
-    refId: 'KANDO-2026-4109',
-    empId: 'YMI-5590',
-    empName: 'Deepak Chawla',
-    email: 'deepak.c@yamaha-motor.co.in',
-    phone: '+91 99998 77665',
-    city: 'Faridabad',
-    familyMembers: 3,
-    videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-happy-family-decorating-a-christmas-tree-41525-large.mp4',
-    photo1Url: 'https://images.unsplash.com/photo-1542037104857-ffbb0b9155fb?auto=format&fit=crop&q=80&w=800',
-    photo2Url: 'https://images.unsplash.com/photo-1581579438747-1dc8d1e05dd8?auto=format&fit=crop&q=80&w=800',
-    ceoReflection: 'A wonderful initiative by Yamaha Motor India. Loved spending quality time making memories.',
-    status: 'Pending',
-    submittedAt: '2026-07-30 09:20 AM',
-    language: 'en'
-  }
-];
-
-const initialLogs: AuditLog[] = [
-  { id: 'log-1', timestamp: '2026-07-31 09:15 AM', adminUser: 'SuperAdmin (admin@yamaha.in)', action: 'LOGIN', details: 'Authenticated into Admin Portal successfully.' },
-  { id: 'log-2', timestamp: '2026-07-31 09:30 AM', adminUser: 'SuperAdmin (admin@yamaha.in)', action: 'TAG_UPDATE', details: 'Updated status for YMI-2281 to "Featured".' },
-  { id: 'log-3', timestamp: '2026-07-31 10:05 AM', adminUser: 'Reviewer (eval@yamaha.in)', action: 'EXPORT', details: 'Exported 5 records to CSV file.' }
-];
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguageState] = useState<Language>(() => {
-    const saved = localStorage.getItem('kando_lang') as Language;
-    return saved || 'en';
-  });
+const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
-  const [currentView, setCurrentView] = useState<string>('landing');
-  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(false);
+export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Parse initial state from URL hash e.g. #en/home or #hi/form1
+  const parseHash = () => {
+    const hash = window.location.hash.replace('#', '');
+    const parts = hash.split('/').filter(Boolean);
+    const savedLang = (localStorage.getItem('kando_lang') as Language) || 'en';
+    let lang: Language = savedLang;
+    let view = 'landing';
+
+    if (parts.length > 0) {
+      if (['en', 'hi', 'ta'].includes(parts[0])) {
+        lang = parts[0] as Language;
+        if (parts[1]) view = parts[1];
+      } else {
+        view = parts[0];
+      }
+    }
+    return { lang, view };
+  };
+
+  const initial = parseHash();
+  const [language, setLanguageState] = useState<Language>(initial.lang);
+  const [currentView, setCurrentView] = useState<string>(initial.view);
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(() => {
+    return localStorage.getItem('kando_admin_auth') === 'true';
+  });
 
   const [formData, setFormData] = useState({
     empName: '',
@@ -180,33 +121,102 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     ceoReflection: ''
   });
 
-  const [submissions, setSubmissions] = useState<SubmissionRecord[]>(initialSubmissions);
-  const [auditLogs, setAuditLogs] = useState<AuditLog[]>(initialLogs);
+  const [submissions, setSubmissions] = useState<SubmissionRecord[]>([]);
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
+
+  // Sync state with URL hash change (Enables Browser Back/Forward buttons!)
+  useEffect(() => {
+    const handleHashChange = () => {
+      const { lang, view } = parseHash();
+      setLanguageState(lang);
+      setCurrentView(view);
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  // Update hash when navigating — GUARANTEED REAL-TIME URL HASH SYNC
+  const updateUrlHash = (lang: Language, view: string) => {
+    const newHash = `#${lang}/${view}`;
+    if (window.location.hash !== newHash) {
+      window.location.hash = newHash;
+    }
+  };
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
     localStorage.setItem('kando_lang', lang);
+    updateUrlHash(lang, currentView);
   };
 
-  const updateSubmissionStatus = (id: string, status: SubmissionRecord['status']) => {
-    setSubmissions(prev => prev.map(item => item.id === id ? { ...item, status } : item));
-    addAuditLog('TAG_UPDATE', `Updated entry ${id} status to "${status}".`);
+  const navigateTo = (view: string, langOverride?: Language) => {
+    const targetLang = langOverride || language;
+    if (langOverride) {
+      setLanguageState(langOverride);
+      localStorage.setItem('kando_lang', langOverride);
+    }
+    setCurrentView(view);
+    updateUrlHash(targetLang, view);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const addAuditLog = (action: string, details: string) => {
+  // Fetch Users & Submissions from API
+  const fetchSubmissions = async (page = 1, search = '', tag = '') => {
+    try {
+      const query = new URLSearchParams({ page: String(page), limit: '25', search, tag });
+      const res = await fetch(`${API_BASE_URL}/api/admin/users?${query}`);
+      if (res.ok) {
+        const data = await res.json();
+        setSubmissions(data.users || []);
+      }
+    } catch (err) {
+      console.warn('Backend API connection pending, using local state:', err);
+    }
+  };
+
+  // Fetch Audit Logs (Append-Only)
+  const fetchAuditLogs = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/admin/audit-logs`);
+      if (res.ok) {
+        const data = await res.json();
+        setAuditLogs(data || []);
+      }
+    } catch (err) {
+      console.warn('Audit log fetch error:', err);
+    }
+  };
+
+  // Update User Tags
+  const updateUserTags = async (id: string, tags: string[]) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/admin/users/${id}/tags`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tags })
+      });
+      if (res.ok) {
+        fetchSubmissions();
+        fetchAuditLogs();
+      }
+    } catch (err) {
+      console.error('Error updating tags:', err);
+    }
+  };
+
+  const [allUsers, setAllUsers] = useState<any[]>([]);
+  const [customTags, setCustomTags] = useState<string[]>(['Shortlisted', 'Featured', 'Flagged', 'Verified']);
+
+  const addAuditLog = (detail: string) => {
     const newLog: AuditLog = {
-      id: 'log-' + Date.now(),
+      id: Date.now().toString(),
       timestamp: new Date().toLocaleString(),
-      adminUser: 'Admin User',
-      action,
-      details
+      username: 'Admin',
+      ip: '147.93.31.18',
+      detail
     };
     setAuditLogs(prev => [newLog, ...prev]);
-  };
-
-  const navigateTo = (view: string) => {
-    setCurrentView(view);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const t = translations[language];
@@ -221,12 +231,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       formData,
       setFormData,
       submissions,
-      updateSubmissionStatus,
+      fetchSubmissions,
+      updateUserTags,
       auditLogs,
-      addAuditLog,
+      fetchAuditLogs,
       isAdminLoggedIn,
-      setIsAdminLoggedIn,
-      navigateTo
+      setIsAdminLoggedIn: (val) => {
+        setIsAdminLoggedIn(val);
+        localStorage.setItem('kando_admin_auth', val ? 'true' : 'false');
+      },
+      allUsers,
+      setAllUsers,
+      customTags,
+      setCustomTags,
+      addAuditLog,
+      navigateTo,
+      apiBaseUrl: API_BASE_URL
     }}>
       {children}
     </AppContext.Provider>

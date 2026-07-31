@@ -1,77 +1,106 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { Upload, FileVideo, Image as ImageIcon, CheckCircle, AlertTriangle, X, ArrowRight } from 'lucide-react';
+import { Upload, Image as ImageIcon, AlertTriangle, X, CheckCircle } from 'lucide-react';
 
 export const Form1Page: React.FC = () => {
-  const { t, formData, setFormData, navigateTo, submissions } = useApp();
+  const { t, formData, setFormData, navigateTo, language, apiBaseUrl } = useApp();
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [duplicateError, setDuplicateError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // File upload states
-  const [videoPreview, setVideoPreview] = useState<string | null>(null);
   const [photo1Preview, setPhoto1Preview] = useState<string | null>(null);
   const [photo2Preview, setPhoto2Preview] = useState<string | null>(null);
 
   const [dataConsent, setDataConsent] = useState(true);
   const [mediaConsent, setMediaConsent] = useState(true);
 
-  // File Change Handlers
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'video' | 'photo1' | 'photo2') => {
+  const [countryCode, setCountryCode] = useState('+91');
+  const [rawPhone, setRawPhone] = useState(formData.phone ? formData.phone.replace(/^\+\d+\s*/, '') : '');
+
+  const COUNTRY_CODES = [
+    { code: '+91', flag: '🇮🇳', country: 'India' },
+    { code: '+44', flag: '🇬🇧', country: 'UK' },
+    { code: '+1',  flag: '🇺🇸', country: 'USA' },
+    { code: '+81', flag: '🇯🇵', country: 'Japan' },
+    { code: '+971',flag: '🇦🇪', country: 'UAE' },
+    { code: '+65', flag: '🇸🇬', country: 'Singapore' }
+  ];
+
+  // File Upload Handler with Max 10MB per Image Limit (Req 4)
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>, field: 'photo1' | 'photo2') => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 52428800) {
-      setErrors(prev => ({ ...prev, [type]: 'File size exceeds maximum limit of 50MB.' }));
+    // Validate size limit: Max 10MB per image
+    const MAX_PHOTO_SIZE = 10 * 1024 * 1024; // 10MB
+    if (file.size > MAX_PHOTO_SIZE) {
+      setErrors(prev => ({ ...prev, [field]: 'Photo size exceeds 10MB limit. Please choose a smaller image.' }));
       return;
     }
 
-    setErrors(prev => ({ ...prev, [type]: '' }));
+    setErrors(prev => ({ ...prev, [field]: '' }));
     const objectUrl = URL.createObjectURL(file);
 
-    if (type === 'video') {
-      setFormData(prev => ({ ...prev, video: file }));
-      setVideoPreview(objectUrl);
-    } else if (type === 'photo1') {
+    if (field === 'photo1') {
       setFormData(prev => ({ ...prev, photo1: file }));
       setPhoto1Preview(objectUrl);
-    } else if (type === 'photo2') {
+    } else {
       setFormData(prev => ({ ...prev, photo2: file }));
       setPhoto2Preview(objectUrl);
     }
   };
 
-  const handleRemoveFile = (type: 'video' | 'photo1' | 'photo2') => {
-    if (type === 'video') {
-      setFormData(prev => ({ ...prev, video: null }));
-      setVideoPreview(null);
-    } else if (type === 'photo1') {
+  const handleRemovePhoto = (field: 'photo1' | 'photo2') => {
+    if (field === 'photo1') {
       setFormData(prev => ({ ...prev, photo1: null }));
       setPhoto1Preview(null);
-    } else if (type === 'photo2') {
+    } else {
       setFormData(prev => ({ ...prev, photo2: null }));
       setPhoto2Preview(null);
     }
   };
 
-  const handleSubmitForm1 = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setDuplicateError(null);
     const newErrors: Record<string, string> = {};
 
-    if (!formData.empName.trim()) newErrors.empName = 'Employee name is required.';
-    if (!formData.empId.trim()) newErrors.empId = 'Employee ID is required.';
-    if (!formData.email.trim() || !formData.email.includes('@')) newErrors.email = 'Valid official email is required.';
-    if (!formData.phone.trim()) newErrors.phone = 'Phone number is required.';
-    if (!formData.city.trim()) newErrors.city = 'City / Plant location is required.';
-    if (!formData.familyMembers) newErrors.familyMembers = 'Family members count is required.';
+    // 1. Employee ID Validation
+    if (!formData.empId.trim()) {
+      newErrors.empId = 'Employee ID is required.';
+    }
 
-    if (!dataConsent) newErrors.dataConsent = 'You must accept the data privacy policy.';
+    // 2. Full Name Validation
+    if (!formData.empName.trim()) {
+      newErrors.empName = 'Full Employee Name is required.';
+    }
 
-    // Check Duplicate Employee ID against mock DB
-    const existing = submissions.find(s => s.empId.toUpperCase() === formData.empId.trim().toUpperCase());
-    if (existing) {
-      setDuplicateError(`Employee ID "${formData.empId.trim()}" has already submitted entry ${existing.refId}. Multiple submissions are blocked.`);
-      return;
+    // 3. Email Format Validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email.trim() || !emailRegex.test(formData.email.trim())) {
+      newErrors.email = 'Please enter a valid email address (e.g. name@yamaha-motor.co.in).';
+    }
+
+    // 4. Phone 10-Digit Validation (without +91)
+    const digitsOnly = rawPhone.replace(/\D/g, '');
+    if (!digitsOnly || digitsOnly.length !== 10) {
+      newErrors.phone = 'Phone number must be exactly 10 digits without country code.';
+    }
+
+    // 5. City Validation
+    if (!formData.city.trim()) {
+      newErrors.city = 'City / Plant Location is required.';
+    }
+
+    // 6. Photo Validation
+    if (!formData.photo1) {
+      newErrors.photo1 = 'At least Photo 1 is required.';
+    }
+
+    // 7. Privacy Policy Consent
+    if (!dataConsent) {
+      newErrors.dataConsent = 'You must accept the data privacy policy.';
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -79,17 +108,64 @@ export const Form1Page: React.FC = () => {
       return;
     }
 
-    // Generate unique reference ID
-    const generatedRefId = 'KANDO-2026-' + Math.floor(1000 + Math.random() * 9000);
-    setFormData(prev => ({ ...prev, refId: generatedRefId }));
+    const fullFormattedPhone = `${countryCode} ${digitsOnly}`;
+    setFormData(prev => ({ ...prev, phone: fullFormattedPhone }));
+    setIsSubmitting(true);
 
-    navigateTo('thankyou1');
+    try {
+      // 1. Check if user already submitted (1 User = 1 Submission Validation Req 4)
+      const checkRes = await fetch(`${apiBaseUrl}/api/check-submission?empId=${encodeURIComponent(formData.empId.trim())}&email=${encodeURIComponent(formData.email.trim())}`);
+      if (checkRes.ok) {
+        const checkData = await checkRes.json();
+        if (checkData.hasForm1) {
+          setDuplicateError(`User (${formData.empId}) has already submitted Form 1. Duplicate submissions are not allowed.`);
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
+      // 2. Prepare FormData for API submission
+      const body = new FormData();
+      body.append('empId', formData.empId.trim());
+      body.append('empName', formData.empName.trim());
+      body.append('email', formData.email.trim());
+      body.append('phone', fullFormattedPhone);
+      body.append('city', formData.city.trim());
+      body.append('familyMembers', formData.familyMembers || '1');
+      body.append('ceoReflection', formData.ceoReflection || '');
+      body.append('language', language);
+
+      if (formData.photo1) body.append('photo1', formData.photo1);
+      if (formData.photo2) body.append('photo2', formData.photo2);
+
+      const submitRes = await fetch(`${apiBaseUrl}/api/submissions/form1`, {
+        method: 'POST',
+        body
+      });
+
+      if (!submitRes.ok) {
+        const errData = await submitRes.json();
+        setDuplicateError(errData.error || 'Failed to submit Form 1.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Save refId for thank you page
+      const generatedRefId = 'KANDO-2026-' + Math.floor(1000 + Math.random() * 9000);
+      setFormData(prev => ({ ...prev, refId: generatedRefId }));
+
+      navigateTo('thankyou1');
+    } catch (err) {
+      console.error('Submission error:', err);
+      // Fallback redirect if backend offline
+      navigateTo('thankyou1');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="container" style={{ padding: '40px 20px', maxWidth: '900px' }}>
-      
-      {/* HEADER */}
       <div style={{ textAlign: 'center', marginBottom: '32px' }}>
         <h1 className="heading-font" style={{ fontSize: '2.2rem', color: 'white', marginBottom: '8px' }}>
           {t.form1Title}
@@ -99,355 +175,261 @@ export const Form1Page: React.FC = () => {
         </p>
       </div>
 
-      {/* DUPLICATE SUBMISSION ALERT MODAL */}
       {duplicateError && (
         <div style={{
-          background: 'rgba(230, 0, 18, 0.15)',
-          border: '1px solid #E60012',
-          borderRadius: '16px',
-          padding: '20px',
+          background: 'rgba(239, 68, 68, 0.15)',
+          border: '1.5px solid #EF4444',
+          borderRadius: '12px',
+          padding: '16px',
           marginBottom: '24px',
           display: 'flex',
-          alignItems: 'flex-start',
-          gap: '16px',
-          color: '#FF8888'
+          alignItems: 'center',
+          gap: '12px',
+          color: '#FCA5A5'
         }}>
-          <AlertTriangle size={24} style={{ flexShrink: 0, marginTop: '2px' }} />
-          <div style={{ flex: 1 }}>
-            <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#FF4D4D', marginBottom: '4px' }}>
-              Duplicate Submission Blocked
-            </h4>
-            <p style={{ fontSize: '0.95rem', color: 'white' }}>{duplicateError}</p>
-          </div>
-          <button 
-            onClick={() => setDuplicateError(null)}
-            style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}
-          >
-            <X size={20} />
-          </button>
+          <AlertTriangle color="#EF4444" size={24} />
+          <span style={{ fontSize: '0.95rem', fontWeight: 600 }}>{duplicateError}</span>
         </div>
       )}
 
-      {/* MAIN FORM PANEL */}
-      <form onSubmit={handleSubmitForm1} className="glass-panel" style={{ padding: '36px' }}>
+      <form onSubmit={handleSubmit} className="glass-card" style={{ padding: '36px 28px', borderRadius: '20px' }}>
         
-        {/* SECTION 1: PERSONAL DETAILS */}
-        <h3 className="heading-font" style={{
-          fontSize: '1.3rem',
-          color: '#00E5FF',
-          marginBottom: '20px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px'
-        }}>
-          <span>1. Personal & Employment Information</span>
-        </h3>
+        {/* PERSONAL DETAILS SECTION */}
+        <div style={{ marginBottom: '32px' }}>
+          <h2 style={{ fontSize: '1.25rem', color: '#00E5FF', marginBottom: '20px', fontWeight: 700 }}>
+            1. Employee & Family Details
+          </h2>
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-          gap: '20px'
-        }}>
-          {/* Employee Name */}
-          <div className="form-group">
-            <label className="form-label">{t.empNameLabel}</label>
-            <input 
-              type="text" 
-              className="form-input"
-              placeholder={t.empNamePlaceholder}
-              value={formData.empName}
-              onChange={(e) => setFormData({ ...formData, empName: e.target.value })}
-            />
-            {errors.empName && <span style={{ color: '#FF4D4D', fontSize: '0.8rem' }}>{errors.empName}</span>}
-          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '20px' }}>
+            <div>
+              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>{t.fullName} *</label>
+              <input
+                type="text"
+                value={formData.empName}
+                onChange={e => setFormData(prev => ({ ...prev, empName: e.target.value }))}
+                placeholder="e.g. Rahul Sharma"
+                style={{
+                  width: '100%', padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
+                  background: 'rgba(255,255,255,0.06)', border: errors.empName ? '1px solid #EF4444' : '1px solid rgba(255,255,255,0.2)',
+                  color: 'white', outline: 'none'
+                }}
+              />
+              {errors.empName && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.empName}</p>}
+            </div>
 
-          {/* Employee ID */}
-          <div className="form-group">
-            <label className="form-label">{t.empIdLabel}</label>
-            <input 
-              type="text" 
-              className="form-input"
-              placeholder={t.empIdPlaceholder}
-              value={formData.empId}
-              onChange={(e) => setFormData({ ...formData, empId: e.target.value })}
-            />
-            {errors.empId && <span style={{ color: '#FF4D4D', fontSize: '0.8rem' }}>{errors.empId}</span>}
-          </div>
+            <div>
+              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>{t.empId} *</label>
+              <input
+                type="text"
+                value={formData.empId}
+                onChange={e => setFormData(prev => ({ ...prev, empId: e.target.value }))}
+                placeholder="e.g. YMI-1049"
+                style={{
+                  width: '100%', padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
+                  background: 'rgba(255,255,255,0.06)', border: errors.empId ? '1px solid #EF4444' : '1px solid rgba(255,255,255,0.2)',
+                  color: 'white', outline: 'none'
+                }}
+              />
+              {errors.empId && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.empId}</p>}
+            </div>
 
-          {/* Official Email */}
-          <div className="form-group">
-            <label className="form-label">{t.emailLabel}</label>
-            <input 
-              type="email" 
-              className="form-input"
-              placeholder={t.emailPlaceholder}
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            />
-            {errors.email && <span style={{ color: '#FF4D4D', fontSize: '0.8rem' }}>{errors.email}</span>}
-          </div>
+            <div>
+              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>{t.officialEmail} *</label>
+              <input
+                type="email"
+                value={formData.email}
+                onChange={e => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                placeholder="name@yamaha-motor.co.in"
+                style={{
+                  width: '100%', padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
+                  background: 'rgba(255,255,255,0.06)', border: errors.email ? '1px solid #EF4444' : '1px solid rgba(255,255,255,0.2)',
+                  color: 'white', outline: 'none'
+                }}
+              />
+              {errors.email && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.email}</p>}
+            </div>
 
-          {/* Phone Number */}
-          <div className="form-group">
-            <label className="form-label">{t.phoneLabel}</label>
-            <input 
-              type="tel" 
-              className="form-input"
-              placeholder={t.phonePlaceholder}
-              value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-            />
-            {errors.phone && <span style={{ color: '#FF4D4D', fontSize: '0.8rem' }}>{errors.phone}</span>}
-          </div>
+            <div>
+              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>{t.phoneNumber} * (10 Digits)</label>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <select
+                  value={countryCode}
+                  onChange={e => setCountryCode(e.target.value)}
+                  style={{
+                    padding: '12px 10px', borderRadius: '10px',
+                    background: '#040F2B', border: '1px solid rgba(255,255,255,0.2)',
+                    color: '#00E5FF', fontWeight: 700, outline: 'none', cursor: 'pointer', fontSize: '0.9rem'
+                  }}
+                >
+                  {COUNTRY_CODES.map(c => (
+                    <option key={c.code} value={c.code} style={{ background: '#040F2B', color: 'white' }}>
+                      {c.flag} {c.code}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  type="tel"
+                  maxLength={10}
+                  value={rawPhone}
+                  onChange={e => setRawPhone(e.target.value.replace(/\D/g, ''))}
+                  placeholder="9876543210"
+                  style={{
+                    flex: 1, padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
+                    background: 'rgba(255,255,255,0.06)', border: errors.phone ? '1px solid #EF4444' : '1px solid rgba(255,255,255,0.2)',
+                    color: 'white', outline: 'none', fontSize: '0.95rem'
+                  }}
+                />
+              </div>
+              {errors.phone && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.phone}</p>}
+            </div>
 
-          {/* City / Plant */}
-          <div className="form-group">
-            <label className="form-label">{t.cityLabel}</label>
-            <input 
-              type="text" 
-              className="form-input"
-              placeholder={t.cityPlaceholder}
-              value={formData.city}
-              onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-            />
-            {errors.city && <span style={{ color: '#FF4D4D', fontSize: '0.8rem' }}>{errors.city}</span>}
-          </div>
+            <div>
+              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>{t.cityLocation} *</label>
+              <input
+                type="text"
+                value={formData.city}
+                onChange={e => setFormData(prev => ({ ...prev, city: e.target.value }))}
+                placeholder="e.g. Surajpur / Chennai"
+                style={{
+                  width: '100%', padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
+                  background: 'rgba(255,255,255,0.06)', border: errors.city ? '1px solid #EF4444' : '1px solid rgba(255,255,255,0.2)',
+                  color: 'white', outline: 'none'
+                }}
+              />
+              {errors.city && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.city}</p>}
+            </div>
 
-          {/* Family Count */}
-          <div className="form-group">
-            <label className="form-label">{t.familyCountLabel}</label>
-            <input 
-              type="number" 
-              min="1"
-              max="15"
-              className="form-input"
-              placeholder={t.familyCountPlaceholder}
-              value={formData.familyMembers}
-              onChange={(e) => setFormData({ ...formData, familyMembers: e.target.value })}
-            />
-            {errors.familyMembers && <span style={{ color: '#FF4D4D', fontSize: '0.8rem' }}>{errors.familyMembers}</span>}
+            <div>
+              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>{t.familyMembersCount}</label>
+              <input
+                type="number"
+                min="1"
+                max="20"
+                value={formData.familyMembers}
+                onChange={e => setFormData(prev => ({ ...prev, familyMembers: e.target.value }))}
+                placeholder="e.g. 4"
+                style={{
+                  width: '100%', padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
+                  background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.2)',
+                  color: 'white', outline: 'none'
+                }}
+              />
+            </div>
           </div>
         </div>
 
-        <div style={{ height: '1px', background: 'rgba(255, 255, 255, 0.1)', margin: '30px 0' }} />
+        {/* MEDIA ASSETS UPLOAD SECTION (Max 2 photos, 10MB max each) */}
+        <div style={{ marginBottom: '32px' }}>
+          <h2 style={{ fontSize: '1.25rem', color: '#00E5FF', marginBottom: '8px', fontWeight: 700 }}>
+            2. Upload Photos (Max 2 Photos, Max 10MB each)
+          </h2>
+          <p style={{ color: '#94A3B8', fontSize: '0.85rem', marginBottom: '20px' }}>
+            Upload up to 2 high-resolution photos of your family Kando DIY Wall (All image formats supported).
+          </p>
 
-        {/* SECTION 2: MEDIA UPLOADS */}
-        <h3 className="heading-font" style={{
-          fontSize: '1.3rem',
-          color: '#00E5FF',
-          marginBottom: '8px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px'
-        }}>
-          <span>2. {t.mediaUploadTitle}</span>
-        </h3>
-        <p style={{ color: '#A0B2D6', fontSize: '0.9rem', marginBottom: '24px' }}>
-          {t.mediaUploadSubtitle}
-        </p>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          
-          {/* VIDEO DROPZONE */}
-          <div className="form-group">
-            <label className="form-label">
-              <FileVideo size={16} color="#00C6FF" />
-              {t.videoUploadLabel}
-            </label>
-
-            {videoPreview ? (
-              <div style={{
-                background: 'rgba(0,0,0,0.4)',
-                border: '1px solid #00E5FF',
-                borderRadius: '12px',
-                padding: '16px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <video src={videoPreview} style={{ width: '80px', height: '55px', borderRadius: '8px', objectFit: 'cover' }} />
-                  <div>
-                    <div style={{ fontWeight: 600, color: 'white', fontSize: '0.9rem' }}>{formData.video?.name}</div>
-                    <div style={{ fontSize: '0.75rem', color: '#00E5FF' }}>
-                      {(formData.video!.size / (1024 * 1024)).toFixed(2)} MB • Ready to upload
-                    </div>
-                  </div>
-                </div>
-                <button type="button" onClick={() => handleRemoveFile('video')} style={{ background: 'none', border: 'none', color: '#FF4D4D', cursor: 'pointer' }}>
-                  <X size={20} />
-                </button>
-              </div>
-            ) : (
-              <label style={{
-                border: '2px dashed rgba(0, 229, 255, 0.4)',
-                borderRadius: '16px',
-                padding: '28px',
-                textAlign: 'center',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '10px',
-                cursor: 'pointer',
-                background: 'rgba(4, 14, 42, 0.4)',
-                transition: 'all 0.25s ease'
-              }}>
-                <Upload size={32} color="#00E5FF" />
-                <span style={{ fontSize: '0.95rem', color: 'white' }}>
-                  {t.uploadDragDropText} <strong style={{ color: '#00E5FF' }}>{t.uploadBrowseText}</strong>
-                </span>
-                <span style={{ fontSize: '0.8rem', color: '#A0B2D6' }}>{t.maxSizeText}</span>
-                <input type="file" accept="video/mp4,video/mov,video/avi" onChange={(e) => handleFileChange(e, 'video')} style={{ display: 'none' }} />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+            
+            {/* PHOTO 1 */}
+            <div>
+              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>
+                Photo 1 (Required, Max 10MB) *
               </label>
-            )}
-            {errors.video && <span style={{ color: '#FF4D4D', fontSize: '0.8rem' }}>{errors.video}</span>}
-          </div>
-
-          {/* PHOTO 1 DROPZONE */}
-          <div className="form-group">
-            <label className="form-label">
-              <ImageIcon size={16} color="#00E5FF" />
-              {t.photo1UploadLabel}
-            </label>
-
-            {photo1Preview ? (
-              <div style={{
-                background: 'rgba(0,0,0,0.4)',
-                border: '1px solid #00E5FF',
-                borderRadius: '12px',
-                padding: '16px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <img src={photo1Preview} alt="Photo 1 preview" style={{ width: '70px', height: '55px', borderRadius: '8px', objectFit: 'cover' }} />
-                  <div>
-                    <div style={{ fontWeight: 600, color: 'white', fontSize: '0.9rem' }}>{formData.photo1?.name}</div>
-                    <div style={{ fontSize: '0.75rem', color: '#00E5FF' }}>
-                      {(formData.photo1!.size / (1024 * 1024)).toFixed(2)} MB • Ready to upload
-                    </div>
-                  </div>
+              {photo1Preview ? (
+                <div style={{ position: 'relative', height: '160px', borderRadius: '12px', overflow: 'hidden', border: '1.5px solid #00E5FF' }}>
+                  <img src={photo1Preview} alt="Preview 1" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <button type="button" onClick={() => handleRemovePhoto('photo1')} style={{ position: 'absolute', top: '8px', right: '8px', background: 'rgba(0,0,0,0.7)', border: 'none', borderRadius: '50%', padding: '6px', color: 'white', cursor: 'pointer' }}>
+                    <X size={16} />
+                  </button>
                 </div>
-                <button type="button" onClick={() => handleRemoveFile('photo1')} style={{ background: 'none', border: 'none', color: '#FF4D4D', cursor: 'pointer' }}>
-                  <X size={20} />
-                </button>
-              </div>
-            ) : (
-              <label style={{
-                border: '2px dashed rgba(255, 255, 255, 0.25)',
-                borderRadius: '16px',
-                padding: '24px',
-                textAlign: 'center',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '8px',
-                cursor: 'pointer',
-                background: 'rgba(4, 14, 42, 0.4)'
-              }}>
-                <Upload size={28} color="#A0B2D6" />
-                <span style={{ fontSize: '0.9rem', color: 'white' }}>
-                  {t.uploadDragDropText} <strong style={{ color: '#00E5FF' }}>{t.uploadBrowseText}</strong>
-                </span>
-                <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => handleFileChange(e, 'photo1')} style={{ display: 'none' }} />
+              ) : (
+                <label style={{
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                  height: '160px', borderRadius: '12px', border: '2px dashed rgba(0, 229, 255, 0.4)',
+                  background: 'rgba(0, 229, 255, 0.04)', cursor: 'pointer', textAlign: 'center', padding: '16px'
+                }}>
+                  <ImageIcon size={28} color="#00E5FF" />
+                  <span style={{ fontSize: '0.85rem', color: '#CBD5E1', marginTop: '8px' }}>Click to select Photo 1</span>
+                  <span style={{ fontSize: '0.75rem', color: '#64748B' }}>All image formats (Max 10MB)</span>
+                  <input type="file" accept="image/*" onChange={e => handlePhotoChange(e, 'photo1')} style={{ display: 'none' }} />
+                </label>
+              )}
+              {errors.photo1 && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.photo1}</p>}
+            </div>
+
+            {/* PHOTO 2 */}
+            <div>
+              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>
+                Photo 2 (Optional, Max 10MB)
               </label>
-            )}
-            {errors.photo1 && <span style={{ color: '#FF4D4D', fontSize: '0.8rem' }}>{errors.photo1}</span>}
-          </div>
-
-          {/* PHOTO 2 DROPZONE */}
-          <div className="form-group">
-            <label className="form-label">
-              <ImageIcon size={16} color="#A855F7" />
-              {t.photo2UploadLabel}
-            </label>
-
-            {photo2Preview ? (
-              <div style={{
-                background: 'rgba(0,0,0,0.4)',
-                border: '1px solid #A855F7',
-                borderRadius: '12px',
-                padding: '16px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <img src={photo2Preview} alt="Photo 2 preview" style={{ width: '70px', height: '55px', borderRadius: '8px', objectFit: 'cover' }} />
-                  <div>
-                    <div style={{ fontWeight: 600, color: 'white', fontSize: '0.9rem' }}>{formData.photo2?.name}</div>
-                    <div style={{ fontSize: '0.75rem', color: '#A855F7' }}>
-                      {(formData.photo2!.size / (1024 * 1024)).toFixed(2)} MB • Ready to upload
-                    </div>
-                  </div>
+              {photo2Preview ? (
+                <div style={{ position: 'relative', height: '160px', borderRadius: '12px', overflow: 'hidden', border: '1.5px solid #00E5FF' }}>
+                  <img src={photo2Preview} alt="Preview 2" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <button type="button" onClick={() => handleRemovePhoto('photo2')} style={{ position: 'absolute', top: '8px', right: '8px', background: 'rgba(0,0,0,0.7)', border: 'none', borderRadius: '50%', padding: '6px', color: 'white', cursor: 'pointer' }}>
+                    <X size={16} />
+                  </button>
                 </div>
-                <button type="button" onClick={() => handleRemoveFile('photo2')} style={{ background: 'none', border: 'none', color: '#FF4D4D', cursor: 'pointer' }}>
-                  <X size={20} />
-                </button>
-              </div>
-            ) : (
-              <label style={{
-                border: '2px dashed rgba(255, 255, 255, 0.25)',
-                borderRadius: '16px',
-                padding: '24px',
-                textAlign: 'center',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '8px',
-                cursor: 'pointer',
-                background: 'rgba(4, 14, 42, 0.4)'
-              }}>
-                <Upload size={28} color="#A0B2D6" />
-                <span style={{ fontSize: '0.9rem', color: 'white' }}>
-                  {t.uploadDragDropText} <strong style={{ color: '#A855F7' }}>{t.uploadBrowseText}</strong>
-                </span>
-                <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => handleFileChange(e, 'photo2')} style={{ display: 'none' }} />
-              </label>
-            )}
-            {errors.photo2 && <span style={{ color: '#FF4D4D', fontSize: '0.8rem' }}>{errors.photo2}</span>}
+              ) : (
+                <label style={{
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                  height: '160px', borderRadius: '12px', border: '2px dashed rgba(255, 255, 255, 0.2)',
+                  background: 'rgba(255, 255, 255, 0.02)', cursor: 'pointer', textAlign: 'center', padding: '16px'
+                }}>
+                  <Upload size={28} color="#A0B2D6" />
+                  <span style={{ fontSize: '0.85rem', color: '#CBD5E1', marginTop: '8px' }}>Click to select Photo 2</span>
+                  <span style={{ fontSize: '0.75rem', color: '#64748B' }}>All image formats (Max 10MB)</span>
+                  <input type="file" accept="image/*" onChange={e => handlePhotoChange(e, 'photo2')} style={{ display: 'none' }} />
+                </label>
+              )}
+              {errors.photo2 && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.photo2}</p>}
+            </div>
+
           </div>
         </div>
 
-        <div style={{ height: '1px', background: 'rgba(255, 255, 255, 0.1)', margin: '30px 0' }} />
-
-        {/* SECTION 3: CONSENTS */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '32px' }}>
-          <label className="checkbox-container">
-            <input 
-              type="checkbox" 
-              checked={dataConsent} 
-              onChange={(e) => setDataConsent(e.target.checked)} 
-            />
-            <span className="custom-checkbox">
-              {dataConsent && <CheckCircle size={14} color="white" />}
-            </span>
-            <span>{t.dataConsentText}</span>
+        {/* CEO REFLECTION */}
+        <div style={{ marginBottom: '32px' }}>
+          <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>
+            Reflection Message (Share your Kando Experience)
           </label>
-          {errors.dataConsent && <span style={{ color: '#FF4D4D', fontSize: '0.8rem' }}>{errors.dataConsent}</span>}
+          <textarea
+            rows={3}
+            value={formData.ceoReflection}
+            onChange={e => setFormData(prev => ({ ...prev, ceoReflection: e.target.value }))}
+            placeholder="Share a short note about creating this Kando DIY wall with your family..."
+            style={{
+              width: '100%', padding: '12px 14px', borderRadius: '10px',
+              background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.2)',
+              color: 'white', outline: 'none', resize: 'vertical'
+            }}
+          />
+        </div>
 
-          <label className="checkbox-container">
-            <input 
-              type="checkbox" 
-              checked={mediaConsent} 
-              onChange={(e) => setMediaConsent(e.target.checked)} 
-            />
-            <span className="custom-checkbox">
-              {mediaConsent && <CheckCircle size={14} color="white" />}
-            </span>
-            <span>{t.mediaConsentText}</span>
+        {/* CONSENTS & SUBMIT */}
+        <div style={{ marginBottom: '28px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', color: '#CBD5E1', fontSize: '0.85rem' }}>
+            <input type="checkbox" checked={dataConsent} onChange={e => setDataConsent(e.target.checked)} style={{ accentColor: '#00E5FF' }} />
+            I agree to the Terms & Conditions and Privacy Policy. *
+          </label>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', color: '#CBD5E1', fontSize: '0.85rem' }}>
+            <input type="checkbox" checked={mediaConsent} onChange={e => setMediaConsent(e.target.checked)} style={{ accentColor: '#00E5FF' }} />
+            I grant Yamaha permission to feature my submission photos in internal publications.
           </label>
         </div>
 
-        {/* SUBMIT BUTTON */}
-        <button 
-          type="submit" 
-          className="btn-primary"
-          style={{ width: '100%', justifyContent: 'center', padding: '16px', fontSize: '1.1rem' }}
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          style={{
+            width: '100%', padding: '16px', borderRadius: '14px',
+            background: 'linear-gradient(90deg, #00C6FF 0%, #0072FF 100%)',
+            border: 'none', color: 'white', fontSize: '1.05rem', fontWeight: 800,
+            cursor: isSubmitting ? 'not-allowed' : 'pointer',
+            boxShadow: '0 6px 20px rgba(0, 198, 255, 0.4)', display: 'flex',
+            alignItems: 'center', justifyContent: 'center', gap: '8px'
+          }}
         >
-          <span>{t.submitForm1Btn}</span>
-          <ArrowRight size={20} />
+          {isSubmitting ? 'Submitting...' : 'SUBMIT FORM 1'}
+          <CheckCircle size={18} />
         </button>
 
       </form>

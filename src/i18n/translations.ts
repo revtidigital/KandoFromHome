@@ -36,10 +36,29 @@ export interface Translations {
   step4Desc: string;
   startSubmissionBtn: string;
   submissionDeadlineText: string;
+
+  // Home Page Cards
+  chooseSubmissionFormTitle: string;
+  chooseSubmissionFormDesc: string;
+  form1Badge: string;
+  form1CardTitle: string;
+  form1CardDesc: string;
+  form1CardBtn: string;
+  form2Badge: string;
+  form2CardTitle: string;
+  form2CardDesc: string;
+  form2CardBtn: string;
   
-  // Form 1
+  // Form 1 & Form 2 Fields
   form1Title: string;
   form1Subtitle: string;
+  fullName: string;
+  empId: string;
+  officialEmail: string;
+  phoneNumber: string;
+  cityLocation: string;
+  familyMembersCount: string;
+
   empNameLabel: string;
   empNamePlaceholder: string;
   empIdLabel: string;
@@ -97,7 +116,28 @@ export interface Translations {
   
   // Legal
   privacyPolicyTitle: string;
+  privacySubtitle: string;
+  privacySec1Title: string;
+  privacySec1Body: string;
+  privacySec2Title: string;
+  privacySec2Body: string;
+  privacySec3Title: string;
+  privacySec3Body: string;
+  privacySec4Title: string;
+  privacySec4Body: string;
+  privacySec5Title: string;
+  privacySec5Body: string;
+
   termsConditionsTitle: string;
+  termsSubtitle: string;
+  termsSec1Title: string;
+  termsSec1Body: string;
+  termsSec2Title: string;
+  termsSec2Body: string;
+  termsSec3Title: string;
+  termsSec3Body: string;
+  termsSec4Title: string;
+  termsSec4Body: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -137,9 +177,28 @@ export const translations: Record<Language, Translations> = {
     startSubmissionBtn: "Start Submission Now",
     submissionDeadlineText: "Campaign Submission Window: 27 July 2026 – 15 August 2026",
 
-    // Form 1
+    // Home Cards
+    chooseSubmissionFormTitle: "Choose Your Submission Form",
+    chooseSubmissionFormDesc: "Form 1 and Form 2 are independent. You can submit either or both forms for Yamaha Day 2026.",
+    form1Badge: "FORM 1 SUBMISSION",
+    form1CardTitle: "DIY Kit Creation & Photos",
+    form1CardDesc: "Fill your employee details, upload up to 2 high-quality photos (Max 10MB each) of your assembled Family Day DIY Kit, and share your CEO reflection text.",
+    form1CardBtn: "Open & Fill Form 1 →",
+    form2Badge: "FORM 2 SUBMISSION",
+    form2CardTitle: "Family Kando Video Submission",
+    form2CardDesc: "Authenticate your Employee ID and upload 1 family video (Max 40MB) showcasing your family's creation in action and sharing your special Kando moment.",
+    form2CardBtn: "Open & Fill Form 2 →",
+
+    // Form 1 & Form 2 Fields
     form1Title: "Form 1: Personal Details & Media Upload",
     form1Subtitle: "Please fill out all mandatory fields and attach high-quality media of your completed DIY creation.",
+    fullName: "Employee Full Name",
+    empId: "Employee ID",
+    officialEmail: "Official Email Address",
+    phoneNumber: "Mobile Phone Number",
+    cityLocation: "City / Plant Location",
+    familyMembersCount: "Number of Participating Family Members",
+
     empNameLabel: "Employee Full Name *",
     empNamePlaceholder: "e.g. Rahul Sharma",
     empIdLabel: "Employee ID *",
@@ -155,13 +214,13 @@ export const translations: Record<Language, Translations> = {
 
     // Media
     mediaUploadTitle: "DIY Creation Media Upload",
-    mediaUploadSubtitle: "Upload 1 video (showing creation in action) and 2 clear photos (max 50MB per file).",
-    videoUploadLabel: "DIY Video (1 Video File - Max 50MB) *",
-    photo1UploadLabel: "DIY Creation Photo 1 (Max 50MB) *",
-    photo2UploadLabel: "DIY Creation Photo 2 (Max 50MB) *",
+    mediaUploadSubtitle: "Upload 1 video (showing creation in action) and 2 clear photos (max 10MB per image, 40MB per video).",
+    videoUploadLabel: "DIY Video (1 Video File - Max 40MB) *",
+    photo1UploadLabel: "DIY Creation Photo 1 (Max 10MB) *",
+    photo2UploadLabel: "DIY Creation Photo 2 (Max 10MB) *",
     uploadDragDropText: "Drag & drop file here, or",
     uploadBrowseText: "Browse File",
-    maxSizeText: "Accepted formats: MP4, MOV, JPG, PNG (Max 50MB)",
+    maxSizeText: "Accepted formats: MP4, MOV, JPG, PNG (Max 10MB photo, 40MB video)",
     fileSelectedText: "File attached successfully",
 
     // Consents
@@ -197,7 +256,28 @@ export const translations: Record<Language, Translations> = {
 
     // Legal
     privacyPolicyTitle: "Data Privacy & PII Protection Policy",
-    termsConditionsTitle: "Campaign Terms & Media Rights Conditions"
+    privacySubtitle: "Last Updated: 27 July 2026 | Compliant with Digital Personal Data Protection (DPDP) Standards",
+    privacySec1Title: "1. Scope of Data Collection",
+    privacySec1Body: "For the Yamaha Day 2026 \"Kando From Home\" campaign, Yamaha Motor India Group collects employee personal information strictly required for identity validation and campaign administration. This includes Employee Full Name, Employee ID, Official Email Address, Contact Number, Plant/City Location, Family Participation Count, and uploaded media files (photos & video).",
+    privacySec2Title: "2. Purpose & Media Consent",
+    privacySec2Body: "Personal data collected is used solely for validating participation, shortlisting winning family DIY entries, issuing digital certificates, and organizing Yamaha Day 2026 events. Uploaded photos and videos will only be featured in internal communications and promotional showcases where explicit consent has been provided during Form 1 submission.",
+    privacySec3Title: "3. Data Storage, Encryption & Security",
+    privacySec3Body: "All submitted data is stored securely in encrypted MongoDB databases and server object storage with signed URL access controls. Access is strictly restricted to authorized administrative personnel with role-based access controls and detailed audit logging.",
+    privacySec4Title: "4. Data Retention & Deletion",
+    privacySec4Body: "Campaign submissions will be retained for 180 days following the conclusion of Yamaha Day 2026 for archiving and administrative reporting, after which non-featured personal media will be securely purged upon written request from the employee.",
+    privacySec5Title: "5. Contact Data Protection Officer",
+    privacySec5Body: "For privacy inquiries or data rights requests, please contact the Internal Data Protection Committee at privacy@yamaha-motor.co.in.",
+
+    termsConditionsTitle: "Campaign Terms & Media Rights Conditions",
+    termsSubtitle: "Yamaha Day 2026 \"Kando From Home\" Official Campaign Guidelines",
+    termsSec1Title: "1. Eligibility",
+    termsSec1Body: "The Kando From Home DIY Kit initiative is open to all active employees of Yamaha Motor India Group and their immediate family members across all corporate offices, manufacturing plants (Surajpur, Chennai, Kanchipuram), and regional sales locations.",
+    termsSec2Title: "2. Submission Guidelines & File Specifications",
+    termsSec2Body: "Each employee is permitted exactly one submission against their valid Employee ID. Submission includes Form 1 (Personal details & up to 2 photos max 10MB each) and Form 2 (1 video max 40MB & CEO Reflection).",
+    termsSec3Title: "3. Originality & Safety",
+    termsSec3Body: "All submissions must feature original DIY craft assembly completed by the employee and their family. Uploaded content must adhere to corporate conduct guidelines and contain no inappropriate material.",
+    termsSec4Title: "4. Shortlisting & Recognition",
+    termsSec4Body: "Entries will be evaluated by the Yamaha Day 2026 Admin Committee based on creativity, family participation, and reflection alignment with Yamaha's spirit of Kando."
   },
 
   hi: {
@@ -236,9 +316,28 @@ export const translations: Record<Language, Translations> = {
     startSubmissionBtn: "सबमिशन शुरू करें",
     submissionDeadlineText: "अभियान जमा करने की अवधि: 27 जुलाई 2026 - 15 अगस्त 2026",
 
+    // Home Cards
+    chooseSubmissionFormTitle: "अपना सबमिशन फॉर्म चुनें",
+    chooseSubmissionFormDesc: "फॉर्म 1 और फॉर्म 2 स्वतंत्र हैं। आप यामाहा डे 2026 के लिए इनमें से कोई भी या दोनों फॉर्म जमा कर सकते हैं।",
+    form1Badge: "फॉर्म 1 सबमिशन",
+    form1CardTitle: "DIY किट निर्माण और तस्वीरें",
+    form1CardDesc: "अपने कर्मचारी विवरण भरें, अपनी फैमिली डे DIY किट की अधिकतम 2 उच्च-गुणवत्ता वाली तस्वीरें (प्रत्येक अधिकतम 10MB) अपलोड करें, और अपने सीईओ विचार पाठ साझा करें।",
+    form1CardBtn: "फॉर्म 1 खोलें और भरें →",
+    form2Badge: "फॉर्म 2 सबमिशन",
+    form2CardTitle: "फैमिली कांदो वीडियो सबमिशन",
+    form2CardDesc: "अपनी कर्मचारी आईडी सत्यापित करें और अपने परिवार की रचना और विशेष कांदो क्षण प्रदर्शित करने वाला 1 पारिवारिक वीडियो (अधिकतम 40MB) अपलोड करें।",
+    form2CardBtn: "फॉर्म 2 खोलें और भरें →",
+
     // Form 1
     form1Title: "फॉर्म 1: व्यक्तिगत विवरण और मीडिया अपलोड",
     form1Subtitle: "कृपया सभी अनिवार्य फ़ील्ड भरें और अपनी पूर्ण DIY रचना के उच्च-गुणवत्ता वाले मीडिया संलग्न करें।",
+    fullName: "कर्मचारी का पूरा नाम",
+    empId: "कर्मचारी आईडी",
+    officialEmail: "आधिकारिक ईमेल पता",
+    phoneNumber: "मोबाइल फोन नंबर",
+    cityLocation: "शहर / प्लांट स्थान",
+    familyMembersCount: "परिवार के सदस्यों की संख्या",
+
     empNameLabel: "कर्मचारी का पूरा नाम *",
     empNamePlaceholder: "उदा. राहुल शर्मा",
     empIdLabel: "कर्मचारी आईडी *",
@@ -254,13 +353,13 @@ export const translations: Record<Language, Translations> = {
 
     // Media
     mediaUploadTitle: "DIY क्रिएशन मीडिया अपलोड",
-    mediaUploadSubtitle: "1 वीडियो और 2 स्पष्ट फ़ोटो अपलोड करें (अधिकतम 50MB प्रति फ़ाइल)।",
-    videoUploadLabel: "DIY वीडियो (1 वीडियो फ़ाइल - अधिकतम 50MB) *",
-    photo1UploadLabel: "DIY निर्माण फोटो 1 (अधिकतम 50MB) *",
-    photo2UploadLabel: "DIY निर्माण फोटो 2 (अधिकतम 50MB) *",
+    mediaUploadSubtitle: "1 वीडियो (अधिकतम 40MB) और 2 फोटो (अधिकतम 10MB प्रति फ़ोटो) अपलोड करें।",
+    videoUploadLabel: "DIY वीडियो (1 वीडियो फ़ाइल - अधिकतम 40MB) *",
+    photo1UploadLabel: "DIY निर्माण फोटो 1 (अधिकतम 10MB) *",
+    photo2UploadLabel: "DIY निर्माण फोटो 2 (अधिकतम 10MB) *",
     uploadDragDropText: "फ़ाइल यहाँ खींचें और छोड़ें, या",
     uploadBrowseText: "फ़ाइल ब्राउज़ करें",
-    maxSizeText: "स्वीकृत प्रारूप: MP4, MOV, JPG, PNG (अधिकतम 50MB)",
+    maxSizeText: "स्वीकृत प्रारूप: MP4, MOV, JPG, PNG (अधिकतम 10MB फोटो, 40MB वीडियो)",
     fileSelectedText: "फ़ाइल सफलतापूर्वक संलग्न की गई",
 
     // Consents
@@ -296,7 +395,28 @@ export const translations: Record<Language, Translations> = {
 
     // Legal
     privacyPolicyTitle: "डेटा गोपनीयता और PII सुरक्षा नीति",
-    termsConditionsTitle: "अभियान नियम और मीडिया अधिकार शर्तें"
+    privacySubtitle: "अंतिम अद्यतन: 27 जुलाई 2026 | डिजिटल व्यक्तिगत डेटा संरक्षण (DPDP) मानकों के अनुरूप",
+    privacySec1Title: "1. डेटा संग्रह का दायरा",
+    privacySec1Body: "यामाहा डे 2026 \"कांदो फ्रॉम होम\" अभियान के लिए, यामाहा मोटर इंडिया ग्रुप केवल पहचान सत्यापन और अभियान प्रशासन के लिए आवश्यक कर्मचारी व्यक्तिगत जानकारी एकत्र करता है। इसमें कर्मचारी का पूरा नाम, कर्मचारी आईडी, आधिकारिक ईमेल पता, संपर्क नंबर, प्लांट/शहर का स्थान, परिवार की भागीदारी संख्या और अपलोड की गई मीडिया फ़ाइलें शामिल हैं।",
+    privacySec2Title: "2. उद्देश्य और मीडिया सहमति",
+    privacySec2Body: "एकत्रित व्यक्तिगत डेटा का उपयोग केवल भागीदारी को सत्यापित करने, विजेता पारिवारिक DIY प्रविष्टियों को शॉर्टलिस्ट करने, डिजिटल प्रमाणपत्र जारी करने और यामाहा डे 2026 कार्यक्रमों का आयोजन करने के लिए किया जाता है। अपलोड की गई तस्वीरें और वीडियो केवल आंतरिक संचार और प्रचार प्रदर्शनों में दिखाए जाएंगे जहां सहमति प्रदान की गई है।",
+    privacySec3Title: "3. डेटा संग्रहण, एन्क्रिप्शन और सुरक्षा",
+    privacySec3Body: "सभी सबमिट किया गया डेटा एन्क्रिप्टेड MongoDB डेटाबेस और सर्वर ऑब्जेक्ट स्टोरेज में सुरक्षित रूप से संग्रहीत किया जाता है। एक्सेस केवल अधिकृत प्रशासनिक कर्मियों तक ही सीमित है।",
+    privacySec4Title: "4. डेटा अवधारण और विलोपन",
+    privacySec4Body: "अभियान सबमिशन को यामाहा डे 2026 के समापन के बाद 180 दिनों के लिए संग्रहीत किया जाएगा, जिसके बाद कर्मचारी के लिखित अनुरोध पर मीडिया को सुरक्षित रूप से हटा दिया जाएगा।",
+    privacySec5Title: "5. डेटा संरक्षण अधिकारी से संपर्क करें",
+    privacySec5Body: "गोपनीयता पूछताछ या डेटा अधिकारों के अनुरोधों के लिए, कृपया आंतरिक डेटा संरक्षण समिति से privacy@yamaha-motor.co.in पर संपर्क करें।",
+
+    termsConditionsTitle: "अभियान नियम और मीडिया अधिकार शर्तें",
+    termsSubtitle: "यामाहा डे 2026 \"कांदो फ्रॉम होम\" आधिकारिक अभियान दिशानिर्देश",
+    termsSec1Title: "1. पात्रता",
+    termsSec1Body: "कांदो फ्रॉम होम DIY किट पहल यामाहा मोटर इंडिया ग्रुप के सभी सक्रिय कर्मचारियों और उनके निकटतम परिवार के सदस्यों के लिए खुली है।",
+    termsSec2Title: "2. सबमिशन दिशानिर्देश और फ़ाइल विनिर्देश",
+    termsSec2Body: "प्रत्येक कर्मचारी को अपनी वैध कर्मचारी आईडी के विरुद्ध केवल एक सबमिशन की अनुमति है। सबमिशन में फॉर्म 1 (अधिकतम 2 तस्वीरें, 10MB प्रत्येक) और फॉर्म 2 (1 वीडियो, अधिकतम 40MB और सीईओ विचार) शामिल हैं।",
+    termsSec3Title: "3. मौलिकता और सुरक्षा",
+    termsSec3Body: "सभी सबमिशन में कर्मचारी और उनके परिवार द्वारा पूरी की गई मूल DIY क्राफ्ट असेंबली होनी चाहिए।",
+    termsSec4Title: "4. शॉर्टलिस्टिंग और मान्यता",
+    termsSec4Body: "प्रविष्टियों का मूल्यांकन यामाहा डे 2026 एडमिन समिति द्वारा रचनात्मकता और पारिवारिक भागीदारी के आधार पर किया जाएगा।"
   },
 
   ta: {
@@ -335,9 +455,28 @@ export const translations: Record<Language, Translations> = {
     startSubmissionBtn: "சமர்ப்பிக்கத் தொடங்குங்கள்",
     submissionDeadlineText: "சமர்ப்பிப்பு காலம்: 27 ஜூலை 2026 – 15 ஆகஸ்ட் 2026",
 
+    // Home Cards
+    chooseSubmissionFormTitle: "உங்கள் சமர்ப்பிப்பு படிவத்தைத் தேர்ந்தெடுக்கவும்",
+    chooseSubmissionFormDesc: "படிவம் 1 மற்றும் படிவம் 2 ஆகியவை தனித்தனி. இரண்டையும் அல்லது ஒன்றினைச் சமர்ப்பிக்கலாம்.",
+    form1Badge: "படிவம் 1 சமர்ப்பிப்பு",
+    form1CardTitle: "DIY கிட் உருவாக்கம் & புகைப்படங்கள்",
+    form1CardDesc: "உங்கள் விவரங்களை நிரப்பி, 2 புகைப்படங்கள் (அதிகபட்சம் 10MB) மற்றும் சிஇஓ சிந்தனையைப் பகிரவும்.",
+    form1CardBtn: "படிவம் 1 ஐத் திறந்து நிரப்பவும் →",
+    form2Badge: "படிவம் 2 சமர்ப்பிப்பு",
+    form2CardTitle: "குடும்ப காண்டோ வீடியோ சமர்ப்பிப்பு",
+    form2CardDesc: "பணியாளர் ஐடியை சரிபார்த்து 1 குடும்ப வீடியோவை (அதிகபட்சம் 40MB) பதிவேற்றவும்.",
+    form2CardBtn: "படிவம் 2 ஐத் திறந்து நிரப்பவும் →",
+
     // Form 1
     form1Title: "படிவம் 1: தனிப்பட்ட விவரங்கள் & ஊடகப் பதிவேற்றம்",
     form1Subtitle: "தேவையான விவரங்களை நிரப்பி உங்கள் படைப்பின் படங்களை பதிவேற்றவும்.",
+    fullName: "பணியாளர் முழுப் பெயர்",
+    empId: "பணியாளர் ஐடி",
+    officialEmail: "அதிகாரப்பூர்வ மின்னஞ்சல்",
+    phoneNumber: "கைபேசி எண்",
+    cityLocation: "நகரம் / ஆலை இருப்பிடம்",
+    familyMembersCount: "குடும்ப உறுப்பினர்கள் எண்ணிக்கை",
+
     empNameLabel: "பணியாளர் முழுப் பெயர் *",
     empNamePlaceholder: "எ.கா. ராகுல் சர்மா",
     empIdLabel: "பணியாளர் ஐடி *",
@@ -353,13 +492,13 @@ export const translations: Record<Language, Translations> = {
 
     // Media
     mediaUploadTitle: "DIY படைப்பு ஊடகப் பதிவேற்றம்",
-    mediaUploadSubtitle: "1 வீடியோ மற்றும் 2 படங்களைப் பதிவேற்றவும் (அதிகபட்சம் 50MB).",
-    videoUploadLabel: "DIY வீடியோ (1 வீடியோ கோப்பு - அதிகபட்சம் 50MB) *",
-    photo1UploadLabel: "DIY புகைப்பட 1 (அதிகபட்சம் 50MB) *",
-    photo2UploadLabel: "DIY புகைப்பட 2 (அதிகபட்சம் 50MB) *",
+    mediaUploadSubtitle: "1 வீடியோ மற்றும் 2 படங்களைப் பதிவேற்றவும் (அதிகபட்சம் 10MB photo, 40MB video).",
+    videoUploadLabel: "DIY வீடியோ (1 வீடியோ கோப்பு - அதிகபட்சம் 40MB) *",
+    photo1UploadLabel: "DIY புகைப்பட 1 (அதிகபட்சம் 10MB) *",
+    photo2UploadLabel: "DIY புகைப்பட 2 (அதிகபட்சம் 10MB) *",
     uploadDragDropText: "கோப்பை இங்கே இழுத்து விடவும், அல்லது",
     uploadBrowseText: "கோப்பைத் தேர்ந்தெடுக்கவும்",
-    maxSizeText: "ஏற்றுக்கொள்ளப்பட்ட வடிவங்கள்: MP4, MOV, JPG, PNG (அதிகபட்சம் 50MB)",
+    maxSizeText: "ஏற்றுக்கொள்ளப்பட்ட வடிவங்கள்: MP4, MOV, JPG, PNG (10MB photo, 40MB video)",
     fileSelectedText: "கோப்பு வெற்றிகரமாக இணைக்கப்பட்டது",
 
     // Consents
@@ -394,7 +533,28 @@ export const translations: Record<Language, Translations> = {
     backHomeBtn: "முகப்புப் பக்கத்திற்குத் திரும்பவும்",
 
     // Legal
-    privacyPolicyTitle: "தரவு தனியுரிமை மற்றும் PII பாதுகாப்பு கொள்கை",
-    termsConditionsTitle: "பிரச்சார விதிமுறைகள் மற்றும் ஊடக உரிமை நிபந்தனைகள்"
+    privacyPolicyTitle: "தரவு தனியுரிமை கொள்கை",
+    privacySubtitle: "கடைசியாகப் புதுப்பிக்கப்பட்டது: 27 ஜூலை 2026",
+    privacySec1Title: "1. சேகரிக்கப்படும் தரவு",
+    privacySec1Body: "யமஹா டே 2026 பிரச்சாரத்திற்காக பணியாளர் பெயர், ஐடி, மின்னஞ்சல், தொலைபேசி மற்றும் புகைப்படங்கள் சேகரிக்கப்படுகின்றன.",
+    privacySec2Title: "2. நோக்கம்",
+    privacySec2Body: "சான்றிதழ் வழங்கவும் தேர்வுகளை நடத்தவும் தரவு பயன்படுத்தப்படும்.",
+    privacySec3Title: "3. பாதுகாப்பு",
+    privacySec3Body: "அனைத்து தரவுகளும் பாதுகாப்பாக MongoDB சேமிப்பகத்தில் சேமிக்கப்படும்.",
+    privacySec4Title: "4. தரவு நீக்கம்",
+    privacySec4Body: "180 நாட்களுக்குப் பிறகு தரவு நீக்கப்படும்.",
+    privacySec5Title: "5. தொடர்பு",
+    privacySec5Body: "privacy@yamaha-motor.co.in ஐத் தொடர்பு கொள்ளவும்.",
+
+    termsConditionsTitle: "பிரச்சார விதிமுறைகள்",
+    termsSubtitle: "யமஹா டே 2026 அதிகாரப்பூர்வ வழிகாட்டுதல்கள்",
+    termsSec1Title: "1. தகுதி",
+    termsSec1Body: "யமஹா மோட்டார் இந்தியா குழுமத்தின் அனைத்து ஊழியர்களும் அவர்களின் குடும்பத்தினரும் பங்கேற்கலாம்.",
+    termsSec2Title: "2. கோப்பு விவரங்கள்",
+    termsSec2Body: "படிவம் 1 (2 படங்கள்) மற்றும் படிவம் 2 (1 வீடியோ) சமர்ப்பிக்கப்பட வேண்டும்.",
+    termsSec3Title: "3. பாதுகாப்பு",
+    termsSec3Body: "அனைத்து சமர்ப்பிப்புகளும் அசல் படைப்புகளாக இருக்க வேண்டும்.",
+    termsSec4Title: "4. அங்கீகாரம்",
+    termsSec4Body: "சிறந்த படைப்புகளுக்கு யமஹா தினத்தில் அங்கீகாரம் வழங்கப்படும்."
   }
 };
