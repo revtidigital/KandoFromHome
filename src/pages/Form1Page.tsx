@@ -15,17 +15,7 @@ export const Form1Page: React.FC = () => {
   const [dataConsent, setDataConsent] = useState(true);
   const [mediaConsent, setMediaConsent] = useState(true);
 
-  const [countryCode, setCountryCode] = useState('+91');
   const [rawPhone, setRawPhone] = useState(formData.phone ? formData.phone.replace(/^\+\d+\s*/, '') : '');
-
-  const COUNTRY_CODES = [
-    { code: '+91', flag: '🇮🇳', country: 'India' },
-    { code: '+44', flag: '🇬🇧', country: 'UK' },
-    { code: '+1',  flag: '🇺🇸', country: 'USA' },
-    { code: '+81', flag: '🇯🇵', country: 'Japan' },
-    { code: '+971',flag: '🇦🇪', country: 'UAE' },
-    { code: '+65', flag: '🇸🇬', country: 'Singapore' }
-  ];
 
   // File Upload Handler with Max 10MB per Image Limit (Req 4)
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>, field: 'photo1' | 'photo2') => {
@@ -108,7 +98,7 @@ export const Form1Page: React.FC = () => {
       return;
     }
 
-    const fullFormattedPhone = `${countryCode} ${digitsOnly}`;
+    const fullFormattedPhone = `+91 ${digitsOnly}`;
     setFormData(prev => ({ ...prev, phone: fullFormattedPhone }));
     setIsSubmitting(true);
 
@@ -262,23 +252,16 @@ export const Form1Page: React.FC = () => {
 
             <div style={{ minWidth: 0 }}>
               <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>{t.phoneNumber} * (10 Digits)</label>
-              <div style={{ display: 'flex', gap: '6px', minWidth: 0, width: '100%' }}>
-                <select
-                  value={countryCode}
-                  onChange={e => setCountryCode(e.target.value)}
-                  style={{
-                    padding: '12px 6px', borderRadius: '10px',
-                    background: '#040F2B', border: '1px solid rgba(255,255,255,0.2)',
-                    color: '#00E5FF', fontWeight: 700, outline: 'none', cursor: 'pointer', fontSize: '0.85rem',
-                    flexShrink: 0, width: '85px'
-                  }}
-                >
-                  {COUNTRY_CODES.map(c => (
-                    <option key={c.code} value={c.code} style={{ background: '#040F2B', color: 'white' }}>
-                      {c.flag} {c.code}
-                    </option>
-                  ))}
-                </select>
+              <div style={{ display: 'flex', gap: '8px', minWidth: 0, width: '100%', alignItems: 'center' }}>
+                <div style={{
+                  padding: '12px 10px', borderRadius: '10px',
+                  background: 'rgba(0, 229, 255, 0.12)', border: '1px solid rgba(0, 229, 255, 0.3)',
+                  color: '#00E5FF', fontWeight: 800, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '6px',
+                  flexShrink: 0
+                }}>
+                  <span>🇮🇳</span>
+                  <span>+91</span>
+                </div>
                 <input
                   type="tel"
                   maxLength={10}
@@ -286,9 +269,9 @@ export const Form1Page: React.FC = () => {
                   onChange={e => setRawPhone(e.target.value.replace(/\D/g, ''))}
                   placeholder="9876543210"
                   style={{
-                    flex: 1, minWidth: 0, width: '100%', padding: '12px 12px', borderRadius: '10px', boxSizing: 'border-box',
+                    flex: 1, minWidth: 0, width: '100%', padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
                     background: 'rgba(255,255,255,0.06)', border: errors.phone ? '1px solid #EF4444' : '1px solid rgba(255,255,255,0.2)',
-                    color: 'white', outline: 'none', fontSize: '0.9rem'
+                    color: 'white', outline: 'none', fontSize: '0.95rem'
                   }}
                 />
               </div>
