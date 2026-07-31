@@ -106,9 +106,15 @@ export const Form1Page: React.FC = () => {
       newErrors.city = t.errCityRequired;
     }
 
-    // 6. Photo Validation
+    // 6. Photo & Video Mandatory Validation
     if (!formData.photo1) {
       newErrors.photo1 = t.errPhoto1Required;
+    }
+    if (!formData.photo2) {
+      newErrors.photo2 = t.errPhoto2Required;
+    }
+    if (!video) {
+      newErrors.video = t.errVideoRequired;
     }
 
     // 7. Privacy Policy Consent

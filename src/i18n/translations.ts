@@ -157,6 +157,7 @@ export interface Translations {
   errPhone10Digits: string;
   errCityRequired: string;
   errPhoto1Required: string;
+  errPhoto2Required: string;
   errVideoRequired: string;
   errConsentRequired: string;
 }
@@ -305,8 +306,8 @@ export const translations: Record<Language, Translations> = {
     sec2UploadPhotosTitle: "2. Upload Photos (Max 2 Photos, Max 10MB each)",
     sec2UploadPhotosDesc: "Upload up to 2 high-resolution photos of your family Kando DIY Wall (All image formats supported).",
     photo1Label: "Photo 1 (Required, Max 10MB) *",
-    photo2Label: "Photo 2 (Optional, Max 10MB)",
-    sec2UploadVideoTitle: "2. Upload Kando Video (Max 1 Video, Max 40MB) *",
+    photo2Label: "Photo 2 (Required, Max 10MB) *",
+    sec2UploadVideoTitle: "Upload Kando Video (Required, Max 40MB) *",
     sec2UploadVideoDesc: "Upload 1 video of your family making the DIY Craft Wall (MP4, WEBM, MOV, etc. Max 40MB limit).",
 
     // Validation Error Messages
@@ -317,7 +318,8 @@ export const translations: Record<Language, Translations> = {
     errPhoneRequired: "Mobile phone number is required.",
     errPhone10Digits: "Phone number must be exactly 10 digits without country code.",
     errCityRequired: "City / Plant Location is required.",
-    errPhoto1Required: "At least 1 Kando DIY Wall Photo is required.",
+    errPhoto1Required: "Photo 1 is required.",
+    errPhoto2Required: "Photo 2 is required.",
     errVideoRequired: "Kando DIY Video submission is required.",
     errConsentRequired: "You must agree to data processing consent to submit."
   },
@@ -465,9 +467,9 @@ export const translations: Record<Language, Translations> = {
     sec2UploadPhotosTitle: "2. तस्वीरें अपलोड करें (अधिकतम 2 तस्वीरें, 10MB प्रत्येक)",
     sec2UploadPhotosDesc: "अपने परिवार की कांदो DIY वॉल की 2 उच्च-गुणवत्ता वाली तस्वीरें अपलोड करें (सभी फोटो प्रारूप समर्थित)।",
     photo1Label: "फोटो 1 (अनिवार्य, अधिकतम 10MB) *",
-    photo2Label: "फोटो 2 (वैकल्पिक, अधिकतम 10MB)",
-    sec2UploadVideoTitle: "2. कांदो वीडियो अपलोड करें (अधिकतम 1 वीडियो, 40MB) *",
-    sec2UploadVideoDesc: "DIY क्राफ्ट वॉल बनाते हुए अपने परिवार का 1 वीडियो अपलोड करें (MP4, WEBM, MOV, अधिकतम 40MB limit)।",
+    photo2Label: "फोटो 2 (अनिवार्य, अधिकतम 10MB) *",
+    sec2UploadVideoTitle: "कांदो वीडियो अपलोड करें (अनिवार्य, अधिकतम 40MB) *",
+    sec2UploadVideoDesc: "DIY क्राफ्ट वॉल बनाते हुए अपने परिवार का 1 वीडियो अपलोड करें (MP4, WEBM, MOV, अधिकतम 40MB)।",
 
     // Validation Error Messages
     errEmpNameRequired: "कर्मचारी का पूरा नाम आवश्यक है।",
@@ -477,7 +479,8 @@ export const translations: Record<Language, Translations> = {
     errPhoneRequired: "मोबाइल फोन नंबर आवश्यक है।",
     errPhone10Digits: "फोन नंबर बिना कंट्री कोड के ठीक 10 अंकों का होना चाहिए।",
     errCityRequired: "शहर / प्लांट स्थान आवश्यक है।",
-    errPhoto1Required: "कम से कम 1 कांदो DIY वॉल फोटो अनिवार्य है।",
+    errPhoto1Required: "फोटो 1 अनिवार्य है।",
+    errPhoto2Required: "फोटो 2 अनिवार्य है।",
     errVideoRequired: "कांदो DIY वीडियो जमा करना अनिवार्य है।",
     errConsentRequired: "सबमिट करने के लिए आपको डेटा प्रोसेसिंग सहमति स्वीकार करनी होगी।"
   },
@@ -625,8 +628,8 @@ export const translations: Record<Language, Translations> = {
     sec2UploadPhotosTitle: "2. புகைப்படங்களைப் பதிவேற்றவும் (அதிகபட்சம் 2 புகைப்படங்கள், தலா 10MB)",
     sec2UploadPhotosDesc: "உங்கள் குடும்ப காண்டோ DIY சுவரின் 2 உயர்தர புகைப்படங்களைப் பதிவேற்றவும்.",
     photo1Label: "புகைப்படம் 1 (தேவை, அதிகபட்சம் 10MB) *",
-    photo2Label: "புகைப்படம் 2 (விருப்பத்தேர்வு, அதிகபட்சம் 10MB)",
-    sec2UploadVideoTitle: "2. காண்டோ வீடியோவைப் பதிவேற்றவும் (அதிகபட்சம் 1 வீடியோ, 40MB) *",
+    photo2Label: "புகைப்படம் 2 (தேவை, அதிகபட்சம் 10MB) *",
+    sec2UploadVideoTitle: "காண்டோ வீடியோவைப் பதிவேற்றவும் (தேவை, அதிகபட்சம் 40MB) *",
     sec2UploadVideoDesc: "DIY கைவினைச் சுவரை உருவாக்கும் உங்கள் குடும்பத்தின் 1 வீடியோவைப் பதிவேற்றவும் (MP4, WEBM, MOV, 40MB).",
 
     // Validation Error Messages
@@ -637,7 +640,8 @@ export const translations: Record<Language, Translations> = {
     errPhoneRequired: "கைபேசி எண் தேவை.",
     errPhone10Digits: "தொலைபேசி எண் சரியாக 10 இலக்கங்களாக இருக்க வேண்டும்.",
     errCityRequired: "நகரம் / ஆலை இருப்பிடம் தேவை.",
-    errPhoto1Required: "குறைந்தது 1 காண்டோ DIY சுவர் புகைப்படம் தேவை.",
+    errPhoto1Required: "புகைப்படம் 1 தேவை.",
+    errPhoto2Required: "புகைப்படம் 2 தேவை.",
     errVideoRequired: "காண்டோ DIY வீடியோ சமர்ப்பிப்பு தேவை.",
     errConsentRequired: "சமர்ப்பிக்க தரவு செயலாக்க ஒப்புதலை ஏற்க வேண்டும்."
   }
