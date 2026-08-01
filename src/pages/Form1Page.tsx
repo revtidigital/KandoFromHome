@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
-import { Upload, Image as ImageIcon, FileVideo, AlertTriangle, X, CheckCircle } from 'lucide-react';
+import { Upload, Image as ImageIcon, FileVideo, AlertTriangle, X, CheckCircle, Loader2 } from 'lucide-react';
 
 export const Form1Page: React.FC = () => {
   const { t, formData, setFormData, navigateTo, language, apiBaseUrl } = useApp();
@@ -8,6 +8,37 @@ export const Form1Page: React.FC = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [duplicateError, setDuplicateError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Most employees have an Employee ID; the ~50 without one identify by phone
+  // instead. Whichever is filled gets real-time checked against the
+  // client-supplied whitelist as the user types.
+  const hasNoEmpId = !formData.empId.trim() && formData.phone.trim().length > 0;
+  const [idCheckStatus, setIdCheckStatus] = useState<'idle' | 'checking' | 'valid' | 'invalid'>('idle');
+  const idCheckTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const value = hasNoEmpId ? formData.phone.trim() : formData.empId.trim();
+    if (idCheckTimer.current) clearTimeout(idCheckTimer.current);
+    if (!value) {
+      setIdCheckStatus('idle');
+      return;
+    }
+    setIdCheckStatus('checking');
+    idCheckTimer.current = setTimeout(async () => {
+      try {
+        const endpoint = hasNoEmpId
+          ? `${apiBaseUrl}/api/validate-phone?phone=${encodeURIComponent(value)}`
+          : `${apiBaseUrl}/api/validate-empid?id=${encodeURIComponent(value)}`;
+        const res = await fetch(endpoint);
+        const data = await res.json();
+        setIdCheckStatus(data.valid ? 'valid' : 'invalid');
+      } catch {
+        setIdCheckStatus('idle');
+      }
+    }, 500);
+    return () => { if (idCheckTimer.current) clearTimeout(idCheckTimer.current); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData.empId, formData.phone, hasNoEmpId]);
 
   const [photo1Preview, setPhoto1Preview] = useState<string | null>(null);
   const [photo2Preview, setPhoto2Preview] = useState<string | null>(null);
@@ -76,9 +107,15 @@ export const Form1Page: React.FC = () => {
     setDuplicateError(null);
     const newErrors: Record<string, string> = {};
 
-    // 1. Employee ID Validation
-    if (!formData.empId.trim()) {
+    // 1. Employee ID (or Phone, if no Employee ID) Validation
+    if (!formData.empId.trim() && !formData.phone.trim()) {
       newErrors.empId = t.errEmpIdRequired;
+    } else if (idCheckStatus === 'invalid') {
+      newErrors.empId = hasNoEmpId
+        ? 'This Phone Number was not found in company records.'
+        : 'This Employee ID was not found in company records.';
+    } else if (idCheckStatus === 'checking') {
+      newErrors.empId = 'Please wait, checking eligibility...';
     }
 
     // 2. Full Name Validation
@@ -110,26 +147,26 @@ export const Form1Page: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      // 1. Check if Employee ID is already registered (Unique Employee ID Check)
-      const empIdCheck = await fetch(`${apiBaseUrl}/api/check-empid?empId=${encodeURIComponent(formData.empId.trim())}`);
-      if (empIdCheck.ok) {
-        const empIdData = await empIdCheck.json();
-        if (empIdData.exists) {
-          const checkRes = await fetch(`${apiBaseUrl}/api/check-submission?empId=${encodeURIComponent(formData.empId.trim())}`);
-          if (checkRes.ok) {
-            const checkData = await checkRes.json();
-            if (checkData.hasForm1) {
-              setDuplicateError(`Employee ID "${formData.empId.trim()}" has already submitted Form 1. Duplicate submissions are not allowed.`);
-              setIsSubmitting(false);
-              return;
-            }
-          }
+      const cleanEmpId = formData.empId.trim();
+      const cleanPhone = formData.phone.trim();
+      const identityLabel = cleanEmpId ? `Employee ID "${cleanEmpId}"` : `Phone Number "${cleanPhone}"`;
+
+      // 1. Check for a duplicate submission under this identity
+      const checkParams = cleanEmpId ? `empId=${encodeURIComponent(cleanEmpId)}` : `phone=${encodeURIComponent(cleanPhone)}`;
+      const checkRes = await fetch(`${apiBaseUrl}/api/check-submission?${checkParams}`);
+      if (checkRes.ok) {
+        const checkData = await checkRes.json();
+        if (checkData.hasForm1) {
+          setDuplicateError(`${identityLabel} has already submitted Form 1. Duplicate submissions are not allowed.`);
+          setIsSubmitting(false);
+          return;
         }
       }
 
       // 2. Prepare FormData for API submission
       const body = new FormData();
-      body.append('empId', formData.empId.trim());
+      body.append('empId', cleanEmpId);
+      body.append('phone', cleanPhone);
       body.append('empName', formData.empName.trim());
       body.append('companyName', companyName.trim());
       body.append('department', department.trim());
@@ -219,19 +256,59 @@ export const Form1Page: React.FC = () => {
             </div>
 
             <div style={{ minWidth: 0 }}>
-              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>{t.empId} *</label>
-              <input
-                type="text"
-                value={formData.empId}
-                onChange={e => setFormData(prev => ({ ...prev, empId: e.target.value }))}
-                placeholder="e.g. YMI-1049"
-                style={{
-                  width: '100%', minWidth: 0, padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
-                  background: 'rgba(255,255,255,0.06)', border: errors.empId ? '1px solid #EF4444' : '1px solid rgba(255,255,255,0.2)',
-                  color: 'white', outline: 'none'
-                }}
-              />
+              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>{t.empId} {!hasNoEmpId && '*'}</label>
+              <div style={{ position: 'relative' }}>
+                <input
+                  type="text"
+                  value={formData.empId}
+                  disabled={formData.phone.trim().length > 0}
+                  onChange={e => setFormData(prev => ({ ...prev, empId: e.target.value }))}
+                  placeholder="e.g. YMI-1049"
+                  style={{
+                    width: '100%', minWidth: 0, padding: '12px 40px 12px 14px', borderRadius: '10px', boxSizing: 'border-box',
+                    background: formData.phone.trim() ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.06)',
+                    border: errors.empId ? '1px solid #EF4444' : '1px solid rgba(255,255,255,0.2)',
+                    color: formData.phone.trim() ? '#64748B' : 'white', outline: 'none'
+                  }}
+                />
+                {!hasNoEmpId && formData.empId.trim() && (
+                  <span style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)' }}>
+                    {idCheckStatus === 'checking' && <Loader2 size={16} color="#94A3B8" className="animate-spin" />}
+                    {idCheckStatus === 'valid' && <CheckCircle size={16} color="#4ADE80" />}
+                    {idCheckStatus === 'invalid' && <AlertTriangle size={16} color="#EF4444" />}
+                  </span>
+                )}
+              </div>
+              <p style={{ color: '#64748B', fontSize: '0.75rem', marginTop: '4px' }}>
+                Don't have an Employee ID? Leave this blank and enter your Phone Number below.
+              </p>
               {errors.empId && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.empId}</p>}
+            </div>
+
+            <div style={{ minWidth: 0 }}>
+              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>Phone Number {hasNoEmpId && '*'}</label>
+              <div style={{ position: 'relative' }}>
+                <input
+                  type="tel"
+                  value={formData.phone}
+                  disabled={formData.empId.trim().length > 0}
+                  onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                  placeholder="Only if you have no Employee ID"
+                  style={{
+                    width: '100%', minWidth: 0, padding: '12px 40px 12px 14px', borderRadius: '10px', boxSizing: 'border-box',
+                    background: formData.empId.trim() ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    color: formData.empId.trim() ? '#64748B' : 'white', outline: 'none'
+                  }}
+                />
+                {hasNoEmpId && formData.phone.trim() && (
+                  <span style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)' }}>
+                    {idCheckStatus === 'checking' && <Loader2 size={16} color="#94A3B8" className="animate-spin" />}
+                    {idCheckStatus === 'valid' && <CheckCircle size={16} color="#4ADE80" />}
+                    {idCheckStatus === 'invalid' && <AlertTriangle size={16} color="#EF4444" />}
+                  </span>
+                )}
+              </div>
             </div>
 
             <div style={{ minWidth: 0 }}>

@@ -54,6 +54,45 @@ export const AdminDashboardPage: React.FC = () => {
   const [captchaStatusMsg, setCaptchaStatusMsg] = useState('');
   const [gaStatusMsg, setGaStatusMsg] = useState('');
 
+  // Eligibility whitelist (Employee IDs + Phone Numbers) upload state
+  const [whitelistCounts, setWhitelistCounts] = useState<{ employees: number; phones: number }>({ employees: 0, phones: 0 });
+  const [whitelistUploading, setWhitelistUploading] = useState<'employees' | 'phones' | null>(null);
+  const [whitelistStatusMsg, setWhitelistStatusMsg] = useState('');
+
+  const fetchWhitelistCounts = () => {
+    fetch(`${apiBaseUrl}/api/admin/whitelist/counts`, { headers: adminAuthHeader() })
+      .then(res => res.json())
+      .then(data => setWhitelistCounts({ employees: data.employees || 0, phones: data.phones || 0 }))
+      .catch(() => {});
+  };
+
+  const handleWhitelistUpload = async (type: 'employees' | 'phones', file: File) => {
+    setWhitelistUploading(type);
+    setWhitelistStatusMsg('');
+    try {
+      const body = new FormData();
+      body.append('file', file);
+      const res = await fetch(`${apiBaseUrl}/api/admin/whitelist/${type}`, {
+        method: 'POST',
+        headers: adminAuthHeader(),
+        body
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setWhitelistStatusMsg(data.error || 'Upload failed.');
+      } else {
+        setWhitelistStatusMsg(`${type === 'employees' ? 'Employee ID' : 'Phone Number'} whitelist updated — ${data.count} entries loaded.`);
+        fetchWhitelistCounts();
+        fetchAuditLogs();
+      }
+    } catch (err) {
+      console.error('Whitelist upload error:', err);
+      setWhitelistStatusMsg('Upload failed.');
+    } finally {
+      setWhitelistUploading(null);
+    }
+  };
+
   // Media preview modal state
   const [mediaModal, setMediaModal] = useState<{ type: 'image' | 'video'; url: string; title: string } | null>(null);
   const [mediaSignedUrl, setMediaSignedUrl] = useState<string | null>(null);
@@ -126,6 +165,8 @@ export const AdminDashboardPage: React.FC = () => {
       })
       .catch(() => {});
 
+    fetchWhitelistCounts();
+
     fetch(`${apiBaseUrl}/api/admin/users?limit=200`, { headers: adminAuthHeader() })
       .then(res => res.json())
       .then(data => {
@@ -140,13 +181,17 @@ export const AdminDashboardPage: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiBaseUrl, setAllUsers, setCustomTags]);
 
+  // Some employees have no Employee ID and identify by phone instead — fall
+  // back to phone anywhere empId would otherwise be used as the user's key.
+  const userKey = (user: any) => user?.empId || user?.phone || '';
+
   // Resolve activeTab (+ selected user, for /admin-dashboard/users/:empId) from a URL path
   const applyStateFromPath = (pathname: string, usersList: any[]) => {
     const rest = pathname.replace(/^\/admin-dashboard\/?/, '');
     const [segment, empId] = rest.split('/').filter(Boolean);
 
     if (segment === 'users' && empId) {
-      const user = usersList.find((u: any) => u.empId === decodeURIComponent(empId));
+      const user = usersList.find((u: any) => userKey(u) === decodeURIComponent(empId));
       if (user) {
         setSelectedUserForProfile(user);
         setActiveTab('user-detail');
@@ -179,11 +224,11 @@ export const AdminDashboardPage: React.FC = () => {
   const handleOpenUserProfile = (user: any) => {
     setSelectedUserForProfile(user);
     setActiveTab('user-detail');
-    const path = pathForTab('user-detail', user.empId);
+    const path = pathForTab('user-detail', userKey(user));
     if (window.location.pathname !== path) {
-      window.history.pushState({ tab: 'user-detail', empId: user.empId }, '', path);
+      window.history.pushState({ tab: 'user-detail', empId: userKey(user) }, '', path);
     }
-    logAdminAction(`Viewed profile of ${user.empName} (${user.empId})`);
+    logAdminAction(`Viewed profile of ${user.empName} (${userKey(user)})`);
   };
 
   // ── FIX TAGS CHANGING AND ADDING (Req 2) ──
@@ -366,11 +411,13 @@ export const AdminDashboardPage: React.FC = () => {
 
   // Users Filtered List
   const filteredUsers = allUsers.filter(u => {
-    const matchesSearch = !searchQuery || 
-      u.empName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      u.empId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      u.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (u.city && u.city.toLowerCase().includes(searchQuery.toLowerCase()));
+    const q = searchQuery.toLowerCase();
+    const matchesSearch = !searchQuery ||
+      (u.empName || '').toLowerCase().includes(q) ||
+      (u.empId || '').toLowerCase().includes(q) ||
+      (u.phone || '').toLowerCase().includes(q) ||
+      (u.email || '').toLowerCase().includes(q) ||
+      (u.city && u.city.toLowerCase().includes(q));
 
     const matchesTag = !selectedTagFilter || (u.tags && u.tags.includes(selectedTagFilter));
     
@@ -632,7 +679,7 @@ export const AdminDashboardPage: React.FC = () => {
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
                 <thead>
                   <tr style={{ background: '#091A44', color: '#00E5FF', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                    <th style={{ padding: '14px 18px' }}>Emp ID</th>
+                    <th style={{ padding: '14px 18px' }}>Emp ID / Phone</th>
                     <th style={{ padding: '14px 18px' }}>Employee Name</th>
                     <th style={{ padding: '14px 18px' }}>Registered Date</th>
                     <th style={{ padding: '14px 18px' }}>Form 1</th>
@@ -647,18 +694,17 @@ export const AdminDashboardPage: React.FC = () => {
                     return (
                       <tr key={user.id || (user as any)._id} style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                         <td style={{ padding: '14px 18px', fontWeight: 800, color: '#00E5FF' }}>
-                          {user.empId}
+                          {user.empId || user.phone || '—'}
                         </td>
-                        
+
                         <td style={{ padding: '14px 18px' }}>
-                          <div 
+                          <div
                             onClick={() => handleOpenUserProfile(user)}
                             style={{ cursor: 'pointer', fontWeight: 700, color: 'white', textDecoration: 'underline' }}
                             title="Click to view full user profile page"
                           >
                             {user.empName}
                           </div>
-                          <div style={{ fontSize: '0.75rem', color: '#94A3B8' }}>{user.email}</div>
                         </td>
 
                         <td style={{ padding: '14px 18px', color: '#CBD5E1', fontSize: '0.8rem' }}>
@@ -776,7 +822,11 @@ export const AdminDashboardPage: React.FC = () => {
                   <h1 style={{ fontSize: '2rem', color: '#00E5FF', fontWeight: 900, margin: 0 }}>
                     {selectedUserForProfile.empName}
                   </h1>
-                  <p style={{ color: '#94A3B8', fontSize: '0.9rem', marginTop: '4px' }}>Employee ID: <strong style={{ color: 'white' }}>{selectedUserForProfile.empId}</strong></p>
+                  <p style={{ color: '#94A3B8', fontSize: '0.9rem', marginTop: '4px' }}>
+                    {selectedUserForProfile.empId
+                      ? <>Employee ID: <strong style={{ color: 'white' }}>{selectedUserForProfile.empId}</strong></>
+                      : <>Phone Number: <strong style={{ color: 'white' }}>{selectedUserForProfile.phone || '—'}</strong></>}
+                  </p>
                 </div>
 
                 {/* Tag Selection */}
@@ -978,7 +1028,72 @@ export const AdminDashboardPage: React.FC = () => {
             <p style={{ color: '#94A3B8', fontSize: '0.85rem', marginBottom: '28px' }}>Configure Google reCAPTCHA Verification & Google Analytics ID separately</p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
-              
+
+              {/* CARD 0: ELIGIBILITY WHITELIST UPLOAD */}
+              <div style={{ background: '#040F2B', padding: '28px', borderRadius: '18px', border: '1.5px solid rgba(168,85,247,0.3)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <Users size={22} color="#C084FC" />
+                  <div>
+                    <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'white', margin: 0 }}>Eligibility Whitelist</h2>
+                    <p style={{ fontSize: '0.8rem', color: '#94A3B8', margin: 0 }}>
+                      Only Employee IDs / Phone Numbers on these lists can submit Form 1 &amp; Form 2. Each upload replaces the previous list.
+                    </p>
+                  </div>
+                </div>
+
+                {whitelistStatusMsg && (
+                  <div style={{ background: 'rgba(168,85,247,0.15)', border: '1px solid #A855F7', color: '#C084FC', padding: '10px 14px', borderRadius: '8px', marginBottom: '16px', fontSize: '0.85rem', fontWeight: 700 }}>
+                    {whitelistStatusMsg}
+                  </div>
+                )}
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
+                  <div style={{ background: 'rgba(255,255,255,0.04)', padding: '16px', borderRadius: '12px' }}>
+                    <div style={{ fontWeight: 700, color: 'white', marginBottom: '4px' }}>Employee ID List</div>
+                    <div style={{ fontSize: '0.8rem', color: '#94A3B8', marginBottom: '12px' }}>
+                      {whitelistCounts.employees.toLocaleString()} Employee IDs currently loaded
+                    </div>
+                    <label style={{
+                      display: 'inline-flex', alignItems: 'center', gap: '8px', cursor: whitelistUploading ? 'not-allowed' : 'pointer',
+                      border: '1px solid #A855F7', borderRadius: '10px', padding: '10px 16px', color: '#C084FC', fontSize: '0.85rem', fontWeight: 700,
+                      background: 'rgba(168,85,247,0.08)', opacity: whitelistUploading ? 0.6 : 1
+                    }}>
+                      {whitelistUploading === 'employees' ? 'Uploading…' : 'Upload Excel/CSV'}
+                      <input
+                        type="file"
+                        accept=".csv,.xlsx,.xls"
+                        disabled={!!whitelistUploading}
+                        onChange={e => { const f = e.target.files?.[0]; if (f) handleWhitelistUpload('employees', f); e.target.value = ''; }}
+                        style={{ display: 'none' }}
+                      />
+                    </label>
+                    <p style={{ fontSize: '0.72rem', color: '#64748B', marginTop: '8px' }}>First column = Employee ID, first row treated as header.</p>
+                  </div>
+
+                  <div style={{ background: 'rgba(255,255,255,0.04)', padding: '16px', borderRadius: '12px' }}>
+                    <div style={{ fontWeight: 700, color: 'white', marginBottom: '4px' }}>Phone Number List</div>
+                    <div style={{ fontSize: '0.8rem', color: '#94A3B8', marginBottom: '12px' }}>
+                      {whitelistCounts.phones.toLocaleString()} Phone Numbers currently loaded
+                    </div>
+                    <label style={{
+                      display: 'inline-flex', alignItems: 'center', gap: '8px', cursor: whitelistUploading ? 'not-allowed' : 'pointer',
+                      border: '1px solid #A855F7', borderRadius: '10px', padding: '10px 16px', color: '#C084FC', fontSize: '0.85rem', fontWeight: 700,
+                      background: 'rgba(168,85,247,0.08)', opacity: whitelistUploading ? 0.6 : 1
+                    }}>
+                      {whitelistUploading === 'phones' ? 'Uploading…' : 'Upload Excel/CSV'}
+                      <input
+                        type="file"
+                        accept=".csv,.xlsx,.xls"
+                        disabled={!!whitelistUploading}
+                        onChange={e => { const f = e.target.files?.[0]; if (f) handleWhitelistUpload('phones', f); e.target.value = ''; }}
+                        style={{ display: 'none' }}
+                      />
+                    </label>
+                    <p style={{ fontSize: '0.72rem', color: '#64748B', marginTop: '8px' }}>For employees with no Employee ID. First column = Phone Number.</p>
+                  </div>
+                </div>
+              </div>
+
               {/* CARD 1: GOOGLE RECAPTCHA SECURITY SETTINGS (Req 3) */}
               <div style={{ background: '#040F2B', padding: '28px', borderRadius: '18px', border: '1.5px solid rgba(0,229,255,0.3)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>

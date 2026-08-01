@@ -1,3 +1,10 @@
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
 :root {
   --yamaha-navy: #020B2A;
   --yamaha-navy-light: #081745;

@@ -61,6 +61,15 @@ const exportLimiter = rateLimit({
   legacyHeaders: false
 });
 
+// Tighter limit than the general API limiter — these endpoints exist purely
+// to check whitelist membership, so they're the most enumeration-attractive.
+const validateLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
 // Admin routes require HTTP Basic Auth (same credentials enforced at nginx layer too)
 function requireAdmin(req, res, next) {
   const header = req.headers.authorization || '';
@@ -216,6 +225,25 @@ const upload = multer({
   }
 });
 
+// Whitelist CSV/Excel uploads are parsed in memory and discarded — nothing to
+// persist to disk or R2, only the parsed rows matter.
+const whitelistUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 }
+});
+
+// Reads the first column of every row after the header row.
+function parseWhitelistFile(buffer) {
+  const wb = XLSX.read(buffer, { type: 'buffer' });
+  const sheet = wb.Sheets[wb.SheetNames[0]];
+  const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+  const values = rows.slice(1)
+    .map(row => row[0])
+    .filter(cell => cell !== undefined && cell !== null && String(cell).trim() !== '')
+    .map(cell => String(cell).trim());
+  return [...new Set(values)];
+}
+
 // MongoDB Connection
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/kando_db';
 mongoose.connect(MONGO_URI)
@@ -223,11 +251,13 @@ mongoose.connect(MONGO_URI)
   .catch(err => console.error('MongoDB Connection Error:', err));
 
 // Schemas
+// empId is optional now — the ~50 employees with no ID identify by phone
+// instead, so both are sparse-unique (only indexed when actually present).
 const UserSchema = new mongoose.Schema({
-  empId: { type: String, required: true, unique: true },
+  empId: { type: String, unique: true, sparse: true },
   empName: { type: String, required: true },
   email: { type: String, default: '' },
-  phone: { type: String },
+  phone: { type: String, unique: true, sparse: true },
   city: { type: String },
   familyMembers: { type: Number, default: 1 },
   tags: { type: [String], default: [] },
@@ -236,7 +266,8 @@ const UserSchema = new mongoose.Schema({
 
 const Form1Schema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  empId: { type: String, required: true },
+  empId: { type: String },
+  phone: { type: String },
   companyName: { type: String, default: '' },
   department: { type: String, default: '' },
   photo1Url: { type: String, required: true },
@@ -250,7 +281,8 @@ const Form1Schema = new mongoose.Schema({
 
 const Form2Schema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  empId: { type: String, required: true },
+  empId: { type: String },
+  phone: { type: String },
   companyName: { type: String, default: '' },
   department: { type: String, default: '' },
   location: { type: String, default: '' },
@@ -259,6 +291,15 @@ const Form2Schema = new mongoose.Schema({
   language: { type: String, default: 'en' },
   submittedAt: { type: Date, default: Date.now },
   ip: { type: String }
+});
+
+// Client-provided eligibility lists — the ~4950 employees with an Employee ID,
+// and the ~50 without one who are identified by phone number instead.
+const AllowedEmployeeSchema = new mongoose.Schema({
+  empId: { type: String, required: true, unique: true, trim: true }
+});
+const AllowedPhoneSchema = new mongoose.Schema({
+  phone: { type: String, required: true, unique: true, trim: true }
 });
 
 const AuditLogSchema = new mongoose.Schema({
@@ -277,6 +318,8 @@ const SettingsSchema = new mongoose.Schema({
 const User = mongoose.model('User', UserSchema);
 const Form1 = mongoose.model('Form1', Form1Schema);
 const Form2 = mongoose.model('Form2', Form2Schema);
+const AllowedEmployee = mongoose.model('AllowedEmployee', AllowedEmployeeSchema);
+const AllowedPhone = mongoose.model('AllowedPhone', AllowedPhoneSchema);
 const AuditLog = mongoose.model('AuditLog', AuditLogSchema);
 const Settings = mongoose.model('Settings', SettingsSchema);
 
@@ -292,6 +335,22 @@ async function recordAuditLog(req, detail, username = 'SuperAdmin') {
 }
 
 // ── API ROUTES ──
+
+// Real-time eligibility checks against the client-provided whitelist, used by
+// both forms as the admin types their Employee ID / Phone Number.
+app.get('/api/validate-empid', validateLimiter, async (req, res) => {
+  const empId = (req.query.id || '').toString().trim();
+  if (!empId) return res.json({ valid: false });
+  const found = await AllowedEmployee.findOne({ empId });
+  res.json({ valid: !!found });
+});
+
+app.get('/api/validate-phone', validateLimiter, async (req, res) => {
+  const phone = (req.query.phone || '').toString().trim();
+  if (!phone) return res.json({ valid: false });
+  const found = await AllowedPhone.findOne({ phone });
+  res.json({ valid: !!found });
+});
 
 // Check if Employee ID already exists (Unique Employee ID API)
 app.get('/api/check-empid', async (req, res) => {
@@ -318,14 +377,16 @@ app.get('/api/check-empid', async (req, res) => {
 // Check if user already submitted
 app.get('/api/check-submission', async (req, res) => {
   try {
-    const { empId, email } = req.query;
-    if (!empId && !email) return res.json({ submitted: false });
+    const { empId, email, phone } = req.query;
+    if (!empId && !email && !phone) return res.json({ submitted: false });
 
-    // Only match on fields that were actually provided — email is optional now,
-    // and matching a blank string would return an arbitrary other blank-email user.
+    // Only match on fields that were actually provided — email/phone are
+    // optional, and matching a blank string would return an arbitrary other
+    // blank-field user.
     const orClauses = [];
     if (empId) orClauses.push({ empId });
     if (email) orClauses.push({ email });
+    if (phone) orClauses.push({ phone });
     const user = await User.findOne({ $or: orClauses });
 
     if (!user) return res.json({ submitted: false, hasForm1: false, hasForm2: false });
@@ -344,6 +405,25 @@ app.get('/api/check-submission', async (req, res) => {
     res.status(500).json({ error: 'Internal server error.' });
   }
 });
+
+// Most employees identify by Employee ID; the ~50 with no ID identify by
+// phone number instead — either way, they must appear in the client-supplied
+// whitelist to submit.
+async function resolveEligibleIdentity(rawEmpId, rawPhone) {
+  const cleanEmpId = (rawEmpId || '').toString().trim();
+  const cleanPhone = (rawPhone || '').toString().trim();
+  if (!cleanEmpId && !cleanPhone) {
+    return { ok: false, error: 'Employee ID is required. If you don\'t have one, enter your Phone Number instead.' };
+  }
+  if (cleanEmpId) {
+    const allowed = await AllowedEmployee.findOne({ empId: cleanEmpId });
+    if (!allowed) return { ok: false, error: 'This Employee ID was not found in company records. Please check and try again.' };
+  } else {
+    const allowed = await AllowedPhone.findOne({ phone: cleanPhone });
+    if (!allowed) return { ok: false, error: 'This Phone Number was not found in company records. Please check and try again.' };
+  }
+  return { ok: true, cleanEmpId, cleanPhone };
+}
 
 // Form 1 Submission
 const form1Upload = upload.fields([
@@ -367,11 +447,18 @@ app.post('/api/submissions/form1', (req, res, next) => {
   });
 }, async (req, res) => {
   try {
-    const { empId, empName, companyName, department, location, language } = req.body || {};
+    const { empId, phone, empName, companyName, department, location, language } = req.body || {};
 
-    if (!empId || !empName) {
+    if (!empName) {
       return res.status(400).json({ error: 'Missing required user details.' });
     }
+
+    const identity = await resolveEligibleIdentity(empId, phone);
+    if (!identity.ok) {
+      if (req.files) Object.values(req.files).flat().forEach(f => cleanupLocalFile(f.path));
+      return res.status(400).json({ error: identity.error });
+    }
+    const { cleanEmpId, cleanPhone } = identity;
 
     if (!req.files || !req.files['photo1']) {
       return res.status(400).json({ error: 'Photo 1 is required.' });
@@ -393,13 +480,17 @@ app.post('/api/submissions/form1', (req, res, next) => {
       return res.status(400).json({ error: 'Video exceeds maximum size limit of 40MB.' });
     }
 
-    const cleanEmpId = empId.toString().trim();
-
-    // Enforce Employee ID Uniqueness — the sole identity anchor now that
-    // email/phone are no longer collected on this form.
-    let user = await User.findOne({ empId: cleanEmpId });
+    // Identity anchor is Employee ID when present, otherwise Phone Number —
+    // whichever one was validated against the whitelist above.
+    const identityQuery = cleanEmpId ? { empId: cleanEmpId } : { phone: cleanPhone };
+    let user = await User.findOne(identityQuery);
     if (!user) {
-      user = await User.create({ empId: cleanEmpId, empName: empName.trim(), city: (location || '').trim() });
+      user = await User.create({
+        empId: cleanEmpId || undefined,
+        phone: cleanPhone || undefined,
+        empName: empName.trim(),
+        city: (location || '').trim()
+      });
     }
 
     const existingF1 = await Form1.findOne({ userId: user._id });
@@ -408,8 +499,8 @@ app.post('/api/submissions/form1', (req, res, next) => {
       return res.status(400).json({ error: 'Form 1 has already been submitted by this user.' });
     }
 
-    // User-specific R2 folder: empId_INITIALS
-    const userFolder = getUserFolder(cleanEmpId, empName, '');
+    // User-specific R2 folder: empId_INITIALS (or last4phone_INITIALS if no ID)
+    const userFolder = getUserFolder(cleanEmpId, empName, cleanPhone);
 
     const photo1Name = `${userFolder}_photo1${path.extname(req.files['photo1'][0].originalname).toLowerCase()}`;
     const photo2Name = req.files['photo2'] ? `${userFolder}_photo2${path.extname(req.files['photo2'][0].originalname).toLowerCase()}` : '';
@@ -438,7 +529,8 @@ app.post('/api/submissions/form1', (req, res, next) => {
 
     const submission = await Form1.create({
       userId: user._id,
-      empId,
+      empId: cleanEmpId,
+      phone: cleanPhone,
       companyName: (companyName || '').trim(),
       department: (department || '').trim(),
       photo1Url,
@@ -448,7 +540,7 @@ app.post('/api/submissions/form1', (req, res, next) => {
       ip
     });
 
-    await recordAuditLog(req, `New Form 1 Submission by ${empName} (${empId})`, 'Public User');
+    await recordAuditLog(req, `New Form 1 Submission by ${empName} (${cleanEmpId || cleanPhone})`, 'Public User');
 
     res.json({ success: true, submissionId: submission._id });
   } catch (err) {
@@ -471,25 +563,51 @@ app.post('/api/submissions/form2', (req, res, next) => {
   });
 }, async (req, res) => {
   try {
-    const { empId, empName, companyName, department, location, thoughts, language } = req.body || {};
+    const { empId, phone, empName, companyName, department, location, thoughts, language } = req.body || {};
 
-    if (!empId || !empName) {
-      return res.status(400).json({ error: 'Missing required user details (empId, empName).' });
+    if (!empName) {
+      return res.status(400).json({ error: 'Missing required user details.' });
     }
     if (!thoughts || !thoughts.trim()) {
+      if (req.file) cleanupLocalFile(req.file.path);
       return res.status(400).json({ error: 'Please share your thoughts (required).' });
     }
     if (thoughts.trim().length > 2000) {
+      if (req.file) cleanupLocalFile(req.file.path);
       return res.status(400).json({ error: 'Thoughts must be 2000 characters or less.' });
     }
 
-    const cleanEmpId = empId.toString().trim();
+    const identity = await resolveEligibleIdentity(empId, phone);
+    if (!identity.ok) {
+      if (req.file) cleanupLocalFile(req.file.path);
+      return res.status(400).json({ error: identity.error });
+    }
+    const { cleanEmpId, cleanPhone } = identity;
 
-    const userFolder2 = getUserFolder(cleanEmpId, empName, '');
+    // Identity anchor is Employee ID when present, otherwise Phone Number.
+    const identityQuery = cleanEmpId ? { empId: cleanEmpId } : { phone: cleanPhone };
+    let user = await User.findOne(identityQuery);
+    if (!user) {
+      user = await User.create({
+        empId: cleanEmpId || undefined,
+        phone: cleanPhone || undefined,
+        empName: empName.trim(),
+        city: location || ''
+      });
+    }
+
+    const existingF2 = await Form2.findOne({ userId: user._id });
+    if (existingF2) {
+      if (req.file) cleanupLocalFile(req.file.path);
+      return res.status(400).json({ error: 'Form 2 has already been submitted by this user.' });
+    }
+
+    const userFolder2 = getUserFolder(cleanEmpId, empName, cleanPhone);
 
     let optionalFileUrl = '';
     if (req.file) {
       if (req.file.size > 50 * 1024 * 1024) {
+        cleanupLocalFile(req.file.path);
         return res.status(400).json({ error: 'File exceeds maximum size limit of 50MB.' });
       }
       const attachmentName = `${userFolder2}_attachment${path.extname(req.file.originalname).toLowerCase()}`;
@@ -498,23 +616,12 @@ app.post('/api/submissions/form2', (req, res, next) => {
       if (r2File) { optionalFileUrl = r2File; cleanupLocalFile(req.file.path); }
     }
 
-    // Enforce Employee ID Uniqueness — the sole identity anchor now that
-    // email/phone are no longer collected on either form.
-    let user = await User.findOne({ empId: cleanEmpId });
-    if (!user) {
-      user = await User.create({ empId: cleanEmpId, empName: empName.trim(), city: location || '' });
-    }
-
-    const existingF2 = await Form2.findOne({ userId: user._id });
-    if (existingF2) {
-      return res.status(400).json({ error: 'Form 2 has already been submitted by this user.' });
-    }
-
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
 
     const submission = await Form2.create({
       userId: user._id,
       empId: cleanEmpId,
+      phone: cleanPhone,
       companyName: (companyName || '').trim(),
       department: (department || '').trim(),
       location: (location || '').trim(),
@@ -524,7 +631,7 @@ app.post('/api/submissions/form2', (req, res, next) => {
       ip
     });
 
-    await recordAuditLog(req, `New Form 2 Submission by ${empName} (${empId})`, 'Public User');
+    await recordAuditLog(req, `New Form 2 Submission by ${empName} (${cleanEmpId || cleanPhone})`, 'Public User');
 
     res.json({ success: true, submissionId: submission._id });
   } catch (err) {
@@ -536,6 +643,46 @@ app.post('/api/submissions/form2', (req, res, next) => {
 
 // ── ADMIN ROUTES (require x-admin-key header + nginx basic auth) ──
 app.use('/api/admin', requireAdmin);
+
+// Eligibility whitelist management — client supplies the full Employee ID list
+// (~4950) and the phone-number list for employees with no ID (~50). Each
+// upload replaces the whole list rather than merging, since the client sends
+// the final list each time.
+app.post('/api/admin/whitelist/employees', whitelistUpload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'No file uploaded.' });
+    const empIds = parseWhitelistFile(req.file.buffer);
+    await AllowedEmployee.deleteMany({});
+    if (empIds.length) await AllowedEmployee.insertMany(empIds.map(empId => ({ empId })), { ordered: false });
+    await recordAuditLog(req, `Uploaded Employee ID whitelist (${empIds.length} entries)`, req.adminUser);
+    res.json({ success: true, count: empIds.length });
+  } catch (err) {
+    console.error('Whitelist upload error:', err);
+    res.status(500).json({ error: 'Failed to process the uploaded file.' });
+  }
+});
+
+app.post('/api/admin/whitelist/phones', whitelistUpload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'No file uploaded.' });
+    const phones = parseWhitelistFile(req.file.buffer);
+    await AllowedPhone.deleteMany({});
+    if (phones.length) await AllowedPhone.insertMany(phones.map(phone => ({ phone })), { ordered: false });
+    await recordAuditLog(req, `Uploaded Phone Number whitelist (${phones.length} entries)`, req.adminUser);
+    res.json({ success: true, count: phones.length });
+  } catch (err) {
+    console.error('Whitelist upload error:', err);
+    res.status(500).json({ error: 'Failed to process the uploaded file.' });
+  }
+});
+
+app.get('/api/admin/whitelist/counts', async (req, res) => {
+  const [employees, phones] = await Promise.all([
+    AllowedEmployee.countDocuments(),
+    AllowedPhone.countDocuments()
+  ]);
+  res.json({ employees, phones });
+});
 
 // R2 object key doesn't allow browser-side CORS fetches, so both media routes
 // below validate the requested URL belongs to our bucket before touching R2.
@@ -625,6 +772,7 @@ app.get('/api/admin/users', async (req, res) => {
       query.$or = [
         { empName: new RegExp(safeSearch, 'i') },
         { empId: new RegExp(safeSearch, 'i') },
+        { phone: new RegExp(safeSearch, 'i') },
         { email: new RegExp(safeSearch, 'i') },
         { city: new RegExp(safeSearch, 'i') }
       ];
@@ -918,9 +1066,9 @@ app.get('/api/admin/export/pdf', exportLimiter, async (req, res) => {
       const f2 = await Form2.findOne({ userId: u._id });
       html += `
         <tr>
-          <td><strong>${u.empId}</strong></td>
+          <td><strong>${u.empId || u.phone || ''}</strong></td>
           <td>${u.empName}</td>
-          <td>${u.email}</td>
+          <td>${u.email || ''}</td>
           <td>${u.city || 'N/A'}</td>
           <td>${f1 ? '✓ Submitted' : 'Not Filled'}</td>
           <td>${f2 ? '✓ Submitted' : 'Not Filled'}</td>
@@ -968,8 +1116,11 @@ async function buildExportArchive(archive) {
     const f1 = await Form1.findOne({ userId: u._id });
     const f2 = await Form2.findOne({ userId: u._id });
 
+    const userKey = u.empId || u.phone || u._id.toString();
+
     rows.push({
       'Emp ID': u.empId,
+      'Phone': u.phone || '',
       'Name': u.empName,
       'Form 1 Photo 1': f1 ? f1.photo1Url : '',
       'Form 1 Photo 2': f1 ? f1.photo2Url : '',
@@ -977,11 +1128,11 @@ async function buildExportArchive(archive) {
       'Form 2 Attachment': f2 ? f2.optionalFileUrl : ''
     });
 
-    const empFolder = `media/${u.empId}`;
-    if (f1?.photo1Url) await appendR2FileToArchive(archive, f1.photo1Url, `${empFolder}/${u.empId}_photo1${path.extname(f1.photo1Url)}`);
-    if (f1?.photo2Url) await appendR2FileToArchive(archive, f1.photo2Url, `${empFolder}/${u.empId}_photo2${path.extname(f1.photo2Url)}`);
-    if (f1?.videoUrl) await appendR2FileToArchive(archive, f1.videoUrl, `${empFolder}/${u.empId}_video${path.extname(f1.videoUrl)}`);
-    if (f2?.optionalFileUrl) await appendR2FileToArchive(archive, f2.optionalFileUrl, `${empFolder}/${u.empId}_attachment${path.extname(f2.optionalFileUrl)}`);
+    const empFolder = `media/${userKey}`;
+    if (f1?.photo1Url) await appendR2FileToArchive(archive, f1.photo1Url, `${empFolder}/${userKey}_photo1${path.extname(f1.photo1Url)}`);
+    if (f1?.photo2Url) await appendR2FileToArchive(archive, f1.photo2Url, `${empFolder}/${userKey}_photo2${path.extname(f1.photo2Url)}`);
+    if (f1?.videoUrl) await appendR2FileToArchive(archive, f1.videoUrl, `${empFolder}/${userKey}_video${path.extname(f1.videoUrl)}`);
+    if (f2?.optionalFileUrl) await appendR2FileToArchive(archive, f2.optionalFileUrl, `${empFolder}/${userKey}_attachment${path.extname(f2.optionalFileUrl)}`);
   }
 
   const ws = XLSX.utils.json_to_sheet(rows);
