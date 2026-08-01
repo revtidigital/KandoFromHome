@@ -57,6 +57,31 @@ export const AdminDashboardPage: React.FC = () => {
   // Media preview modal state
   const [mediaModal, setMediaModal] = useState<{ type: 'image' | 'video'; url: string; title: string } | null>(null);
   const [mediaSignedUrl, setMediaSignedUrl] = useState<string | null>(null);
+  const [mediaDownloading, setMediaDownloading] = useState(false);
+
+  // Cross-origin URLs ignore the <a download> attribute (browsers just navigate to
+  // them), so fetch the file as a blob and download it via a same-origin blob URL.
+  const handleMediaDownload = async () => {
+    if (!mediaSignedUrl || !mediaModal) return;
+    setMediaDownloading(true);
+    try {
+      const res = await fetch(mediaSignedUrl);
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const filename = mediaModal.url.split('/').pop() || mediaModal.title;
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(blobUrl);
+    } catch (err) {
+      console.error('Media download failed:', err);
+    } finally {
+      setMediaDownloading(false);
+    }
+  };
 
   // R2 media is private — fetch a short-lived signed URL to view/download it.
   // Legacy relative /uploads paths (pre-R2) are served directly via apiBaseUrl.
@@ -1068,15 +1093,13 @@ export const AdminDashboardPage: React.FC = () => {
                 ) : (
                   <video controls src={mediaSignedUrl} style={{ width: '100%', borderRadius: '12px' }} />
                 )}
-                <a
-                  href={mediaSignedUrl}
-                  download
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginTop: '16px', border: '1px solid #00E5FF', borderRadius: '10px', padding: '10px 18px', color: '#00E5FF', fontSize: '0.85rem', fontWeight: 700, background: 'rgba(0,229,255,0.08)', textDecoration: 'none' }}
+                <button
+                  onClick={handleMediaDownload}
+                  disabled={mediaDownloading}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginTop: '16px', border: '1px solid #00E5FF', borderRadius: '10px', padding: '10px 18px', color: '#00E5FF', fontSize: '0.85rem', fontWeight: 700, background: 'rgba(0,229,255,0.08)', cursor: mediaDownloading ? 'not-allowed' : 'pointer', opacity: mediaDownloading ? 0.6 : 1 }}
                 >
-                  <Download size={16} /> Download
-                </a>
+                  <Download size={16} /> {mediaDownloading ? 'Downloading…' : 'Download'}
+                </button>
               </>
             )}
           </div>
