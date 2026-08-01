@@ -4,6 +4,18 @@
 .animate-spin {
   animation: spin 1s linear infinite;
 }
+@font-face {
+  font-family: 'Kozuka Gothic Pro';
+  src: url('/fonts/KozGoProRegular.otf') format('opentype');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Kozuka Gothic Pro';
+  src: url('/fonts/KozGoProMedium.otf') format('opentype');
+  font-weight: 500;
+  font-display: swap;
+}
 
 :root {
   --yamaha-navy: #020B2A;
@@ -237,7 +249,7 @@ body {
 
 /* ── LANDING PAGE RESPONSIVE SYSTEM ── */
 .landing-wrapper {
-  width: 100vw;
+  width: 100%;
   min-height: 100vh;
   margin: 0;
   padding: 0;
@@ -333,6 +345,7 @@ body {
 }
 
 .landing-subtitle {
+  font-family: 'Kozuka Gothic Pro', 'Outfit', sans-serif;
   font-size: 1.05rem;
   color: #E2E8F0;
   line-height: 1.5;
@@ -353,7 +366,7 @@ body {
 .landing-slogan {
   font-family: 'Caveat', cursive;
   font-size: 1.55rem;
-  color: #FFD700;
+  color: #D1B07B;
   font-weight: 600;
   letter-spacing: 0.5px;
   margin: 0;
