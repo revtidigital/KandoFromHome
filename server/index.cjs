@@ -962,10 +962,11 @@ app.get('/api/admin/export/zip', exportLimiter, async (req, res) => {
         'Form 2 Attachment': f2 ? f2.optionalFileUrl : ''
       });
 
-      if (f1?.photo1Url) await appendR2FileToArchive(archive, f1.photo1Url, `media/${u.empId}_photo1${path.extname(f1.photo1Url)}`);
-      if (f1?.photo2Url) await appendR2FileToArchive(archive, f1.photo2Url, `media/${u.empId}_photo2${path.extname(f1.photo2Url)}`);
-      if (f1?.videoUrl) await appendR2FileToArchive(archive, f1.videoUrl, `media/${u.empId}_video${path.extname(f1.videoUrl)}`);
-      if (f2?.optionalFileUrl) await appendR2FileToArchive(archive, f2.optionalFileUrl, `media/${u.empId}_attachment${path.extname(f2.optionalFileUrl)}`);
+      const empFolder = `media/${u.empId}`;
+      if (f1?.photo1Url) await appendR2FileToArchive(archive, f1.photo1Url, `${empFolder}/${u.empId}_photo1${path.extname(f1.photo1Url)}`);
+      if (f1?.photo2Url) await appendR2FileToArchive(archive, f1.photo2Url, `${empFolder}/${u.empId}_photo2${path.extname(f1.photo2Url)}`);
+      if (f1?.videoUrl) await appendR2FileToArchive(archive, f1.videoUrl, `${empFolder}/${u.empId}_video${path.extname(f1.videoUrl)}`);
+      if (f2?.optionalFileUrl) await appendR2FileToArchive(archive, f2.optionalFileUrl, `${empFolder}/${u.empId}_attachment${path.extname(f2.optionalFileUrl)}`);
     }
 
     const ws = XLSX.utils.json_to_sheet(rows);
