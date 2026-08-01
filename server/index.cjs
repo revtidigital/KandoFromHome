@@ -193,7 +193,7 @@ mongoose.connect(MONGO_URI)
 const UserSchema = new mongoose.Schema({
   empId: { type: String, required: true, unique: true },
   empName: { type: String, required: true },
-  email: { type: String, required: true },
+  email: { type: String, default: '' },
   phone: { type: String },
   city: { type: String },
   familyMembers: { type: Number, default: 1 },
@@ -287,10 +287,13 @@ app.get('/api/check-submission', async (req, res) => {
   try {
     const { empId, email } = req.query;
     if (!empId && !email) return res.json({ submitted: false });
-    
-    const user = await User.findOne({
-      $or: [{ empId: empId || '' }, { email: email || '' }]
-    });
+
+    // Only match on fields that were actually provided — email is optional now,
+    // and matching a blank string would return an arbitrary other blank-email user.
+    const orClauses = [];
+    if (empId) orClauses.push({ empId });
+    if (email) orClauses.push({ email });
+    const user = await User.findOne({ $or: orClauses });
 
     if (!user) return res.json({ submitted: false, hasForm1: false, hasForm2: false });
 
@@ -331,9 +334,9 @@ app.post('/api/submissions/form1', (req, res, next) => {
   });
 }, async (req, res) => {
   try {
-    const { empId, empName, email, phone, city, familyMembers, companyName, department, ceoReflection, language } = req.body || {};
+    const { empId, empName, companyName, department, location, language } = req.body || {};
 
-    if (!empId || !empName || !email) {
+    if (!empId || !empName) {
       return res.status(400).json({ error: 'Missing required user details.' });
     }
 
@@ -358,29 +361,12 @@ app.post('/api/submissions/form1', (req, res, next) => {
     }
 
     const cleanEmpId = empId.toString().trim();
-    const cleanEmail = email.toString().trim().toLowerCase();
-    const cleanPhone = (phone || '').toString().trim();
 
-    // Check Phone Uniqueness
-    if (cleanPhone) {
-      const phoneUser = await User.findOne({ phone: cleanPhone });
-      if (phoneUser && phoneUser.empId !== cleanEmpId) {
-        return res.status(400).json({ error: `Phone number "${phone}" is already registered under Employee ID (${phoneUser.empId}). Each Phone Number must be unique!` });
-      }
-    }
-
-    // Enforce Employee ID Uniqueness
+    // Enforce Employee ID Uniqueness — the sole identity anchor now that
+    // email/phone are no longer collected on this form.
     let user = await User.findOne({ empId: cleanEmpId });
     if (!user) {
-      const emailUser = await User.findOne({ email: cleanEmail });
-      if (emailUser && emailUser.empId !== cleanEmpId) {
-        return res.status(400).json({ error: `Email address "${email}" is already registered under Employee ID (${emailUser.empId}).` });
-      }
-      user = await User.create({ empId: cleanEmpId, empName: empName.trim(), email: cleanEmail, phone: cleanPhone, city, familyMembers: Number(familyMembers) || 1 });
-    } else {
-      if (user.email.toLowerCase() !== cleanEmail) {
-        return res.status(400).json({ error: `Employee ID "${cleanEmpId}" is already registered to another employee (${user.empName}). Each Employee ID must be unique!` });
-      }
+      user = await User.create({ empId: cleanEmpId, empName: empName.trim(), city: (location || '').trim() });
     }
 
     const existingF1 = await Form1.findOne({ userId: user._id });
@@ -388,8 +374,8 @@ app.post('/api/submissions/form1', (req, res, next) => {
       return res.status(400).json({ error: 'Form 1 has already been submitted by this user.' });
     }
 
-    // User-specific R2 folder: empId_INITIALS or last4phone_INITIALS
-    const userFolder = getUserFolder(cleanEmpId, empName, phone);
+    // User-specific R2 folder: empId_INITIALS
+    const userFolder = getUserFolder(cleanEmpId, empName, '');
 
     let photo1Url = `${R2_PUBLIC_URL}/${userFolder}/${req.files['photo1'][0].filename}`;
     let photo2Url = req.files['photo2'] ? `${R2_PUBLIC_URL}/${userFolder}/${req.files['photo2'][0].filename}` : '';
@@ -420,7 +406,6 @@ app.post('/api/submissions/form1', (req, res, next) => {
       photo1Url,
       photo2Url,
       videoUrl,
-      ceoReflection: ceoReflection || '',
       language: language || 'en',
       ip
     });
@@ -448,10 +433,10 @@ app.post('/api/submissions/form2', (req, res, next) => {
   });
 }, async (req, res) => {
   try {
-    const { empId, empName, email, phone, companyName, department, location, thoughts, language } = req.body || {};
+    const { empId, empName, companyName, department, location, thoughts, language } = req.body || {};
 
-    if (!empId || !empName || !email) {
-      return res.status(400).json({ error: 'Missing required user details (empId, empName, email).' });
+    if (!empId || !empName) {
+      return res.status(400).json({ error: 'Missing required user details (empId, empName).' });
     }
     if (!thoughts || !thoughts.trim()) {
       return res.status(400).json({ error: 'Please share your thoughts (required).' });
@@ -461,18 +446,8 @@ app.post('/api/submissions/form2', (req, res, next) => {
     }
 
     const cleanEmpId = empId.toString().trim();
-    const cleanEmail = email.toString().trim().toLowerCase();
-    const cleanPhone = (phone || '').toString().trim();
 
-    // Check Phone Uniqueness
-    if (cleanPhone) {
-      const phoneUser = await User.findOne({ phone: cleanPhone });
-      if (phoneUser && phoneUser.empId !== cleanEmpId) {
-        return res.status(400).json({ error: `Phone number "${phone}" is already registered under Employee ID (${phoneUser.empId}). Each Phone Number must be unique!` });
-      }
-    }
-
-    const userFolder2 = getUserFolder(cleanEmpId, empName, phone);
+    const userFolder2 = getUserFolder(cleanEmpId, empName, '');
 
     let optionalFileUrl = '';
     if (req.file) {
@@ -484,18 +459,11 @@ app.post('/api/submissions/form2', (req, res, next) => {
       if (r2File) optionalFileUrl = r2File;
     }
 
-    // Enforce Employee ID Uniqueness
+    // Enforce Employee ID Uniqueness — the sole identity anchor now that
+    // email/phone are no longer collected on either form.
     let user = await User.findOne({ empId: cleanEmpId });
     if (!user) {
-      const emailUser = await User.findOne({ email: cleanEmail });
-      if (emailUser && emailUser.empId !== cleanEmpId) {
-        return res.status(400).json({ error: `Email address "${email}" is already registered under Employee ID (${emailUser.empId}).` });
-      }
-      user = await User.create({ empId: cleanEmpId, empName: empName.trim(), email: cleanEmail, phone: cleanPhone, city: location || '', familyMembers: 1 });
-    } else {
-      if (user.email.toLowerCase() !== cleanEmail) {
-        return res.status(400).json({ error: `Employee ID "${cleanEmpId}" is already registered to another employee (${user.empName}). Each Employee ID must be unique!` });
-      }
+      user = await User.create({ empId: cleanEmpId, empName: empName.trim(), city: location || '' });
     }
 
     const existingF2 = await Form2.findOne({ userId: user._id });

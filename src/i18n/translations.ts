@@ -305,8 +305,8 @@ export const translations: Record<Language, Translations> = {
     sec1EmployeeDetailsTitle: "1. Employee & Family Details",
     sec2UploadPhotosTitle: "2. Upload Photos (Max 2 Photos, Max 10MB each)",
     sec2UploadPhotosDesc: "Upload up to 2 high-resolution photos of your family Kando DIY Wall (All image formats supported).",
-    photo1Label: "Photo 1 (Required, Max 10MB) *",
-    photo2Label: "Photo 2 (Required, Max 10MB) *",
+    photo1Label: "Photo 1 (Required, Max 5MB) *",
+    photo2Label: "Photo 2 (Required, Max 5MB) *",
     sec2UploadVideoTitle: "Upload Kando Video (Required, Max 40MB) *",
     sec2UploadVideoDesc: "Upload 1 video of your family making the DIY Craft Wall (MP4, WEBM, MOV, etc. Max 40MB limit).",
 
@@ -466,8 +466,8 @@ export const translations: Record<Language, Translations> = {
     sec1EmployeeDetailsTitle: "1. कर्मचारी और परिवार विवरण",
     sec2UploadPhotosTitle: "2. तस्वीरें अपलोड करें (अधिकतम 2 तस्वीरें, 10MB प्रत्येक)",
     sec2UploadPhotosDesc: "अपने परिवार की कांदो DIY वॉल की 2 उच्च-गुणवत्ता वाली तस्वीरें अपलोड करें (सभी फोटो प्रारूप समर्थित)।",
-    photo1Label: "फोटो 1 (अनिवार्य, अधिकतम 10MB) *",
-    photo2Label: "फोटो 2 (अनिवार्य, अधिकतम 10MB) *",
+    photo1Label: "फोटो 1 (अनिवार्य, अधिकतम 5MB) *",
+    photo2Label: "फोटो 2 (अनिवार्य, अधिकतम 5MB) *",
     sec2UploadVideoTitle: "कांदो वीडियो अपलोड करें (अनिवार्य, अधिकतम 40MB) *",
     sec2UploadVideoDesc: "DIY क्राफ्ट वॉल बनाते हुए अपने परिवार का 1 वीडियो अपलोड करें (MP4, WEBM, MOV, अधिकतम 40MB)।",
 
@@ -627,8 +627,8 @@ export const translations: Record<Language, Translations> = {
     sec1EmployeeDetailsTitle: "1. ஊழியர் மற்றும் குடும்ப விவரங்கள்",
     sec2UploadPhotosTitle: "2. புகைப்படங்களைப் பதிவேற்றவும் (அதிகபட்சம் 2 புகைப்படங்கள், தலா 10MB)",
     sec2UploadPhotosDesc: "உங்கள் குடும்ப காண்டோ DIY சுவரின் 2 உயர்தர புகைப்படங்களைப் பதிவேற்றவும்.",
-    photo1Label: "புகைப்படம் 1 (தேவை, அதிகபட்சம் 10MB) *",
-    photo2Label: "புகைப்படம் 2 (தேவை, அதிகபட்சம் 10MB) *",
+    photo1Label: "புகைப்படம் 1 (தேவை, அதிகபட்சம் 5MB) *",
+    photo2Label: "புகைப்படம் 2 (தேவை, அதிகபட்சம் 5MB) *",
     sec2UploadVideoTitle: "காண்டோ வீடியோவைப் பதிவேற்றவும் (தேவை, அதிகபட்சம் 40MB) *",
     sec2UploadVideoDesc: "DIY கைவினைச் சுவரை உருவாக்கும் உங்கள் குடும்பத்தின் 1 வீடியோவைப் பதிவேற்றவும் (MP4, WEBM, MOV, 40MB).",
 

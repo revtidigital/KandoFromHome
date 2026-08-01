@@ -34,9 +34,6 @@ export const Form2Page: React.FC = () => {
 
     if (!formData.empId.trim()) newErrors.empId = t.errEmpIdRequired || 'Employee ID is required.';
     if (!formData.empName.trim()) newErrors.empName = t.errEmpNameRequired || 'Full name is required.';
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!formData.email.trim()) newErrors.email = t.errEmailRequired || 'Email is required.';
-    else if (!emailRegex.test(formData.email.trim())) newErrors.email = t.errEmailInvalid || 'Invalid email format.';
     if (!thoughts.trim()) newErrors.thoughts = 'Please share your thoughts (required).';
     else if (thoughts.trim().length > 2000) newErrors.thoughts = 'Thoughts must be 2000 characters or less.';
     if (!dataConsent) newErrors.dataConsent = 'You must agree to the Terms & Conditions to proceed.';
@@ -49,7 +46,7 @@ export const Form2Page: React.FC = () => {
     setIsSubmitting(true);
     try {
       // Check duplicate Form 2
-      const checkRes = await fetch(`${apiBaseUrl}/api/check-submission?empId=${encodeURIComponent(formData.empId.trim())}&email=${encodeURIComponent(formData.email.trim())}`);
+      const checkRes = await fetch(`${apiBaseUrl}/api/check-submission?empId=${encodeURIComponent(formData.empId.trim())}`);
       if (checkRes.ok) {
         const checkData = await checkRes.json();
         if (checkData.hasForm2) {
@@ -62,8 +59,6 @@ export const Form2Page: React.FC = () => {
       const body = new FormData();
       body.append('empId', formData.empId.trim());
       body.append('empName', formData.empName.trim());
-      body.append('email', formData.email.trim());
-      body.append('phone', formData.phone || '');
       body.append('companyName', companyName.trim());
       body.append('department', department.trim());
       body.append('location', location.trim());
@@ -160,15 +155,6 @@ export const Form2Page: React.FC = () => {
                 onChange={e => setFormData(prev => ({ ...prev, empName: e.target.value }))}
                 placeholder="e.g. Priya Sundaram" style={inputStyle(errors.empName)} />
               {errors.empName && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.empName}</p>}
-            </div>
-
-            {/* Email */}
-            <div style={{ minWidth: 0 }}>
-              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>Email *</label>
-              <input type="email" value={formData.email}
-                onChange={e => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                placeholder="name@yamaha-motor.co.in" style={inputStyle(errors.email)} />
-              {errors.email && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.email}</p>}
             </div>
 
             {/* Department */}

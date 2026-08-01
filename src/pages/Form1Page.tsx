@@ -20,8 +20,6 @@ export const Form1Page: React.FC = () => {
   const [companyName, setCompanyName] = useState('');
   const [department, setDepartment] = useState('');
 
-  const [rawPhone, setRawPhone] = useState(formData.phone ? formData.phone.replace(/^\+\d+\s*/, '') : '');
-
   const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -88,28 +86,7 @@ export const Form1Page: React.FC = () => {
       newErrors.empName = t.errEmpNameRequired;
     }
 
-    // 3. Email Format Validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!formData.email.trim()) {
-      newErrors.email = t.errEmailRequired;
-    } else if (!emailRegex.test(formData.email.trim())) {
-      newErrors.email = t.errEmailInvalid;
-    }
-
-    // 4. Phone 10-Digit Validation (without +91)
-    const digitsOnly = rawPhone.replace(/\D/g, '');
-    if (!digitsOnly) {
-      newErrors.phone = t.errPhoneRequired;
-    } else if (digitsOnly.length !== 10) {
-      newErrors.phone = t.errPhone10Digits;
-    }
-
-    // 5. City Validation
-    if (!formData.city.trim()) {
-      newErrors.city = t.errCityRequired;
-    }
-
-    // 6. Photo & Video Mandatory Validation
+    // 3. Photo & Video Mandatory Validation
     if (!formData.photo1) {
       newErrors.photo1 = t.errPhoto1Required;
     }
@@ -120,7 +97,7 @@ export const Form1Page: React.FC = () => {
       newErrors.video = t.errVideoRequired;
     }
 
-    // 7. Privacy Policy Consent
+    // 4. Privacy Policy Consent
     if (!dataConsent) {
       newErrors.dataConsent = t.errConsentRequired;
     }
@@ -130,30 +107,23 @@ export const Form1Page: React.FC = () => {
       return;
     }
 
-    const fullFormattedPhone = `+91 ${digitsOnly}`;
-    setFormData(prev => ({ ...prev, phone: fullFormattedPhone }));
     setIsSubmitting(true);
 
     try {
-      // 1. Check if Employee ID is already registered under a different email (Unique Employee ID Check)
-      const empIdCheck = await fetch(`${apiBaseUrl}/api/check-empid?empId=${encodeURIComponent(formData.empId.trim())}&email=${encodeURIComponent(formData.email.trim())}`);
+      // 1. Check if Employee ID is already registered (Unique Employee ID Check)
+      const empIdCheck = await fetch(`${apiBaseUrl}/api/check-empid?empId=${encodeURIComponent(formData.empId.trim())}`);
       if (empIdCheck.ok) {
         const empIdData = await empIdCheck.json();
-        if (empIdData.exists && !empIdData.isSameUser) {
-          setDuplicateError(`Employee ID "${formData.empId.trim()}" is already registered to another candidate (${empIdData.registeredName}). Each Employee ID must be unique!`);
-          setIsSubmitting(false);
-          return;
-        }
-      }
-
-      // 2. Check if user already submitted Form 1 (1 User = 1 Submission Validation Req 4)
-      const checkRes = await fetch(`${apiBaseUrl}/api/check-submission?empId=${encodeURIComponent(formData.empId.trim())}&email=${encodeURIComponent(formData.email.trim())}`);
-      if (checkRes.ok) {
-        const checkData = await checkRes.json();
-        if (checkData.hasForm1) {
-          setDuplicateError(`User (${formData.empId}) has already submitted Form 1. Duplicate submissions are not allowed.`);
-          setIsSubmitting(false);
-          return;
+        if (empIdData.exists) {
+          const checkRes = await fetch(`${apiBaseUrl}/api/check-submission?empId=${encodeURIComponent(formData.empId.trim())}`);
+          if (checkRes.ok) {
+            const checkData = await checkRes.json();
+            if (checkData.hasForm1) {
+              setDuplicateError(`Employee ID "${formData.empId.trim()}" has already submitted Form 1. Duplicate submissions are not allowed.`);
+              setIsSubmitting(false);
+              return;
+            }
+          }
         }
       }
 
@@ -161,13 +131,9 @@ export const Form1Page: React.FC = () => {
       const body = new FormData();
       body.append('empId', formData.empId.trim());
       body.append('empName', formData.empName.trim());
-      body.append('email', formData.email.trim());
-      body.append('phone', fullFormattedPhone);
-      body.append('city', formData.city.trim());
-      body.append('familyMembers', formData.familyMembers || '1');
       body.append('companyName', companyName.trim());
       body.append('department', department.trim());
-      body.append('ceoReflection', formData.ceoReflection || '');
+      body.append('location', formData.city.trim());
       body.append('language', language);
 
       if (formData.photo1) body.append('photo1', formData.photo1);
@@ -229,8 +195,8 @@ export const Form1Page: React.FC = () => {
       )}
 
       <form onSubmit={handleSubmit} className="glass-card form-card-panel" style={{ borderRadius: '20px', width: '100%', boxSizing: 'border-box' }}>
-        
-        {/* PERSONAL DETAILS SECTION */}
+
+        {/* EMPLOYEE DETAILS SECTION */}
         <div style={{ marginBottom: '28px' }}>
           <h2 style={{ fontSize: '1.15rem', color: '#00E5FF', marginBottom: '16px', fontWeight: 700 }}>
             {t.sec1EmployeeDetailsTitle}
@@ -238,43 +204,12 @@ export const Form1Page: React.FC = () => {
 
           <div className="form-fields-grid">
             <div style={{ minWidth: 0 }}>
-              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>{t.fullName} *</label>
-              <input
-                type="text"
-                value={formData.empName}
-                onChange={e => setFormData(prev => ({ ...prev, empName: e.target.value }))}
-                placeholder="e.g. Rahul Sharma"
-                style={{
-                  width: '100%', minWidth: 0, padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
-                  background: 'rgba(255,255,255,0.06)', border: errors.empName ? '1px solid #EF4444' : '1px solid rgba(255,255,255,0.2)',
-                  color: 'white', outline: 'none'
-                }}
-              />
-              {errors.empName && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.empName}</p>}
-            </div>
-
-            <div style={{ minWidth: 0 }}>
               <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>Company Name</label>
               <input
                 type="text"
                 value={companyName}
                 onChange={e => setCompanyName(e.target.value)}
                 placeholder="e.g. Yamaha Motor India"
-                style={{
-                  width: '100%', minWidth: 0, padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
-                  background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.2)',
-                  color: 'white', outline: 'none'
-                }}
-              />
-            </div>
-
-            <div style={{ minWidth: 0 }}>
-              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>Department</label>
-              <input
-                type="text"
-                value={department}
-                onChange={e => setDepartment(e.target.value)}
-                placeholder="e.g. Marketing"
                 style={{
                   width: '100%', minWidth: 0, padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
                   background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.2)',
@@ -300,74 +235,43 @@ export const Form1Page: React.FC = () => {
             </div>
 
             <div style={{ minWidth: 0 }}>
-              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>{t.officialEmail} *</label>
+              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>{t.fullName} *</label>
               <input
-                type="email"
-                value={formData.email}
-                onChange={e => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                placeholder="name@yamaha-motor.co.in"
+                type="text"
+                value={formData.empName}
+                onChange={e => setFormData(prev => ({ ...prev, empName: e.target.value }))}
+                placeholder="e.g. Rahul Sharma"
                 style={{
                   width: '100%', minWidth: 0, padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
-                  background: 'rgba(255,255,255,0.06)', border: errors.email ? '1px solid #EF4444' : '1px solid rgba(255,255,255,0.2)',
+                  background: 'rgba(255,255,255,0.06)', border: errors.empName ? '1px solid #EF4444' : '1px solid rgba(255,255,255,0.2)',
                   color: 'white', outline: 'none'
                 }}
               />
-              {errors.email && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.email}</p>}
+              {errors.empName && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.empName}</p>}
             </div>
 
             <div style={{ minWidth: 0 }}>
-              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>{t.phoneNumber} * (10 Digits)</label>
-              <div style={{ display: 'flex', gap: '8px', minWidth: 0, width: '100%', alignItems: 'center' }}>
-                <div style={{
-                  padding: '12px 10px', borderRadius: '10px',
-                  background: 'rgba(0, 229, 255, 0.12)', border: '1px solid rgba(0, 229, 255, 0.3)',
-                  color: '#00E5FF', fontWeight: 800, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '6px',
-                  flexShrink: 0
-                }}>
-                  <span>🇮🇳</span>
-                  <span>+91</span>
-                </div>
-                <input
-                  type="tel"
-                  maxLength={10}
-                  value={rawPhone}
-                  onChange={e => setRawPhone(e.target.value.replace(/\D/g, ''))}
-                  placeholder="9876543210"
-                  style={{
-                    flex: 1, minWidth: 0, width: '100%', padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
-                    background: 'rgba(255,255,255,0.06)', border: errors.phone ? '1px solid #EF4444' : '1px solid rgba(255,255,255,0.2)',
-                    color: 'white', outline: 'none', fontSize: '0.95rem'
-                  }}
-                />
-              </div>
-              {errors.phone && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.phone}</p>}
+              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>Department</label>
+              <input
+                type="text"
+                value={department}
+                onChange={e => setDepartment(e.target.value)}
+                placeholder="e.g. Marketing"
+                style={{
+                  width: '100%', minWidth: 0, padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
+                  background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.2)',
+                  color: 'white', outline: 'none'
+                }}
+              />
             </div>
 
             <div style={{ minWidth: 0 }}>
-              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>{t.cityLocation} *</label>
+              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>Location</label>
               <input
                 type="text"
                 value={formData.city}
                 onChange={e => setFormData(prev => ({ ...prev, city: e.target.value }))}
                 placeholder="e.g. Surajpur / Chennai"
-                style={{
-                  width: '100%', minWidth: 0, padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
-                  background: 'rgba(255,255,255,0.06)', border: errors.city ? '1px solid #EF4444' : '1px solid rgba(255,255,255,0.2)',
-                  color: 'white', outline: 'none'
-                }}
-              />
-              {errors.city && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.city}</p>}
-            </div>
-
-            <div style={{ minWidth: 0 }}>
-              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>{t.familyMembersCount}</label>
-              <input
-                type="number"
-                min="1"
-                max="20"
-                value={formData.familyMembers}
-                onChange={e => setFormData(prev => ({ ...prev, familyMembers: e.target.value }))}
-                placeholder="e.g. 4"
                 style={{
                   width: '100%', minWidth: 0, padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
                   background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.2)',
@@ -388,7 +292,7 @@ export const Form1Page: React.FC = () => {
           </p>
 
           <div className="form-photos-grid">
-            
+
             {/* PHOTO 1 */}
             <div>
               <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>
@@ -475,24 +379,6 @@ export const Form1Page: React.FC = () => {
             )}
             {errors.video && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.video}</p>}
           </div>
-        </div>
-
-        {/* CEO REFLECTION */}
-        <div style={{ marginBottom: '32px' }}>
-          <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>
-            Reflection Message (Share your Kando Experience)
-          </label>
-          <textarea
-            rows={3}
-            value={formData.ceoReflection}
-            onChange={e => setFormData(prev => ({ ...prev, ceoReflection: e.target.value }))}
-            placeholder="Share a short note about creating this Kando DIY wall with your family..."
-            style={{
-              width: '100%', padding: '12px 14px', borderRadius: '10px',
-              background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.2)',
-              color: 'white', outline: 'none', resize: 'vertical'
-            }}
-          />
         </div>
 
         {/* CONSENTS & SUBMIT */}
