@@ -65,7 +65,10 @@ interface AppContextType {
   
   isAdminLoggedIn: boolean;
   setIsAdminLoggedIn: (val: boolean) => void;
-  
+  adminLogin: (username: string, password: string) => Promise<boolean>;
+  adminLogout: () => void;
+  adminAuthHeader: () => Record<string, string>;
+
   allUsers: any[];
   setAllUsers: React.Dispatch<React.SetStateAction<any[]>>;
   customTags: string[];
@@ -110,8 +113,37 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [language, setLanguageState] = useState<Language>(initial.lang);
   const [currentView, setCurrentView] = useState<string>(initial.view);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(() => {
-    return localStorage.getItem('kando_admin_auth') === 'true';
+    return !!sessionStorage.getItem('kando_admin_cred');
   });
+
+  // Real admin login — verifies the entered credentials against the backend
+  // (protected by nginx + Express Basic Auth) before granting dashboard access.
+  const adminLogin = async (username: string, password: string): Promise<boolean> => {
+    const encoded = btoa(`${username}:${password}`);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/admin/overview`, {
+        headers: { Authorization: `Basic ${encoded}` }
+      });
+      if (res.ok) {
+        sessionStorage.setItem('kando_admin_cred', encoded);
+        setIsAdminLoggedIn(true);
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  };
+
+  const adminLogout = () => {
+    sessionStorage.removeItem('kando_admin_cred');
+    setIsAdminLoggedIn(false);
+  };
+
+  const adminAuthHeader = (): Record<string, string> => {
+    const cred = sessionStorage.getItem('kando_admin_cred');
+    return cred ? { Authorization: `Basic ${cred}` } : {};
+  };
 
   const [formData, setFormData] = useState({
     empName: '',
@@ -181,7 +213,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const fetchSubmissions = async (page = 1, search = '', tag = '') => {
     try {
       const query = new URLSearchParams({ page: String(page), limit: '25', search, tag });
-      const res = await fetch(`${API_BASE_URL}/api/admin/users?${query}`);
+      const res = await fetch(`${API_BASE_URL}/api/admin/users?${query}`, { headers: adminAuthHeader() });
       if (res.ok) {
         const data = await res.json();
         setSubmissions(data.users || []);
@@ -194,7 +226,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Fetch Audit Logs (Append-Only)
   const fetchAuditLogs = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/admin/audit-logs`);
+      const res = await fetch(`${API_BASE_URL}/api/admin/audit-logs`, { headers: adminAuthHeader() });
       if (res.ok) {
         const data = await res.json();
         setAuditLogs(data || []);
@@ -209,7 +241,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     try {
       const res = await fetch(`${API_BASE_URL}/api/admin/users/${id}/tags`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...adminAuthHeader() },
         body: JSON.stringify({ tags })
       });
       if (res.ok) {
@@ -252,10 +284,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       auditLogs,
       fetchAuditLogs,
       isAdminLoggedIn,
-      setIsAdminLoggedIn: (val) => {
-        setIsAdminLoggedIn(val);
-        localStorage.setItem('kando_admin_auth', val ? 'true' : 'false');
-      },
+      setIsAdminLoggedIn,
+      adminLogin,
+      adminLogout,
+      adminAuthHeader,
       allUsers,
       setAllUsers,
       customTags,

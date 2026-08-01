@@ -7,10 +7,10 @@ import {
 } from 'lucide-react';
 
 export const AdminDashboardPage: React.FC = () => {
-  const { 
-    setIsAdminLoggedIn, navigateTo, 
-    allUsers, setAllUsers, customTags, setCustomTags, 
-    auditLogs, addAuditLog, apiBaseUrl 
+  const {
+    adminLogout, navigateTo,
+    allUsers, setAllUsers, customTags, setCustomTags,
+    auditLogs, addAuditLog, apiBaseUrl, adminAuthHeader
   } = useApp();
 
   const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'tags' | 'settings' | 'audit' | 'user-detail'>('overview');
@@ -40,7 +40,7 @@ export const AdminDashboardPage: React.FC = () => {
 
   // Fetch initial settings & users from API
   useEffect(() => {
-    fetch(`${apiBaseUrl}/api/admin/settings`)
+    fetch(`${apiBaseUrl}/api/admin/settings`, { headers: adminAuthHeader() })
       .then(res => res.json())
       .then(data => {
         if (data) {
@@ -51,7 +51,7 @@ export const AdminDashboardPage: React.FC = () => {
       })
       .catch(() => {});
 
-    fetch(`${apiBaseUrl}/api/admin/users?limit=200`)
+    fetch(`${apiBaseUrl}/api/admin/users?limit=200`, { headers: adminAuthHeader() })
       .then(res => res.json())
       .then(data => {
         if (data && data.users) {
@@ -59,10 +59,11 @@ export const AdminDashboardPage: React.FC = () => {
         }
       })
       .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiBaseUrl, setAllUsers, setCustomTags]);
 
   const handleLogout = () => {
-    setIsAdminLoggedIn(false);
+    adminLogout();
     navigateTo('landing');
   };
 
@@ -94,7 +95,7 @@ export const AdminDashboardPage: React.FC = () => {
       // Sync with Backend API
       await fetch(`${apiBaseUrl}/api/admin/users/${userId}/tags`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...adminAuthHeader() },
         body: JSON.stringify({ tags: updatedTags })
       });
 
@@ -116,7 +117,7 @@ export const AdminDashboardPage: React.FC = () => {
     try {
       const res = await fetch(`${apiBaseUrl}/api/admin/tags`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...adminAuthHeader() },
         body: JSON.stringify({ tag })
       });
       if (res.ok) {
@@ -137,7 +138,8 @@ export const AdminDashboardPage: React.FC = () => {
 
     try {
       const res = await fetch(`${apiBaseUrl}/api/admin/tags/${encodeURIComponent(tagToRemove)}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: adminAuthHeader()
       });
       if (res.ok) {
         const data = await res.json();
@@ -156,7 +158,7 @@ export const AdminDashboardPage: React.FC = () => {
     try {
       await fetch(`${apiBaseUrl}/api/admin/settings`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...adminAuthHeader() },
         body: JSON.stringify({ captchaEnabled, googleAnalyticsId: gaId, customTags })
       });
       addAuditLog(`Updated Google reCAPTCHA Verification (Enabled: ${captchaEnabled})`);
@@ -171,7 +173,7 @@ export const AdminDashboardPage: React.FC = () => {
     try {
       await fetch(`${apiBaseUrl}/api/admin/settings`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...adminAuthHeader() },
         body: JSON.stringify({ captchaEnabled, googleAnalyticsId: gaId, customTags })
       });
       addAuditLog(`Updated Google Analytics Measurement ID: ${gaId}`);
@@ -183,26 +185,44 @@ export const AdminDashboardPage: React.FC = () => {
   };
 
   // Export handlers (CSV, Excel, PDF Report & ZIP Media Archive)
-  const handleExportData = (format: 'csv' | 'excel' | 'pdf' | 'zip') => {
+  // Uses fetch + blob (not a plain <a href> / window.open) so the admin auth header
+  // actually reaches the protected /api/admin/export/* endpoints.
+  const handleExportData = async (format: 'csv' | 'excel' | 'pdf' | 'zip') => {
     let url = '';
+    let filename = 'kando_export';
     if (format === 'zip') {
       url = `${apiBaseUrl}/api/admin/export/zip`;
+      filename = 'kando_submissions_assets.zip';
       addAuditLog('Exported Candidate Submissions (CSV + ZIP Media Archive)');
     } else if (format === 'pdf') {
-      window.open(`${apiBaseUrl}/api/admin/export/pdf`, '_blank');
+      url = `${apiBaseUrl}/api/admin/export/pdf`;
+      filename = 'kando_users_report.html';
       addAuditLog('Exported Candidate Directory PDF Report');
-      return;
     } else {
       url = `${apiBaseUrl}/api/admin/export/users?format=${format}`;
+      filename = format === 'excel' ? 'kando_users.xlsx' : 'kando_users.csv';
       addAuditLog(`Exported Registered Users Data (${format.toUpperCase()})`);
     }
 
-    // Direct invisible anchor download link (Bypasses popup blockers in all browsers!)
-    const link = document.createElement('a');
-    link.href = url;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    try {
+      const res = await fetch(url, { headers: adminAuthHeader() });
+      if (!res.ok) return;
+      const blob = await res.blob();
+      const objectUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = objectUrl;
+      if (format === 'pdf') {
+        window.open(objectUrl, '_blank');
+      } else {
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+      setTimeout(() => window.URL.revokeObjectURL(objectUrl), 60000);
+    } catch (err) {
+      console.error('Export error:', err);
+    }
   };
 
   // Users Filtered List

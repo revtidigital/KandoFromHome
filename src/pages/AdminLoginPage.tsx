@@ -3,19 +3,23 @@ import { useApp } from '../context/AppContext';
 import { Lock, LogIn, AlertCircle } from 'lucide-react';
 
 export const AdminLoginPage: React.FC = () => {
-  const { setIsAdminLoggedIn, navigateTo } = useApp();
+  const { adminLogin, navigateTo } = useApp();
 
-  const [username, setUsername] = useState('admin');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleAdminLogin = (e: React.FormEvent) => {
+  const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (username === 'admin' && (password === 'yamaha2026' || password === 'admin' || password === '123456')) {
-      setIsAdminLoggedIn(true);
+    setError('');
+    setLoading(true);
+    const ok = await adminLogin(username, password);
+    setLoading(false);
+    if (ok) {
       navigateTo('admin-dashboard');
     } else {
-      setError('Invalid admin credentials. Use admin / yamaha2026');
+      setError('Invalid admin credentials.');
     }
   };
 
@@ -72,44 +76,36 @@ export const AdminLoginPage: React.FC = () => {
         <form onSubmit={handleAdminLogin}>
           <div className="form-group">
             <label className="form-label">Username</label>
-            <input 
+            <input
               type="text"
               className="form-input"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="e.g. admin"
+              placeholder="Username"
+              autoComplete="username"
             />
           </div>
 
           <div className="form-group">
             <label className="form-label">Password</label>
-            <input 
+            <input
               type="password"
               className="form-input"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter admin password (yamaha2026)"
+              placeholder="Password"
+              autoComplete="current-password"
             />
           </div>
 
-          <div style={{
-            background: 'rgba(255, 255, 255, 0.05)',
-            padding: '10px 14px',
-            borderRadius: '8px',
-            fontSize: '0.8rem',
-            color: '#00E5FF',
-            marginBottom: '24px'
-          }}>
-            💡 Demo credentials: <strong>admin</strong> / <strong>yamaha2026</strong>
-          </div>
-
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="btn-primary"
-            style={{ width: '100%', justifyContent: 'center', padding: '14px' }}
+            disabled={loading}
+            style={{ width: '100%', justifyContent: 'center', padding: '14px', marginTop: '8px', opacity: loading ? 0.7 : 1 }}
           >
             <LogIn size={18} />
-            <span>Secure Admin Sign In</span>
+            <span>{loading ? 'Verifying...' : 'Secure Admin Sign In'}</span>
           </button>
         </form>
 
