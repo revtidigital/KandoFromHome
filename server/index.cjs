@@ -1,9 +1,12 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const archiverModule = require('archiver');
 const XLSX = require('xlsx');
 
@@ -17,9 +20,45 @@ function getZipArchive() {
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const ADMIN_PANEL_USER = process.env.ADMIN_PANEL_USER || '';
+const ADMIN_PANEL_PASS = process.env.ADMIN_PANEL_PASS || '';
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '';
 
-app.use(cors());
+app.set('trust proxy', 1);
+app.use(helmet({
+  contentSecurityPolicy: false // frontend is a pre-built SPA; avoid breaking inline scripts it may rely on
+}));
+app.use(cors(ALLOWED_ORIGIN ? { origin: ALLOWED_ORIGIN } : {}));
 app.use(express.json());
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 300,
+  standardHeaders: true,
+  legacyHeaders: false
+});
+app.use('/api', apiLimiter);
+
+const exportLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+// Admin routes require HTTP Basic Auth (same credentials enforced at nginx layer too)
+function requireAdmin(req, res, next) {
+  const header = req.headers.authorization || '';
+  const [scheme, encoded] = header.split(' ');
+  if (scheme === 'Basic' && encoded) {
+    const [user, pass] = Buffer.from(encoded, 'base64').toString('utf8').split(':');
+    if (ADMIN_PANEL_USER && ADMIN_PANEL_PASS && user === ADMIN_PANEL_USER && pass === ADMIN_PANEL_PASS) {
+      return next();
+    }
+  }
+  res.setHeader('WWW-Authenticate', 'Basic realm="Kando Admin"');
+  return res.status(401).json({ error: 'Unauthorized' });
+}
 
 // Serve static frontend build from /dist
 const distDir = path.join(__dirname, '..', 'dist');
@@ -32,7 +71,13 @@ const uploadsDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
-app.use('/uploads', express.static(uploadsDir));
+// Serve uploads as downloads only — prevents any uploaded HTML/SVG from executing in-browser (stored XSS)
+app.use('/uploads', express.static(uploadsDir, {
+  setHeaders: (res) => {
+    res.setHeader('Content-Disposition', 'attachment');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+  }
+}));
 
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 
@@ -102,9 +147,21 @@ const storage = multer.diskStorage({
   }
 });
 
+const ALLOWED_MIME_TYPES = new Set([
+  'image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/heic', 'image/heif',
+  'video/mp4', 'video/quicktime', 'video/webm', 'video/x-matroska',
+  'application/pdf'
+]);
+
 const upload = multer({
   storage,
-  limits: { fileSize: 55 * 1024 * 1024 } // 55MB max buffer
+  limits: { fileSize: 55 * 1024 * 1024 }, // 55MB max buffer
+  fileFilter: (req, file, cb) => {
+    if (ALLOWED_MIME_TYPES.has(file.mimetype)) {
+      return cb(null, true);
+    }
+    cb(new Error('Unsupported file type. Only images, videos and PDFs are allowed.'));
+  }
 });
 
 // MongoDB Connection
@@ -199,7 +256,8 @@ app.get('/api/check-empid', async (req, res) => {
       registeredEmail: user.email
     });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error.' });
   }
 });
 
@@ -225,7 +283,8 @@ app.get('/api/check-submission', async (req, res) => {
       user
     });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error.' });
   }
 });
 
@@ -348,12 +407,23 @@ app.post('/api/submissions/form1', (req, res, next) => {
     res.json({ success: true, submissionId: submission._id });
   } catch (err) {
     console.error('Form1 error:', err);
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error.' });
   }
 });
 
 // Form 2 Submission — Chairman Invites Your Thoughts
-app.post('/api/submissions/form2', upload.single('optionalFile'), async (req, res) => {
+app.post('/api/submissions/form2', (req, res, next) => {
+  upload.single('optionalFile')(req, res, (err) => {
+    if (err) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({ error: 'File exceeds the maximum allowed size.' });
+      }
+      return res.status(400).json({ error: err.message || 'File upload error.' });
+    }
+    next();
+  });
+}, async (req, res) => {
   try {
     const { empId, empName, email, phone, companyName, department, location, thoughts, language } = req.body || {};
 
@@ -429,9 +499,17 @@ app.post('/api/submissions/form2', upload.single('optionalFile'), async (req, re
     res.json({ success: true, submissionId: submission._id });
   } catch (err) {
     console.error('Form2 error:', err);
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error.' });
   }
 });
+
+// ── ADMIN ROUTES (require x-admin-key header + nginx basic auth) ──
+app.use('/api/admin', requireAdmin);
+
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 // Admin Get Users Table
 app.get('/api/admin/users', async (req, res) => {
@@ -444,11 +522,12 @@ app.get('/api/admin/users', async (req, res) => {
 
     let query = {};
     if (search) {
+      const safeSearch = escapeRegex(search.toString()).slice(0, 100);
       query.$or = [
-        { empName: new RegExp(search, 'i') },
-        { empId: new RegExp(search, 'i') },
-        { email: new RegExp(search, 'i') },
-        { city: new RegExp(search, 'i') }
+        { empName: new RegExp(safeSearch, 'i') },
+        { empId: new RegExp(safeSearch, 'i') },
+        { email: new RegExp(safeSearch, 'i') },
+        { city: new RegExp(safeSearch, 'i') }
       ];
     }
     if (tag) {
@@ -506,7 +585,8 @@ app.get('/api/admin/users', async (req, res) => {
       totalPages: Math.ceil(totalUsers / limit)
     });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error.' });
   }
 });
 
@@ -520,7 +600,8 @@ app.patch('/api/admin/users/:id/tags', async (req, res) => {
     await recordAuditLog(req, `Updated tags for user ${user.empName} (${user.empId}) to: [${tags.join(', ')}]`, 'Admin');
     res.json({ success: true, tags: user.tags });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error.' });
   }
 });
 
@@ -539,7 +620,8 @@ app.get('/api/admin/overview', async (req, res) => {
       recentLogs
     });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error.' });
   }
 });
 
@@ -549,7 +631,8 @@ app.get('/api/admin/audit-logs', async (req, res) => {
     const logs = await AuditLog.find().sort({ timestamp: -1 }).limit(200);
     res.json(logs);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error.' });
   }
 });
 
@@ -562,7 +645,8 @@ app.get('/api/admin/settings', async (req, res) => {
     }
     res.json(settings);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error.' });
   }
 });
 
@@ -581,7 +665,8 @@ app.put('/api/admin/settings', async (req, res) => {
     await recordAuditLog(req, `Updated System Settings (Captcha: ${captchaEnabled}, GA: ${googleAnalyticsId})`, 'Admin');
     res.json({ success: true, settings });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error.' });
   }
 });
 
@@ -594,7 +679,8 @@ app.get('/api/admin/tags', async (req, res) => {
     }
     res.json({ customTags: settings.customTags || [] });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error.' });
   }
 });
 
@@ -615,7 +701,8 @@ app.post('/api/admin/tags', async (req, res) => {
     }
     res.json({ success: true, customTags: settings.customTags });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error.' });
   }
 });
 
@@ -630,13 +717,14 @@ app.delete('/api/admin/tags/:tag', async (req, res) => {
     }
     res.json({ success: true, customTags: settings ? settings.customTags : [] });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error.' });
   }
 });
 
 // ── EXPORT ENDPOINTS ──
 
-app.get('/api/admin/export/users', async (req, res) => {
+app.get('/api/admin/export/users', exportLimiter, async (req, res) => {
   try {
     const format = req.query.format || 'csv';
     const users = await User.find().lean();
@@ -678,12 +766,13 @@ app.get('/api/admin/export/users', async (req, res) => {
       return res.send(csv);
     }
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error.' });
   }
 });
 
 // PDF Export Endpoint (Req 2)
-app.get('/api/admin/export/pdf', async (req, res) => {
+app.get('/api/admin/export/pdf', exportLimiter, async (req, res) => {
   try {
     const users = await User.find().lean();
     await recordAuditLog(req, 'Generated Candidate Directory PDF Report', 'Admin');
@@ -747,11 +836,12 @@ app.get('/api/admin/export/pdf', async (req, res) => {
     res.setHeader('Content-Type', 'text/html');
     res.send(html);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error.' });
   }
 });
 
-app.get('/api/admin/export/zip', async (req, res) => {
+app.get('/api/admin/export/zip', exportLimiter, async (req, res) => {
   try {
     await recordAuditLog(req, `Exported CSV + ZIP Media Assets Archive`, 'Admin');
 
@@ -803,7 +893,8 @@ app.get('/api/admin/export/zip', async (req, res) => {
 
     archive.finalize();
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error.' });
   }
 });
 

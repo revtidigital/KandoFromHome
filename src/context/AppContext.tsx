@@ -83,6 +83,12 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Parse initial state from URL hash e.g. #en/home or #hi/form1
   const parseHash = () => {
+    // Clean path /admin-login is a dedicated alias for the admin login screen
+    if (window.location.pathname === '/admin-login') {
+      const savedLang = (localStorage.getItem('kando_lang') as Language) || 'en';
+      return { lang: savedLang, view: 'admin-login' };
+    }
+
     const hash = window.location.hash.replace('#', '');
     const parts = hash.split('/').filter(Boolean);
     const savedLang = (localStorage.getItem('kando_lang') as Language) || 'en';
@@ -138,6 +144,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Update hash when navigating — GUARANTEED REAL-TIME URL HASH SYNC
   const updateUrlHash = (lang: Language, view: string) => {
+    if (view === 'admin-login') {
+      // Keep the clean /admin-login path in the address bar for this view
+      if (window.location.pathname !== '/admin-login') {
+        window.history.pushState(null, '', '/admin-login');
+      }
+      return;
+    }
+    if (window.location.pathname === '/admin-login') {
+      window.history.pushState(null, '', '/');
+    }
     const newHash = `#${lang}/${view}`;
     if (window.location.hash !== newHash) {
       window.location.hash = newHash;
