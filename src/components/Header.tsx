@@ -10,8 +10,7 @@ export const Header: React.FC = () => {
     return null;
   }
 
-  const isHashAdmin = typeof window !== 'undefined' && window.location.hash.includes('admin');
-  const isAdminView = currentView === 'admin-login' || isHashAdmin;
+  const isAdminView = currentView === 'admin-login';
 
   return (
     <header className="site-header">

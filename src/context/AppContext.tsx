@@ -89,12 +89,18 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 const ADMIN_CLEAN_VIEWS = ['admin-login', 'admin-dashboard'];
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Parse initial state from URL hash e.g. #en/home or #hi/form1
-  const parseHash = () => {
-    const cleanPath = window.location.pathname.replace(/^\//, '');
-    // Prefix match so deep links / refreshes like /admin-dashboard/users/EMP123
-    // still resolve to the admin-dashboard view (AdminDashboardPage owns the
-    // rest of that path itself and restores the exact tab/user from it).
+  // Parse initial state from a real URL path, e.g. /en/home or /hi/form1.
+  // (Previously this was hash-based — #en/home — which meant two separate
+  // state-writing functions called back-to-back could race each other and
+  // leave a stale language in the URL. Real paths + a single history write
+  // per navigation avoids that class of bug entirely.)
+  const parsePath = () => {
+    const pathname = window.location.pathname;
+    const cleanPath = pathname.replace(/^\//, '');
+
+    // Admin views keep a clean, language-free path; deep links like
+    // /admin-dashboard/users/EMP123 still resolve here via prefix match —
+    // AdminDashboardPage owns and restores the rest of that path itself.
     const matchedAdminView = ADMIN_CLEAN_VIEWS.find(
       v => cleanPath === v || cleanPath.startsWith(`${v}/`)
     );
@@ -102,24 +108,40 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return { lang: 'en' as Language, view: matchedAdminView };
     }
 
-    const hash = window.location.hash.replace('#', '');
-    const parts = hash.split('/').filter(Boolean);
     const savedLang = (localStorage.getItem('kando_lang') as Language) || 'en';
-    let lang: Language = savedLang;
-    let view = 'landing';
 
-    if (parts.length > 0) {
-      if (['en', 'hi', 'ta'].includes(parts[0])) {
-        lang = parts[0] as Language;
-        if (parts[1]) view = parts[1];
-      } else {
-        view = parts[0];
+    // One-time redirect for old hash-style links (#en/home) some users may
+    // still have bookmarked/shared from before this was path-based.
+    if (pathname === '/' && window.location.hash) {
+      const hashParts = window.location.hash.replace('#', '').split('/').filter(Boolean);
+      if (hashParts.length > 0) {
+        let lang = savedLang;
+        let view = 'landing';
+        if (['en', 'hi', 'ta'].includes(hashParts[0])) {
+          lang = hashParts[0] as Language;
+          if (hashParts[1]) view = hashParts[1];
+        } else {
+          view = hashParts[0];
+        }
+        const newPath = view === 'landing' ? '/' : `/${lang}/${view}`;
+        window.history.replaceState(null, '', newPath);
+        return { lang, view };
       }
     }
-    return { lang, view };
+
+    if (cleanPath === '') {
+      return { lang: savedLang, view: 'landing' };
+    }
+
+    const parts = cleanPath.split('/').filter(Boolean);
+    if (['en', 'hi', 'ta'].includes(parts[0])) {
+      return { lang: parts[0] as Language, view: parts[1] || 'home' };
+    }
+
+    return { lang: savedLang, view: 'landing' };
   };
 
-  const initial = parseHash();
+  const initial = parsePath();
   const [language, setLanguageState] = useState<Language>(initial.lang);
   const [currentView, setCurrentView] = useState<string>(initial.view);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(() => {
@@ -195,20 +217,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [submissions, setSubmissions] = useState<SubmissionRecord[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
 
-  // Sync state with URL hash change (Enables Browser Back/Forward buttons!)
+  // Sync state on browser Back/Forward — real path navigation fires 'popstate',
+  // not 'hashchange' (that listener is gone now that we don't use hashes).
   useEffect(() => {
-    const handleHashChange = () => {
-      const { lang, view } = parseHash();
+    const handlePopState = () => {
+      const { lang, view } = parsePath();
       setLanguageState(lang);
       setCurrentView(view);
     };
 
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  // Update hash when navigating — GUARANTEED REAL-TIME URL HASH SYNC
-  const updateUrlHash = (lang: Language, view: string) => {
+  // Push the real URL for the given lang/view — one write per navigation.
+  const updatePath = (lang: Language, view: string) => {
     if (ADMIN_CLEAN_VIEWS.includes(view)) {
       // Admin views use a clean, language-free path in the address bar
       const targetPath = `/${view}`;
@@ -217,19 +240,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
       return;
     }
-    if (ADMIN_CLEAN_VIEWS.includes(window.location.pathname.replace(/^\//, ''))) {
-      window.history.pushState(null, '', '/');
-    }
-    const newHash = `#${lang}/${view}`;
-    if (window.location.hash !== newHash) {
-      window.location.hash = newHash;
+    const targetPath = view === 'landing' ? '/' : `/${lang}/${view}`;
+    if (window.location.pathname !== targetPath) {
+      window.history.pushState(null, '', targetPath);
     }
   };
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
     localStorage.setItem('kando_lang', lang);
-    updateUrlHash(lang, currentView);
+    updatePath(lang, currentView);
   };
 
   const navigateTo = (view: string, langOverride?: Language) => {
@@ -239,7 +259,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       localStorage.setItem('kando_lang', langOverride);
     }
     setCurrentView(view);
-    updateUrlHash(targetLang, view);
+    updatePath(targetLang, view);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
