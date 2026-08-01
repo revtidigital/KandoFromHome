@@ -59,6 +59,16 @@ export const AdminDashboardPage: React.FC = () => {
   const [mediaSignedUrl, setMediaSignedUrl] = useState<string | null>(null);
   const [mediaDownloading, setMediaDownloading] = useState(false);
 
+  // CSV+ZIP email-export modal + toast state
+  const [emailExportOpen, setEmailExportOpen] = useState(false);
+  const [emailExportAddress, setEmailExportAddress] = useState('');
+  const [emailExportSending, setEmailExportSending] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 4000);
+  };
+
   // R2 blocks direct browser fetches (no CORS headers on the bucket), so download
   // via our own server, which proxies the object through with no CORS restriction.
   const handleMediaDownload = async () => {
@@ -325,6 +335,35 @@ export const AdminDashboardPage: React.FC = () => {
     }
   };
 
+  // CSV+ZIP is built server-side and emailed as an R2 download link rather than
+  // streamed to the browser — for thousands of users it can take a while and
+  // run into GBs, so the admin gets an instant toast instead of a blocked download.
+  const handleEmailExport = async () => {
+    if (!emailExportAddress.trim()) return;
+    setEmailExportSending(true);
+    try {
+      const res = await fetch(`${apiBaseUrl}/api/admin/export/zip-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...adminAuthHeader() },
+        body: JSON.stringify({ email: emailExportAddress.trim() })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(data.error || 'Failed to start export.');
+        return;
+      }
+      setEmailExportOpen(false);
+      setEmailExportAddress('');
+      showToast(`We will send the CSV + ZIP export link to ${emailExportAddress.trim()} shortly.`);
+      fetchAuditLogs();
+    } catch (err) {
+      console.error('Email export error:', err);
+      showToast('Failed to start export.');
+    } finally {
+      setEmailExportSending(false);
+    }
+  };
+
   // Users Filtered List
   const filteredUsers = allUsers.filter(u => {
     const matchesSearch = !searchQuery || 
@@ -541,8 +580,8 @@ export const AdminDashboardPage: React.FC = () => {
                 >
                   <Download size={14} /> Excel
                 </button>
-                <button 
-                  onClick={() => handleExportData('zip')}
+                <button
+                  onClick={() => setEmailExportOpen(true)}
                   style={{ background: 'rgba(168,85,247,0.12)', border: '1px solid #A855F7', color: '#C084FC', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}
                 >
                   <Download size={14} /> CSV + ZIP Media Assets
@@ -1103,6 +1142,42 @@ export const AdminDashboardPage: React.FC = () => {
               </>
             )}
           </div>
+        </div>
+      )}
+
+      {/* EMAIL CSV+ZIP EXPORT MODAL */}
+      {emailExportOpen && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+          <div style={{ background: '#040F2B', border: '1px solid #A855F7', borderRadius: '16px', padding: '24px', maxWidth: '420px', width: '100%', position: 'relative' }}>
+            <button onClick={() => setEmailExportOpen(false)} style={{ position: 'absolute', top: '16px', right: '16px', background: 'transparent', border: 'none', color: 'white', cursor: 'pointer' }}>
+              <X size={20} />
+            </button>
+            <h3 style={{ fontSize: '1.1rem', color: '#C084FC', marginBottom: '8px' }}>Email CSV + ZIP Export</h3>
+            <p style={{ color: '#94A3B8', fontSize: '0.85rem', marginBottom: '16px' }}>
+              We'll build the export and email you a download link — large exports can take a few minutes.
+            </p>
+            <input
+              type="email"
+              value={emailExportAddress}
+              onChange={e => setEmailExportAddress(e.target.value)}
+              placeholder="admin@example.com"
+              style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.15)', background: '#091A44', color: '#E2E8F0', fontSize: '0.9rem', marginBottom: '16px', outline: 'none', boxSizing: 'border-box' }}
+            />
+            <button
+              onClick={handleEmailExport}
+              disabled={emailExportSending || !emailExportAddress.trim()}
+              style={{ width: '100%', padding: '12px', borderRadius: '10px', border: 'none', background: 'linear-gradient(90deg, #A855F7 0%, #6366F1 100%)', color: 'white', fontWeight: 700, cursor: (emailExportSending || !emailExportAddress.trim()) ? 'not-allowed' : 'pointer', opacity: (emailExportSending || !emailExportAddress.trim()) ? 0.6 : 1 }}
+            >
+              {emailExportSending ? 'Starting…' : 'Send Export Link'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* TOAST NOTIFICATION */}
+      {toast && (
+        <div style={{ position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)', background: '#091A44', border: '1px solid #A855F7', color: '#E2E8F0', padding: '14px 22px', borderRadius: '12px', fontSize: '0.88rem', fontWeight: 600, zIndex: 3000, boxShadow: '0 8px 24px rgba(0,0,0,0.4)', maxWidth: '90vw' }}>
+          {toast}
         </div>
       )}
 

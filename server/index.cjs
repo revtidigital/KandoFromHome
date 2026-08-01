@@ -5,10 +5,12 @@ const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const { PassThrough } = require('stream');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const archiverModule = require('archiver');
 const XLSX = require('xlsx');
+const nodemailer = require('nodemailer');
 
 const createArchiver = typeof archiverModule === 'function' ? archiverModule : (archiverModule.default || archiverModule.create);
 function getZipArchive() {
@@ -100,6 +102,7 @@ app.use('/uploads', express.static(uploadsDir, {
 
 const { S3Client, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
+const { Upload } = require('@aws-sdk/lib-storage');
 
 // Cloudflare R2 Configuration
 const R2_ACCOUNT_ID = process.env.R2_ACCOUNT_ID || 'b272577e002d6d57aafa1d19eac41046';
@@ -119,6 +122,25 @@ if (R2_ACCESS_KEY_ID && R2_SECRET_ACCESS_KEY) {
     }
   });
   console.log('Cloudflare R2 Storage initialized for bucket:', R2_BUCKET);
+}
+
+// SMTP (Gmail) — used only to email a download link for the CSV+ZIP export,
+// never the file itself (large exports can be GBs, way past attachment limits).
+function maskEmail(user) {
+  const [name, domain] = user.split('@');
+  return `${name.slice(0, 2)}***@${domain || ''}`;
+}
+const SMTP_USER = process.env.SMTP_USER || '';
+const SMTP_PASS = process.env.SMTP_PASS || '';
+let mailTransporter = null;
+if (SMTP_USER && SMTP_PASS) {
+  mailTransporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
+    auth: { user: SMTP_USER, pass: SMTP_PASS }
+  });
+  console.log('SMTP mail transporter initialized for', maskEmail(SMTP_USER));
 }
 
 // Multer writes to local disk first; once the file is safely in R2 the local
@@ -936,6 +958,39 @@ async function appendR2FileToArchive(archive, url, name) {
   }
 }
 
+// Builds the CSV+media zip into the given archiver instance and finalizes it.
+// Shared by the direct-download route and the background email-export job.
+async function buildExportArchive(archive) {
+  const users = await User.find().lean();
+  const rows = [];
+
+  for (const u of users) {
+    const f1 = await Form1.findOne({ userId: u._id });
+    const f2 = await Form2.findOne({ userId: u._id });
+
+    rows.push({
+      'Emp ID': u.empId,
+      'Name': u.empName,
+      'Form 1 Photo 1': f1 ? f1.photo1Url : '',
+      'Form 1 Photo 2': f1 ? f1.photo2Url : '',
+      'Form 1 Video': f1 ? f1.videoUrl : '',
+      'Form 2 Attachment': f2 ? f2.optionalFileUrl : ''
+    });
+
+    const empFolder = `media/${u.empId}`;
+    if (f1?.photo1Url) await appendR2FileToArchive(archive, f1.photo1Url, `${empFolder}/${u.empId}_photo1${path.extname(f1.photo1Url)}`);
+    if (f1?.photo2Url) await appendR2FileToArchive(archive, f1.photo2Url, `${empFolder}/${u.empId}_photo2${path.extname(f1.photo2Url)}`);
+    if (f1?.videoUrl) await appendR2FileToArchive(archive, f1.videoUrl, `${empFolder}/${u.empId}_video${path.extname(f1.videoUrl)}`);
+    if (f2?.optionalFileUrl) await appendR2FileToArchive(archive, f2.optionalFileUrl, `${empFolder}/${u.empId}_attachment${path.extname(f2.optionalFileUrl)}`);
+  }
+
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const csvContent = XLSX.utils.sheet_to_csv(ws);
+  archive.append(csvContent, { name: 'users_summary.csv' });
+
+  archive.finalize();
+}
+
 app.get('/api/admin/export/zip', exportLimiter, async (req, res) => {
   try {
     await recordAuditLog(req, `Exported CSV + ZIP Media Assets Archive`, req.adminUser);
@@ -945,39 +1000,73 @@ app.get('/api/admin/export/zip', exportLimiter, async (req, res) => {
 
     const archive = getZipArchive();
     archive.pipe(res);
-
-    const users = await User.find().lean();
-    const rows = [];
-
-    for (const u of users) {
-      const f1 = await Form1.findOne({ userId: u._id });
-      const f2 = await Form2.findOne({ userId: u._id });
-
-      rows.push({
-        'Emp ID': u.empId,
-        'Name': u.empName,
-        'Form 1 Photo 1': f1 ? f1.photo1Url : '',
-        'Form 1 Photo 2': f1 ? f1.photo2Url : '',
-        'Form 1 Video': f1 ? f1.videoUrl : '',
-        'Form 2 Attachment': f2 ? f2.optionalFileUrl : ''
-      });
-
-      const empFolder = `media/${u.empId}`;
-      if (f1?.photo1Url) await appendR2FileToArchive(archive, f1.photo1Url, `${empFolder}/${u.empId}_photo1${path.extname(f1.photo1Url)}`);
-      if (f1?.photo2Url) await appendR2FileToArchive(archive, f1.photo2Url, `${empFolder}/${u.empId}_photo2${path.extname(f1.photo2Url)}`);
-      if (f1?.videoUrl) await appendR2FileToArchive(archive, f1.videoUrl, `${empFolder}/${u.empId}_video${path.extname(f1.videoUrl)}`);
-      if (f2?.optionalFileUrl) await appendR2FileToArchive(archive, f2.optionalFileUrl, `${empFolder}/${u.empId}_attachment${path.extname(f2.optionalFileUrl)}`);
-    }
-
-    const ws = XLSX.utils.json_to_sheet(rows);
-    const csvContent = XLSX.utils.sheet_to_csv(ws);
-    archive.append(csvContent, { name: 'users_summary.csv' });
-
-    archive.finalize();
+    await buildExportArchive(archive);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Internal server error.' });
   }
+});
+
+// Builds the same zip but uploads it straight to R2 (never touching local disk),
+// then emails the requester a presigned download link instead of the file itself
+// — large exports (5000 users, photos + video) can run into GBs, way past any
+// email attachment limit.
+async function buildAndEmailExport(email) {
+  const timestamp = Date.now();
+  const key = `exports/kando_export_${timestamp}.zip`;
+
+  // archiver's ZipArchive isn't a real Node Readable (lib-storage rejects it
+  // outright), so pipe it through an actual PassThrough stream for the upload.
+  const archive = getZipArchive();
+  const passThrough = new PassThrough();
+  archive.pipe(passThrough);
+
+  const upload = new Upload({
+    client: r2Client,
+    params: { Bucket: R2_BUCKET, Key: key, Body: passThrough, ContentType: 'application/zip' }
+  });
+
+  await Promise.all([upload.done(), buildExportArchive(archive)]);
+
+  const signedUrl = await getSignedUrl(
+    r2Client,
+    new GetObjectCommand({ Bucket: R2_BUCKET, Key: key }),
+    { expiresIn: 24 * 60 * 60 }
+  );
+
+  await mailTransporter.sendMail({
+    from: `Kando From Home <${SMTP_USER}>`,
+    to: email,
+    subject: 'Kando From Home — CSV + Media Export',
+    html: `
+      <p>Your CSV + ZIP media export is ready.</p>
+      <p><a href="${signedUrl}">Download the export</a></p>
+      <p style="color:#888;font-size:12px">This link expires in 24 hours.</p>
+    `
+  });
+}
+
+app.post('/api/admin/export/zip-email', exportLimiter, async (req, res) => {
+  const { email } = req.body || {};
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return res.status(400).json({ error: 'A valid email address is required.' });
+  }
+  if (!r2Client) {
+    return res.status(503).json({ error: 'R2 storage not configured.' });
+  }
+  if (!mailTransporter) {
+    return res.status(503).json({ error: 'Email is not configured on the server.' });
+  }
+
+  // Respond immediately — building the zip and sending the email can take a
+  // while for large exports, so the admin gets a toast, not a spinner.
+  res.json({ success: true, message: 'Export started. The download link will be emailed shortly.' });
+
+  recordAuditLog(req, `Requested CSV + ZIP export via email to ${email}`, req.adminUser).catch(() => {});
+
+  buildAndEmailExport(email).catch(err => {
+    console.error('Email export failed:', err);
+  });
 });
 
 // SPA Fallback to index.html for client routing (Exclude /api routes!)
