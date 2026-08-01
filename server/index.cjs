@@ -499,23 +499,25 @@ app.post('/api/submissions/form2', (req, res, next) => {
 // ── ADMIN ROUTES (require x-admin-key header + nginx basic auth) ──
 app.use('/api/admin', requireAdmin);
 
-// Generates a short-lived signed URL so admins can view/download private R2 media
-// without making the bucket publicly readable (submissions contain employee PII).
+// R2 object key doesn't allow browser-side CORS fetches, so both media routes
+// below validate the requested URL belongs to our bucket before touching R2.
+function r2KeyFromUrl(url) {
+  const prefix = `${R2_PUBLIC_URL}/`;
+  if (typeof url !== 'string' || !url.startsWith(prefix)) return null;
+  return url.slice(prefix.length);
+}
+
+// Generates a short-lived signed URL so admins can view private R2 media
+// (<img>/<video> src) without making the bucket publicly readable.
 app.get('/api/admin/media-url', async (req, res) => {
   try {
-    const { url } = req.query;
-    if (!url || typeof url !== 'string') {
-      return res.status(400).json({ error: 'Missing url parameter.' });
-    }
     if (!r2Client) {
       return res.status(503).json({ error: 'R2 storage not configured.' });
     }
-
-    const prefix = `${R2_PUBLIC_URL}/`;
-    if (!url.startsWith(prefix)) {
+    const key = r2KeyFromUrl(req.query.url);
+    if (!key) {
       return res.status(400).json({ error: 'Invalid media URL.' });
     }
-    const key = url.slice(prefix.length);
 
     const command = new GetObjectCommand({ Bucket: R2_BUCKET, Key: key });
     const signedUrl = await getSignedUrl(r2Client, command, { expiresIn: 300 });
@@ -523,6 +525,31 @@ app.get('/api/admin/media-url', async (req, res) => {
   } catch (err) {
     console.error('Media URL sign error:', err);
     res.status(500).json({ error: 'Failed to generate media URL.' });
+  }
+});
+
+// Streams the R2 object through our own server (server-to-server fetch has no
+// CORS restriction) so the browser can force-download it as a same-origin response.
+app.get('/api/admin/media-download', async (req, res) => {
+  try {
+    if (!r2Client) {
+      return res.status(503).json({ error: 'R2 storage not configured.' });
+    }
+    const key = r2KeyFromUrl(req.query.url);
+    if (!key) {
+      return res.status(400).json({ error: 'Invalid media URL.' });
+    }
+
+    const command = new GetObjectCommand({ Bucket: R2_BUCKET, Key: key });
+    const object = await r2Client.send(command);
+
+    res.setHeader('Content-Disposition', `attachment; filename="${path.basename(key)}"`);
+    res.setHeader('Content-Type', object.ContentType || 'application/octet-stream');
+    if (object.ContentLength) res.setHeader('Content-Length', object.ContentLength);
+    object.Body.pipe(res);
+  } catch (err) {
+    console.error('Media download error:', err);
+    res.status(500).json({ error: 'Failed to download media.' });
   }
 });
 

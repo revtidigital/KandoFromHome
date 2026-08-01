@@ -59,13 +59,13 @@ export const AdminDashboardPage: React.FC = () => {
   const [mediaSignedUrl, setMediaSignedUrl] = useState<string | null>(null);
   const [mediaDownloading, setMediaDownloading] = useState(false);
 
-  // Cross-origin URLs ignore the <a download> attribute (browsers just navigate to
-  // them), so fetch the file as a blob and download it via a same-origin blob URL.
+  // R2 blocks direct browser fetches (no CORS headers on the bucket), so download
+  // via our own server, which proxies the object through with no CORS restriction.
   const handleMediaDownload = async () => {
-    if (!mediaSignedUrl || !mediaModal) return;
+    if (!mediaModal) return;
     setMediaDownloading(true);
     try {
-      const res = await fetch(mediaSignedUrl);
+      const res = await fetch(`${apiBaseUrl}/api/admin/media-download?url=${encodeURIComponent(mediaModal.url)}`, { headers: adminAuthHeader() });
       const blob = await res.blob();
       const blobUrl = URL.createObjectURL(blob);
       const filename = mediaModal.url.split('/').pop() || mediaModal.title;
