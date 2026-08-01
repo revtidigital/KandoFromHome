@@ -311,6 +311,8 @@ const AuditLogSchema = new mongoose.Schema({
 
 const SettingsSchema = new mongoose.Schema({
   captchaEnabled: { type: Boolean, default: false },
+  captchaSiteKey: { type: String, default: '' },
+  captchaSecretKey: { type: String, default: '' },
   googleAnalyticsId: { type: String, default: '' },
   customTags: { type: [String], default: ['Shortlisted', 'Featured', 'Flagged', 'Verified'] }
 });
@@ -335,6 +337,39 @@ async function recordAuditLog(req, detail, username = 'SuperAdmin') {
 }
 
 // ── API ROUTES ──
+
+// Public settings the forms need before rendering — captcha site key only,
+// never the secret key (that stays server-side for verification).
+app.get('/api/public-settings', async (req, res) => {
+  try {
+    const settings = await Settings.findOne();
+    res.json({
+      captchaEnabled: !!(settings?.captchaEnabled && settings?.captchaSiteKey && settings?.captchaSecretKey),
+      captchaSiteKey: settings?.captchaSiteKey || ''
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ captchaEnabled: false, captchaSiteKey: '' });
+  }
+});
+
+// Verifies a reCAPTCHA v3 token with Google and requires a minimum score.
+// Returns true when captcha protection is off/unconfigured, so this can be
+// called unconditionally from both submission routes.
+async function verifyCaptcha(token, remoteIp) {
+  const settings = await Settings.findOne();
+  if (!settings?.captchaEnabled || !settings?.captchaSecretKey) return true;
+  if (!token) return false;
+  try {
+    const params = new URLSearchParams({ secret: settings.captchaSecretKey, response: token, remoteip: remoteIp || '' });
+    const res = await fetch('https://www.google.com/recaptcha/api/siteverify', { method: 'POST', body: params });
+    const data = await res.json();
+    return !!data.success && (data.score === undefined || data.score >= 0.5);
+  } catch (err) {
+    console.error('reCAPTCHA verification error:', err);
+    return false;
+  }
+}
 
 // Real-time eligibility checks against the client-provided whitelist, used by
 // both forms as the admin types their Employee ID / Phone Number.
@@ -447,10 +482,16 @@ app.post('/api/submissions/form1', (req, res, next) => {
   });
 }, async (req, res) => {
   try {
-    const { empId, phone, empName, companyName, department, location, language } = req.body || {};
+    const { empId, phone, empName, companyName, department, location, language, captchaToken } = req.body || {};
 
     if (!empName) {
       return res.status(400).json({ error: 'Missing required user details.' });
+    }
+
+    const submitIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+    if (!(await verifyCaptcha(captchaToken, submitIp))) {
+      if (req.files) Object.values(req.files).flat().forEach(f => cleanupLocalFile(f.path));
+      return res.status(400).json({ error: 'Captcha verification failed. Please try again.' });
     }
 
     const identity = await resolveEligibleIdentity(empId, phone);
@@ -563,7 +604,7 @@ app.post('/api/submissions/form2', (req, res, next) => {
   });
 }, async (req, res) => {
   try {
-    const { empId, phone, empName, companyName, department, location, thoughts, language } = req.body || {};
+    const { empId, phone, empName, companyName, department, location, thoughts, language, captchaToken } = req.body || {};
 
     if (!empName) {
       return res.status(400).json({ error: 'Missing required user details.' });
@@ -575,6 +616,12 @@ app.post('/api/submissions/form2', (req, res, next) => {
     if (thoughts.trim().length > 2000) {
       if (req.file) cleanupLocalFile(req.file.path);
       return res.status(400).json({ error: 'Thoughts must be 2000 characters or less.' });
+    }
+
+    const submitIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+    if (!(await verifyCaptcha(captchaToken, submitIp))) {
+      if (req.file) cleanupLocalFile(req.file.path);
+      return res.status(400).json({ error: 'Captcha verification failed. Please try again.' });
     }
 
     const identity = await resolveEligibleIdentity(empId, phone);
@@ -903,12 +950,14 @@ app.get('/api/admin/settings', async (req, res) => {
 
 app.put('/api/admin/settings', async (req, res) => {
   try {
-    const { captchaEnabled, googleAnalyticsId, customTags } = req.body;
+    const { captchaEnabled, captchaSiteKey, captchaSecretKey, googleAnalyticsId, customTags } = req.body;
     let settings = await Settings.findOne();
     if (!settings) {
       settings = new Settings();
     }
     settings.captchaEnabled = captchaEnabled;
+    if (captchaSiteKey !== undefined) settings.captchaSiteKey = captchaSiteKey;
+    if (captchaSecretKey !== undefined) settings.captchaSecretKey = captchaSecretKey;
     settings.googleAnalyticsId = googleAnalyticsId;
     if (customTags) settings.customTags = customTags;
     await settings.save();

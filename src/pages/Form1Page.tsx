@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import { Upload, Image as ImageIcon, FileVideo, AlertTriangle, X, CheckCircle, Loader2 } from 'lucide-react';
+import { useCaptcha } from '../hooks/useCaptcha';
 
 export const Form1Page: React.FC = () => {
   const { t, formData, setFormData, navigateTo, language, apiBaseUrl } = useApp();
+  const { getCaptchaToken } = useCaptcha(apiBaseUrl);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [duplicateError, setDuplicateError] = useState<string | null>(null);
@@ -164,9 +166,11 @@ export const Form1Page: React.FC = () => {
       }
 
       // 2. Prepare FormData for API submission
+      const captchaToken = await getCaptchaToken('form1_submit');
       const body = new FormData();
       body.append('empId', cleanEmpId);
       body.append('phone', cleanPhone);
+      body.append('captchaToken', captchaToken);
       body.append('empName', formData.empName.trim());
       body.append('companyName', companyName.trim());
       body.append('department', department.trim());

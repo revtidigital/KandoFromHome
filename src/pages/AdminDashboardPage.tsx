@@ -47,8 +47,8 @@ export const AdminDashboardPage: React.FC = () => {
   // Settings & Tags states (Req 2 & 3)
   const [newTagInput, setNewTagInput] = useState('');
   const [captchaEnabled, setCaptchaEnabled] = useState(false);
-  const [captchaSiteKey, setCaptchaSiteKey] = useState('6Ld_sample_site_key_yamaha_2026');
-  const [captchaSecretKey, setCaptchaSecretKey] = useState('6Ld_sample_secret_key_yamaha_2026');
+  const [captchaSiteKey, setCaptchaSiteKey] = useState('');
+  const [captchaSecretKey, setCaptchaSecretKey] = useState('');
   const [gaId, setGaId] = useState('G-YAMAHA2026KANDO');
   
   const [captchaStatusMsg, setCaptchaStatusMsg] = useState('');
@@ -159,6 +159,8 @@ export const AdminDashboardPage: React.FC = () => {
       .then(data => {
         if (data) {
           if (data.captchaEnabled !== undefined) setCaptchaEnabled(data.captchaEnabled);
+          if (data.captchaSiteKey !== undefined) setCaptchaSiteKey(data.captchaSiteKey);
+          if (data.captchaSecretKey !== undefined) setCaptchaSecretKey(data.captchaSecretKey);
           if (data.googleAnalyticsId) setGaId(data.googleAnalyticsId);
           if (data.customTags && Array.isArray(data.customTags)) setCustomTags(data.customTags);
         }
@@ -316,7 +318,7 @@ export const AdminDashboardPage: React.FC = () => {
       await fetch(`${apiBaseUrl}/api/admin/settings`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', ...adminAuthHeader() },
-        body: JSON.stringify({ captchaEnabled, googleAnalyticsId: gaId, customTags })
+        body: JSON.stringify({ captchaEnabled, captchaSiteKey, captchaSecretKey, googleAnalyticsId: gaId, customTags })
       });
       fetchAuditLogs();
       setCaptchaStatusMsg('Google reCAPTCHA Security settings saved successfully!');
@@ -1130,6 +1132,7 @@ export const AdminDashboardPage: React.FC = () => {
                       type="text"
                       value={captchaSiteKey}
                       onChange={e => setCaptchaSiteKey(e.target.value)}
+                      placeholder="From google.com/recaptcha/admin (reCAPTCHA v3)"
                       style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.2)', color: 'white', fontSize: '0.85rem', outline: 'none' }}
                     />
                   </div>
@@ -1140,9 +1143,13 @@ export const AdminDashboardPage: React.FC = () => {
                       type="password"
                       value={captchaSecretKey}
                       onChange={e => setCaptchaSecretKey(e.target.value)}
+                      placeholder="Kept server-side only, never shown to the public site"
                       style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.2)', color: 'white', fontSize: '0.85rem', outline: 'none' }}
                     />
                   </div>
+                  <p style={{ fontSize: '0.72rem', color: '#64748B', margin: 0 }}>
+                    Register site type "reCAPTCHA v3" for domain <code>147.93.31.18</code> (Google accepts bare IPs as a domain entry).
+                  </p>
 
                   <button onClick={handleSaveCaptchaSettings} style={{ background: 'linear-gradient(90deg, #00C6FF 0%, #0072FF 100%)', border: 'none', color: 'white', padding: '12px', borderRadius: '10px', fontWeight: 800, cursor: 'pointer', marginTop: '6px' }}>
                     SAVE CAPTCHA SETTINGS
