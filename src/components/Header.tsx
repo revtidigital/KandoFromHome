@@ -6,12 +6,12 @@ import { Globe } from 'lucide-react';
 export const Header: React.FC = () => {
   const { language, setLanguage, currentView, navigateTo } = useApp();
 
-  if (currentView === 'landing') {
+  if (currentView === 'landing' || currentView === 'admin-dashboard') {
     return null;
   }
 
   const isHashAdmin = typeof window !== 'undefined' && window.location.hash.includes('admin');
-  const isAdminView = currentView === 'admin-dashboard' || currentView === 'admin-login' || isHashAdmin;
+  const isAdminView = currentView === 'admin-login' || isHashAdmin;
 
   return (
     <header className="site-header">

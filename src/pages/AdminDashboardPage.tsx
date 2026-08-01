@@ -10,7 +10,7 @@ export const AdminDashboardPage: React.FC = () => {
   const {
     adminLogout, navigateTo,
     allUsers, setAllUsers, customTags, setCustomTags,
-    auditLogs, addAuditLog, apiBaseUrl, adminAuthHeader
+    auditLogs, fetchAuditLogs, logAdminAction, apiBaseUrl, adminAuthHeader
   } = useApp();
 
   const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'tags' | 'settings' | 'audit' | 'user-detail'>('overview');
@@ -59,6 +59,8 @@ export const AdminDashboardPage: React.FC = () => {
         }
       })
       .catch(() => {});
+
+    fetchAuditLogs();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiBaseUrl, setAllUsers, setCustomTags]);
 
@@ -71,12 +73,12 @@ export const AdminDashboardPage: React.FC = () => {
   const handleOpenUserProfile = (user: any) => {
     setSelectedUserForProfile(user);
     setActiveTab('user-detail');
+    logAdminAction(`Viewed profile of ${user.empName} (${user.empId})`);
   };
 
   // ── FIX TAGS CHANGING AND ADDING (Req 2) ──
   const handleUpdateUserTag = async (userId: string, newTag: string) => {
     try {
-      const targetUser = allUsers.find((u: any) => u.id === userId || u._id === userId);
       const updatedTags = newTag ? [newTag] : [];
 
       // Update local state immediately
@@ -99,7 +101,7 @@ export const AdminDashboardPage: React.FC = () => {
         body: JSON.stringify({ tags: updatedTags })
       });
 
-      addAuditLog(`Updated candidate tag for ${targetUser?.empName || userId} to: ${newTag || 'None'}`);
+      fetchAuditLogs();
     } catch (err) {
       console.error('Tag update error:', err);
     }
@@ -125,7 +127,7 @@ export const AdminDashboardPage: React.FC = () => {
         if (data && data.customTags) {
           setCustomTags(data.customTags);
         }
-        addAuditLog(`Added new system classification tag: "${tag}"`);
+        fetchAuditLogs();
       }
     } catch (err) {
       console.error('Add tag error:', err);
@@ -146,7 +148,7 @@ export const AdminDashboardPage: React.FC = () => {
         if (data && data.customTags) {
           setCustomTags(data.customTags);
         }
-        addAuditLog(`Removed classification tag: "${tagToRemove}"`);
+        fetchAuditLogs();
       }
     } catch (err) {
       console.error('Remove tag error:', err);
@@ -161,7 +163,7 @@ export const AdminDashboardPage: React.FC = () => {
         headers: { 'Content-Type': 'application/json', ...adminAuthHeader() },
         body: JSON.stringify({ captchaEnabled, googleAnalyticsId: gaId, customTags })
       });
-      addAuditLog(`Updated Google reCAPTCHA Verification (Enabled: ${captchaEnabled})`);
+      fetchAuditLogs();
       setCaptchaStatusMsg('Google reCAPTCHA Security settings saved successfully!');
       setTimeout(() => setCaptchaStatusMsg(''), 4000);
     } catch (err) {
@@ -176,7 +178,7 @@ export const AdminDashboardPage: React.FC = () => {
         headers: { 'Content-Type': 'application/json', ...adminAuthHeader() },
         body: JSON.stringify({ captchaEnabled, googleAnalyticsId: gaId, customTags })
       });
-      addAuditLog(`Updated Google Analytics Measurement ID: ${gaId}`);
+      fetchAuditLogs();
       setGaStatusMsg('Google Analytics tracking settings saved successfully!');
       setTimeout(() => setGaStatusMsg(''), 4000);
     } catch (err) {
@@ -193,15 +195,12 @@ export const AdminDashboardPage: React.FC = () => {
     if (format === 'zip') {
       url = `${apiBaseUrl}/api/admin/export/zip`;
       filename = 'kando_submissions_assets.zip';
-      addAuditLog('Exported Candidate Submissions (CSV + ZIP Media Archive)');
     } else if (format === 'pdf') {
       url = `${apiBaseUrl}/api/admin/export/pdf`;
       filename = 'kando_users_report.html';
-      addAuditLog('Exported Candidate Directory PDF Report');
     } else {
       url = `${apiBaseUrl}/api/admin/export/users?format=${format}`;
       filename = format === 'excel' ? 'kando_users.xlsx' : 'kando_users.csv';
-      addAuditLog(`Exported Registered Users Data (${format.toUpperCase()})`);
     }
 
     try {
@@ -220,6 +219,7 @@ export const AdminDashboardPage: React.FC = () => {
         document.body.removeChild(link);
       }
       setTimeout(() => window.URL.revokeObjectURL(objectUrl), 60000);
+      fetchAuditLogs();
     } catch (err) {
       console.error('Export error:', err);
     }
@@ -247,9 +247,9 @@ export const AdminDashboardPage: React.FC = () => {
   const paginatedUsers = filteredUsers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
-    <div style={{ display: 'flex', minHeight: 'calc(100vh - 76px)', background: '#020924', color: 'white', fontFamily: 'Outfit, sans-serif' }}>
-      
-      {/* ── LEFT SIDENAVBAR (Req 7) ── */}
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#020924', color: 'white', fontFamily: 'Outfit, sans-serif' }}>
+
+      {/* ── LEFT SIDENAVBAR (Req 7) — sticky so Logout stays visible on every tab, not just short ones ── */}
       <aside style={{
         width: '260px',
         background: '#040F2B',
@@ -258,7 +258,11 @@ export const AdminDashboardPage: React.FC = () => {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        flexShrink: 0
+        flexShrink: 0,
+        position: 'sticky',
+        top: 0,
+        height: '100vh',
+        overflowY: 'auto'
       }}>
         <div>
           <div style={{ padding: '0 12px 24px 12px', borderBottom: '1px solid rgba(255,255,255,0.08)', marginBottom: '20px' }}>
@@ -947,8 +951,8 @@ export const AdminDashboardPage: React.FC = () => {
                     { id: '1', timestamp: new Date().toLocaleString(), ip: '147.93.31.18', detail: 'System Admin Logged in', username: 'SuperAdmin' },
                     { id: '2', timestamp: new Date(Date.now() - 3600000).toLocaleString(), ip: '147.93.31.18', detail: 'Updated Settings: Captcha toggled', username: 'Admin' }
                   ]).map(log => (
-                    <tr key={log.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                      <td style={{ padding: '14px 18px', color: '#CBD5E1', fontSize: '0.8rem' }}>{log.timestamp}</td>
+                    <tr key={log.id || (log as any)._id} style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                      <td style={{ padding: '14px 18px', color: '#CBD5E1', fontSize: '0.8rem' }}>{new Date(log.timestamp).toLocaleString()}</td>
                       <td style={{ padding: '14px 18px', color: '#00E5FF', fontWeight: 700, fontSize: '0.8rem' }}>{log.ip || '127.0.0.1'}</td>
                       <td style={{ padding: '14px 18px', color: 'white' }}>{log.detail}</td>
                       <td style={{ padding: '14px 18px', color: '#94A3B8' }}>{log.username || 'Admin'}</td>

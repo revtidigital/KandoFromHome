@@ -64,13 +64,16 @@ function requireAdmin(req, res, next) {
   const header = req.headers.authorization || '';
   const [scheme, encoded] = header.split(' ');
   if (scheme === 'Basic' && encoded) {
-    const sep = Buffer.from(encoded, 'base64').toString('utf8').indexOf(':');
     const decoded = Buffer.from(encoded, 'base64').toString('utf8');
+    const sep = decoded.indexOf(':');
     const user = decoded.slice(0, sep);
     const pass = decoded.slice(sep + 1);
     if (ADMIN_CREDENTIALS.has(user) && ADMIN_CREDENTIALS.get(user) === pass) {
+      req.adminUser = user;
       return next();
     }
+    // A credential was actually submitted and rejected — log it (skip bare/no-auth probes to avoid noise)
+    recordAuditLog(req, `Failed admin login attempt (username: "${user}")`, user || 'Unknown').catch(() => {});
   }
   res.setHeader('WWW-Authenticate', 'Basic realm="Kando Admin"');
   return res.status(401).json({ error: 'Unauthorized' });
@@ -527,6 +530,21 @@ function escapeRegex(str) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+// Generic action logger for the admin panel — lets the frontend record
+// fine-grained activity (login, logout, viewing a profile, etc.) with the
+// real authenticated username attached, not a hardcoded label.
+app.post('/api/admin/audit-log', async (req, res) => {
+  try {
+    const detail = (req.body && req.body.detail || '').toString().trim().slice(0, 300);
+    if (!detail) return res.status(400).json({ error: 'detail is required' });
+    await recordAuditLog(req, detail, req.adminUser);
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
 // Admin Get Users Table
 app.get('/api/admin/users', async (req, res) => {
   try {
@@ -613,7 +631,7 @@ app.patch('/api/admin/users/:id/tags', async (req, res) => {
     const user = await User.findByIdAndUpdate(req.params.id, { tags }, { new: true });
     if (!user) return res.status(404).json({ error: 'User not found' });
 
-    await recordAuditLog(req, `Updated tags for user ${user.empName} (${user.empId}) to: [${tags.join(', ')}]`, 'Admin');
+    await recordAuditLog(req, `Updated tags for user ${user.empName} (${user.empId}) to: [${tags.join(', ')}]`, req.adminUser);
     res.json({ success: true, tags: user.tags });
   } catch (err) {
     console.error(err);
@@ -678,7 +696,7 @@ app.put('/api/admin/settings', async (req, res) => {
     if (customTags) settings.customTags = customTags;
     await settings.save();
 
-    await recordAuditLog(req, `Updated System Settings (Captcha: ${captchaEnabled}, GA: ${googleAnalyticsId})`, 'Admin');
+    await recordAuditLog(req, `Updated System Settings (Captcha: ${captchaEnabled}, GA: ${googleAnalyticsId})`, req.adminUser);
     res.json({ success: true, settings });
   } catch (err) {
     console.error(err);
@@ -713,7 +731,7 @@ app.post('/api/admin/tags', async (req, res) => {
     if (!settings.customTags.includes(cleanTag)) {
       settings.customTags.push(cleanTag);
       await settings.save();
-      await recordAuditLog(req, `Added new system classification tag: "${cleanTag}"`, 'Admin');
+      await recordAuditLog(req, `Added new system classification tag: "${cleanTag}"`, req.adminUser);
     }
     res.json({ success: true, customTags: settings.customTags });
   } catch (err) {
@@ -729,7 +747,7 @@ app.delete('/api/admin/tags/:tag', async (req, res) => {
     if (settings) {
       settings.customTags = settings.customTags.filter(t => t !== tagToRemove);
       await settings.save();
-      await recordAuditLog(req, `Removed classification tag: "${tagToRemove}"`, 'Admin');
+      await recordAuditLog(req, `Removed classification tag: "${tagToRemove}"`, req.adminUser);
     }
     res.json({ success: true, customTags: settings ? settings.customTags : [] });
   } catch (err) {
@@ -764,7 +782,7 @@ app.get('/api/admin/export/users', exportLimiter, async (req, res) => {
       };
     }));
 
-    await recordAuditLog(req, `Exported Users Data in format: ${format.toUpperCase()}`, 'Admin');
+    await recordAuditLog(req, `Exported Users Data in format: ${format.toUpperCase()}`, req.adminUser);
 
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.json_to_sheet(rows);
@@ -791,7 +809,7 @@ app.get('/api/admin/export/users', exportLimiter, async (req, res) => {
 app.get('/api/admin/export/pdf', exportLimiter, async (req, res) => {
   try {
     const users = await User.find().lean();
-    await recordAuditLog(req, 'Generated Candidate Directory PDF Report', 'Admin');
+    await recordAuditLog(req, 'Generated Candidate Directory PDF Report', req.adminUser);
 
     let html = `
       <!DOCTYPE html>
@@ -859,7 +877,7 @@ app.get('/api/admin/export/pdf', exportLimiter, async (req, res) => {
 
 app.get('/api/admin/export/zip', exportLimiter, async (req, res) => {
   try {
-    await recordAuditLog(req, `Exported CSV + ZIP Media Assets Archive`, 'Admin');
+    await recordAuditLog(req, `Exported CSV + ZIP Media Assets Archive`, req.adminUser);
 
     res.setHeader('Content-Type', 'application/zip');
     res.setHeader('Content-Disposition', 'attachment; filename="kando_submissions_assets.zip"');

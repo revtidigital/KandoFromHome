@@ -68,6 +68,7 @@ interface AppContextType {
   adminLogin: (username: string, password: string) => Promise<boolean>;
   adminLogout: () => void;
   adminAuthHeader: () => Record<string, string>;
+  logAdminAction: (detail: string) => void;
 
   allUsers: any[];
   setAllUsers: React.Dispatch<React.SetStateAction<any[]>>;
@@ -130,6 +131,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (res.ok) {
         sessionStorage.setItem('kando_admin_cred', encoded);
         setIsAdminLoggedIn(true);
+        fetch(`${API_BASE_URL}/api/admin/audit-log`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Basic ${encoded}` },
+          body: JSON.stringify({ detail: 'Logged in to Admin Dashboard' })
+        }).catch(() => {});
         return true;
       }
       return false;
@@ -139,6 +145,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const adminLogout = () => {
+    const cred = sessionStorage.getItem('kando_admin_cred');
+    if (cred) {
+      fetch(`${API_BASE_URL}/api/admin/audit-log`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Basic ${cred}` },
+        body: JSON.stringify({ detail: 'Logged out of Admin Dashboard' })
+      }).catch(() => {});
+    }
     sessionStorage.removeItem('kando_admin_cred');
     setIsAdminLoggedIn(false);
   };
@@ -146,6 +160,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const adminAuthHeader = (): Record<string, string> => {
     const cred = sessionStorage.getItem('kando_admin_cred');
     return cred ? { Authorization: `Basic ${cred}` } : {};
+  };
+
+  const logAdminAction = (detail: string) => {
+    const cred = sessionStorage.getItem('kando_admin_cred');
+    if (!cred) return;
+    fetch(`${API_BASE_URL}/api/admin/audit-log`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Basic ${cred}` },
+      body: JSON.stringify({ detail })
+    }).catch(() => {});
   };
 
   const [formData, setFormData] = useState({
@@ -292,6 +316,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       adminLogin,
       adminLogout,
       adminAuthHeader,
+      logAdminAction,
       allUsers,
       setAllUsers,
       customTags,
