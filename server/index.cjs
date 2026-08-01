@@ -121,6 +121,14 @@ if (R2_ACCESS_KEY_ID && R2_SECRET_ACCESS_KEY) {
   console.log('Cloudflare R2 Storage initialized for bucket:', R2_BUCKET);
 }
 
+// Multer writes to local disk first; once the file is safely in R2 the local
+// copy serves no purpose and must go, or disk fills up long before R2 does.
+function cleanupLocalFile(filePath) {
+  fs.unlink(filePath, (err) => {
+    if (err && err.code !== 'ENOENT') console.error('Local file cleanup error:', err);
+  });
+}
+
 async function uploadFileToR2(filePath, fileName, mimeType, userFolder) {
   if (!r2Client) return null;
   try {
@@ -374,6 +382,7 @@ app.post('/api/submissions/form1', (req, res, next) => {
 
     const existingF1 = await Form1.findOne({ userId: user._id });
     if (existingF1) {
+      Object.values(req.files).flat().forEach(f => cleanupLocalFile(f.path));
       return res.status(400).json({ error: 'Form 1 has already been submitted by this user.' });
     }
 
@@ -391,16 +400,16 @@ app.post('/api/submissions/form1', (req, res, next) => {
     if (req.files['video']) {
       videoUrl = `${R2_PUBLIC_URL}/${userFolder}/${videoName}`;
       const r2Vid = await uploadFileToR2(req.files['video'][0].path, videoName, req.files['video'][0].mimetype, userFolder);
-      if (r2Vid) videoUrl = r2Vid;
+      if (r2Vid) { videoUrl = r2Vid; cleanupLocalFile(req.files['video'][0].path); }
     }
 
     // Stream uploads to Cloudflare R2 Bucket if credentials configured
     const r2P1 = await uploadFileToR2(req.files['photo1'][0].path, photo1Name, req.files['photo1'][0].mimetype, userFolder);
-    if (r2P1) photo1Url = r2P1;
+    if (r2P1) { photo1Url = r2P1; cleanupLocalFile(req.files['photo1'][0].path); }
 
     if (req.files['photo2']) {
       const r2P2 = await uploadFileToR2(req.files['photo2'][0].path, photo2Name, req.files['photo2'][0].mimetype, userFolder);
-      if (r2P2) photo2Url = r2P2;
+      if (r2P2) { photo2Url = r2P2; cleanupLocalFile(req.files['photo2'][0].path); }
     }
 
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
@@ -464,7 +473,7 @@ app.post('/api/submissions/form2', (req, res, next) => {
       const attachmentName = `${userFolder2}_attachment${path.extname(req.file.originalname).toLowerCase()}`;
       optionalFileUrl = `${R2_PUBLIC_URL}/${userFolder2}/${attachmentName}`;
       const r2File = await uploadFileToR2(req.file.path, attachmentName, req.file.mimetype, userFolder2);
-      if (r2File) optionalFileUrl = r2File;
+      if (r2File) { optionalFileUrl = r2File; cleanupLocalFile(req.file.path); }
     }
 
     // Enforce Employee ID Uniqueness — the sole identity anchor now that
@@ -913,6 +922,20 @@ app.get('/api/admin/export/pdf', exportLimiter, async (req, res) => {
   }
 });
 
+// Streams each R2 object straight into the zip response (R2 -> server -> browser),
+// so nothing ever touches local disk — safe at any user count regardless of
+// server storage size.
+async function appendR2FileToArchive(archive, url, name) {
+  const key = r2KeyFromUrl(url);
+  if (!key || !r2Client) return;
+  try {
+    const object = await r2Client.send(new GetObjectCommand({ Bucket: R2_BUCKET, Key: key }));
+    archive.append(object.Body, { name });
+  } catch (err) {
+    console.error(`ZIP export: failed to fetch ${key} from R2:`, err.message);
+  }
+}
+
 app.get('/api/admin/export/zip', exportLimiter, async (req, res) => {
   try {
     await recordAuditLog(req, `Exported CSV + ZIP Media Assets Archive`, req.adminUser);
@@ -933,30 +956,16 @@ app.get('/api/admin/export/zip', exportLimiter, async (req, res) => {
       rows.push({
         'Emp ID': u.empId,
         'Name': u.empName,
-        'Email': u.email,
         'Form 1 Photo 1': f1 ? f1.photo1Url : '',
         'Form 1 Photo 2': f1 ? f1.photo2Url : '',
-        'Form 2 Video': f2 ? f2.videoUrl : ''
+        'Form 1 Video': f1 ? f1.videoUrl : '',
+        'Form 2 Attachment': f2 ? f2.optionalFileUrl : ''
       });
 
-      if (f1 && f1.photo1Url) {
-        const file1 = path.join(uploadsDir, path.basename(f1.photo1Url));
-        if (fs.existsSync(file1)) {
-          archive.file(file1, { name: `media/${u.empId}_photo1${path.extname(file1)}` });
-        }
-        if (f1.photo2Url) {
-          const file2 = path.join(uploadsDir, path.basename(f1.photo2Url));
-          if (fs.existsSync(file2)) {
-            archive.file(file2, { name: `media/${u.empId}_photo2${path.extname(file2)}` });
-          }
-        }
-      }
-      if (f2 && f2.videoUrl) {
-        const fileVideo = path.join(uploadsDir, path.basename(f2.videoUrl));
-        if (fs.existsSync(fileVideo)) {
-          archive.file(fileVideo, { name: `media/${u.empId}_video${path.extname(fileVideo)}` });
-        }
-      }
+      if (f1?.photo1Url) await appendR2FileToArchive(archive, f1.photo1Url, `media/${u.empId}_photo1${path.extname(f1.photo1Url)}`);
+      if (f1?.photo2Url) await appendR2FileToArchive(archive, f1.photo2Url, `media/${u.empId}_photo2${path.extname(f1.photo2Url)}`);
+      if (f1?.videoUrl) await appendR2FileToArchive(archive, f1.videoUrl, `media/${u.empId}_video${path.extname(f1.videoUrl)}`);
+      if (f2?.optionalFileUrl) await appendR2FileToArchive(archive, f2.optionalFileUrl, `media/${u.empId}_attachment${path.extname(f2.optionalFileUrl)}`);
     }
 
     const ws = XLSX.utils.json_to_sheet(rows);
