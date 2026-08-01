@@ -230,11 +230,26 @@ app.get('/api/check-submission', async (req, res) => {
 });
 
 // Form 1 Submission
-app.post('/api/submissions/form1', upload.fields([
+const form1Upload = upload.fields([
   { name: 'photo1', maxCount: 1 },
   { name: 'photo2', maxCount: 1 },
   { name: 'video', maxCount: 1 }
-]), async (req, res) => {
+]);
+
+app.post('/api/submissions/form1', (req, res, next) => {
+  form1Upload(req, res, (err) => {
+    if (err) {
+      if (err.code === 'LIMIT_UNEXPECTED_FILE') {
+        return res.status(400).json({ error: 'Only 2 photos (photo1, photo2) and 1 video are allowed per submission.' });
+      }
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({ error: 'File exceeds the maximum allowed size.' });
+      }
+      return res.status(400).json({ error: err.message || 'File upload error.' });
+    }
+    next();
+  });
+}, async (req, res) => {
   try {
     const { empId, empName, email, phone, city, familyMembers, ceoReflection, language } = req.body || {};
     
