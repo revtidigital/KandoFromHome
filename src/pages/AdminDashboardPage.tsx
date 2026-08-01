@@ -111,25 +111,43 @@ export const AdminDashboardPage: React.FC = () => {
 
   // R2 blocks direct browser fetches (no CORS headers on the bucket), so download
   // via our own server, which proxies the object through with no CORS restriction.
+  // Used for both the media preview modal and any other private R2 attachment
+  // (e.g. Form 2's optional file) — any raw R2 href would 403 in the browser.
+  const downloadR2File = async (url: string, fallbackName: string) => {
+    const res = await fetch(`${apiBaseUrl}/api/admin/media-download?url=${encodeURIComponent(url)}`, { headers: adminAuthHeader() });
+    const blob = await res.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    const filename = url.split('/').pop() || fallbackName;
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(blobUrl);
+  };
+
   const handleMediaDownload = async () => {
     if (!mediaModal) return;
     setMediaDownloading(true);
     try {
-      const res = await fetch(`${apiBaseUrl}/api/admin/media-download?url=${encodeURIComponent(mediaModal.url)}`, { headers: adminAuthHeader() });
-      const blob = await res.blob();
-      const blobUrl = URL.createObjectURL(blob);
-      const filename = mediaModal.url.split('/').pop() || mediaModal.title;
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(blobUrl);
+      await downloadR2File(mediaModal.url, mediaModal.title);
     } catch (err) {
       console.error('Media download failed:', err);
     } finally {
       setMediaDownloading(false);
+    }
+  };
+
+  const [attachmentDownloading, setAttachmentDownloading] = useState(false);
+  const handleAttachmentDownload = async (url: string) => {
+    setAttachmentDownloading(true);
+    try {
+      await downloadR2File(url, 'attachment');
+    } catch (err) {
+      console.error('Attachment download failed:', err);
+    } finally {
+      setAttachmentDownloading(false);
     }
   };
 
@@ -978,14 +996,13 @@ export const AdminDashboardPage: React.FC = () => {
 
                   {/* Optional file attachment (if any) */}
                   {selectedUserForProfile.form2.optionalFileUrl && (
-                    <a
-                      href={selectedUserForProfile.form2.optionalFileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', border: '1px solid #A855F7', borderRadius: '10px', padding: '10px 18px', color: '#C084FC', fontSize: '0.85rem', fontWeight: 700, background: 'rgba(168,85,247,0.08)', textDecoration: 'none' }}
+                    <button
+                      onClick={() => handleAttachmentDownload(selectedUserForProfile.form2.optionalFileUrl)}
+                      disabled={attachmentDownloading}
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', border: '1px solid #A855F7', borderRadius: '10px', padding: '10px 18px', color: '#C084FC', fontSize: '0.85rem', fontWeight: 700, background: 'rgba(168,85,247,0.08)', cursor: attachmentDownloading ? 'not-allowed' : 'pointer', opacity: attachmentDownloading ? 0.6 : 1 }}
                     >
-                      <Download size={16} /> Download Attached File
-                    </a>
+                      <Download size={16} /> {attachmentDownloading ? 'Downloading…' : 'Download Attached File'}
+                    </button>
                   )}
                 </div>
               ) : (
