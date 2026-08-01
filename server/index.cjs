@@ -204,6 +204,8 @@ const UserSchema = new mongoose.Schema({
 const Form1Schema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   empId: { type: String, required: true },
+  companyName: { type: String, default: '' },
+  department: { type: String, default: '' },
   photo1Url: { type: String, required: true },
   photo2Url: { type: String },
   videoUrl: { type: String },
@@ -329,8 +331,8 @@ app.post('/api/submissions/form1', (req, res, next) => {
   });
 }, async (req, res) => {
   try {
-    const { empId, empName, email, phone, city, familyMembers, ceoReflection, language } = req.body || {};
-    
+    const { empId, empName, email, phone, city, familyMembers, companyName, department, ceoReflection, language } = req.body || {};
+
     if (!empId || !empName || !email) {
       return res.status(400).json({ error: 'Missing required user details.' });
     }
@@ -345,11 +347,11 @@ app.post('/api/submissions/form1', (req, res, next) => {
       return res.status(400).json({ error: 'Video file is required.' });
     }
 
-    if (req.files['photo1'][0].size > 10 * 1024 * 1024) {
-      return res.status(400).json({ error: 'Photo 1 exceeds 10MB limit.' });
+    if (req.files['photo1'][0].size > 5 * 1024 * 1024) {
+      return res.status(400).json({ error: 'Photo 1 exceeds 5MB limit.' });
     }
-    if (req.files['photo2'][0].size > 10 * 1024 * 1024) {
-      return res.status(400).json({ error: 'Photo 2 exceeds 10MB limit.' });
+    if (req.files['photo2'][0].size > 5 * 1024 * 1024) {
+      return res.status(400).json({ error: 'Photo 2 exceeds 5MB limit.' });
     }
     if (req.files['video'][0].size > 40 * 1024 * 1024) {
       return res.status(400).json({ error: 'Video exceeds maximum size limit of 40MB.' });
@@ -413,6 +415,8 @@ app.post('/api/submissions/form1', (req, res, next) => {
     const submission = await Form1.create({
       userId: user._id,
       empId,
+      companyName: (companyName || '').trim(),
+      department: (department || '').trim(),
       photo1Url,
       photo2Url,
       videoUrl,
@@ -590,6 +594,8 @@ app.get('/api/admin/users', async (req, res) => {
         createdAt: user.createdAt,
         form1: f1 ? {
           submittedAt: f1.submittedAt,
+          companyName: f1.companyName || '',
+          department: f1.department || '',
           photo1Url: f1.photo1Url,
           photo2Url: f1.photo2Url,
           videoUrl: f1.videoUrl || '',

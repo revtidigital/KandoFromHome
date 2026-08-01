@@ -17,6 +17,9 @@ export const Form1Page: React.FC = () => {
   const [dataConsent, setDataConsent] = useState(false);
   const [mediaConsent, setMediaConsent] = useState(false);
 
+  const [companyName, setCompanyName] = useState('');
+  const [department, setDepartment] = useState('');
+
   const [rawPhone, setRawPhone] = useState(formData.phone ? formData.phone.replace(/^\+\d+\s*/, '') : '');
 
   const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,15 +39,15 @@ export const Form1Page: React.FC = () => {
     setVideoPreview(null);
   };
 
-  // File Upload Handler with Max 10MB per Image Limit (Req 4)
+  // File Upload Handler with Max 5MB per Image Limit
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>, field: 'photo1' | 'photo2') => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate size limit: Max 10MB per image
-    const MAX_PHOTO_SIZE = 10 * 1024 * 1024; // 10MB
+    // Validate size limit: Max 5MB per image
+    const MAX_PHOTO_SIZE = 5 * 1024 * 1024; // 5MB
     if (file.size > MAX_PHOTO_SIZE) {
-      setErrors(prev => ({ ...prev, [field]: 'Photo size exceeds 10MB limit. Please choose a smaller image.' }));
+      setErrors(prev => ({ ...prev, [field]: 'Photo size exceeds 5MB limit. Please choose a smaller image.' }));
       return;
     }
 
@@ -162,6 +165,8 @@ export const Form1Page: React.FC = () => {
       body.append('phone', fullFormattedPhone);
       body.append('city', formData.city.trim());
       body.append('familyMembers', formData.familyMembers || '1');
+      body.append('companyName', companyName.trim());
+      body.append('department', department.trim());
       body.append('ceoReflection', formData.ceoReflection || '');
       body.append('language', language);
 
@@ -246,6 +251,36 @@ export const Form1Page: React.FC = () => {
                 }}
               />
               {errors.empName && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.empName}</p>}
+            </div>
+
+            <div style={{ minWidth: 0 }}>
+              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>Company Name</label>
+              <input
+                type="text"
+                value={companyName}
+                onChange={e => setCompanyName(e.target.value)}
+                placeholder="e.g. Yamaha Motor India"
+                style={{
+                  width: '100%', minWidth: 0, padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
+                  background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.2)',
+                  color: 'white', outline: 'none'
+                }}
+              />
+            </div>
+
+            <div style={{ minWidth: 0 }}>
+              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>Department</label>
+              <input
+                type="text"
+                value={department}
+                onChange={e => setDepartment(e.target.value)}
+                placeholder="e.g. Marketing"
+                style={{
+                  width: '100%', minWidth: 0, padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
+                  background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.2)',
+                  color: 'white', outline: 'none'
+                }}
+              />
             </div>
 
             <div style={{ minWidth: 0 }}>
@@ -374,7 +409,7 @@ export const Form1Page: React.FC = () => {
                 }}>
                   <ImageIcon size={28} color="#00E5FF" />
                   <span style={{ fontSize: '0.85rem', color: '#CBD5E1', marginTop: '8px' }}>Click to select Photo 1</span>
-                  <span style={{ fontSize: '0.75rem', color: '#64748B' }}>All photo formats supported (Max 10MB)</span>
+                  <span style={{ fontSize: '0.75rem', color: '#64748B' }}>All photo formats supported (Max 5MB)</span>
                   <input type="file" accept="image/*,.png,.jpg,.jpeg,.gif,.webp,.heic,.heif,.bmp,.svg,.tiff" onChange={e => handlePhotoChange(e, 'photo1')} style={{ display: 'none' }} />
                 </label>
               )}
@@ -401,7 +436,7 @@ export const Form1Page: React.FC = () => {
                 }}>
                   <Upload size={28} color="#A0B2D6" />
                   <span style={{ fontSize: '0.85rem', color: '#CBD5E1', marginTop: '8px' }}>Click to select Photo 2</span>
-                  <span style={{ fontSize: '0.75rem', color: '#64748B' }}>All photo formats supported (Max 10MB)</span>
+                  <span style={{ fontSize: '0.75rem', color: '#64748B' }}>All photo formats supported (Max 5MB)</span>
                   <input type="file" accept="image/*,.png,.jpg,.jpeg,.gif,.webp,.heic,.heif,.bmp,.svg,.tiff" onChange={e => handlePhotoChange(e, 'photo2')} style={{ display: 'none' }} />
                 </label>
               )}

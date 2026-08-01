@@ -741,6 +741,14 @@ export const AdminDashboardPage: React.FC = () => {
                   {/* Meta info row */}
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px', marginBottom: '18px', fontSize: '0.85rem' }}>
                     <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '10px' }}>
+                      <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Company Name</div>
+                      <div style={{ color: '#E2E8F0' }}>{selectedUserForProfile.form1.companyName || 'N/A'}</div>
+                    </div>
+                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '10px' }}>
+                      <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Department</div>
+                      <div style={{ color: '#E2E8F0' }}>{selectedUserForProfile.form1.department || 'N/A'}</div>
+                    </div>
+                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '10px' }}>
                       <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Language</div>
                       <div style={{ color: '#E2E8F0' }}>{selectedUserForProfile.form1.language === 'hi' ? 'Hindi' : selectedUserForProfile.form1.language === 'ta' ? 'Tamil' : 'English'}</div>
                     </div>
@@ -798,11 +806,11 @@ export const AdminDashboardPage: React.FC = () => {
                 </div>
               )}
 
-              {/* ── SECTION C: FORM 2 DETAILS ── */}
+              {/* ── SECTION C: FORM 2 DETAILS (Chairman Invites Your Thoughts) ── */}
               {selectedUserForProfile.form2 ? (
                 <div style={{ background: '#06133B', padding: '24px', borderRadius: '18px', border: '1px solid rgba(168, 85, 247, 0.3)' }}>
                   <h3 style={{ fontSize: '1.1rem', color: '#C084FC', fontWeight: 800, marginBottom: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <FileVideo size={20} /> Form 2 — CEO Reflection Submission
+                    <FileVideo size={20} /> Form 2 — Chairman Invites Your Thoughts
                     <span style={{ marginLeft: 'auto', fontSize: '0.75rem', color: '#64748B', fontWeight: 400 }}>
                       Submitted: {new Date(selectedUserForProfile.form2.submittedAt).toLocaleString()}
                     </span>
@@ -810,6 +818,18 @@ export const AdminDashboardPage: React.FC = () => {
 
                   {/* Meta info row */}
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px', marginBottom: '18px', fontSize: '0.85rem' }}>
+                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '10px' }}>
+                      <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Company Name</div>
+                      <div style={{ color: '#E2E8F0' }}>{selectedUserForProfile.form2.companyName || 'N/A'}</div>
+                    </div>
+                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '10px' }}>
+                      <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Department</div>
+                      <div style={{ color: '#E2E8F0' }}>{selectedUserForProfile.form2.department || 'N/A'}</div>
+                    </div>
+                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '10px' }}>
+                      <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Location</div>
+                      <div style={{ color: '#E2E8F0' }}>{selectedUserForProfile.form2.location || 'N/A'}</div>
+                    </div>
                     <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '10px' }}>
                       <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Language</div>
                       <div style={{ color: '#E2E8F0' }}>{selectedUserForProfile.form2.language === 'hi' ? 'Hindi' : selectedUserForProfile.form2.language === 'ta' ? 'Tamil' : 'English'}</div>
@@ -820,19 +840,24 @@ export const AdminDashboardPage: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* CEO Reflection */}
-                  {selectedUserForProfile.form2.ceoReflection && (
+                  {/* Share Your Thoughts answer */}
+                  {selectedUserForProfile.form2.thoughts && (
                     <div style={{ background: 'rgba(255,255,255,0.04)', padding: '16px', borderRadius: '12px', marginBottom: '18px' }}>
-                      <div style={{ fontSize: '0.72rem', color: '#C084FC', fontWeight: 800, textTransform: 'uppercase', marginBottom: '8px' }}>CEO Reflection Answer (Form 2)</div>
-                      <p style={{ margin: 0, color: '#E2E8F0', fontStyle: 'italic', lineHeight: 1.6 }}>"{selectedUserForProfile.form2.ceoReflection}"</p>
+                      <div style={{ fontSize: '0.72rem', color: '#C084FC', fontWeight: 800, textTransform: 'uppercase', marginBottom: '8px' }}>Share Your Thoughts</div>
+                      <p style={{ margin: 0, color: '#E2E8F0', fontStyle: 'italic', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>"{selectedUserForProfile.form2.thoughts}"</p>
                     </div>
                   )}
 
-                  {/* Form 2 video (if any) */}
-                  {selectedUserForProfile.form2.videoUrl && (
-                    <div style={{ maxWidth: '640px', borderRadius: '14px', overflow: 'hidden', border: '1.5px solid #A855F7' }}>
-                      <video controls src={selectedUserForProfile.form2.videoUrl} style={{ width: '100%', display: 'block' }} />
-                    </div>
+                  {/* Optional file attachment (if any) */}
+                  {selectedUserForProfile.form2.optionalFileUrl && (
+                    <a
+                      href={selectedUserForProfile.form2.optionalFileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', border: '1px solid #A855F7', borderRadius: '10px', padding: '10px 18px', color: '#C084FC', fontSize: '0.85rem', fontWeight: 700, background: 'rgba(168,85,247,0.08)', textDecoration: 'none' }}
+                    >
+                      <Download size={16} /> Download Attached File
+                    </a>
                   )}
                 </div>
               ) : (
