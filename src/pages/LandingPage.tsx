@@ -102,11 +102,15 @@ const GopuramIcon: React.FC = () => (
 );
 
 export const LandingPage: React.FC = () => {
-  const { setLanguage, navigateTo } = useApp();
+  const { navigateTo } = useApp();
 
+  // Pass lang directly to navigateTo instead of calling setLanguage() first —
+  // React state updates are async, so a separate setLanguage() call followed
+  // immediately by navigateTo() reads the OLD language value (it hasn't
+  // re-rendered yet), which is why picking Hindi right after English could
+  // still land on #en/home showing English content.
   const handleSelectLanguage = (lang: Language) => {
-    setLanguage(lang);
-    navigateTo('home');
+    navigateTo('home', lang);
   };
 
   return (
