@@ -255,15 +255,15 @@ export const Form2Page: React.FC = () => {
 
         <button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isSubmitting || !dataConsent}
           style={{
             width: '100%', padding: '16px', borderRadius: '14px',
             background: 'linear-gradient(90deg, #A855F7 0%, #6366F1 100%)',
             border: 'none', color: 'white', fontSize: '1.05rem', fontWeight: 800,
-            cursor: isSubmitting ? 'not-allowed' : 'pointer',
+            cursor: (isSubmitting || !dataConsent) ? 'not-allowed' : 'pointer',
             boxShadow: '0 6px 20px rgba(168, 85, 247, 0.4)',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-            opacity: isSubmitting ? 0.7 : 1
+            opacity: (isSubmitting || !dataConsent) ? 0.5 : 1
           }}
         >
           {isSubmitting ? 'Submitting...' : 'SUBMIT — Chairman\'s Invitation'}

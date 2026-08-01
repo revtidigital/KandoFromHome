@@ -417,7 +417,7 @@ export const Form1Page: React.FC = () => {
                 onChange={e => { setMediaConsent(e.target.checked); if (e.target.checked) setErrors(prev => ({ ...prev, mediaConsent: '' })); }}
                 style={{ accentColor: '#00E5FF', width: '18px', height: '18px', flexShrink: 0, marginTop: '2px' }} />
               <span style={{ color: '#CBD5E1', fontSize: '0.87rem', lineHeight: 1.5 }}>
-                I grant Yamaha permission to feature my submission photos in internal publications.
+                I grant Yamaha permission to feature my submission photos in internal publications. *
               </span>
             </label>
           </div>
@@ -425,15 +425,15 @@ export const Form1Page: React.FC = () => {
 
         <button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isSubmitting || !dataConsent || !mediaConsent}
           style={{
             width: '100%', padding: '16px', borderRadius: '14px',
             background: 'linear-gradient(90deg, #00C6FF 0%, #0072FF 100%)',
             border: 'none', color: 'white', fontSize: '1.05rem', fontWeight: 800,
-            cursor: isSubmitting ? 'not-allowed' : 'pointer',
+            cursor: (isSubmitting || !dataConsent || !mediaConsent) ? 'not-allowed' : 'pointer',
             boxShadow: '0 6px 20px rgba(0, 198, 255, 0.4)', display: 'flex',
             alignItems: 'center', justifyContent: 'center', gap: '8px',
-            opacity: isSubmitting ? 0.7 : 1
+            opacity: (isSubmitting || !dataConsent || !mediaConsent) ? 0.5 : 1
           }}
         >
           {isSubmitting ? 'Submitting...' : 'SUBMIT FORM 1'}
