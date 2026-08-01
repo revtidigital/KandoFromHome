@@ -395,7 +395,14 @@ export const Form1Page: React.FC = () => {
                 onChange={e => { setDataConsent(e.target.checked); if (e.target.checked) setErrors(prev => ({ ...prev, dataConsent: '' })); }}
                 style={{ accentColor: '#00E5FF', width: '18px', height: '18px', flexShrink: 0, marginTop: '2px' }} />
               <span style={{ color: '#CBD5E1', fontSize: '0.87rem', lineHeight: 1.5 }}>
-                I agree to the Terms &amp; Conditions and Privacy Policy. *
+                I agree to the{' '}
+                <a href={`/${language}/terms`} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ color: '#00E5FF', textDecoration: 'underline' }}>
+                  Terms &amp; Conditions
+                </a>{' '}
+                and{' '}
+                <a href={`/${language}/privacy`} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ color: '#00E5FF', textDecoration: 'underline' }}>
+                  Privacy Policy
+                </a>. *
               </span>
             </label>
             {errors.dataConsent && (
