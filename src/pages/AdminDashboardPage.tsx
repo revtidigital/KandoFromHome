@@ -873,6 +873,10 @@ export const AdminDashboardPage: React.FC = () => {
                       <div style={{ color: '#E2E8F0' }}>{selectedUserForProfile.form1.department || 'N/A'}</div>
                     </div>
                     <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '10px' }}>
+                      <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Location</div>
+                      <div style={{ color: '#E2E8F0' }}>{selectedUserForProfile.city || 'N/A'}</div>
+                    </div>
+                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '10px' }}>
                       <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Language</div>
                       <div style={{ color: '#E2E8F0' }}>{selectedUserForProfile.form1.language === 'hi' ? 'Hindi' : selectedUserForProfile.form1.language === 'ta' ? 'Tamil' : 'English'}</div>
                     </div>
