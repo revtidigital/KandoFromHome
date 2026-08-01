@@ -662,7 +662,9 @@ app.get('/api/admin/overview', async (req, res) => {
 // Admin Audit Logs (READ ONLY - NO DELETE API)
 app.get('/api/admin/audit-logs', async (req, res) => {
   try {
-    const logs = await AuditLog.find().sort({ timestamp: -1 }).limit(200);
+    // Only admin-performed actions belong here — public form submissions have
+    // their own trail (visible in the Users Directory) and would just be noise.
+    const logs = await AuditLog.find({ username: { $ne: 'Public User' } }).sort({ timestamp: -1 }).limit(200);
     res.json(logs);
   } catch (err) {
     console.error(err);
