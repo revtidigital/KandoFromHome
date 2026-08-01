@@ -126,7 +126,9 @@ async function uploadFileToR2(filePath, fileName, mimeType, userFolder) {
   try {
     const fileBuffer = fs.readFileSync(filePath);
     const folder = userFolder ? `uploads/${userFolder}` : 'uploads';
-    const key = `${folder}/${Date.now()}-${fileName}`;
+    // fileName is the final human-readable object name (e.g. RD1234_M_photo1.jpg) —
+    // one submission per employee is enforced, so no collision risk without a timestamp.
+    const key = `${folder}/${fileName}`;
     const command = new PutObjectCommand({
       Bucket: R2_BUCKET,
       Key: key,
@@ -378,22 +380,26 @@ app.post('/api/submissions/form1', (req, res, next) => {
     // User-specific R2 folder: empId_INITIALS
     const userFolder = getUserFolder(cleanEmpId, empName, '');
 
-    let photo1Url = `${R2_PUBLIC_URL}/${userFolder}/${req.files['photo1'][0].filename}`;
-    let photo2Url = req.files['photo2'] ? `${R2_PUBLIC_URL}/${userFolder}/${req.files['photo2'][0].filename}` : '';
+    const photo1Name = `${userFolder}_photo1${path.extname(req.files['photo1'][0].originalname).toLowerCase()}`;
+    const photo2Name = req.files['photo2'] ? `${userFolder}_photo2${path.extname(req.files['photo2'][0].originalname).toLowerCase()}` : '';
+    const videoName = req.files['video'] ? `${userFolder}_video${path.extname(req.files['video'][0].originalname).toLowerCase()}` : '';
+
+    let photo1Url = `${R2_PUBLIC_URL}/${userFolder}/${photo1Name}`;
+    let photo2Url = photo2Name ? `${R2_PUBLIC_URL}/${userFolder}/${photo2Name}` : '';
     let videoUrl = '';
 
     if (req.files['video']) {
-      videoUrl = `${R2_PUBLIC_URL}/${userFolder}/${req.files['video'][0].filename}`;
-      const r2Vid = await uploadFileToR2(req.files['video'][0].path, req.files['video'][0].filename, req.files['video'][0].mimetype, userFolder);
+      videoUrl = `${R2_PUBLIC_URL}/${userFolder}/${videoName}`;
+      const r2Vid = await uploadFileToR2(req.files['video'][0].path, videoName, req.files['video'][0].mimetype, userFolder);
       if (r2Vid) videoUrl = r2Vid;
     }
 
     // Stream uploads to Cloudflare R2 Bucket if credentials configured
-    const r2P1 = await uploadFileToR2(req.files['photo1'][0].path, req.files['photo1'][0].filename, req.files['photo1'][0].mimetype, userFolder);
+    const r2P1 = await uploadFileToR2(req.files['photo1'][0].path, photo1Name, req.files['photo1'][0].mimetype, userFolder);
     if (r2P1) photo1Url = r2P1;
 
     if (req.files['photo2']) {
-      const r2P2 = await uploadFileToR2(req.files['photo2'][0].path, req.files['photo2'][0].filename, req.files['photo2'][0].mimetype, userFolder);
+      const r2P2 = await uploadFileToR2(req.files['photo2'][0].path, photo2Name, req.files['photo2'][0].mimetype, userFolder);
       if (r2P2) photo2Url = r2P2;
     }
 
@@ -455,8 +461,9 @@ app.post('/api/submissions/form2', (req, res, next) => {
       if (req.file.size > 50 * 1024 * 1024) {
         return res.status(400).json({ error: 'File exceeds maximum size limit of 50MB.' });
       }
-      optionalFileUrl = `${R2_PUBLIC_URL}/${userFolder2}/${req.file.filename}`;
-      const r2File = await uploadFileToR2(req.file.path, req.file.filename, req.file.mimetype, userFolder2);
+      const attachmentName = `${userFolder2}_attachment${path.extname(req.file.originalname).toLowerCase()}`;
+      optionalFileUrl = `${R2_PUBLIC_URL}/${userFolder2}/${attachmentName}`;
+      const r2File = await uploadFileToR2(req.file.path, attachmentName, req.file.mimetype, userFolder2);
       if (r2File) optionalFileUrl = r2File;
     }
 
