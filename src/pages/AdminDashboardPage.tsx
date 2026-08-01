@@ -13,10 +13,29 @@ export const AdminDashboardPage: React.FC = () => {
     auditLogs, fetchAuditLogs, logAdminAction, apiBaseUrl, adminAuthHeader
   } = useApp();
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'tags' | 'settings' | 'audit' | 'user-detail'>('overview');
-  
+  type Tab = 'overview' | 'users' | 'tags' | 'settings' | 'audit' | 'user-detail';
+  const [activeTab, setActiveTab] = useState<Tab>('overview');
+
   // Dedicated user profile detail state (Req 1)
   const [selectedUserForProfile, setSelectedUserForProfile] = useState<any | null>(null);
+
+  // Every tab (and an open user profile) gets its own URL/history entry, so the
+  // browser Back button steps through them one at a time instead of jumping
+  // straight past the whole dashboard session back to the original login page.
+  const pathForTab = (tab: Tab, empId?: string) => {
+    if (tab === 'overview') return '/admin-dashboard';
+    if (tab === 'user-detail') return `/admin-dashboard/users/${encodeURIComponent(empId || '')}`;
+    return `/admin-dashboard/${tab}`;
+  };
+
+  const goToTab = (tab: Exclude<Tab, 'user-detail'>) => {
+    setActiveTab(tab);
+    if (tab !== 'users') setSelectedUserForProfile(null);
+    const path = pathForTab(tab);
+    if (window.location.pathname !== path) {
+      window.history.pushState({ tab }, '', path);
+    }
+  };
 
   // Filters & Pagination for Users table
   const [searchQuery, setSearchQuery] = useState('');
@@ -56,6 +75,7 @@ export const AdminDashboardPage: React.FC = () => {
       .then(data => {
         if (data && data.users) {
           setAllUsers(data.users);
+          applyStateFromPath(window.location.pathname, data.users);
         }
       })
       .catch(() => {});
@@ -63,6 +83,36 @@ export const AdminDashboardPage: React.FC = () => {
     fetchAuditLogs();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiBaseUrl, setAllUsers, setCustomTags]);
+
+  // Resolve activeTab (+ selected user, for /admin-dashboard/users/:empId) from a URL path
+  const applyStateFromPath = (pathname: string, usersList: any[]) => {
+    const rest = pathname.replace(/^\/admin-dashboard\/?/, '');
+    const [segment, empId] = rest.split('/').filter(Boolean);
+
+    if (segment === 'users' && empId) {
+      const user = usersList.find((u: any) => u.empId === decodeURIComponent(empId));
+      if (user) {
+        setSelectedUserForProfile(user);
+        setActiveTab('user-detail');
+        return;
+      }
+    }
+    if (segment === 'users' || segment === 'tags' || segment === 'settings' || segment === 'audit') {
+      setActiveTab(segment as Tab);
+      return;
+    }
+    setActiveTab('overview');
+  };
+
+  // Browser Back/Forward — keep the visible tab in sync with the URL instead of
+  // silently doing nothing (which is what made Back feel like it "skipped" straight
+  // past the whole dashboard session to the login page).
+  useEffect(() => {
+    const handlePopState = () => applyStateFromPath(window.location.pathname, allUsers);
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allUsers]);
 
   const handleLogout = () => {
     adminLogout();
@@ -73,6 +123,10 @@ export const AdminDashboardPage: React.FC = () => {
   const handleOpenUserProfile = (user: any) => {
     setSelectedUserForProfile(user);
     setActiveTab('user-detail');
+    const path = pathForTab('user-detail', user.empId);
+    if (window.location.pathname !== path) {
+      window.history.pushState({ tab: 'user-detail', empId: user.empId }, '', path);
+    }
     logAdminAction(`Viewed profile of ${user.empName} (${user.empId})`);
   };
 
@@ -276,7 +330,7 @@ export const AdminDashboardPage: React.FC = () => {
 
           <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <button
-              onClick={() => setActiveTab('overview')}
+              onClick={() => goToTab('overview')}
               style={{
                 display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '12px',
                 background: activeTab === 'overview' ? 'rgba(0,229,255,0.15)' : 'transparent',
@@ -290,7 +344,7 @@ export const AdminDashboardPage: React.FC = () => {
             </button>
 
             <button
-              onClick={() => { setActiveTab('users'); setSelectedUserForProfile(null); }}
+              onClick={() => goToTab('users')}
               style={{
                 display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '12px',
                 background: (activeTab === 'users' || activeTab === 'user-detail') ? 'rgba(0,229,255,0.15)' : 'transparent',
@@ -304,7 +358,7 @@ export const AdminDashboardPage: React.FC = () => {
             </button>
 
             <button
-              onClick={() => setActiveTab('tags')}
+              onClick={() => goToTab('tags')}
               style={{
                 display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '12px',
                 background: activeTab === 'tags' ? 'rgba(0,229,255,0.15)' : 'transparent',
@@ -318,7 +372,7 @@ export const AdminDashboardPage: React.FC = () => {
             </button>
 
             <button
-              onClick={() => setActiveTab('settings')}
+              onClick={() => goToTab('settings')}
               style={{
                 display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '12px',
                 background: activeTab === 'settings' ? 'rgba(0,229,255,0.15)' : 'transparent',
@@ -332,7 +386,7 @@ export const AdminDashboardPage: React.FC = () => {
             </button>
 
             <button
-              onClick={() => setActiveTab('audit')}
+              onClick={() => goToTab('audit')}
               style={{
                 display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '12px',
                 background: activeTab === 'audit' ? 'rgba(0,229,255,0.15)' : 'transparent',
@@ -617,7 +671,7 @@ export const AdminDashboardPage: React.FC = () => {
         {activeTab === 'user-detail' && selectedUserForProfile && (
           <div>
             <button
-              onClick={() => setActiveTab('users')}
+              onClick={() => goToTab('users')}
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: '8px',
                 background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.2)',

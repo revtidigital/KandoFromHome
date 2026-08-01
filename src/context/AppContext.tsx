@@ -92,8 +92,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Parse initial state from URL hash e.g. #en/home or #hi/form1
   const parseHash = () => {
     const cleanPath = window.location.pathname.replace(/^\//, '');
-    if (ADMIN_CLEAN_VIEWS.includes(cleanPath)) {
-      return { lang: 'en' as Language, view: cleanPath };
+    // Prefix match so deep links / refreshes like /admin-dashboard/users/EMP123
+    // still resolve to the admin-dashboard view (AdminDashboardPage owns the
+    // rest of that path itself and restores the exact tab/user from it).
+    const matchedAdminView = ADMIN_CLEAN_VIEWS.find(
+      v => cleanPath === v || cleanPath.startsWith(`${v}/`)
+    );
+    if (matchedAdminView) {
+      return { lang: 'en' as Language, view: matchedAdminView };
     }
 
     const hash = window.location.hash.replace('#', '');
