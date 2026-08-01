@@ -56,6 +56,8 @@ export const AdminDashboardPage: React.FC = () => {
 
   // Media preview modal state
   const [mediaModal, setMediaModal] = useState<{ type: 'image' | 'video'; url: string; title: string } | null>(null);
+  // Media URLs from R2 are already absolute; only prefix apiBaseUrl for legacy relative /uploads paths
+  const mediaSrc = (url: string) => (/^https?:\/\//i.test(url) ? url : `${apiBaseUrl}${url}`);
 
   // Fetch initial settings & users from API
   useEffect(() => {
@@ -713,21 +715,6 @@ export const AdminDashboardPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* ── SECTION A: USER PROFILE DETAILS ── */}
-              <div style={{ marginBottom: '28px' }}>
-                <h3 style={{ fontSize: '0.8rem', fontWeight: 800, color: '#64748B', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '12px' }}>
-                  👤 Profile Details
-                </h3>
-                <div style={{ background: '#091A44', padding: '20px', borderRadius: '14px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px', fontSize: '0.9rem' }}>
-                  <div><span style={{ color: '#64748B', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>Email</span><br /><span style={{ color: '#E2E8F0' }}>{selectedUserForProfile.email}</span></div>
-                  <div><span style={{ color: '#64748B', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>Phone</span><br /><span style={{ color: '#E2E8F0' }}>{selectedUserForProfile.phone || 'N/A'}</span></div>
-                  <div><span style={{ color: '#64748B', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>City / Location</span><br /><span style={{ color: '#E2E8F0' }}>{selectedUserForProfile.city || 'N/A'}</span></div>
-                  <div><span style={{ color: '#64748B', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>Family Members</span><br /><span style={{ color: '#E2E8F0' }}>{selectedUserForProfile.familyMembers || 1}</span></div>
-                  <div><span style={{ color: '#64748B', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>Registered At</span><br /><span style={{ color: '#E2E8F0' }}>{selectedUserForProfile.createdAt ? new Date(selectedUserForProfile.createdAt).toLocaleString() : '—'}</span></div>
-                  <div><span style={{ color: '#64748B', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>Tags</span><br /><span style={{ color: '#A855F7', fontWeight: 700 }}>{selectedUserForProfile.tags?.length > 0 ? selectedUserForProfile.tags.join(', ') : 'None'}</span></div>
-                </div>
-              </div>
-
               {/* ── SECTION B: FORM 1 DETAILS ── */}
               {selectedUserForProfile.form1 ? (
                 <div style={{ marginBottom: '28px', background: '#06133B', padding: '24px', borderRadius: '18px', border: '1px solid rgba(74, 222, 128, 0.3)' }}>
@@ -1054,10 +1041,19 @@ export const AdminDashboardPage: React.FC = () => {
             </button>
             <h3 style={{ fontSize: '1.1rem', color: '#00E5FF', marginBottom: '16px' }}>{mediaModal.title}</h3>
             {mediaModal.type === 'image' ? (
-              <img src={`${apiBaseUrl}${mediaModal.url}`} alt={mediaModal.title} style={{ maxWidth: '100%', maxHeight: '70vh', borderRadius: '12px', display: 'block', margin: '0 auto' }} />
+              <img src={mediaSrc(mediaModal.url)} alt={mediaModal.title} style={{ maxWidth: '100%', maxHeight: '70vh', borderRadius: '12px', display: 'block', margin: '0 auto' }} />
             ) : (
-              <video controls src={`${apiBaseUrl}${mediaModal.url}`} style={{ width: '100%', borderRadius: '12px' }} />
+              <video controls src={mediaSrc(mediaModal.url)} style={{ width: '100%', borderRadius: '12px' }} />
             )}
+            <a
+              href={mediaSrc(mediaModal.url)}
+              download
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginTop: '16px', border: '1px solid #00E5FF', borderRadius: '10px', padding: '10px 18px', color: '#00E5FF', fontSize: '0.85rem', fontWeight: 700, background: 'rgba(0,229,255,0.08)', textDecoration: 'none' }}
+            >
+              <Download size={16} /> Download
+            </a>
           </div>
         </div>
       )}
