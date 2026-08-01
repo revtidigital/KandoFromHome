@@ -56,8 +56,27 @@ export const AdminDashboardPage: React.FC = () => {
 
   // Media preview modal state
   const [mediaModal, setMediaModal] = useState<{ type: 'image' | 'video'; url: string; title: string } | null>(null);
-  // Media URLs from R2 are already absolute; only prefix apiBaseUrl for legacy relative /uploads paths
-  const mediaSrc = (url: string) => (/^https?:\/\//i.test(url) ? url : `${apiBaseUrl}${url}`);
+  const [mediaSignedUrl, setMediaSignedUrl] = useState<string | null>(null);
+
+  // R2 media is private — fetch a short-lived signed URL to view/download it.
+  // Legacy relative /uploads paths (pre-R2) are served directly via apiBaseUrl.
+  useEffect(() => {
+    if (!mediaModal) {
+      setMediaSignedUrl(null);
+      return;
+    }
+    if (!/^https?:\/\//i.test(mediaModal.url)) {
+      setMediaSignedUrl(`${apiBaseUrl}${mediaModal.url}`);
+      return;
+    }
+    let cancelled = false;
+    setMediaSignedUrl(null);
+    fetch(`${apiBaseUrl}/api/admin/media-url?url=${encodeURIComponent(mediaModal.url)}`, { headers: adminAuthHeader() })
+      .then(res => res.json())
+      .then(data => { if (!cancelled && data.url) setMediaSignedUrl(data.url); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [mediaModal, apiBaseUrl]);
 
   // Fetch initial settings & users from API
   useEffect(() => {
@@ -1040,20 +1059,26 @@ export const AdminDashboardPage: React.FC = () => {
               <X size={20} />
             </button>
             <h3 style={{ fontSize: '1.1rem', color: '#00E5FF', marginBottom: '16px' }}>{mediaModal.title}</h3>
-            {mediaModal.type === 'image' ? (
-              <img src={mediaSrc(mediaModal.url)} alt={mediaModal.title} style={{ maxWidth: '100%', maxHeight: '70vh', borderRadius: '12px', display: 'block', margin: '0 auto' }} />
+            {!mediaSignedUrl ? (
+              <div style={{ padding: '40px 0', textAlign: 'center', color: '#64748B' }}>Loading…</div>
             ) : (
-              <video controls src={mediaSrc(mediaModal.url)} style={{ width: '100%', borderRadius: '12px' }} />
+              <>
+                {mediaModal.type === 'image' ? (
+                  <img src={mediaSignedUrl} alt={mediaModal.title} style={{ maxWidth: '100%', maxHeight: '70vh', borderRadius: '12px', display: 'block', margin: '0 auto' }} />
+                ) : (
+                  <video controls src={mediaSignedUrl} style={{ width: '100%', borderRadius: '12px' }} />
+                )}
+                <a
+                  href={mediaSignedUrl}
+                  download
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginTop: '16px', border: '1px solid #00E5FF', borderRadius: '10px', padding: '10px 18px', color: '#00E5FF', fontSize: '0.85rem', fontWeight: 700, background: 'rgba(0,229,255,0.08)', textDecoration: 'none' }}
+                >
+                  <Download size={16} /> Download
+                </a>
+              </>
             )}
-            <a
-              href={mediaSrc(mediaModal.url)}
-              download
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginTop: '16px', border: '1px solid #00E5FF', borderRadius: '10px', padding: '10px 18px', color: '#00E5FF', fontSize: '0.85rem', fontWeight: 700, background: 'rgba(0,229,255,0.08)', textDecoration: 'none' }}
-            >
-              <Download size={16} /> Download
-            </a>
           </div>
         </div>
       )}

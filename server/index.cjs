@@ -98,7 +98,8 @@ app.use('/uploads', express.static(uploadsDir, {
   }
 }));
 
-const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+const { S3Client, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
+const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 
 // Cloudflare R2 Configuration
 const R2_ACCOUNT_ID = process.env.R2_ACCOUNT_ID || 'b272577e002d6d57aafa1d19eac41046';
@@ -497,6 +498,33 @@ app.post('/api/submissions/form2', (req, res, next) => {
 
 // ── ADMIN ROUTES (require x-admin-key header + nginx basic auth) ──
 app.use('/api/admin', requireAdmin);
+
+// Generates a short-lived signed URL so admins can view/download private R2 media
+// without making the bucket publicly readable (submissions contain employee PII).
+app.get('/api/admin/media-url', async (req, res) => {
+  try {
+    const { url } = req.query;
+    if (!url || typeof url !== 'string') {
+      return res.status(400).json({ error: 'Missing url parameter.' });
+    }
+    if (!r2Client) {
+      return res.status(503).json({ error: 'R2 storage not configured.' });
+    }
+
+    const prefix = `${R2_PUBLIC_URL}/`;
+    if (!url.startsWith(prefix)) {
+      return res.status(400).json({ error: 'Invalid media URL.' });
+    }
+    const key = url.slice(prefix.length);
+
+    const command = new GetObjectCommand({ Bucket: R2_BUCKET, Key: key });
+    const signedUrl = await getSignedUrl(r2Client, command, { expiresIn: 300 });
+    res.json({ url: signedUrl });
+  } catch (err) {
+    console.error('Media URL sign error:', err);
+    res.status(500).json({ error: 'Failed to generate media URL.' });
+  }
+});
 
 function escapeRegex(str) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
