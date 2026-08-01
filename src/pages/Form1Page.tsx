@@ -22,8 +22,8 @@ export const Form1Page: React.FC = () => {
   const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 50 * 1024 * 1024) {
-      setErrors(prev => ({ ...prev, video: 'Video size exceeds 50MB limit.' }));
+    if (file.size > 40 * 1024 * 1024) {
+      setErrors(prev => ({ ...prev, video: 'Video size exceeds 40MB limit.' }));
       return;
     }
     setErrors(prev => ({ ...prev, video: '' }));
@@ -41,10 +41,10 @@ export const Form1Page: React.FC = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate size limit: Max 50MB per image
-    const MAX_PHOTO_SIZE = 50 * 1024 * 1024; // 50MB
+    // Validate size limit: Max 10MB per image
+    const MAX_PHOTO_SIZE = 10 * 1024 * 1024; // 10MB
     if (file.size > MAX_PHOTO_SIZE) {
-      setErrors(prev => ({ ...prev, [field]: 'Photo size exceeds 50MB limit. Please choose a smaller image.' }));
+      setErrors(prev => ({ ...prev, [field]: 'Photo size exceeds 10MB limit. Please choose a smaller image.' }));
       return;
     }
 

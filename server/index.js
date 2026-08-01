@@ -252,14 +252,14 @@ app.post('/api/submissions/form1', upload.fields([
       return res.status(400).json({ error: 'Video file is required.' });
     }
 
-    if (req.files['photo1'][0].size > 50 * 1024 * 1024) {
-      return res.status(400).json({ error: 'Photo 1 exceeds 50MB limit.' });
+    if (req.files['photo1'][0].size > 10 * 1024 * 1024) {
+      return res.status(400).json({ error: 'Photo 1 exceeds 10MB limit.' });
     }
-    if (req.files['photo2'][0].size > 50 * 1024 * 1024) {
-      return res.status(400).json({ error: 'Photo 2 exceeds 50MB limit.' });
+    if (req.files['photo2'][0].size > 10 * 1024 * 1024) {
+      return res.status(400).json({ error: 'Photo 2 exceeds 10MB limit.' });
     }
-    if (req.files['video'][0].size > 50 * 1024 * 1024) {
-      return res.status(400).json({ error: 'Video exceeds maximum size limit of 50MB.' });
+    if (req.files['video'][0].size > 40 * 1024 * 1024) {
+      return res.status(400).json({ error: 'Video exceeds maximum size limit of 40MB.' });
     }
 
     const cleanEmpId = empId.toString().trim();
