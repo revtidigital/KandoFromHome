@@ -20,9 +20,22 @@ function getZipArchive() {
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const ADMIN_PANEL_USER = process.env.ADMIN_PANEL_USER || '';
-const ADMIN_PANEL_PASS = process.env.ADMIN_PANEL_PASS || '';
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '';
+
+// Supports multiple equal-access admin accounts: ADMIN_USERS=user1:pass1,user2:pass2
+// Falls back to the single ADMIN_PANEL_USER/ADMIN_PANEL_PASS pair for backward compatibility.
+const ADMIN_CREDENTIALS = new Map();
+(process.env.ADMIN_USERS || '')
+  .split(',')
+  .map(pair => pair.trim())
+  .filter(Boolean)
+  .forEach(pair => {
+    const idx = pair.indexOf(':');
+    if (idx > 0) ADMIN_CREDENTIALS.set(pair.slice(0, idx), pair.slice(idx + 1));
+  });
+if (process.env.ADMIN_PANEL_USER && process.env.ADMIN_PANEL_PASS) {
+  ADMIN_CREDENTIALS.set(process.env.ADMIN_PANEL_USER, process.env.ADMIN_PANEL_PASS);
+}
 
 app.set('trust proxy', 1);
 app.use(helmet({
@@ -51,8 +64,11 @@ function requireAdmin(req, res, next) {
   const header = req.headers.authorization || '';
   const [scheme, encoded] = header.split(' ');
   if (scheme === 'Basic' && encoded) {
-    const [user, pass] = Buffer.from(encoded, 'base64').toString('utf8').split(':');
-    if (ADMIN_PANEL_USER && ADMIN_PANEL_PASS && user === ADMIN_PANEL_USER && pass === ADMIN_PANEL_PASS) {
+    const sep = Buffer.from(encoded, 'base64').toString('utf8').indexOf(':');
+    const decoded = Buffer.from(encoded, 'base64').toString('utf8');
+    const user = decoded.slice(0, sep);
+    const pass = decoded.slice(sep + 1);
+    if (ADMIN_CREDENTIALS.has(user) && ADMIN_CREDENTIALS.get(user) === pass) {
       return next();
     }
   }

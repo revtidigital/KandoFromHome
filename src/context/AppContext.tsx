@@ -83,13 +83,16 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
+// Admin views are English-only — they use a clean path (/admin-login, /admin-dashboard)
+// instead of the language-prefixed hash used by the public-facing pages.
+const ADMIN_CLEAN_VIEWS = ['admin-login', 'admin-dashboard'];
+
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Parse initial state from URL hash e.g. #en/home or #hi/form1
   const parseHash = () => {
-    // Clean path /admin-login is a dedicated alias for the admin login screen
-    if (window.location.pathname === '/admin-login') {
-      const savedLang = (localStorage.getItem('kando_lang') as Language) || 'en';
-      return { lang: savedLang, view: 'admin-login' };
+    const cleanPath = window.location.pathname.replace(/^\//, '');
+    if (ADMIN_CLEAN_VIEWS.includes(cleanPath)) {
+      return { lang: 'en' as Language, view: cleanPath };
     }
 
     const hash = window.location.hash.replace('#', '');
@@ -176,14 +179,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Update hash when navigating — GUARANTEED REAL-TIME URL HASH SYNC
   const updateUrlHash = (lang: Language, view: string) => {
-    if (view === 'admin-login') {
-      // Keep the clean /admin-login path in the address bar for this view
-      if (window.location.pathname !== '/admin-login') {
-        window.history.pushState(null, '', '/admin-login');
+    if (ADMIN_CLEAN_VIEWS.includes(view)) {
+      // Admin views use a clean, language-free path in the address bar
+      const targetPath = `/${view}`;
+      if (window.location.pathname !== targetPath) {
+        window.history.pushState(null, '', targetPath);
       }
       return;
     }
-    if (window.location.pathname === '/admin-login') {
+    if (ADMIN_CLEAN_VIEWS.includes(window.location.pathname.replace(/^\//, ''))) {
       window.history.pushState(null, '', '/');
     }
     const newHash = `#${lang}/${view}`;
