@@ -279,6 +279,15 @@ app.post('/api/submissions/form1', (req, res, next) => {
 
     const cleanEmpId = empId.toString().trim();
     const cleanEmail = email.toString().trim().toLowerCase();
+    const cleanPhone = (phone || '').toString().trim();
+
+    // Check Phone Uniqueness
+    if (cleanPhone) {
+      const phoneUser = await User.findOne({ phone: cleanPhone });
+      if (phoneUser && phoneUser.empId !== cleanEmpId) {
+        return res.status(400).json({ error: `Phone number "${phone}" is already registered under Employee ID (${phoneUser.empId}). Each Phone Number must be unique!` });
+      }
+    }
 
     // Enforce Employee ID Uniqueness
     let user = await User.findOne({ empId: cleanEmpId });
@@ -287,7 +296,7 @@ app.post('/api/submissions/form1', (req, res, next) => {
       if (emailUser && emailUser.empId !== cleanEmpId) {
         return res.status(400).json({ error: `Email address "${email}" is already registered under Employee ID (${emailUser.empId}).` });
       }
-      user = await User.create({ empId: cleanEmpId, empName: empName.trim(), email: cleanEmail, phone, city, familyMembers: Number(familyMembers) || 1 });
+      user = await User.create({ empId: cleanEmpId, empName: empName.trim(), email: cleanEmail, phone: cleanPhone, city, familyMembers: Number(familyMembers) || 1 });
     } else {
       if (user.email.toLowerCase() !== cleanEmail) {
         return res.status(400).json({ error: `Employee ID "${cleanEmpId}" is already registered to another employee (${user.empName}). Each Employee ID must be unique!` });
@@ -360,6 +369,16 @@ app.post('/api/submissions/form2', upload.single('optionalFile'), async (req, re
 
     const cleanEmpId = empId.toString().trim();
     const cleanEmail = email.toString().trim().toLowerCase();
+    const cleanPhone = (phone || '').toString().trim();
+
+    // Check Phone Uniqueness
+    if (cleanPhone) {
+      const phoneUser = await User.findOne({ phone: cleanPhone });
+      if (phoneUser && phoneUser.empId !== cleanEmpId) {
+        return res.status(400).json({ error: `Phone number "${phone}" is already registered under Employee ID (${phoneUser.empId}). Each Phone Number must be unique!` });
+      }
+    }
+
     const userFolder2 = getUserFolder(cleanEmpId, empName, phone);
 
     let optionalFileUrl = '';
@@ -378,7 +397,7 @@ app.post('/api/submissions/form2', upload.single('optionalFile'), async (req, re
       if (emailUser && emailUser.empId !== cleanEmpId) {
         return res.status(400).json({ error: `Email address "${email}" is already registered under Employee ID (${emailUser.empId}).` });
       }
-      user = await User.create({ empId: cleanEmpId, empName: empName.trim(), email: cleanEmail, phone: phone || '', city: location || '', familyMembers: 1 });
+      user = await User.create({ empId: cleanEmpId, empName: empName.trim(), email: cleanEmail, phone: cleanPhone, city: location || '', familyMembers: 1 });
     } else {
       if (user.email.toLowerCase() !== cleanEmail) {
         return res.status(400).json({ error: `Employee ID "${cleanEmpId}" is already registered to another employee (${user.empName}). Each Employee ID must be unique!` });
@@ -466,8 +485,11 @@ app.get('/api/admin/users', async (req, res) => {
         } : null,
         form2: f2 ? {
           submittedAt: f2.submittedAt,
-          videoUrl: f2.videoUrl || '',
-          ceoReflection: f2.ceoReflection || '',
+          companyName: f2.companyName || '',
+          department: f2.department || '',
+          location: f2.location || '',
+          thoughts: f2.thoughts || '',
+          optionalFileUrl: f2.optionalFileUrl || '',
           language: f2.language,
           ip: f2.ip || ''
         } : null

@@ -374,8 +374,8 @@ export const Form1Page: React.FC = () => {
                 }}>
                   <ImageIcon size={28} color="#00E5FF" />
                   <span style={{ fontSize: '0.85rem', color: '#CBD5E1', marginTop: '8px' }}>Click to select Photo 1</span>
-                  <span style={{ fontSize: '0.75rem', color: '#64748B' }}>All image formats (Max 10MB)</span>
-                  <input type="file" accept="image/*" onChange={e => handlePhotoChange(e, 'photo1')} style={{ display: 'none' }} />
+                  <span style={{ fontSize: '0.75rem', color: '#64748B' }}>All photo formats supported (Max 10MB)</span>
+                  <input type="file" accept="image/*,.png,.jpg,.jpeg,.gif,.webp,.heic,.heif,.bmp,.svg,.tiff" onChange={e => handlePhotoChange(e, 'photo1')} style={{ display: 'none' }} />
                 </label>
               )}
               {errors.photo1 && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.photo1}</p>}
@@ -401,8 +401,8 @@ export const Form1Page: React.FC = () => {
                 }}>
                   <Upload size={28} color="#A0B2D6" />
                   <span style={{ fontSize: '0.85rem', color: '#CBD5E1', marginTop: '8px' }}>Click to select Photo 2</span>
-                  <span style={{ fontSize: '0.75rem', color: '#64748B' }}>All image formats (Max 10MB)</span>
-                  <input type="file" accept="image/*" onChange={e => handlePhotoChange(e, 'photo2')} style={{ display: 'none' }} />
+                  <span style={{ fontSize: '0.75rem', color: '#64748B' }}>All photo formats supported (Max 10MB)</span>
+                  <input type="file" accept="image/*,.png,.jpg,.jpeg,.gif,.webp,.heic,.heif,.bmp,.svg,.tiff" onChange={e => handlePhotoChange(e, 'photo2')} style={{ display: 'none' }} />
                 </label>
               )}
               {errors.photo2 && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.photo2}</p>}
@@ -434,8 +434,8 @@ export const Form1Page: React.FC = () => {
               }}>
                 <FileVideo size={32} color="#00E5FF" />
                 <span style={{ fontSize: '0.85rem', color: '#CBD5E1', marginTop: '8px', fontWeight: 600 }}>Click to select Kando Video (Max 40MB)</span>
-                <span style={{ fontSize: '0.75rem', color: '#64748B' }}>Accepted formats: MP4, WEBM, MOV</span>
-                <input type="file" accept="video/*" onChange={handleVideoChange} style={{ display: 'none' }} />
+                <span style={{ fontSize: '0.75rem', color: '#64748B' }}>All video formats supported (MP4, MOV, WEBM, AVI, MKV, WMV, etc. Max 40MB)</span>
+                <input type="file" accept="video/*,.mp4,.mov,.webm,.avi,.mkv,.wmv,.flv,.m4v,.3gp,.ts" onChange={handleVideoChange} style={{ display: 'none' }} />
               </label>
             )}
             {errors.video && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.video}</p>}
