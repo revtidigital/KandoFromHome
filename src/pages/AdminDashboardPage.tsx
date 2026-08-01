@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { 
-  LayoutDashboard, Users, Tag, Settings as SettingsIcon, History, 
-  LogOut, Search, Download, Info, ChevronLeft, ChevronRight, 
-  X, Image as ImageIcon, FileVideo, Plus, ArrowLeft, Lock, BarChart3
+  LayoutDashboard, Users, Tag, Settings as SettingsIcon, History,
+  LogOut, Search, Download, Info, ChevronLeft, ChevronRight,
+  X, Image as ImageIcon, FileVideo, Plus, ArrowLeft, Lock, BarChart3, AlertTriangle
 } from 'lucide-react';
 
 export const AdminDashboardPage: React.FC = () => {
@@ -46,6 +46,7 @@ export const AdminDashboardPage: React.FC = () => {
 
   // Settings & Tags states (Req 2 & 3)
   const [newTagInput, setNewTagInput] = useState('');
+  const [tagPendingDelete, setTagPendingDelete] = useState<string | null>(null);
   const [captchaEnabled, setCaptchaEnabled] = useState(false);
   const [captchaSiteKey, setCaptchaSiteKey] = useState('');
   const [captchaSecretKey, setCaptchaSecretKey] = useState('');
@@ -292,6 +293,7 @@ export const AdminDashboardPage: React.FC = () => {
   };
 
   const handleRemoveTag = async (tagToRemove: string) => {
+    setTagPendingDelete(null);
     // Instant optimistic UI update
     setCustomTags(prev => prev.filter(t => t !== tagToRemove));
 
@@ -1016,7 +1018,7 @@ export const AdminDashboardPage: React.FC = () => {
               {customTags.map(tag => (
                 <div key={tag} style={{ background: '#091A44', border: '1.5px solid #00E5FF', padding: '10px 18px', borderRadius: '24px', display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>{tag}</span>
-                  <X size={16} color="#EF4444" onClick={() => handleRemoveTag(tag)} style={{ cursor: 'pointer' }} />
+                  <X size={16} color="#EF4444" onClick={() => setTagPendingDelete(tag)} style={{ cursor: 'pointer' }} />
                 </div>
               ))}
             </div>
@@ -1263,6 +1265,35 @@ export const AdminDashboardPage: React.FC = () => {
                 </button>
               </>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* TAG DELETE CONFIRMATION MODAL */}
+      {tagPendingDelete && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+          <div style={{ background: '#040F2B', border: '1px solid #EF4444', borderRadius: '16px', padding: '24px', maxWidth: '380px', width: '100%' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
+              <AlertTriangle size={22} color="#EF4444" />
+              <h3 style={{ fontSize: '1.05rem', color: 'white', margin: 0 }}>Delete Tag?</h3>
+            </div>
+            <p style={{ color: '#94A3B8', fontSize: '0.88rem', marginBottom: '20px' }}>
+              Are you sure you want to delete the tag <strong style={{ color: 'white' }}>"{tagPendingDelete}"</strong>? Any users currently assigned this tag will lose it.
+            </p>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                onClick={() => setTagPendingDelete(null)}
+                style={{ flex: 1, padding: '10px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.2)', background: 'transparent', color: '#CBD5E1', fontWeight: 700, cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleRemoveTag(tagPendingDelete)}
+                style={{ flex: 1, padding: '10px', borderRadius: '10px', border: 'none', background: '#EF4444', color: 'white', fontWeight: 700, cursor: 'pointer' }}
+              >
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       )}
