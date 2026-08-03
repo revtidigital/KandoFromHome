@@ -94,7 +94,7 @@ export const LandingPage: React.FC = () => {
                 <span className="landing-title-script">
                   Kando Moment
                 </span>
-                <svg width="46" height="44" viewBox="0 0 44 42" fill="none" stroke="#D1B07B" strokeWidth="2.3"
+                <svg width="46" height="44" viewBox="0 0 44 42" fill="none" stroke="#9c827a" strokeWidth="2.3"
                   strokeLinecap="round" strokeLinejoin="round"
                   style={{ marginTop: '6px', flexShrink: 0 }}>
                   <path d="M22 34 C 16 26 6 22 6 14 C 6 8.5 10.5 5.5 14.5 6.5 C 18 7.3 20.8 10 22 12.8 C 23.2 10 26 7.3 29.5 6.5 C 34 5.5 39 8.5 38 15 C 37.2 21.5 29 26.5 22 34 Z" />
@@ -102,7 +102,7 @@ export const LandingPage: React.FC = () => {
               </div>
               <div style={{ display: 'flex', justifyContent: 'center', marginTop: '2px' }}>
                 <svg width="300" height="18" viewBox="0 0 300 18" fill="none" style={{ display: 'block' }}>
-                  <path d="M6 13 C 100 4 200 4 294 11 C 200 12 100 12 6 13 Z" fill="#D1B07B" />
+                  <path d="M6 13 C 100 4 200 4 294 11 C 200 12 100 12 6 13 Z" fill="#9c827a" />
                 </svg>
               </div>
             </div>
@@ -116,7 +116,7 @@ export const LandingPage: React.FC = () => {
               </p>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '10px' }}>
                 <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.25)' }} />
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D1B07B" strokeWidth="2" style={{ flexShrink: 0 }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9c827a" strokeWidth="2" style={{ flexShrink: 0 }}>
                   <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
                 </svg>
                 <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.25)' }} />
