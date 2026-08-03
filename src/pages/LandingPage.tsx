@@ -27,7 +27,7 @@ export const LandingPage: React.FC = () => {
             width: '100%',
             height: '100%',
             objectFit: 'cover',
-            objectPosition: '20% 8%'
+            objectPosition: '20% 22%'
           }}
         />
         {/* SEAMLESS GRADIENT OVERLAY BLENDING IMAGE WITH DEEP BLUE BACKGROUND */}
@@ -72,7 +72,7 @@ export const LandingPage: React.FC = () => {
                   <span className="landing-title-script">
                     Kando Moment
                   </span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px', width: '78%' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px', width: '78%', marginLeft: 'auto', marginRight: 'auto' }}>
                     <div style={{ flex: 1, height: '1px', background: '#E1AA66' }} />
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#E1AA66" strokeWidth="2" style={{ flexShrink: 0 }}>
                       <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
@@ -83,20 +83,20 @@ export const LandingPage: React.FC = () => {
 
                 <svg width="46" height="44" viewBox="0 0 44 42" fill="none" stroke="#E1AA66" strokeWidth="2.3"
                   strokeLinecap="round" strokeLinejoin="round"
-                  style={{ marginTop: '8px', marginLeft: '3px', flexShrink: 0 }}>
+                  style={{ marginTop: '11px', marginLeft: '6px', flexShrink: 0 }}>
                   <path d="M22 34 C 16 26 6 22 6 14 C 6 8.5 10.5 5.5 14.5 6.5 C 18 7.3 20.8 10 22 12.8 C 23.2 10 26 7.3 29.5 6.5 C 34 5.5 39 8.5 38 15 C 37.2 21.5 29 26.5 22 34 Z" />
                 </svg>
               </div>
             </div>
 
             {/* SUBTITLE DESCRIPTION */}
-            <div>
+            <div style={{ textAlign: 'center' }}>
               <p className="landing-subtitle">
                 A feeling of joy, pride and togetherness.<br />
                 This Yamaha Day, create a special moment with your family<br />
                 and share it with Yamaha.
               </p>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '10px', width: 'min(420px, 90%)', marginLeft: 'auto', marginRight: 'auto' }}>
                 <div style={{ flex: 1, height: '1px', background: '#E1AA66' }} />
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E2E8F0" strokeWidth="2" style={{ flexShrink: 0 }}>
                   <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
@@ -140,7 +140,8 @@ export const LandingPage: React.FC = () => {
                         fontWeight: 400,
                         color: '#E2E8F0',
                         lineHeight: 1.5,
-                        textAlign: 'center'
+                        textAlign: 'center',
+                        textTransform: card.lang === 'en' ? 'uppercase' : 'none'
                       }}>
                         {card.chooseLabel}
                       </span>
