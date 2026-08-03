@@ -21,7 +21,7 @@ export const LandingPage: React.FC = () => {
       {/* ── BACKGROUND LAYER: FAMILY PHOTO ON RIGHT ── */}
       <div className="landing-bg-image">
         <img 
-          src="/clean_right_family.png" 
+          src="/new_right_family.png"
           alt="Yamaha Family DIY Craft Wall"
           style={{
             width: '100%',
@@ -202,7 +202,7 @@ export const LandingPage: React.FC = () => {
             {/* CURSIVE SLOGAN BELOW CARDS */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', marginTop: '4px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <img src="/family_heart_icon.png" alt="Family" style={{ height: '44px', width: 'auto' }} />
+                <img src="/slogan_family_icon.png" alt="Family" style={{ height: '52px', width: 'auto' }} />
               </div>
               <p className="landing-slogan">
                 Behind every Yamaha action<br />is a family that inspires it.
