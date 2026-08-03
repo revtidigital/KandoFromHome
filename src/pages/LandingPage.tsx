@@ -83,7 +83,7 @@ export const LandingPage: React.FC = () => {
 
                 <svg width="46" height="44" viewBox="0 0 44 42" fill="none" stroke="#E1AA66" strokeWidth="2.3"
                   strokeLinecap="round" strokeLinejoin="round"
-                  style={{ marginTop: '11px', marginLeft: '6px', flexShrink: 0 }}>
+                  style={{ marginTop: '20px', marginLeft: '10px', flexShrink: 0 }}>
                   <path d="M22 34 C 16 26 6 22 6 14 C 6 8.5 10.5 5.5 14.5 6.5 C 18 7.3 20.8 10 22 12.8 C 23.2 10 26 7.3 29.5 6.5 C 34 5.5 39 8.5 38 15 C 37.2 21.5 29 26.5 22 34 Z" />
                 </svg>
               </div>
@@ -114,7 +114,7 @@ export const LandingPage: React.FC = () => {
                     border: '#00C6FF', bg: 'linear-gradient(180deg, #091D58 0%, #041038 100%)',
                     shadow: 'rgba(0,198,255,0.35)',
                     label: 'ENGLISH', labelFont: undefined,
-                    chooseLabel: 'CHOOSE YOUR LANGUAGE', chooseFont: "'Kozuka Gothic Pro', 'Outfit', sans-serif"
+                    chooseLabel: 'Choose Your Language', chooseFont: "'Kozuka Gothic Pro', 'Outfit', sans-serif"
                   },
                   {
                     lang: 'hi' as Language,
@@ -140,8 +140,7 @@ export const LandingPage: React.FC = () => {
                         fontWeight: 400,
                         color: '#E2E8F0',
                         lineHeight: 1.5,
-                        textAlign: 'center',
-                        textTransform: card.lang === 'en' ? 'uppercase' : 'none'
+                        textAlign: 'center'
                       }}>
                         {card.chooseLabel}
                       </span>
