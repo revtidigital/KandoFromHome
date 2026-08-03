@@ -2,12 +2,24 @@ import React from 'react';
 import { useApp } from '../context/AppContext';
 import { Sparkles, Calendar, Award, ArrowRight, Heart, Video, UserCheck, Image as ImageIcon, FileVideo } from 'lucide-react';
 
+/* Decorative gift-ribbon bow — echoes the gold bow tied on the Yamaha Day
+   "Kando From Home" gift box in the campaign artwork. */
+const RibbonBow: React.FC<{ size?: number; style?: React.CSSProperties }> = ({ size = 56, style }) => (
+  <svg width={size} height={size} viewBox="0 0 60 60" fill="none" style={style}>
+    <path d="M30 30 C 30 30 10 15 6 24 C 3 31 14 34 30 30 Z" fill="#D1B07B" opacity="0.92" />
+    <path d="M30 30 C 30 30 50 15 54 24 C 57 31 46 34 30 30 Z" fill="#D1B07B" opacity="0.92" />
+    <path d="M30 30 C 26 34 22 46 18 53 C 24 51 27 44 30 30 Z" fill="#D1B07B" opacity="0.75" />
+    <path d="M30 30 C 34 34 38 46 42 53 C 36 51 33 44 30 30 Z" fill="#D1B07B" opacity="0.75" />
+    <circle cx="30" cy="30" r="5.5" fill="#B8935E" stroke="#F0DFB8" strokeWidth="1" />
+  </svg>
+);
+
 export const HomePage: React.FC = () => {
   const { t, navigateTo } = useApp();
 
   return (
     <div className="container" style={{ padding: '40px 20px', minHeight: '80vh' }}>
-      
+
       {/* HERO BANNER */}
       <div className="glass-panel animate-fade-in" style={{
         padding: '48px 36px',
@@ -26,6 +38,9 @@ export const HomePage: React.FC = () => {
           background: 'radial-gradient(circle, rgba(0, 82, 204, 0.4) 0%, transparent 70%)',
           pointerEvents: 'none'
         }} />
+
+        {/* Ribbon bow — gift-box accent, corner of the hero card */}
+        <RibbonBow size={64} style={{ position: 'absolute', top: '18px', right: '18px', zIndex: 2, filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.35))' }} />
 
         <div style={{ maxWidth: '800px', position: 'relative', zIndex: 2 }}>
           <div style={{
@@ -206,38 +221,54 @@ export const HomePage: React.FC = () => {
         </div>
       </div>
 
-      {/* CEO MESSAGE SECTION */}
-      <div className="glass-panel ceo-card" style={{
-        padding: '32px 24px',
+      {/* CEO MESSAGE SECTION — formal letter card, echoing the "Dear Yamaha Family" PPT slide */}
+      <div style={{
+        position: 'relative',
+        padding: '40px 32px',
         marginBottom: '40px',
-        background: 'linear-gradient(135deg, rgba(8, 22, 60, 0.9) 0%, rgba(3, 13, 40, 0.95) 100%)',
+        borderRadius: '20px',
+        background: 'linear-gradient(135deg, rgba(8, 22, 60, 0.92) 0%, rgba(3, 13, 40, 0.97) 100%)',
         border: '1px solid rgba(255, 255, 255, 0.15)',
-        alignItems: 'center'
+        boxShadow: '0 20px 50px rgba(0, 0, 0, 0.4)',
+        overflow: 'hidden'
       }}>
+        {/* Dashed inner frame — invitation-card feel */}
         <div style={{
-          width: '90px',
-          height: '90px',
-          borderRadius: '50%',
-          border: '3px solid #D1B07B',
-          overflow: 'hidden',
-          boxShadow: '0 0 20px rgba(209, 176, 123, 0.3)',
-          flexShrink: 0
-        }}>
-          <img 
-            src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=300" 
-            alt="Yamaha Leadership CEO"
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          />
-        </div>
-        <div>
-          <h3 className="heading-font" style={{ fontSize: '1.4rem', color: '#D1B07B', marginBottom: '8px' }}>
+          position: 'absolute', inset: '14px',
+          border: '1.5px dashed rgba(209, 176, 123, 0.35)',
+          borderRadius: '14px',
+          pointerEvents: 'none'
+        }} />
+
+        {/* Ribbon bow — top-left corner, like the gift-tag on the campaign box */}
+        <RibbonBow size={72} style={{
+          position: 'absolute', top: '-14px', left: '-14px',
+          transform: 'rotate(-18deg)',
+          filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.4))'
+        }} />
+
+        <div style={{ position: 'relative', maxWidth: '680px', margin: '0 auto', textAlign: 'center' }}>
+          <div style={{
+            fontSize: '0.78rem', fontWeight: 800, letterSpacing: '2px',
+            color: '#D1B07B', textTransform: 'uppercase', marginBottom: '18px'
+          }}>
             {t.ceoMessageTitle}
-          </h3>
-          <p style={{ color: '#E2E8F0', fontStyle: 'italic', lineHeight: 1.6, fontSize: '1rem' }}>
-            "{t.ceoMessageBody}"
+          </div>
+
+          <p style={{ color: '#E2E8F0', lineHeight: 1.75, fontSize: '1.02rem', textAlign: 'left' }}>
+            {t.ceoMessageBody}
           </p>
-          <div style={{ marginTop: '10px', fontSize: '0.85rem', color: '#A0B2D6', fontWeight: 700 }}>
-            — Management Team, Yamaha Motor India Group
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '24px 0' }}>
+            <div style={{ flex: 1, height: '1px', background: 'rgba(209, 176, 123, 0.3)' }} />
+            <Heart size={14} color="#D1B07B" fill="#D1B07B" />
+            <div style={{ flex: 1, height: '1px', background: 'rgba(209, 176, 123, 0.3)' }} />
+          </div>
+
+          <div style={{ textAlign: 'left' }}>
+            <div style={{ color: '#A0B2D6', fontSize: '0.95rem', marginBottom: '4px' }}>With warm regards,</div>
+            <div style={{ color: '#D1B07B', fontWeight: 800, fontSize: '1.1rem' }}>Management Team</div>
+            <div style={{ color: '#A0B2D6', fontSize: '0.85rem' }}>Yamaha Motor India Group</div>
           </div>
         </div>
       </div>
