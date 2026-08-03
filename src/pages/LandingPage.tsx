@@ -1,7 +1,6 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
 import type { Language } from '../i18n/translations';
-import { ChevronRight } from 'lucide-react';
 
 /* ── VECTOR LANDMARK LINE ART ICONS ── */
 export const LandingPage: React.FC = () => {
@@ -124,89 +123,74 @@ export const LandingPage: React.FC = () => {
               </div>
             </div>
 
-            {/* CHOOSE YOUR LANGUAGE + 3 CARDS */}
+            {/* 3 LANGUAGE CARDS — each with its own CHOOSE YOUR LANGUAGE label */}
             <div style={{ width: '100%' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
-                <span style={{ fontSize: '0.85rem', fontWeight: 800, letterSpacing: '2px', color: '#FFFFFF', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
-                  CHOOSE YOUR LANGUAGE
-                </span>
-              </div>
-
-              {/* 3 LANGUAGE CARDS */}
               <div className="landing-lang-grid">
                 {[
                   {
                     lang: 'en' as Language,
                     border: '#00C6FF', bg: 'linear-gradient(180deg, #091D58 0%, #041038 100%)',
-                    shadow: 'rgba(0,198,255,0.35)', btnBg: 'rgba(0,198,255,0.18)',
-                    iconComponent: <img src="/london_icon.png" alt="London" style={{ height: '64px', width: 'auto' }} />,
+                    shadow: 'rgba(0,198,255,0.35)',
                     label: 'ENGLISH', labelFont: undefined,
-                    btnLabel: 'ENTER SITE', btnFont: undefined
+                    chooseLabel: 'CHOOSE YOUR LANGUAGE', chooseFont: undefined
                   },
                   {
                     lang: 'hi' as Language,
                     border: '#00E5FF', bg: 'linear-gradient(180deg, #004D5A 0%, #012B33 100%)',
-                    shadow: 'rgba(0,229,255,0.35)', btnBg: 'rgba(0,229,255,0.18)',
-                    iconComponent: <img src="/hindi_indiagate_icon.png" alt="India Gate" style={{ height: '64px', width: 'auto' }} />,
+                    shadow: 'rgba(0,229,255,0.35)',
                     label: 'हिंदी', labelFont: 'Noto Sans Devanagari, sans-serif',
-                    btnLabel: 'साइट में प्रवेश करें', btnFont: 'Noto Sans Devanagari, sans-serif'
+                    chooseLabel: 'अपनी भाषा चुनें', chooseFont: 'Noto Sans Devanagari, sans-serif'
                   },
                   {
                     lang: 'ta' as Language,
                     border: '#A855F7', bg: 'linear-gradient(180deg, #351259 0%, #1A0633 100%)',
-                    shadow: 'rgba(168,85,247,0.35)', btnBg: 'rgba(168,85,247,0.18)',
-                    iconComponent: <img src="/gopuram_icon.png" alt="Gopuram" style={{ height: '64px', width: 'auto' }} />,
+                    shadow: 'rgba(168,85,247,0.35)',
                     label: 'தமிழ்', labelFont: 'Noto Sans Tamil, sans-serif',
-                    btnLabel: 'தளத்திற்குள் செல்லவும்', btnFont: 'Noto Sans Tamil, sans-serif'
+                    chooseLabel: 'உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்', chooseFont: 'Noto Sans Tamil, sans-serif'
                   }
                 ].map((card) => (
-                  <div
-                    key={card.lang}
-                    onClick={() => handleSelectLanguage(card.lang)}
-                    className="glow-card landing-lang-card"
-                    style={{
-                      background: card.bg,
-                      border: `1.5px solid ${card.border}`,
-                      borderRadius: '16px',
-                      padding: '14px 10px 12px 10px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      textAlign: 'center',
-                      justifyContent: 'space-between',
-                      boxSizing: 'border-box',
-                      cursor: 'pointer',
-                      boxShadow: `0 8px 24px ${card.shadow}`
-                    }}
-                  >
-                    {/* VECTOR ICON */}
-                    <div style={{ height: '64px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      {card.iconComponent}
+                  <div key={card.lang} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                    {/* PER-LANGUAGE "CHOOSE YOUR LANGUAGE" LABEL */}
+                    <div style={{ height: '34px', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+                      <span style={{
+                        fontSize: '0.72rem', fontWeight: 800, letterSpacing: '1px',
+                        color: '#FFFFFF', textTransform: 'uppercase', textAlign: 'center',
+                        fontFamily: card.chooseFont, lineHeight: 1.15
+                      }}>
+                        {card.chooseLabel}
+                      </span>
                     </div>
 
-                    {/* TITLE */}
-                    <span style={{
-                      fontSize: card.labelFont ? '1.18rem' : '1.1rem',
-                      fontWeight: 800,
-                      color: 'white',
-                      fontFamily: card.labelFont,
-                      lineHeight: 1
-                    }}>
-                      {card.label}
-                    </span>
-
-                    {/* BUTTON */}
-                    <button style={{
-                      width: '100%', padding: '7px 8px', borderRadius: '30px',
-                      background: card.btnBg, border: `1px solid ${card.border}`,
-                      color: 'white', fontSize: '0.75rem', fontWeight: 700,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px',
-                      cursor: 'pointer', boxShadow: `0 0 12px ${card.shadow}`,
-                      fontFamily: card.btnFont, flexShrink: 0
-                    }}>
-                      <span>{card.btnLabel}</span>
-                      <ChevronRight size={12} color={card.border} />
-                    </button>
+                    {/* LANGUAGE BOX — name centered */}
+                    <div
+                      onClick={() => handleSelectLanguage(card.lang)}
+                      className="glow-card landing-lang-card"
+                      style={{
+                        width: '100%',
+                        background: card.bg,
+                        border: `1.5px solid ${card.border}`,
+                        borderRadius: '16px',
+                        padding: '14px 10px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        textAlign: 'center',
+                        boxSizing: 'border-box',
+                        cursor: 'pointer',
+                        boxShadow: `0 8px 24px ${card.shadow}`
+                      }}
+                    >
+                      <span style={{
+                        fontSize: card.labelFont ? '1.6rem' : '1.5rem',
+                        fontWeight: 800,
+                        color: 'white',
+                        fontFamily: card.labelFont,
+                        lineHeight: 1
+                      }}>
+                        {card.label}
+                      </span>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -225,13 +209,6 @@ export const LandingPage: React.FC = () => {
           </div>
 
         </main>
-
-        {/* FOOTER COPYRIGHT */}
-        <footer style={{ width: '52%', maxWidth: '720px', margin: '0 auto 0 0', textAlign: 'center', flexShrink: 0, paddingBottom: '4px' }}>
-          <p style={{ fontSize: '0.72rem', color: '#FFFFFF', margin: 0 }}>
-            © 2026 Yamaha Motor India Group. All Rights Reserved.
-          </p>
-        </footer>
 
       </div>
 
