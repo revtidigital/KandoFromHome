@@ -90,25 +90,26 @@ export const LandingPage: React.FC = () => {
               <h1 className="landing-title-main">
                 Create Your
               </h1>
-              <div style={{ display: 'inline-block' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginTop: '0px' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: '8px' }}>
+                {/* TEXT + DIVIDER COLUMN — line stays under "Kando Moment" only, not the heart icon */}
+                <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center' }}>
                   <span className="landing-title-script">
                     Kando Moment
                   </span>
-                  <svg width="46" height="44" viewBox="0 0 44 42" fill="none" stroke="#E1AA66" strokeWidth="2.3"
-                    strokeLinecap="round" strokeLinejoin="round"
-                    style={{ marginTop: '6px', flexShrink: 0 }}>
-                    <path d="M22 34 C 16 26 6 22 6 14 C 6 8.5 10.5 5.5 14.5 6.5 C 18 7.3 20.8 10 22 12.8 C 23.2 10 26 7.3 29.5 6.5 C 34 5.5 39 8.5 38 15 C 37.2 21.5 29 26.5 22 34 Z" />
-                  </svg>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px', width: '78%' }}>
+                    <div style={{ flex: 1, height: '1px', background: '#E1AA66' }} />
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#E1AA66" strokeWidth="2" style={{ flexShrink: 0 }}>
+                      <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                    </svg>
+                    <div style={{ flex: 1, height: '1px', background: '#E1AA66' }} />
+                  </div>
                 </div>
-                {/* HEART + SIDE LINES DIVIDER — spans the width of "Kando Moment" */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '4px', width: '100%' }}>
-                  <div style={{ flex: 1, height: '1px', background: '#E1AA66' }} />
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#E1AA66" strokeWidth="2" style={{ flexShrink: 0 }}>
-                    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
-                  </svg>
-                  <div style={{ flex: 1, height: '1px', background: '#E1AA66' }} />
-                </div>
+
+                <svg width="46" height="44" viewBox="0 0 44 42" fill="none" stroke="#E1AA66" strokeWidth="2.3"
+                  strokeLinecap="round" strokeLinejoin="round"
+                  style={{ marginTop: '6px', flexShrink: 0 }}>
+                  <path d="M22 34 C 16 26 6 22 6 14 C 6 8.5 10.5 5.5 14.5 6.5 C 18 7.3 20.8 10 22 12.8 C 23.2 10 26 7.3 29.5 6.5 C 34 5.5 39 8.5 38 15 C 37.2 21.5 29 26.5 22 34 Z" />
+                </svg>
               </div>
             </div>
 
@@ -121,7 +122,7 @@ export const LandingPage: React.FC = () => {
               </p>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '10px' }}>
                 <div style={{ flex: 1, height: '1px', background: '#E1AA66' }} />
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="2" style={{ flexShrink: 0 }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E2E8F0" strokeWidth="2" style={{ flexShrink: 0 }}>
                   <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
                 </svg>
                 <div style={{ flex: 1, height: '1px', background: '#E1AA66' }} />
