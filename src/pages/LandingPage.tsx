@@ -97,7 +97,7 @@ export const LandingPage: React.FC = () => {
                 <svg width="46" height="44" viewBox="0 0 44 42" fill="none" stroke="#D1B07B" strokeWidth="2.3"
                   strokeLinecap="round" strokeLinejoin="round"
                   style={{ marginTop: '6px', flexShrink: 0 }}>
-                  <path d="M22 34 C 16 26 6 22 6 14 C 6 8.5 10.5 5.5 14.5 6.5 C 18 7.3 20.8 10 22 12.8 C 23.2 10 26 7.3 29.5 6.5 C 34 5.5 39 8.5 38 15 C 37.2 21.5 29 26.5 23 33.5 C 22 35.5 24.5 36 27.5 34.2" />
+                  <path d="M22 34 C 16 26 6 22 6 14 C 6 8.5 10.5 5.5 14.5 6.5 C 18 7.3 20.8 10 22 12.8 C 23.2 10 26 7.3 29.5 6.5 C 34 5.5 39 8.5 38 15 C 37.2 21.5 29 26.5 22 34 Z" />
                 </svg>
               </div>
               <div style={{ display: 'flex', justifyContent: 'center', marginTop: '2px' }}>
