@@ -1,7 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
-import { Upload, Image as ImageIcon, FileVideo, AlertTriangle, X, CheckCircle, Loader2 } from 'lucide-react';
+import { Upload, Image as ImageIcon, FileVideo, AlertTriangle, X, CheckCircle, Loader2, Star } from 'lucide-react';
 import { useCaptcha } from '../hooks/useCaptcha';
+
+/* Numbered circular badge — echoes the "1 / 2 / 3" star badges on the
+   "My Yamaha Promise" fill-in card in the campaign artwork. */
+const StepBadge: React.FC<{ n: number }> = ({ n }) => (
+  <div style={{
+    width: '30px', height: '30px', borderRadius: '50%',
+    background: 'linear-gradient(135deg, #D1B07B 0%, #B8935E 100%)',
+    color: '#020B2A', fontWeight: 800, fontSize: '0.95rem',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    flexShrink: 0, boxShadow: '0 2px 8px rgba(209, 176, 123, 0.4)'
+  }}>
+    {n}
+  </div>
+);
 
 export const Form1Page: React.FC = () => {
   const { t, formData, setFormData, navigateTo, language, apiBaseUrl } = useApp();
@@ -210,9 +224,20 @@ export const Form1Page: React.FC = () => {
   return (
     <div className="container" style={{ padding: '24px 12px', maxWidth: '900px', width: '100%', boxSizing: 'border-box' }}>
       <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-        <h1 className="heading-font" style={{ fontSize: 'clamp(1.6rem, 4vw, 2.2rem)', color: 'white', marginBottom: '8px' }}>
-          {t.form1Title}
-        </h1>
+        {/* BANNER-STYLE TITLE — echoes the ribbon banner on the campaign fill-in card */}
+        <div style={{
+          display: 'inline-block',
+          background: 'linear-gradient(135deg, #0A1A4A 0%, #081745 100%)',
+          border: '1.5px solid #D1B07B',
+          borderRadius: '10px',
+          padding: '10px 28px',
+          marginBottom: '14px',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.3)'
+        }}>
+          <h1 className="heading-font" style={{ fontSize: 'clamp(1.4rem, 4vw, 2rem)', color: 'white', margin: 0 }}>
+            {t.form1Title}
+          </h1>
+        </div>
         <p style={{ color: '#A0B2D6', fontSize: '0.95rem' }}>
           {t.form1Subtitle}
         </p>
@@ -235,11 +260,22 @@ export const Form1Page: React.FC = () => {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="glass-card form-card-panel" style={{ borderRadius: '20px', width: '100%', boxSizing: 'border-box' }}>
+      <form onSubmit={handleSubmit} className="glass-card form-card-panel" style={{ borderRadius: '20px', width: '100%', boxSizing: 'border-box', position: 'relative', overflow: 'hidden' }}>
+
+        {/* Dashed inner frame + corner star doodles — fill-in-card feel */}
+        <div style={{
+          position: 'absolute', inset: '10px',
+          border: '1.5px dashed rgba(209, 176, 123, 0.3)',
+          borderRadius: '14px',
+          pointerEvents: 'none'
+        }} />
+        <Star size={16} color="#D1B07B" fill="#D1B07B" style={{ position: 'absolute', top: '18px', right: '22px', opacity: 0.6 }} />
+        <Star size={12} color="#D1B07B" fill="#D1B07B" style={{ position: 'absolute', bottom: '18px', left: '22px', opacity: 0.5 }} />
 
         {/* EMPLOYEE DETAILS SECTION */}
         <div style={{ marginBottom: '28px' }}>
-          <h2 style={{ fontSize: '1.15rem', color: '#D1B07B', marginBottom: '16px', fontWeight: 700 }}>
+          <h2 style={{ fontSize: '1.15rem', color: '#D1B07B', marginBottom: '16px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <StepBadge n={1} />
             {t.sec1EmployeeDetailsTitle}
           </h2>
 
@@ -365,7 +401,8 @@ export const Form1Page: React.FC = () => {
 
         {/* MEDIA ASSETS UPLOAD SECTION */}
         <div style={{ marginBottom: '28px' }}>
-          <h2 style={{ fontSize: '1.15rem', color: '#D1B07B', marginBottom: '8px', fontWeight: 700 }}>
+          <h2 style={{ fontSize: '1.15rem', color: '#D1B07B', marginBottom: '8px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <StepBadge n={2} />
             {t.sec2UploadPhotosTitle}
           </h2>
           <p style={{ color: '#94A3B8', fontSize: '0.85rem', marginBottom: '16px' }}>
@@ -463,6 +500,12 @@ export const Form1Page: React.FC = () => {
         </div>
 
         {/* CONSENTS & SUBMIT */}
+        <div style={{ marginBottom: '16px' }}>
+          <h2 style={{ fontSize: '1.15rem', color: '#D1B07B', marginBottom: '16px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <StepBadge n={3} />
+            Consent &amp; Submit
+          </h2>
+        </div>
         <div style={{ marginBottom: '28px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {/* Terms & Conditions */}
           <div>
