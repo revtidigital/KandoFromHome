@@ -132,30 +132,33 @@ export const LandingPage: React.FC = () => {
                     border: '#00C6FF', bg: 'linear-gradient(180deg, #091D58 0%, #041038 100%)',
                     shadow: 'rgba(0,198,255,0.35)',
                     label: 'ENGLISH', labelFont: undefined,
-                    chooseLabel: 'CHOOSE YOUR LANGUAGE', chooseFont: undefined
+                    chooseLabel: 'CHOOSE YOUR LANGUAGE', chooseFont: "'Kozuka Gothic Pro', 'Outfit', sans-serif"
                   },
                   {
                     lang: 'hi' as Language,
                     border: '#00E5FF', bg: 'linear-gradient(180deg, #004D5A 0%, #012B33 100%)',
                     shadow: 'rgba(0,229,255,0.35)',
                     label: 'हिंदी', labelFont: 'Noto Sans Devanagari, sans-serif',
-                    chooseLabel: 'अपनी भाषा चुनें', chooseFont: 'Noto Sans Devanagari, sans-serif'
+                    chooseLabel: 'अपनी भाषा चुनें', chooseFont: "'Kozuka Gothic Pro', 'Noto Sans Devanagari', sans-serif"
                   },
                   {
                     lang: 'ta' as Language,
                     border: '#A855F7', bg: 'linear-gradient(180deg, #351259 0%, #1A0633 100%)',
                     shadow: 'rgba(168,85,247,0.35)',
                     label: 'தமிழ்', labelFont: 'Noto Sans Tamil, sans-serif',
-                    chooseLabel: 'உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்', chooseFont: 'Noto Sans Tamil, sans-serif'
+                    chooseLabel: 'உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்', chooseFont: "'Kozuka Gothic Pro', 'Noto Sans Tamil', sans-serif"
                   }
                 ].map((card) => (
                   <div key={card.lang} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                    {/* PER-LANGUAGE "CHOOSE YOUR LANGUAGE" LABEL */}
-                    <div style={{ height: '34px', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+                    {/* PER-LANGUAGE "CHOOSE YOUR LANGUAGE" LABEL — matches subtitle font/attributes */}
+                    <div style={{ height: '48px', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', width: '100%' }}>
                       <span style={{
-                        fontSize: '0.72rem', fontWeight: 800, letterSpacing: '1px',
-                        color: '#FFFFFF', textTransform: 'uppercase', textAlign: 'center',
-                        fontFamily: card.chooseFont, lineHeight: 1.15
+                        fontFamily: card.chooseFont,
+                        fontSize: '1.05rem',
+                        fontWeight: 400,
+                        color: '#E2E8F0',
+                        lineHeight: 1.5,
+                        textAlign: 'center'
                       }}>
                         {card.chooseLabel}
                       </span>
