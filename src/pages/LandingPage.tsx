@@ -53,7 +53,7 @@ export const LandingPage: React.FC = () => {
           </div>
 
           {/* TOP RIGHT MICROSITE LOGO */}
-          <img src="/topright_badge.png" alt="Yamaha Day 2026 · Kando Together" style={{ height: '58px', width: 'auto' }} />
+          <img src="/topright_badge.png" alt="Yamaha Day 2026 · Kando Together" style={{ height: '52px', width: 'auto' }} />
         </header>
 
         {/* MAIN BODY AREA — FULL LEFT HALF (52% WIDTH, MAX 720PX) */}
