@@ -27,7 +27,7 @@ export const LandingPage: React.FC = () => {
             width: '100%',
             height: '100%',
             objectFit: 'cover',
-            objectPosition: '20% center'
+            objectPosition: '20% 8%'
           }}
         />
         {/* SEAMLESS GRADIENT OVERLAY BLENDING IMAGE WITH DEEP BLUE BACKGROUND */}
