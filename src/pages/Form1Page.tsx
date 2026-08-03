@@ -239,7 +239,7 @@ export const Form1Page: React.FC = () => {
 
         {/* EMPLOYEE DETAILS SECTION */}
         <div style={{ marginBottom: '28px' }}>
-          <h2 style={{ fontSize: '1.15rem', color: '#00E5FF', marginBottom: '16px', fontWeight: 700 }}>
+          <h2 style={{ fontSize: '1.15rem', color: '#D1B07B', marginBottom: '16px', fontWeight: 700 }}>
             {t.sec1EmployeeDetailsTitle}
           </h2>
 
@@ -365,7 +365,7 @@ export const Form1Page: React.FC = () => {
 
         {/* MEDIA ASSETS UPLOAD SECTION */}
         <div style={{ marginBottom: '28px' }}>
-          <h2 style={{ fontSize: '1.15rem', color: '#00E5FF', marginBottom: '8px', fontWeight: 700 }}>
+          <h2 style={{ fontSize: '1.15rem', color: '#D1B07B', marginBottom: '8px', fontWeight: 700 }}>
             {t.sec2UploadPhotosTitle}
           </h2>
           <p style={{ color: '#94A3B8', fontSize: '0.85rem', marginBottom: '16px' }}>
@@ -380,7 +380,7 @@ export const Form1Page: React.FC = () => {
                 {t.photo1Label}
               </label>
               {photo1Preview ? (
-                <div style={{ position: 'relative', height: '160px', borderRadius: '12px', overflow: 'hidden', border: '1.5px solid #00E5FF' }}>
+                <div style={{ position: 'relative', height: '160px', borderRadius: '12px', overflow: 'hidden', border: '1.5px solid #D1B07B' }}>
                   <img src={photo1Preview} alt="Preview 1" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   <button type="button" onClick={() => handleRemovePhoto('photo1')} style={{ position: 'absolute', top: '8px', right: '8px', background: 'rgba(0,0,0,0.7)', border: 'none', borderRadius: '50%', padding: '6px', color: 'white', cursor: 'pointer' }}>
                     <X size={16} />
@@ -389,10 +389,10 @@ export const Form1Page: React.FC = () => {
               ) : (
                 <label style={{
                   display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                  height: '160px', borderRadius: '12px', border: '2px dashed rgba(0, 229, 255, 0.4)',
-                  background: 'rgba(0, 229, 255, 0.04)', cursor: 'pointer', textAlign: 'center', padding: '16px'
+                  height: '160px', borderRadius: '12px', border: '2px dashed rgba(209, 176, 123, 0.4)',
+                  background: 'rgba(209, 176, 123, 0.04)', cursor: 'pointer', textAlign: 'center', padding: '16px'
                 }}>
-                  <ImageIcon size={28} color="#00E5FF" />
+                  <ImageIcon size={28} color="#D1B07B" />
                   <span style={{ fontSize: '0.85rem', color: '#CBD5E1', marginTop: '8px' }}>Click to select Photo 1</span>
                   <span style={{ fontSize: '0.75rem', color: '#64748B' }}>All photo formats supported (Max 5MB)</span>
                   <input type="file" accept="image/*,.png,.jpg,.jpeg,.gif,.webp,.heic,.heif,.bmp,.svg,.tiff" onChange={e => handlePhotoChange(e, 'photo1')} style={{ display: 'none' }} />
@@ -407,7 +407,7 @@ export const Form1Page: React.FC = () => {
                 {t.photo2Label}
               </label>
               {photo2Preview ? (
-                <div style={{ position: 'relative', height: '160px', borderRadius: '12px', overflow: 'hidden', border: '1.5px solid #00E5FF' }}>
+                <div style={{ position: 'relative', height: '160px', borderRadius: '12px', overflow: 'hidden', border: '1.5px solid #D1B07B' }}>
                   <img src={photo2Preview} alt="Preview 2" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   <button type="button" onClick={() => handleRemovePhoto('photo2')} style={{ position: 'absolute', top: '8px', right: '8px', background: 'rgba(0,0,0,0.7)', border: 'none', borderRadius: '50%', padding: '6px', color: 'white', cursor: 'pointer' }}>
                     <X size={16} />
@@ -436,7 +436,7 @@ export const Form1Page: React.FC = () => {
               {t.sec2UploadVideoTitle}
             </label>
             {videoPreview ? (
-              <div style={{ position: 'relative', borderRadius: '14px', overflow: 'hidden', border: '1.5px solid #00E5FF', background: 'black' }}>
+              <div style={{ position: 'relative', borderRadius: '14px', overflow: 'hidden', border: '1.5px solid #D1B07B', background: 'black' }}>
                 <video src={videoPreview} controls style={{ width: '100%', maxHeight: '260px', display: 'block' }} />
                 <button
                   type="button"
@@ -449,10 +449,10 @@ export const Form1Page: React.FC = () => {
             ) : (
               <label style={{
                 display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                height: '140px', borderRadius: '12px', border: '2px dashed rgba(0, 229, 255, 0.4)',
-                background: 'rgba(0, 229, 255, 0.04)', cursor: 'pointer', textAlign: 'center', padding: '16px'
+                height: '140px', borderRadius: '12px', border: '2px dashed rgba(209, 176, 123, 0.4)',
+                background: 'rgba(209, 176, 123, 0.04)', cursor: 'pointer', textAlign: 'center', padding: '16px'
               }}>
-                <FileVideo size={32} color="#00E5FF" />
+                <FileVideo size={32} color="#D1B07B" />
                 <span style={{ fontSize: '0.85rem', color: '#CBD5E1', marginTop: '8px', fontWeight: 600 }}>Click to select Kando Video (Max 40MB)</span>
                 <span style={{ fontSize: '0.75rem', color: '#64748B' }}>All video formats supported (MP4, MOV, WEBM, AVI, MKV, WMV, etc. Max 40MB)</span>
                 <input type="file" accept="video/*,.mp4,.mov,.webm,.avi,.mkv,.wmv,.flv,.m4v,.3gp,.ts" onChange={handleVideoChange} style={{ display: 'none' }} />
@@ -474,14 +474,14 @@ export const Form1Page: React.FC = () => {
             }}>
               <input type="checkbox" checked={dataConsent}
                 onChange={e => { setDataConsent(e.target.checked); if (e.target.checked) setErrors(prev => ({ ...prev, dataConsent: '' })); }}
-                style={{ accentColor: '#00E5FF', width: '18px', height: '18px', flexShrink: 0, marginTop: '2px' }} />
+                style={{ accentColor: '#D1B07B', width: '18px', height: '18px', flexShrink: 0, marginTop: '2px' }} />
               <span style={{ color: '#CBD5E1', fontSize: '0.87rem', lineHeight: 1.5 }}>
                 I agree to the{' '}
-                <a href={`/${language}/terms`} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ color: '#00E5FF', textDecoration: 'underline' }}>
+                <a href={`/${language}/terms`} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ color: '#D1B07B', textDecoration: 'underline' }}>
                   Terms &amp; Conditions
                 </a>{' '}
                 and{' '}
-                <a href={`/${language}/privacy`} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ color: '#00E5FF', textDecoration: 'underline' }}>
+                <a href={`/${language}/privacy`} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ color: '#D1B07B', textDecoration: 'underline' }}>
                   Privacy Policy
                 </a>. *
               </span>
@@ -503,7 +503,7 @@ export const Form1Page: React.FC = () => {
             }}>
               <input type="checkbox" checked={mediaConsent}
                 onChange={e => { setMediaConsent(e.target.checked); if (e.target.checked) setErrors(prev => ({ ...prev, mediaConsent: '' })); }}
-                style={{ accentColor: '#00E5FF', width: '18px', height: '18px', flexShrink: 0, marginTop: '2px' }} />
+                style={{ accentColor: '#D1B07B', width: '18px', height: '18px', flexShrink: 0, marginTop: '2px' }} />
               <span style={{ color: '#CBD5E1', fontSize: '0.87rem', lineHeight: 1.5 }}>
                 I grant Yamaha permission to feature my submission photos in internal publications. *
               </span>
@@ -516,10 +516,10 @@ export const Form1Page: React.FC = () => {
           disabled={isSubmitting || !dataConsent || !mediaConsent}
           style={{
             width: '100%', padding: '16px', borderRadius: '14px',
-            background: 'linear-gradient(90deg, #00C6FF 0%, #0072FF 100%)',
+            background: 'linear-gradient(90deg, #D1B07B 0%, #0072FF 100%)',
             border: 'none', color: 'white', fontSize: '1.05rem', fontWeight: 800,
             cursor: (isSubmitting || !dataConsent || !mediaConsent) ? 'not-allowed' : 'pointer',
-            boxShadow: '0 6px 20px rgba(0, 198, 255, 0.4)', display: 'flex',
+            boxShadow: '0 6px 20px rgba(209, 176, 123, 0.4)', display: 'flex',
             alignItems: 'center', justifyContent: 'center', gap: '8px',
             opacity: (isSubmitting || !dataConsent || !mediaConsent) ? 0.5 : 1
           }}

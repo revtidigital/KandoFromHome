@@ -13,7 +13,7 @@ export const HomePage: React.FC = () => {
         padding: '48px 36px',
         position: 'relative',
         overflow: 'hidden',
-        border: '1px solid rgba(0, 229, 255, 0.25)',
+        border: '1px solid rgba(209, 176, 123, 0.25)',
         marginBottom: '40px'
       }}>
         {/* Glow accent */}
@@ -32,9 +32,9 @@ export const HomePage: React.FC = () => {
             display: 'inline-flex',
             alignItems: 'center',
             gap: '8px',
-            background: 'rgba(0, 229, 255, 0.12)',
-            border: '1px solid rgba(0, 229, 255, 0.3)',
-            color: '#00E5FF',
+            background: 'rgba(209, 176, 123, 0.12)',
+            border: '1px solid rgba(209, 176, 123, 0.3)',
+            color: '#D1B07B',
             padding: '6px 14px',
             borderRadius: '20px',
             fontSize: '0.85rem',
@@ -95,7 +95,7 @@ export const HomePage: React.FC = () => {
           <div className="glass-panel glow-card" style={{
             padding: '32px',
             borderRadius: '20px',
-            border: '1.5px solid #00E5FF',
+            border: '1.5px solid #D1B07B',
             background: 'linear-gradient(180deg, rgba(0,77,90,0.4) 0%, rgba(1,43,51,0.6) 100%)',
             display: 'flex',
             flexDirection: 'column',
@@ -106,9 +106,9 @@ export const HomePage: React.FC = () => {
                 width: '56px',
                 height: '56px',
                 borderRadius: '14px',
-                background: 'rgba(0, 229, 255, 0.2)',
-                border: '1.5px solid #00E5FF',
-                color: '#00E5FF',
+                background: 'rgba(209, 176, 123, 0.2)',
+                border: '1.5px solid #D1B07B',
+                color: '#D1B07B',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -117,7 +117,7 @@ export const HomePage: React.FC = () => {
                 <ImageIcon size={28} />
               </div>
               
-              <div style={{ fontSize: '0.8rem', color: '#00E5FF', fontWeight: 800, letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>
+              <div style={{ fontSize: '0.8rem', color: '#D1B07B', fontWeight: 800, letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>
                 {t.form1Badge}
               </div>
 
@@ -218,9 +218,9 @@ export const HomePage: React.FC = () => {
           width: '90px',
           height: '90px',
           borderRadius: '50%',
-          border: '3px solid #00E5FF',
+          border: '3px solid #D1B07B',
           overflow: 'hidden',
-          boxShadow: '0 0 20px rgba(0, 229, 255, 0.3)',
+          boxShadow: '0 0 20px rgba(209, 176, 123, 0.3)',
           flexShrink: 0
         }}>
           <img 
@@ -230,7 +230,7 @@ export const HomePage: React.FC = () => {
           />
         </div>
         <div>
-          <h3 className="heading-font" style={{ fontSize: '1.4rem', color: '#00E5FF', marginBottom: '8px' }}>
+          <h3 className="heading-font" style={{ fontSize: '1.4rem', color: '#D1B07B', marginBottom: '8px' }}>
             {t.ceoMessageTitle}
           </h3>
           <p style={{ color: '#E2E8F0', fontStyle: 'italic', lineHeight: 1.6, fontSize: '1rem' }}>
@@ -265,8 +265,8 @@ export const HomePage: React.FC = () => {
               height: '48px',
               borderRadius: '12px',
               background: 'rgba(0, 191, 255, 0.2)',
-              border: '1px solid #00C6FF',
-              color: '#00C6FF',
+              border: '1px solid #D1B07B',
+              color: '#D1B07B',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -284,9 +284,9 @@ export const HomePage: React.FC = () => {
               width: '48px',
               height: '48px',
               borderRadius: '12px',
-              background: 'rgba(0, 229, 255, 0.2)',
-              border: '1px solid #00E5FF',
-              color: '#00E5FF',
+              background: 'rgba(209, 176, 123, 0.2)',
+              border: '1px solid #D1B07B',
+              color: '#D1B07B',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',

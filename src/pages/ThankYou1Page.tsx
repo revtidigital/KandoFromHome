@@ -9,17 +9,17 @@ export const ThankYou1Page: React.FC = () => {
     <div className="container" style={{ padding: '60px 20px', maxWidth: '750px', textAlign: 'center' }}>
       <div className="glass-panel animate-fade-in" style={{
         padding: '48px 32px',
-        border: '1.5px solid rgba(0, 229, 255, 0.4)',
-        boxShadow: '0 0 50px rgba(0, 229, 255, 0.15)',
+        border: '1.5px solid rgba(209, 176, 123, 0.4)',
+        boxShadow: '0 0 50px rgba(209, 176, 123, 0.15)',
         borderRadius: '24px'
       }}>
         
         {/* Animated Check Icon */}
         <div style={{
           width: '84px', height: '84px', borderRadius: '50%',
-          background: 'rgba(0, 229, 255, 0.15)', border: '2px solid #00E5FF',
-          color: '#00E5FF', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          margin: '0 auto 24px auto', boxShadow: '0 0 30px rgba(0, 229, 255, 0.4)'
+          background: 'rgba(209, 176, 123, 0.15)', border: '2px solid #D1B07B',
+          color: '#D1B07B', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          margin: '0 auto 24px auto', boxShadow: '0 0 30px rgba(209, 176, 123, 0.4)'
         }}>
           <CheckCircle2 size={48} />
         </div>
@@ -34,13 +34,13 @@ export const ThankYou1Page: React.FC = () => {
 
         {/* Reference ID Card */}
         <div style={{
-          background: 'rgba(2, 11, 42, 0.85)', border: '1.5px dashed #00E5FF',
+          background: 'rgba(2, 11, 42, 0.85)', border: '1.5px dashed #D1B07B',
           borderRadius: '18px', padding: '24px', maxWidth: '480px', margin: '0 auto 36px auto'
         }}>
           <div style={{ fontSize: '0.85rem', color: '#A0B2D6', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>
             {t.refIdLabel || 'Form 1 Submission Reference ID'}
           </div>
-          <div style={{ fontSize: '1.9rem', fontWeight: 800, color: '#00E5FF', letterSpacing: '2px', fontFamily: 'monospace' }}>
+          <div style={{ fontSize: '1.9rem', fontWeight: 800, color: '#D1B07B', letterSpacing: '2px', fontFamily: 'monospace' }}>
             {formData.refId || 'KANDO-2026-8942'}
           </div>
           <div style={{ fontSize: '0.85rem', color: '#64748B', marginTop: '6px' }}>

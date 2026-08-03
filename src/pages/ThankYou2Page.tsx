@@ -63,7 +63,7 @@ export const ThankYou2Page: React.FC = () => {
             left: 0,
             width: '120px',
             height: '120px',
-            background: 'linear-gradient(135deg, #00E5FF 0%, transparent 60%)',
+            background: 'linear-gradient(135deg, #D1B07B 0%, transparent 60%)',
             pointerEvents: 'none'
           }} />
 
@@ -84,7 +84,7 @@ export const ThankYou2Page: React.FC = () => {
           <div style={{
             fontFamily: 'Caveat, cursive',
             fontSize: '3rem',
-            color: '#00E5FF',
+            color: '#D1B07B',
             fontWeight: 700,
             lineHeight: 1,
             margin: '8px 0 16px 0'

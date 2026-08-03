@@ -28,11 +28,11 @@ export const Footer: React.FC = () => {
               alignItems: 'center',
               justifyContent: 'center',
               gap: '6px',
-              color: '#00E5FF'
+              color: '#D1B07B'
             }}>
-              <Heart size={18} fill="#00E5FF" />
-              <div style={{ width: '40px', height: '1px', background: 'rgba(0, 229, 255, 0.4)' }} />
-              <Heart size={18} fill="#00E5FF" />
+              <Heart size={18} fill="#D1B07B" />
+              <div style={{ width: '40px', height: '1px', background: 'rgba(209, 176, 123, 0.4)' }} />
+              <Heart size={18} fill="#D1B07B" />
             </div>
             <p style={{
               fontFamily: 'Caveat, cursive',

@@ -176,7 +176,7 @@ export const Form2Page: React.FC = () => {
 
         {/* SECTION 1 — EMPLOYEE DETAILS */}
         <div style={{ marginBottom: '28px' }}>
-          <h2 style={{ fontSize: '1.1rem', color: '#00E5FF', marginBottom: '16px', fontWeight: 700 }}>
+          <h2 style={{ fontSize: '1.1rem', color: '#D1B07B', marginBottom: '16px', fontWeight: 700 }}>
             Employee Details
           </h2>
 
@@ -257,7 +257,7 @@ export const Form2Page: React.FC = () => {
 
         {/* SECTION 2 — SHARE YOUR THOUGHTS */}
         <div style={{ marginBottom: '28px' }}>
-          <h2 style={{ fontSize: '1.1rem', color: '#00E5FF', marginBottom: '8px', fontWeight: 700 }}>
+          <h2 style={{ fontSize: '1.1rem', color: '#D1B07B', marginBottom: '8px', fontWeight: 700 }}>
             Share Your Thoughts *
           </h2>
           <p style={{ color: '#E2E8F0', fontStyle: 'italic', fontSize: '0.9rem', marginBottom: '12px', lineHeight: 1.5 }}>
@@ -288,7 +288,7 @@ export const Form2Page: React.FC = () => {
 
         {/* SECTION 3 — OPTIONAL FILE UPLOAD */}
         <div style={{ marginBottom: '28px' }}>
-          <h2 style={{ fontSize: '1.1rem', color: '#00E5FF', marginBottom: '8px', fontWeight: 700 }}>
+          <h2 style={{ fontSize: '1.1rem', color: '#D1B07B', marginBottom: '8px', fontWeight: 700 }}>
             Browse (Optional)
           </h2>
           <p style={{ color: '#A0B2D6', fontSize: '0.85rem', marginBottom: '12px' }}>Max Size: 50MB</p>
@@ -297,7 +297,7 @@ export const Form2Page: React.FC = () => {
             borderRadius: '12px', border: errors.optionalFile ? '2px dashed #EF4444' : '2px dashed rgba(255,255,255,0.2)',
             cursor: 'pointer', background: 'rgba(255,255,255,0.03)', color: '#CBD5E1', fontSize: '0.9rem'
           }}>
-            <Upload size={20} color="#00E5FF" />
+            <Upload size={20} color="#D1B07B" />
             <span>
               {optionalFile ? optionalFile.name : 'Click to browse file (any format, max 50MB)'}
             </span>
@@ -322,15 +322,15 @@ export const Form2Page: React.FC = () => {
             <input
               type="checkbox" checked={dataConsent}
               onChange={e => { setDataConsent(e.target.checked); if (e.target.checked) setErrors(prev => ({ ...prev, dataConsent: '' })); }}
-              style={{ accentColor: '#00E5FF', width: '18px', height: '18px', flexShrink: 0, marginTop: '2px' }}
+              style={{ accentColor: '#D1B07B', width: '18px', height: '18px', flexShrink: 0, marginTop: '2px' }}
             />
             <span style={{ color: '#CBD5E1', fontSize: '0.87rem', lineHeight: 1.5 }}>
               I agree to the{' '}
-              <a href={`/${language}/terms`} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ color: '#00E5FF', textDecoration: 'underline' }}>
+              <a href={`/${language}/terms`} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ color: '#D1B07B', textDecoration: 'underline' }}>
                 Terms &amp; Conditions
               </a>{' '}
               and{' '}
-              <a href={`/${language}/privacy`} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ color: '#00E5FF', textDecoration: 'underline' }}>
+              <a href={`/${language}/privacy`} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ color: '#D1B07B', textDecoration: 'underline' }}>
                 Privacy Policy
               </a>. My response may be shared internally at Yamaha. *
             </span>

@@ -16,42 +16,60 @@ export const Header: React.FC = () => {
     <header className="site-header">
       <div className="container site-header-inner">
         {/* Brand Left */}
-        <div 
-          onClick={() => navigateTo(isAdminView ? 'admin-dashboard' : 'home')} 
-          style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '50%',
-              background: '#E60012',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 0 15px rgba(230, 0, 18, 0.5)',
-              flexShrink: 0
-            }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-                <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="1.5" fill="none"/>
-                <path d="M12 4L12 20M4 12L20 12M6.34 6.34L17.66 17.66M17.66 6.34L6.34 17.66" stroke="white" strokeWidth="1.2"/>
-              </svg>
+        {isAdminView ? (
+          <div
+            onClick={() => navigateTo('admin-dashboard')}
+            style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '50%',
+                background: '#E60012',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 0 15px rgba(230, 0, 18, 0.5)',
+                flexShrink: 0
+              }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                  <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="1.5" fill="none"/>
+                  <path d="M12 4L12 20M4 12L20 12M6.34 6.34L17.66 17.66M17.66 6.34L6.34 17.66" stroke="white" strokeWidth="1.2"/>
+                </svg>
+              </div>
+              <div>
+                <div style={{ fontWeight: 800, fontSize: '1.15rem', letterSpacing: '1px', color: 'white', lineHeight: 1 }}>YAMAHA</div>
+                <div style={{ fontSize: '0.62rem', color: '#A0B2D6', letterSpacing: '0.5px' }}>Revs Your Heart</div>
+              </div>
             </div>
-            <div>
-              <div style={{ fontWeight: 800, fontSize: '1.15rem', letterSpacing: '1px', color: 'white', lineHeight: 1 }}>YAMAHA</div>
-              <div style={{ fontSize: '0.62rem', color: '#A0B2D6', letterSpacing: '0.5px' }}>Revs Your Heart</div>
+
+            <div className="header-divider" style={{ width: '1px', height: '24px', background: 'rgba(255, 255, 255, 0.2)' }} />
+
+            <div className="header-subtitle" style={{ display: 'flex', flexDirection: 'column' }}>
+              <span style={{ fontSize: '0.65rem', color: '#00E5FF', fontWeight: 700, letterSpacing: '1px' }}>YAMAHA DAY 2026</span>
+              <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'white' }}>
+                ADMIN PORTAL
+              </span>
             </div>
           </div>
+        ) : (
+          <div
+            onClick={() => navigateTo('home')}
+            style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}
+          >
+            <img src="/yamaha_logo.png" alt="Yamaha" style={{ height: '34px', width: 'auto', flexShrink: 0 }} />
 
-          <div className="header-divider" style={{ width: '1px', height: '24px', background: 'rgba(255, 255, 255, 0.2)' }} />
+            <div className="header-divider" style={{ width: '1px', height: '24px', background: 'rgba(255, 255, 255, 0.2)' }} />
 
-          <div className="header-subtitle" style={{ display: 'flex', flexDirection: 'column' }}>
-            <span style={{ fontSize: '0.65rem', color: '#00E5FF', fontWeight: 700, letterSpacing: '1px' }}>YAMAHA DAY 2026</span>
-            <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'white' }}>
-              {isAdminView ? 'ADMIN PORTAL' : 'KANDO FROM HOME'}
-            </span>
+            <div className="header-subtitle" style={{ display: 'flex', flexDirection: 'column' }}>
+              <span style={{ fontSize: '0.65rem', color: '#D1B07B', fontWeight: 700, letterSpacing: '1px' }}>YAMAHA DAY 2026</span>
+              <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'white' }}>
+                KANDO FROM HOME
+              </span>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Navigation Right — HIDE LANGUAGE SELECTOR ON ADMIN DASHBOARD (Req 5) */}
         {!isAdminView && (
@@ -64,9 +82,9 @@ export const Header: React.FC = () => {
               background: 'rgba(255, 255, 255, 0.08)',
               padding: '6px 12px',
               borderRadius: '24px',
-              border: '1px solid rgba(0, 229, 255, 0.3)'
+              border: '1px solid rgba(209, 176, 123, 0.35)'
             }}>
-              <Globe size={14} color="#00E5FF" />
+              <Globe size={14} color="#D1B07B" />
               <select
                 value={language}
                 onChange={(e) => setLanguage(e.target.value as Language)}

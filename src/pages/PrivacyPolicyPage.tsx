@@ -9,7 +9,7 @@ export const PrivacyPolicyPage: React.FC = () => {
     <div className="container" style={{ padding: '40px 20px', maxWidth: '900px' }}>
       <div className="glass-panel" style={{ padding: '40px' }}>
         
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#00E5FF', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#D1B07B', marginBottom: '16px' }}>
           <Shield size={32} />
           <h1 className="heading-font" style={{ fontSize: '2.2rem', color: 'white' }}>
             {t.privacyPolicyTitle}
