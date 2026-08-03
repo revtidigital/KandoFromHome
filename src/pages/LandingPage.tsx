@@ -53,31 +53,7 @@ export const LandingPage: React.FC = () => {
           </div>
 
           {/* TOP RIGHT MICROSITE LOGO */}
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-            <div style={{ textAlign: 'right', lineHeight: 1.1 }}>
-              <div style={{ fontSize: '0.62rem', color: 'white', fontWeight: 500, letterSpacing: '1.2px', textTransform: 'uppercase' }}>
-                YAMAHA DAY 2026
-              </div>
-              <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'white', letterSpacing: '1.2px', lineHeight: 1 }}>
-                KANDO
-              </div>
-              <div style={{
-                fontSize: '0.62rem', color: 'white', fontWeight: 500, letterSpacing: '1.2px',
-                textTransform: 'uppercase', borderTop: '1px solid rgba(255,255,255,0.4)',
-                paddingTop: '2px', marginTop: '2px'
-              }}>
-                TOGETHER
-              </div>
-            </div>
-            <div style={{ paddingTop: '2px' }}>
-              <svg width="30" height="34" viewBox="0 0 32 36" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="2,14 16,2 30,14" />
-                <rect x="5" y="14" width="22" height="18" rx="1" />
-                <rect x="12" y="22" width="8" height="10" rx="1" />
-                <path d="M16 19 C16 19 13 16.5 13 15 C13 13.5 14.2 13 15.2 13.8 L16 14.5 L16.8 13.8 C17.8 13 19 13.5 19 15 C19 16.5 16 19 16 19Z" fill="white" stroke="none"/>
-              </svg>
-            </div>
-          </div>
+          <img src="/topright_badge.png" alt="Yamaha Day 2026 · Kando Together" style={{ height: '58px', width: 'auto' }} />
         </header>
 
         {/* MAIN BODY AREA — FULL LEFT HALF (52% WIDTH, MAX 720PX) */}
@@ -107,7 +83,7 @@ export const LandingPage: React.FC = () => {
 
                 <svg width="46" height="44" viewBox="0 0 44 42" fill="none" stroke="#E1AA66" strokeWidth="2.3"
                   strokeLinecap="round" strokeLinejoin="round"
-                  style={{ marginTop: '6px', flexShrink: 0 }}>
+                  style={{ marginTop: '8px', marginLeft: '3px', flexShrink: 0 }}>
                   <path d="M22 34 C 16 26 6 22 6 14 C 6 8.5 10.5 5.5 14.5 6.5 C 18 7.3 20.8 10 22 12.8 C 23.2 10 26 7.3 29.5 6.5 C 34 5.5 39 8.5 38 15 C 37.2 21.5 29 26.5 22 34 Z" />
                 </svg>
               </div>
