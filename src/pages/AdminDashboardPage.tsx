@@ -1127,6 +1127,14 @@ export const AdminDashboardPage: React.FC = () => {
                       ? <>Employee ID: <strong style={{ color: 'white' }}>{selectedUserForProfile.empId}</strong></>
                       : <>Phone Number: <strong style={{ color: 'white' }}>{selectedUserForProfile.phone || '—'}</strong></>}
                   </p>
+                  <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
+                    <span style={{ fontSize: '0.78rem', fontWeight: 800, padding: '4px 10px', borderRadius: '8px', color: selectedUserForProfile.form1 ? '#4ADE80' : '#EF4444', background: selectedUserForProfile.form1 ? 'rgba(74,222,128,0.1)' : 'rgba(239,68,68,0.1)', border: `1px solid ${selectedUserForProfile.form1 ? 'rgba(74,222,128,0.4)' : 'rgba(239,68,68,0.4)'}` }}>
+                      Form 1: {selectedUserForProfile.form1 ? 'Yes' : 'No'}
+                    </span>
+                    <span style={{ fontSize: '0.78rem', fontWeight: 800, padding: '4px 10px', borderRadius: '8px', color: selectedUserForProfile.form2 ? '#4ADE80' : '#EF4444', background: selectedUserForProfile.form2 ? 'rgba(74,222,128,0.1)' : 'rgba(239,68,68,0.1)', border: `1px solid ${selectedUserForProfile.form2 ? 'rgba(74,222,128,0.4)' : 'rgba(239,68,68,0.4)'}` }}>
+                      Form 2: {selectedUserForProfile.form2 ? 'Yes' : 'No'}
+                    </span>
+                  </div>
                 </div>
 
                 {/* Multi-Tag Selection */}
@@ -1234,6 +1242,14 @@ export const AdminDashboardPage: React.FC = () => {
 
                   {/* Meta info row */}
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px', marginBottom: '18px', fontSize: '0.85rem' }}>
+                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '10px' }}>
+                      <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Employee Name</div>
+                      <div style={{ color: '#E2E8F0' }}>{selectedUserForProfile.empName || 'N/A'}</div>
+                    </div>
+                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '10px' }}>
+                      <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Employee EIN</div>
+                      <div style={{ color: '#E2E8F0' }}>{selectedUserForProfile.empId || 'N/A'}</div>
+                    </div>
                     <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '10px' }}>
                       <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Company Name</div>
                       <div style={{ color: '#E2E8F0' }}>{selectedUserForProfile.form2.companyName || 'N/A'}</div>
