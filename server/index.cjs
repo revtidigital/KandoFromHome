@@ -90,6 +90,13 @@ function requireAdmin(req, res, next) {
   return res.status(401).json({ error: 'Unauthorized' });
 }
 
+// System Settings (whitelist uploads, captcha, GA) are superadmin-only —
+// regular admins (e.g. "kandoadmin") don't see or reach this tab at all.
+function requireSuperAdmin(req, res, next) {
+  if (req.adminUser === 'superadmin') return next();
+  return res.status(403).json({ error: 'Forbidden: superadmin access required.' });
+}
+
 // Serve static frontend build from /dist
 const distDir = path.join(__dirname, '..', 'dist');
 if (fs.existsSync(distDir)) {
@@ -695,7 +702,7 @@ app.use('/api/admin', requireAdmin);
 // (~4950) and the phone-number list for employees with no ID (~50). Each
 // upload replaces the whole list rather than merging, since the client sends
 // the final list each time.
-app.post('/api/admin/whitelist/employees', whitelistUpload.single('file'), async (req, res) => {
+app.post('/api/admin/whitelist/employees', requireSuperAdmin, whitelistUpload.single('file'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded.' });
     const empIds = parseWhitelistFile(req.file.buffer);
@@ -709,7 +716,7 @@ app.post('/api/admin/whitelist/employees', whitelistUpload.single('file'), async
   }
 });
 
-app.post('/api/admin/whitelist/phones', whitelistUpload.single('file'), async (req, res) => {
+app.post('/api/admin/whitelist/phones', requireSuperAdmin, whitelistUpload.single('file'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded.' });
     const phones = parseWhitelistFile(req.file.buffer);
@@ -723,7 +730,7 @@ app.post('/api/admin/whitelist/phones', whitelistUpload.single('file'), async (r
   }
 });
 
-app.get('/api/admin/whitelist/counts', async (req, res) => {
+app.get('/api/admin/whitelist/counts', requireSuperAdmin, async (req, res) => {
   const [employees, phones] = await Promise.all([
     AllowedEmployee.countDocuments(),
     AllowedPhone.countDocuments()
@@ -935,7 +942,7 @@ app.get('/api/admin/audit-logs', async (req, res) => {
 });
 
 // Admin Settings
-app.get('/api/admin/settings', async (req, res) => {
+app.get('/api/admin/settings', requireSuperAdmin, async (req, res) => {
   try {
     let settings = await Settings.findOne();
     if (!settings) {
@@ -948,7 +955,7 @@ app.get('/api/admin/settings', async (req, res) => {
   }
 });
 
-app.put('/api/admin/settings', async (req, res) => {
+app.put('/api/admin/settings', requireSuperAdmin, async (req, res) => {
   try {
     const { captchaEnabled, captchaSiteKey, captchaSecretKey, googleAnalyticsId, customTags } = req.body;
     let settings = await Settings.findOne();
@@ -1024,11 +1031,51 @@ app.delete('/api/admin/tags/:tag', async (req, res) => {
 
 // ── EXPORT ENDPOINTS ──
 
+// Shared by all export routes: honors an explicit checkbox selection (ids=)
+// or, when nothing is checked, the same search/tag/form filters currently
+// applied in the Users Directory table — so "Export" always matches what the
+// admin is actually looking at instead of silently exporting everyone.
+async function getUsersForExport(req) {
+  const { ids, search, tag, formType } = req.query;
+
+  if (ids) {
+    const idList = Array.isArray(ids) ? ids.map(String) : ids.toString().split(',').map(s => s.trim());
+    return User.find({ _id: { $in: idList.filter(Boolean) } }).lean();
+  }
+
+  const query = {};
+  if (search) {
+    const safeSearch = escapeRegex(search.toString()).slice(0, 100);
+    query.$or = [
+      { empName: new RegExp(safeSearch, 'i') },
+      { empId: new RegExp(safeSearch, 'i') },
+      { phone: new RegExp(safeSearch, 'i') },
+      { email: new RegExp(safeSearch, 'i') },
+      { city: new RegExp(safeSearch, 'i') }
+    ];
+  }
+  if (tag) query.tags = tag;
+
+  let users = await User.find(query).lean();
+
+  if (formType === 'form1' || formType === 'form2' || formType === 'both') {
+    users = (await Promise.all(users.map(async u => {
+      const f1 = formType !== 'form2' ? await Form1.findOne({ userId: u._id }).lean() : null;
+      const f2 = formType !== 'form1' ? await Form2.findOne({ userId: u._id }).lean() : null;
+      if (formType === 'form1') return f1 ? u : null;
+      if (formType === 'form2') return f2 ? u : null;
+      return (f1 && f2) ? u : null;
+    }))).filter(Boolean);
+  }
+
+  return users;
+}
+
 app.get('/api/admin/export/users', exportLimiter, async (req, res) => {
   try {
     const format = req.query.format || 'csv';
-    const users = await User.find().lean();
-    
+    const users = await getUsersForExport(req);
+
     const rows = await Promise.all(users.map(async u => {
       const f1 = await Form1.findOne({ userId: u._id });
       const f2 = await Form2.findOne({ userId: u._id });
@@ -1087,7 +1134,7 @@ app.get('/api/admin/export/users', exportLimiter, async (req, res) => {
 // PDF Export Endpoint (Req 2)
 app.get('/api/admin/export/pdf', exportLimiter, async (req, res) => {
   try {
-    const users = await User.find().lean();
+    const users = await getUsersForExport(req);
     await recordAuditLog(req, 'Generated Candidate Directory PDF Report', req.adminUser);
 
     let html = `
@@ -1184,8 +1231,10 @@ async function appendR2FileToArchive(archive, url, name) {
 
 // Builds the CSV+media zip into the given archiver instance and finalizes it.
 // Shared by the direct-download route and the background email-export job.
-async function buildExportArchive(archive) {
-  const users = await User.find().lean();
+// `filterReq` carries the same ids/search/tag/formType query params the
+// Users Directory table is filtered by, so the zip matches what's on screen.
+async function buildExportArchive(archive, filterReq) {
+  const users = await getUsersForExport(filterReq || { query: {} });
   const rows = [];
 
   for (const u of users) {
@@ -1239,7 +1288,7 @@ app.get('/api/admin/export/zip', exportLimiter, async (req, res) => {
 
     const archive = getZipArchive();
     archive.pipe(res);
-    await buildExportArchive(archive);
+    await buildExportArchive(archive, req);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Internal server error.' });
@@ -1250,7 +1299,7 @@ app.get('/api/admin/export/zip', exportLimiter, async (req, res) => {
 // then emails the requester a presigned download link instead of the file itself
 // — large exports (5000 users, photos + video) can run into GBs, way past any
 // email attachment limit.
-async function buildAndEmailExport(email) {
+async function buildAndEmailExport(email, filterReq) {
   const timestamp = Date.now();
   const key = `exports/kando_export_${timestamp}.zip`;
 
@@ -1265,7 +1314,7 @@ async function buildAndEmailExport(email) {
     params: { Bucket: R2_BUCKET, Key: key, Body: passThrough, ContentType: 'application/zip' }
   });
 
-  await Promise.all([upload.done(), buildExportArchive(archive)]);
+  await Promise.all([upload.done(), buildExportArchive(archive, filterReq)]);
 
   const signedUrl = await getSignedUrl(
     r2Client,
@@ -1286,7 +1335,7 @@ async function buildAndEmailExport(email) {
 }
 
 app.post('/api/admin/export/zip-email', exportLimiter, async (req, res) => {
-  const { email } = req.body || {};
+  const { email, ids, search, tag, formType } = req.body || {};
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return res.status(400).json({ error: 'A valid email address is required.' });
   }
@@ -1303,7 +1352,7 @@ app.post('/api/admin/export/zip-email', exportLimiter, async (req, res) => {
 
   recordAuditLog(req, `Requested CSV + ZIP export via email to ${email}`, req.adminUser).catch(() => {});
 
-  buildAndEmailExport(email).catch(err => {
+  buildAndEmailExport(email, { query: { ids, search, tag, formType } }).catch(err => {
     console.error('Email export failed:', err);
   });
 });

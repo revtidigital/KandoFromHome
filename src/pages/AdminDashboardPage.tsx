@@ -1,10 +1,85 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { 
+import {
   LayoutDashboard, Users, Tag, Settings as SettingsIcon, History,
   LogOut, Search, Download, Info, ChevronLeft, ChevronRight,
-  X, Image as ImageIcon, FileVideo, Plus, ArrowLeft, Lock, BarChart3, AlertTriangle
+  X, Image as ImageIcon, FileVideo, Plus, ArrowLeft, Lock, BarChart3, AlertTriangle,
+  Sun, Moon, Images, ChevronDown
 } from 'lucide-react';
+
+// Reads the logged-in admin's username straight out of the stored Basic-Auth
+// credential (base64 "user:pass") — no extra API round trip needed just to
+// know who's logged in for role-gating the Settings tab.
+function getAdminUsername(): string {
+  try {
+    const cred = sessionStorage.getItem('kando_admin_cred');
+    if (!cred) return '';
+    const decoded = atob(cred);
+    return decoded.slice(0, decoded.indexOf(':'));
+  } catch {
+    return '';
+  }
+}
+
+type MediaItem = { type: 'image' | 'video'; url: string; title: string };
+
+// Dark/light color tokens for the dashboard chrome (page bg, sidebar, text).
+// Branded accent cards (navy panels, cyan/purple/green highlights) are kept
+// as-is in both themes — only the base chrome flips.
+const THEMES = {
+  dark: {
+    pageBg: '#020924', pageText: 'white',
+    sidebarBg: '#040F2B', sidebarBorder: 'rgba(255,255,255,0.1)',
+    mutedText: '#94A3B8'
+  },
+  light: {
+    pageBg: '#F1F5F9', pageText: '#0F172A',
+    sidebarBg: '#FFFFFF', sidebarBorder: 'rgba(15,23,42,0.1)',
+    mutedText: '#475569'
+  }
+};
+
+// Native <details>/<summary> gives us a click-to-toggle popover with built-in
+// outside-click/escape handling, so a multi-select checkbox list needs no
+// extra open/close state or document-level listeners.
+const TagMultiSelect: React.FC<{
+  tags: string[];
+  customTags: string[];
+  onToggle: (tag: string) => void;
+  accent?: string;
+}> = ({ tags, customTags, onToggle, accent = '#00E5FF' }) => {
+  return (
+    <details style={{ position: 'relative', display: 'inline-block' }}>
+      <summary
+        style={{
+          listStyle: 'none', cursor: 'pointer', userSelect: 'none',
+          background: tags.length ? `${accent}1F` : 'rgba(255,255,255,0.06)',
+          border: `1px solid ${tags.length ? accent : 'rgba(255,255,255,0.2)'}`,
+          color: tags.length ? accent : '#94A3B8',
+          padding: '5px 10px', borderRadius: '8px', fontSize: '0.78rem', fontWeight: 700,
+          display: 'inline-flex', alignItems: 'center', gap: '6px'
+        }}
+      >
+        {tags.length > 0 ? tags.join(', ') : 'Select Tags...'} <ChevronDown size={12} />
+      </summary>
+      <div style={{
+        position: 'absolute', top: 'calc(100% + 6px)', left: 0, zIndex: 50,
+        background: '#06133B', border: `1px solid ${accent}`, borderRadius: '10px',
+        padding: '8px', minWidth: '180px', boxShadow: '0 10px 30px rgba(0,0,0,0.4)'
+      }}>
+        {customTags.length === 0 && (
+          <div style={{ color: '#64748B', fontSize: '0.8rem', padding: '4px 6px' }}>No tags defined yet</div>
+        )}
+        {customTags.map(t => (
+          <label key={t} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem', color: 'white' }}>
+            <input type="checkbox" checked={tags.includes(t)} onChange={() => onToggle(t)} style={{ accentColor: accent, cursor: 'pointer' }} />
+            {t}
+          </label>
+        ))}
+      </div>
+    </details>
+  );
+};
 
 export const AdminDashboardPage: React.FC = () => {
   const {
@@ -15,6 +90,45 @@ export const AdminDashboardPage: React.FC = () => {
 
   type Tab = 'overview' | 'users' | 'tags' | 'settings' | 'audit' | 'user-detail';
   const [activeTab, setActiveTab] = useState<Tab>('overview');
+
+  // Settings tab is superadmin-only — "kandoadmin" and any other regular
+  // admin account never sees the nav entry or the tab content.
+  const adminUsername = getAdminUsername();
+  const isSuperAdmin = adminUsername === 'superadmin';
+
+  // Light/dark theme — persisted across sessions.
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => (localStorage.getItem('kando_admin_theme') as 'dark' | 'light') || 'dark');
+  const palette = THEMES[theme];
+  const toggleTheme = () => {
+    const next = theme === 'dark' ? 'light' : 'dark';
+    setTheme(next);
+    localStorage.setItem('kando_admin_theme', next);
+  };
+
+  // Row selection for scoped export — when non-empty, exports only these
+  // users; otherwise exports honor whatever filter is currently applied.
+  const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(new Set());
+  const toggleUserSelected = (id: string) => {
+    setSelectedUserIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  // Multi-item asset gallery modal (Form 1 + Form 2 uploads) with prev/next arrows.
+  const [assetsModal, setAssetsModal] = useState<{ items: MediaItem[]; index: number } | null>(null);
+  const getUserAssets = (user: any): MediaItem[] => {
+    const items: MediaItem[] = [];
+    if (user.form1?.photo1Url) items.push({ type: 'image', url: user.form1.photo1Url, title: 'Form 1 — Photo 1' });
+    if (user.form1?.photo2Url) items.push({ type: 'image', url: user.form1.photo2Url, title: 'Form 1 — Photo 2' });
+    if (user.form1?.videoUrl) items.push({ type: 'video', url: user.form1.videoUrl, title: 'Form 1 — Video' });
+    if (user.form2?.optionalFileUrl) {
+      const isVideo = /\.(mp4|mov|webm|avi|mkv)$/i.test(user.form2.optionalFileUrl);
+      items.push({ type: isVideo ? 'video' : 'image', url: user.form2.optionalFileUrl, title: 'Form 2 — Attachment' });
+    }
+    return items;
+  };
 
   // Dedicated user profile detail state (Req 1)
   const [selectedUserForProfile, setSelectedUserForProfile] = useState<any | null>(null);
@@ -98,6 +212,29 @@ export const AdminDashboardPage: React.FC = () => {
   const [mediaModal, setMediaModal] = useState<{ type: 'image' | 'video'; url: string; title: string } | null>(null);
   const [mediaSignedUrl, setMediaSignedUrl] = useState<string | null>(null);
   const [mediaDownloading, setMediaDownloading] = useState(false);
+
+  // Signed URL for whichever asset the gallery modal is currently showing.
+  const [gallerySignedUrl, setGallerySignedUrl] = useState<string | null>(null);
+  useEffect(() => {
+    if (!assetsModal) {
+      setGallerySignedUrl(null);
+      return;
+    }
+    const current = assetsModal.items[assetsModal.index];
+    if (!current) return;
+    if (!/^https?:\/\//i.test(current.url)) {
+      setGallerySignedUrl(`${apiBaseUrl}${current.url}`);
+      return;
+    }
+    let cancelled = false;
+    setGallerySignedUrl(null);
+    fetch(`${apiBaseUrl}/api/admin/media-url?url=${encodeURIComponent(current.url)}`, { headers: adminAuthHeader() })
+      .then(res => res.json())
+      .then(data => { if (!cancelled && data.url) setGallerySignedUrl(data.url); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assetsModal, apiBaseUrl]);
 
   // CSV+ZIP email-export modal + toast state
   const [emailExportOpen, setEmailExportOpen] = useState(false);
@@ -219,6 +356,10 @@ export const AdminDashboardPage: React.FC = () => {
         return;
       }
     }
+    if (segment === 'settings' && !isSuperAdmin) {
+      setActiveTab('overview');
+      return;
+    }
     if (segment === 'users' || segment === 'tags' || segment === 'settings' || segment === 'audit') {
       setActiveTab(segment as Tab);
       return;
@@ -252,11 +393,9 @@ export const AdminDashboardPage: React.FC = () => {
     logAdminAction(`Viewed profile of ${user.empName} (${userKey(user)})`);
   };
 
-  // ── FIX TAGS CHANGING AND ADDING (Req 2) ──
-  const handleUpdateUserTag = async (userId: string, newTag: string) => {
+  // ── MULTI-TAG ASSIGNMENT — a user can carry any number of classification tags ──
+  const handleUpdateUserTags = async (userId: string, updatedTags: string[]) => {
     try {
-      const updatedTags = newTag ? [newTag] : [];
-
       // Update local state immediately
       const updatedUsers = allUsers.map(u => {
         if (u.id === userId || (u as any)._id === userId) {
@@ -281,6 +420,12 @@ export const AdminDashboardPage: React.FC = () => {
     } catch (err) {
       console.error('Tag update error:', err);
     }
+  };
+
+  const handleToggleUserTag = (user: any, tag: string) => {
+    const current: string[] = user.tags || [];
+    const next = current.includes(tag) ? current.filter(t => t !== tag) : [...current, tag];
+    handleUpdateUserTags(user.id || user._id, next);
   };
 
   const handleAddTag = async () => {
@@ -363,20 +508,37 @@ export const AdminDashboardPage: React.FC = () => {
     }
   };
 
+  // Export scope: an explicit row selection always wins; otherwise whatever
+  // search/tag/form filter is currently applied on the table is what exports.
+  const buildExportParams = (): URLSearchParams => {
+    const params = new URLSearchParams();
+    if (selectedUserIds.size > 0) {
+      params.set('ids', Array.from(selectedUserIds).join(','));
+      return params;
+    }
+    if (searchQuery) params.set('search', searchQuery);
+    if (selectedTagFilter) params.set('tag', selectedTagFilter);
+    if (selectedFormFilter) params.set('formType', selectedFormFilter);
+    return params;
+  };
+
   // Export handlers (CSV, Excel, PDF Report & ZIP Media Archive)
   // Uses fetch + blob (not a plain <a href> / window.open) so the admin auth header
   // actually reaches the protected /api/admin/export/* endpoints.
   const handleExportData = async (format: 'csv' | 'excel' | 'pdf' | 'zip') => {
+    const params = buildExportParams();
     let url = '';
     let filename = 'kando_export';
     if (format === 'zip') {
-      url = `${apiBaseUrl}/api/admin/export/zip`;
+      params.set('format', 'zip');
+      url = `${apiBaseUrl}/api/admin/export/zip?${params.toString()}`;
       filename = 'kando_submissions_assets.zip';
     } else if (format === 'pdf') {
-      url = `${apiBaseUrl}/api/admin/export/pdf`;
+      url = `${apiBaseUrl}/api/admin/export/pdf?${params.toString()}`;
       filename = 'kando_users_report.html';
     } else {
-      url = `${apiBaseUrl}/api/admin/export/users?format=${format}`;
+      params.set('format', format);
+      url = `${apiBaseUrl}/api/admin/export/users?${params.toString()}`;
       filename = format === 'excel' ? 'kando_users.xlsx' : 'kando_users.csv';
     }
 
@@ -409,10 +571,17 @@ export const AdminDashboardPage: React.FC = () => {
     if (!emailExportAddress.trim()) return;
     setEmailExportSending(true);
     try {
+      const scopeParams = buildExportParams();
       const res = await fetch(`${apiBaseUrl}/api/admin/export/zip-email`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...adminAuthHeader() },
-        body: JSON.stringify({ email: emailExportAddress.trim() })
+        body: JSON.stringify({
+          email: emailExportAddress.trim(),
+          ids: scopeParams.get('ids') || undefined,
+          search: scopeParams.get('search') || undefined,
+          tag: scopeParams.get('tag') || undefined,
+          formType: scopeParams.get('formType') || undefined
+        })
       });
       const data = await res.json();
       if (!res.ok) {
@@ -455,13 +624,13 @@ export const AdminDashboardPage: React.FC = () => {
   const paginatedUsers = filteredUsers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#020924', color: 'white', fontFamily: 'Outfit, sans-serif' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: palette.pageBg, color: palette.pageText, fontFamily: 'Outfit, sans-serif' }}>
 
       {/* ── LEFT SIDENAVBAR (Req 7) — sticky so Logout stays visible on every tab, not just short ones ── */}
       <aside style={{
         width: '260px',
-        background: '#040F2B',
-        borderRight: '1px solid rgba(255, 255, 255, 0.1)',
+        background: palette.sidebarBg,
+        borderRight: `1px solid ${palette.sidebarBorder}`,
         padding: '24px 16px',
         display: 'flex',
         flexDirection: 'column',
@@ -473,13 +642,26 @@ export const AdminDashboardPage: React.FC = () => {
         overflowY: 'auto'
       }}>
         <div>
-          <div style={{ padding: '0 12px 24px 12px', borderBottom: '1px solid rgba(255,255,255,0.08)', marginBottom: '20px' }}>
-            <div style={{ fontSize: '0.75rem', color: '#00E5FF', fontWeight: 800, letterSpacing: '1px', textTransform: 'uppercase' }}>
-              ADMINISTRATION
+          <div style={{ padding: '0 12px 24px 12px', borderBottom: `1px solid ${palette.sidebarBorder}`, marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div>
+              <div style={{ fontSize: '0.75rem', color: '#00E5FF', fontWeight: 800, letterSpacing: '1px', textTransform: 'uppercase' }}>
+                ADMINISTRATION
+              </div>
+              <div style={{ fontSize: '1.2rem', fontWeight: 800, color: palette.pageText, marginTop: '2px' }}>
+                Control Dashboard
+              </div>
             </div>
-            <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'white', marginTop: '2px' }}>
-              Control Dashboard
-            </div>
+            <button
+              onClick={toggleTheme}
+              title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+              style={{
+                width: '36px', height: '36px', borderRadius: '10px', flexShrink: 0,
+                background: 'rgba(0,229,255,0.12)', border: '1px solid #00E5FF', color: '#00E5FF',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer'
+              }}
+            >
+              {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+            </button>
           </div>
 
           <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -525,6 +707,7 @@ export const AdminDashboardPage: React.FC = () => {
               <span>Tags Management</span>
             </button>
 
+            {isSuperAdmin && (
             <button
               onClick={() => goToTab('settings')}
               style={{
@@ -538,6 +721,7 @@ export const AdminDashboardPage: React.FC = () => {
               <SettingsIcon size={18} />
               <span>System Settings</span>
             </button>
+            )}
 
             <button
               onClick={() => goToTab('audit')}
@@ -575,7 +759,7 @@ export const AdminDashboardPage: React.FC = () => {
         {activeTab === 'overview' && (
           <div>
             <div style={{ marginBottom: '28px' }}>
-              <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: 'white', margin: 0 }}>Campaign Overview</h1>
+              <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: palette.pageText, margin: 0 }}>Campaign Overview</h1>
               <p style={{ color: '#94A3B8', fontSize: '0.9rem', marginTop: '4px' }}>Real-time Campaign Metrics & Performance KPIs</p>
             </div>
 
@@ -625,7 +809,7 @@ export const AdminDashboardPage: React.FC = () => {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
               <div>
-                <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: 'white', margin: 0 }}>Registered Users Directory</h1>
+                <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: palette.pageText, margin: 0 }}>Registered Users Directory</h1>
                 <p style={{ color: '#94A3B8', fontSize: '0.85rem', marginTop: '4px' }}>Manage candidate entries, apply classification tags & export data</p>
               </div>
 
@@ -696,25 +880,80 @@ export const AdminDashboardPage: React.FC = () => {
               </select>
             </div>
 
+            {/* SELECTION EXPORT TOOLBAR — appears above the table only while rows are checked */}
+            {selectedUserIds.size > 0 && (
+              <div style={{ background: 'rgba(0,229,255,0.1)', border: '1px solid #00E5FF', borderRadius: '14px', padding: '14px 18px', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+                <span style={{ color: '#00E5FF', fontWeight: 800, fontSize: '0.9rem' }}>
+                  {selectedUserIds.size} user{selectedUserIds.size > 1 ? 's' : ''} selected
+                </span>
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+                  <button onClick={() => handleExportData('pdf')} style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid #EF4444', color: '#FCA5A5', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
+                    <Download size={14} /> PDF
+                  </button>
+                  <button onClick={() => handleExportData('csv')} style={{ background: 'rgba(0,229,255,0.12)', border: '1px solid #00E5FF', color: '#00E5FF', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
+                    <Download size={14} /> CSV
+                  </button>
+                  <button onClick={() => handleExportData('excel')} style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid #22C55E', color: '#4ADE80', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
+                    <Download size={14} /> Excel
+                  </button>
+                  <button onClick={() => setEmailExportOpen(true)} style={{ background: 'rgba(168,85,247,0.12)', border: '1px solid #A855F7', color: '#C084FC', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
+                    <Download size={14} /> CSV + ZIP
+                  </button>
+                  <button onClick={() => setSelectedUserIds(new Set())} style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: '#94A3B8', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem' }}>
+                    Clear Selection
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* USERS TABLE — 25 ENTRIES PER PAGE (Req 8) */}
             <div style={{ background: '#040F2B', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', overflow: 'hidden' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
                 <thead>
                   <tr style={{ background: '#091A44', color: '#00E5FF', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                    <th style={{ padding: '14px 12px', width: '36px' }}>
+                      <input
+                        type="checkbox"
+                        checked={paginatedUsers.length > 0 && paginatedUsers.every(u => selectedUserIds.has(u.id || u._id))}
+                        onChange={(e) => {
+                          setSelectedUserIds(prev => {
+                            const next = new Set(prev);
+                            paginatedUsers.forEach(u => {
+                              const id = u.id || u._id;
+                              if (e.target.checked) next.add(id); else next.delete(id);
+                            });
+                            return next;
+                          });
+                        }}
+                        style={{ accentColor: '#00E5FF', cursor: 'pointer', width: '16px', height: '16px' }}
+                      />
+                    </th>
                     <th style={{ padding: '14px 18px' }}>Emp ID / Phone</th>
                     <th style={{ padding: '14px 18px' }}>Employee Name</th>
                     <th style={{ padding: '14px 18px' }}>Registered Date</th>
                     <th style={{ padding: '14px 18px' }}>Form 1</th>
                     <th style={{ padding: '14px 18px' }}>Form 2</th>
-                    <th style={{ padding: '14px 18px' }}>Assigned Tag</th>
+                    <th style={{ padding: '14px 18px' }}>Assets</th>
+                    <th style={{ padding: '14px 18px' }}>Assigned Tags</th>
                     <th style={{ padding: '14px 18px', textAlign: 'right' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {paginatedUsers.map(user => {
-                    const currentTag = user.tags && user.tags.length > 0 ? user.tags[0] : '';
+                    const currentTags: string[] = user.tags || [];
+                    const userId = user.id || (user as any)._id;
+                    const assets = getUserAssets(user);
                     return (
-                      <tr key={user.id || (user as any)._id} style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                      <tr key={userId} style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                        <td style={{ padding: '14px 12px' }}>
+                          <input
+                            type="checkbox"
+                            checked={selectedUserIds.has(userId)}
+                            onChange={() => toggleUserSelected(userId)}
+                            style={{ accentColor: '#00E5FF', cursor: 'pointer', width: '16px', height: '16px' }}
+                          />
+                        </td>
+
                         <td style={{ padding: '14px 18px', fontWeight: 800, color: '#00E5FF' }}>
                           {user.empId || user.phone || '—'}
                         </td>
@@ -753,28 +992,27 @@ export const AdminDashboardPage: React.FC = () => {
                           )}
                         </td>
 
-                        {/* INLINE TAG DROPDOWN (Req 2 & 8) */}
+                        {/* ASSETS — every Form 1 / Form 2 upload, opened in a gallery modal with arrows */}
                         <td style={{ padding: '14px 18px' }}>
-                          <select
-                            value={currentTag}
-                            onChange={(e) => handleUpdateUserTag(user.id || (user as any)._id, e.target.value)}
-                            style={{
-                              background: currentTag ? 'rgba(0,229,255,0.12)' : 'rgba(255,255,255,0.06)',
-                              border: `1px solid ${currentTag ? '#00E5FF' : 'rgba(255,255,255,0.2)'}`,
-                              color: currentTag ? '#00E5FF' : '#94A3B8',
-                              padding: '5px 10px',
-                              borderRadius: '8px',
-                              fontSize: '0.78rem',
-                              fontWeight: 700,
-                              outline: 'none',
-                              cursor: 'pointer'
-                            }}
-                          >
-                            <option value="" style={{ background: '#06133B', color: '#94A3B8' }}>Select Tag...</option>
-                            {customTags.map(t => (
-                              <option key={t} value={t} style={{ background: '#06133B', color: 'white' }}>{t}</option>
-                            ))}
-                          </select>
+                          {assets.length > 0 ? (
+                            <button
+                              onClick={() => setAssetsModal({ items: assets, index: 0 })}
+                              style={{ background: 'rgba(0,229,255,0.1)', border: '1px solid #00E5FF', color: '#00E5FF', padding: '5px 10px', borderRadius: '8px', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                            >
+                              <Images size={14} /> {assets.length}
+                            </button>
+                          ) : (
+                            <span style={{ color: '#64748B', fontSize: '0.75rem' }}>None</span>
+                          )}
+                        </td>
+
+                        {/* MULTI-TAG ASSIGNMENT */}
+                        <td style={{ padding: '14px 18px' }}>
+                          <TagMultiSelect
+                            tags={currentTags}
+                            customTags={customTags}
+                            onToggle={(tag) => handleToggleUserTag(user, tag)}
+                          />
                         </td>
 
                         <td style={{ padding: '14px 18px', textAlign: 'right' }}>
@@ -851,22 +1089,14 @@ export const AdminDashboardPage: React.FC = () => {
                   </p>
                 </div>
 
-                {/* Tag Selection */}
+                {/* Multi-Tag Selection */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <span style={{ fontSize: '0.85rem', color: '#94A3B8', fontWeight: 700 }}>Classification Tag:</span>
-                  <select
-                    value={selectedUserForProfile.tags && selectedUserForProfile.tags.length > 0 ? selectedUserForProfile.tags[0] : ''}
-                    onChange={(e) => handleUpdateUserTag(selectedUserForProfile.id || selectedUserForProfile._id, e.target.value)}
-                    style={{
-                      background: '#091A44', border: '1px solid #00E5FF', color: '#00E5FF',
-                      padding: '8px 14px', borderRadius: '10px', fontWeight: 700, outline: 'none', cursor: 'pointer'
-                    }}
-                  >
-                    <option value="">No Tag Assigned</option>
-                    {customTags.map(t => (
-                      <option key={t} value={t}>{t}</option>
-                    ))}
-                  </select>
+                  <span style={{ fontSize: '0.85rem', color: '#94A3B8', fontWeight: 700 }}>Classification Tags:</span>
+                  <TagMultiSelect
+                    tags={selectedUserForProfile.tags || []}
+                    customTags={customTags}
+                    onToggle={(tag) => handleToggleUserTag(selectedUserForProfile, tag)}
+                  />
                 </div>
               </div>
 
@@ -1018,7 +1248,7 @@ export const AdminDashboardPage: React.FC = () => {
         {/* 3. TAGS MANAGEMENT VIEW (Req 2) */}
         {activeTab === 'tags' && (
           <div style={{ maxWidth: '640px' }}>
-            <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: 'white', marginBottom: '8px' }}>Tags Management</h1>
+            <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: palette.pageText, marginBottom: '8px' }}>Tags Management</h1>
             <p style={{ color: '#94A3B8', fontSize: '0.85rem', marginBottom: '24px' }}>Add or remove custom candidate classification tags (Logged in Audit Log)</p>
 
             <div style={{ display: 'flex', gap: '12px', marginBottom: '28px' }}>
@@ -1046,10 +1276,10 @@ export const AdminDashboardPage: React.FC = () => {
           </div>
         )}
 
-        {/* 4. SETTINGS VIEW — SEPARATE CAPTCHA & GA CARDS (Req 3) */}
-        {activeTab === 'settings' && (
+        {/* 4. SETTINGS VIEW — SEPARATE CAPTCHA & GA CARDS (Req 3) — superadmin only */}
+        {activeTab === 'settings' && isSuperAdmin && (
           <div style={{ maxWidth: '720px' }}>
-            <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: 'white', marginBottom: '8px' }}>System Settings</h1>
+            <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: palette.pageText, marginBottom: '8px' }}>System Settings</h1>
             <p style={{ color: '#94A3B8', fontSize: '0.85rem', marginBottom: '28px' }}>Configure Google reCAPTCHA Verification & Google Analytics ID separately</p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
@@ -1227,7 +1457,7 @@ export const AdminDashboardPage: React.FC = () => {
         {/* 5. AUDIT LOGS VIEW — APPEND ONLY / NO DELETE OPTION (Req 12) */}
         {activeTab === 'audit' && (
           <div>
-            <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: 'white', marginBottom: '8px' }}>System Audit Logs</h1>
+            <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: palette.pageText, marginBottom: '8px' }}>System Audit Logs</h1>
             <p style={{ color: '#94A3B8', fontSize: '0.85rem', marginBottom: '24px' }}>Immutable security audit trails (Strict append-only record — deletion disabled)</p>
 
             <div style={{ background: '#040F2B', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', overflow: 'hidden' }}>
@@ -1285,6 +1515,58 @@ export const AdminDashboardPage: React.FC = () => {
                   <Download size={16} /> {mediaDownloading ? 'Downloading…' : 'Download'}
                 </button>
               </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ASSET GALLERY MODAL — every Form 1 / Form 2 upload for a user, with prev/next arrows */}
+      {assetsModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+          <div style={{ background: '#040F2B', border: '1px solid #00E5FF', borderRadius: '16px', padding: '24px', maxWidth: '700px', width: '100%', position: 'relative' }}>
+            <button onClick={() => setAssetsModal(null)} style={{ position: 'absolute', top: '16px', right: '16px', background: 'transparent', border: 'none', color: 'white', cursor: 'pointer' }}>
+              <X size={20} />
+            </button>
+            <h3 style={{ fontSize: '1.1rem', color: '#00E5FF', marginBottom: '4px' }}>{assetsModal.items[assetsModal.index].title}</h3>
+            <p style={{ fontSize: '0.78rem', color: '#64748B', marginBottom: '16px' }}>
+              {assetsModal.index + 1} of {assetsModal.items.length}
+            </p>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <button
+                onClick={() => setAssetsModal(m => m && ({ ...m, index: (m.index - 1 + m.items.length) % m.items.length }))}
+                disabled={assetsModal.items.length < 2}
+                style={{ flexShrink: 0, background: 'rgba(255,255,255,0.08)', border: 'none', color: 'white', width: '36px', height: '36px', borderRadius: '8px', cursor: assetsModal.items.length < 2 ? 'not-allowed' : 'pointer', opacity: assetsModal.items.length < 2 ? 0.4 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >
+                <ChevronLeft size={20} />
+              </button>
+
+              <div style={{ flex: 1, minWidth: 0 }}>
+                {!gallerySignedUrl ? (
+                  <div style={{ padding: '40px 0', textAlign: 'center', color: '#64748B' }}>Loading…</div>
+                ) : assetsModal.items[assetsModal.index].type === 'image' ? (
+                  <img src={gallerySignedUrl} alt={assetsModal.items[assetsModal.index].title} style={{ maxWidth: '100%', maxHeight: '60vh', borderRadius: '12px', display: 'block', margin: '0 auto' }} />
+                ) : (
+                  <video controls src={gallerySignedUrl} style={{ width: '100%', borderRadius: '12px' }} />
+                )}
+              </div>
+
+              <button
+                onClick={() => setAssetsModal(m => m && ({ ...m, index: (m.index + 1) % m.items.length }))}
+                disabled={assetsModal.items.length < 2}
+                style={{ flexShrink: 0, background: 'rgba(255,255,255,0.08)', border: 'none', color: 'white', width: '36px', height: '36px', borderRadius: '8px', cursor: assetsModal.items.length < 2 ? 'not-allowed' : 'pointer', opacity: assetsModal.items.length < 2 ? 0.4 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >
+                <ChevronRight size={20} />
+              </button>
+            </div>
+
+            {gallerySignedUrl && (
+              <button
+                onClick={() => downloadR2File(assetsModal.items[assetsModal.index].url, assetsModal.items[assetsModal.index].title)}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginTop: '16px', border: '1px solid #00E5FF', borderRadius: '10px', padding: '10px 18px', color: '#00E5FF', fontSize: '0.85rem', fontWeight: 700, background: 'rgba(0,229,255,0.08)', cursor: 'pointer' }}
+              >
+                <Download size={16} /> Download
+              </button>
             )}
           </div>
         </div>
