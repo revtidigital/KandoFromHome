@@ -880,11 +880,15 @@ export const AdminDashboardPage: React.FC = () => {
               </select>
             </div>
 
-            {/* SELECTION EXPORT TOOLBAR — appears above the table only while rows are checked */}
-            {selectedUserIds.size > 0 && (
+            {/* SCOPED EXPORT TOOLBAR — appears above the table whenever rows are checked
+                OR a search/tag/form filter is active, so export always matches what's
+                actually on screen instead of silently exporting everyone. */}
+            {(selectedUserIds.size > 0 || !!searchQuery || !!selectedTagFilter || !!selectedFormFilter) && (
               <div style={{ background: 'rgba(0,229,255,0.1)', border: '1px solid #00E5FF', borderRadius: '14px', padding: '14px 18px', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
                 <span style={{ color: '#00E5FF', fontWeight: 800, fontSize: '0.9rem' }}>
-                  {selectedUserIds.size} user{selectedUserIds.size > 1 ? 's' : ''} selected
+                  {selectedUserIds.size > 0
+                    ? `${selectedUserIds.size} user${selectedUserIds.size > 1 ? 's' : ''} selected`
+                    : `Filter applied — ${filteredUsers.length} user${filteredUsers.length !== 1 ? 's' : ''} match`}
                 </span>
                 <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
                   <button onClick={() => handleExportData('pdf')} style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid #EF4444', color: '#FCA5A5', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
@@ -899,8 +903,17 @@ export const AdminDashboardPage: React.FC = () => {
                   <button onClick={() => setEmailExportOpen(true)} style={{ background: 'rgba(168,85,247,0.12)', border: '1px solid #A855F7', color: '#C084FC', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
                     <Download size={14} /> CSV + ZIP
                   </button>
-                  <button onClick={() => setSelectedUserIds(new Set())} style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: '#94A3B8', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem' }}>
-                    Clear Selection
+                  <button
+                    onClick={() => {
+                      if (selectedUserIds.size > 0) {
+                        setSelectedUserIds(new Set());
+                      } else {
+                        setSearchQuery(''); setSelectedTagFilter(''); setSelectedFormFilter(''); setCurrentPage(1);
+                      }
+                    }}
+                    style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: '#94A3B8', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem' }}
+                  >
+                    {selectedUserIds.size > 0 ? 'Clear Selection' : 'Clear Filters'}
                   </button>
                 </div>
               </div>
