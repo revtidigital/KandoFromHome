@@ -1036,7 +1036,6 @@ app.get('/api/admin/export/users', exportLimiter, async (req, res) => {
         'User ID': u._id.toString(),
         'Emp ID': u.empId,
         'Name': u.empName,
-        'Email': u.email,
         'Phone': u.phone || '',
         'City': u.city || '',
         'Family Members': u.familyMembers || '',
@@ -1114,7 +1113,6 @@ app.get('/api/admin/export/pdf', exportLimiter, async (req, res) => {
             <tr>
               <th>Emp ID</th>
               <th>Employee Name</th>
-              <th>Email Address</th>
               <th>City Location</th>
               <th>Form 1 Company</th>
               <th>Form 1 Department</th>
@@ -1140,7 +1138,6 @@ app.get('/api/admin/export/pdf', exportLimiter, async (req, res) => {
         <tr>
           <td><strong>${esc(u.empId || u.phone || '')}</strong></td>
           <td>${esc(u.empName)}</td>
-          <td>${esc(u.email || '')}</td>
           <td>${esc(u.city || 'N/A')}</td>
           <td>${f1 ? esc(f1.companyName) : 'Not Filled'}</td>
           <td>${f1 ? esc(f1.department) : ''}</td>
@@ -1201,7 +1198,6 @@ async function buildExportArchive(archive) {
       'Emp ID': u.empId,
       'Phone': u.phone || '',
       'Name': u.empName,
-      'Email': u.email || '',
       'City': u.city || '',
       'Family Members': u.familyMembers || '',
       'Form 1 Company Name': f1 ? f1.companyName : '',
