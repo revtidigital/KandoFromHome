@@ -30,12 +30,20 @@ const THEMES = {
   dark: {
     pageBg: '#020924', pageText: 'white',
     sidebarBg: '#040F2B', sidebarBorder: 'rgba(255,255,255,0.1)',
-    mutedText: '#94A3B8'
+    mutedText: '#94A3B8',
+    surface: '#040F2B', surfaceAlt: '#091A44', surfaceSoft: '#06133B',
+    border: 'rgba(255,255,255,0.1)', borderStrong: 'rgba(255,255,255,0.2)', borderFaint: 'rgba(255,255,255,0.06)',
+    inputBg: 'rgba(255,255,255,0.06)', subtleBg: 'rgba(255,255,255,0.04)',
+    text: 'white', textMuted2: '#CBD5E1'
   },
   light: {
     pageBg: '#F1F5F9', pageText: '#0F172A',
     sidebarBg: '#FFFFFF', sidebarBorder: 'rgba(15,23,42,0.1)',
-    mutedText: '#475569'
+    mutedText: '#475569',
+    surface: '#FFFFFF', surfaceAlt: '#F8FAFC', surfaceSoft: '#FFFFFF',
+    border: 'rgba(15,23,42,0.1)', borderStrong: 'rgba(15,23,42,0.18)', borderFaint: 'rgba(15,23,42,0.06)',
+    inputBg: 'rgba(15,23,42,0.04)', subtleBg: 'rgba(15,23,42,0.035)',
+    text: '#0F172A', textMuted2: '#334155'
   }
 };
 
@@ -47,15 +55,16 @@ const TagMultiSelect: React.FC<{
   customTags: string[];
   onToggle: (tag: string) => void;
   accent?: string;
-}> = ({ tags, customTags, onToggle, accent = '#00E5FF' }) => {
+  palette: typeof THEMES['dark'];
+}> = ({ tags, customTags, onToggle, accent = '#00E5FF', palette }) => {
   return (
     <details style={{ position: 'relative', display: 'inline-block' }}>
       <summary
         style={{
           listStyle: 'none', cursor: 'pointer', userSelect: 'none',
-          background: tags.length ? `${accent}1F` : 'rgba(255,255,255,0.06)',
-          border: `1px solid ${tags.length ? accent : 'rgba(255,255,255,0.2)'}`,
-          color: tags.length ? accent : '#94A3B8',
+          background: tags.length ? `${accent}1F` : palette.inputBg,
+          border: `1px solid ${tags.length ? accent : palette.borderStrong}`,
+          color: tags.length ? accent : palette.mutedText,
           padding: '5px 10px', borderRadius: '8px', fontSize: '0.78rem', fontWeight: 700,
           display: 'inline-flex', alignItems: 'center', gap: '6px'
         }}
@@ -64,14 +73,14 @@ const TagMultiSelect: React.FC<{
       </summary>
       <div style={{
         position: 'absolute', top: 'calc(100% + 6px)', left: 0, zIndex: 50,
-        background: '#06133B', border: `1px solid ${accent}`, borderRadius: '10px',
+        background: palette.surfaceSoft, border: `1px solid ${accent}`, borderRadius: '10px',
         padding: '8px', minWidth: '180px', boxShadow: '0 10px 30px rgba(0,0,0,0.4)'
       }}>
         {customTags.length === 0 && (
-          <div style={{ color: '#64748B', fontSize: '0.8rem', padding: '4px 6px' }}>No tags defined yet</div>
+          <div style={{ color: palette.mutedText, fontSize: '0.8rem', padding: '4px 6px' }}>No tags defined yet</div>
         )}
         {customTags.map(t => (
-          <label key={t} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem', color: 'white' }}>
+          <label key={t} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem', color: palette.text }}>
             <input type="checkbox" checked={tags.includes(t)} onChange={() => onToggle(t)} style={{ accentColor: accent, cursor: 'pointer' }} />
             {t}
           </label>
@@ -793,9 +802,9 @@ export const AdminDashboardPage: React.FC = () => {
             {/* 3 KPI CARDS WITH INFO ICONS (Req 13) */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', marginBottom: '32px' }}>
               
-              <div style={{ background: '#091A44', border: '1.5px solid rgba(0,229,255,0.3)', borderRadius: '16px', padding: '24px' }}>
+              <div style={{ background: palette.surfaceAlt, border: '1.5px solid rgba(0,229,255,0.3)', borderRadius: '16px', padding: '24px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                  <span style={{ color: '#A0B2D6', fontSize: '0.9rem', fontWeight: 700 }}>Total Registered Users</span>
+                  <span style={{ color: palette.mutedText, fontSize: '0.9rem', fontWeight: 700 }}>Total Registered Users</span>
                   <div title="Total unique employees registered in campaign" style={{ cursor: 'pointer' }}>
                     <Info size={18} color="#00E5FF" />
                   </div>
@@ -803,9 +812,9 @@ export const AdminDashboardPage: React.FC = () => {
                 <div style={{ fontSize: '2.5rem', fontWeight: 900, color: '#00E5FF' }}>{allUsers.length}</div>
               </div>
 
-              <div style={{ background: '#091A44', border: '1.5px solid rgba(168,85,247,0.3)', borderRadius: '16px', padding: '24px' }}>
+              <div style={{ background: palette.surfaceAlt, border: '1.5px solid rgba(168,85,247,0.3)', borderRadius: '16px', padding: '24px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                  <span style={{ color: '#A0B2D6', fontSize: '0.9rem', fontWeight: 700 }}>Form 1 Submissions</span>
+                  <span style={{ color: palette.mutedText, fontSize: '0.9rem', fontWeight: 700 }}>Form 1 Submissions</span>
                   <div title="Form 1 (DIY Craft Wall Photos & Reflection)" style={{ cursor: 'pointer' }}>
                     <Info size={18} color="#A855F7" />
                   </div>
@@ -815,9 +824,9 @@ export const AdminDashboardPage: React.FC = () => {
                 </div>
               </div>
 
-              <div style={{ background: '#091A44', border: '1.5px solid rgba(34,197,94,0.3)', borderRadius: '16px', padding: '24px' }}>
+              <div style={{ background: palette.surfaceAlt, border: '1.5px solid rgba(34,197,94,0.3)', borderRadius: '16px', padding: '24px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                  <span style={{ color: '#A0B2D6', fontSize: '0.9rem', fontWeight: 700 }}>Form 2 Submissions</span>
+                  <span style={{ color: palette.mutedText, fontSize: '0.9rem', fontWeight: 700 }}>Form 2 Submissions</span>
                   <div title="Form 2 (Family Kando Video Submissions)" style={{ cursor: 'pointer' }}>
                     <Info size={18} color="#22C55E" />
                   </div>
@@ -870,7 +879,7 @@ export const AdminDashboardPage: React.FC = () => {
             </div>
 
             {/* FILTERS TOOLBAR (Req 14) */}
-            <div style={{ background: '#040F2B', padding: '16px', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.1)', marginBottom: '20px', display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
+            <div style={{ background: palette.surface, padding: '16px', borderRadius: '14px', border: `1px solid ${palette.border}`, marginBottom: '20px', display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
               <div style={{ position: 'relative', flex: 1, minWidth: '240px' }}>
                 <Search size={16} color="#94A3B8" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
                 <input 
@@ -878,7 +887,7 @@ export const AdminDashboardPage: React.FC = () => {
                   placeholder="Search by Name, Emp ID, Email or City..."
                   value={searchQuery}
                   onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-                  style={{ width: '100%', padding: '9px 12px 9px 36px', borderRadius: '8px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)', color: 'white', fontSize: '0.85rem', outline: 'none' }}
+                  style={{ width: '100%', padding: '9px 12px 9px 36px', borderRadius: '8px', background: palette.inputBg, border: `1px solid ${palette.border}`, color: palette.text, fontSize: '0.85rem', outline: 'none' }}
                 />
               </div>
 
@@ -886,7 +895,7 @@ export const AdminDashboardPage: React.FC = () => {
               <select
                 value={selectedTagFilter}
                 onChange={e => { setSelectedTagFilter(e.target.value); setCurrentPage(1); }}
-                style={{ padding: '9px 12px', borderRadius: '8px', background: '#091A44', border: '1px solid rgba(255,255,255,0.2)', color: 'white', fontSize: '0.85rem', outline: 'none' }}
+                style={{ padding: '9px 12px', borderRadius: '8px', background: palette.surfaceAlt, border: `1px solid ${palette.borderStrong}`, color: palette.text, fontSize: '0.85rem', outline: 'none' }}
               >
                 <option value="">All Classification Tags</option>
                 {customTags.map(tag => (
@@ -898,7 +907,7 @@ export const AdminDashboardPage: React.FC = () => {
               <select
                 value={selectedFormFilter}
                 onChange={e => { setSelectedFormFilter(e.target.value); setCurrentPage(1); }}
-                style={{ padding: '9px 12px', borderRadius: '8px', background: '#091A44', border: '1px solid rgba(255,255,255,0.2)', color: 'white', fontSize: '0.85rem', outline: 'none' }}
+                style={{ padding: '9px 12px', borderRadius: '8px', background: palette.surfaceAlt, border: `1px solid ${palette.borderStrong}`, color: palette.text, fontSize: '0.85rem', outline: 'none' }}
               >
                 <option value="">All Form Submissions</option>
                 <option value="form1">Form 1 Submitted</option>
@@ -938,7 +947,7 @@ export const AdminDashboardPage: React.FC = () => {
                         setSearchQuery(''); setSelectedTagFilter(''); setSelectedFormFilter(''); setCurrentPage(1);
                       }
                     }}
-                    style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: '#94A3B8', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem' }}
+                    style={{ background: 'transparent', border: `1px solid ${palette.borderStrong}`, color: '#94A3B8', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem' }}
                   >
                     {selectedUserIds.size > 0 ? 'Clear Selection' : 'Clear Filters'}
                   </button>
@@ -947,10 +956,10 @@ export const AdminDashboardPage: React.FC = () => {
             )}
 
             {/* USERS TABLE — 25 ENTRIES PER PAGE (Req 8) */}
-            <div style={{ background: '#040F2B', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', overflow: 'hidden' }}>
+            <div style={{ background: palette.surface, borderRadius: '16px', border: `1px solid ${palette.border}`, overflow: 'hidden' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
                 <thead>
-                  <tr style={{ background: '#091A44', color: '#00E5FF', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                  <tr style={{ background: palette.surfaceAlt, color: '#00E5FF', borderBottom: `1px solid ${palette.border}` }}>
                     <th style={{ padding: '14px 12px', width: '36px' }}>
                       <input
                         type="checkbox"
@@ -984,7 +993,7 @@ export const AdminDashboardPage: React.FC = () => {
                     const userId = user.id || (user as any)._id;
                     const assets = getUserAssets(user);
                     return (
-                      <tr key={userId} style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                      <tr key={userId} style={{ borderBottom: `1px solid ${palette.borderFaint}` }}>
                         <td style={{ padding: '14px 12px' }}>
                           <input
                             type="checkbox"
@@ -1001,14 +1010,14 @@ export const AdminDashboardPage: React.FC = () => {
                         <td style={{ padding: '14px 18px' }}>
                           <div
                             onClick={() => handleOpenUserProfile(user)}
-                            style={{ cursor: 'pointer', fontWeight: 700, color: 'white', textDecoration: 'underline' }}
+                            style={{ cursor: 'pointer', fontWeight: 700, color: palette.text, textDecoration: 'underline' }}
                             title="Click to view full user profile page"
                           >
                             {user.empName}
                           </div>
                         </td>
 
-                        <td style={{ padding: '14px 18px', color: '#CBD5E1', fontSize: '0.8rem' }}>
+                        <td style={{ padding: '14px 18px', color: palette.textMuted2, fontSize: '0.8rem' }}>
                           {(user as any).createdAt ? new Date((user as any).createdAt).toLocaleString() : (user as any).submittedAt || '2026-07-31'}
                         </td>
 
@@ -1052,6 +1061,7 @@ export const AdminDashboardPage: React.FC = () => {
                             tags={currentTags}
                             customTags={customTags}
                             onToggle={(tag) => handleToggleUserTag(user, tag)}
+                            palette={palette}
                           />
                         </td>
 
@@ -1079,16 +1089,16 @@ export const AdminDashboardPage: React.FC = () => {
               </table>
 
               {/* PAGINATION BAR (Req 8) */}
-              <div style={{ padding: '16px 20px', background: '#091A44', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+              <div style={{ padding: '16px 20px', background: palette.surfaceAlt, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: `1px solid ${palette.border}` }}>
                 <span style={{ fontSize: '0.8rem', color: '#94A3B8' }}>
                   Showing {paginatedUsers.length} of {filteredUsers.length} entries (25 per page)
                 </span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: 'white', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer' }}>
+                  <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} style={{ background: palette.inputBg, border: 'none', color: palette.text, padding: '6px 12px', borderRadius: '6px', cursor: 'pointer' }}>
                     <ChevronLeft size={16} />
                   </button>
                   <span style={{ fontSize: '0.85rem', fontWeight: 700 }}>Page {currentPage} of {totalPages}</span>
-                  <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: 'white', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer' }}>
+                  <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} style={{ background: palette.inputBg, border: 'none', color: palette.text, padding: '6px 12px', borderRadius: '6px', cursor: 'pointer' }}>
                     <ChevronRight size={16} />
                   </button>
                 </div>
@@ -1105,8 +1115,8 @@ export const AdminDashboardPage: React.FC = () => {
               onClick={() => goToTab('users')}
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: '8px',
-                background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.2)',
-                color: 'white', padding: '10px 18px', borderRadius: '10px',
+                background: palette.inputBg, border: `1px solid ${palette.borderStrong}`,
+                color: palette.text, padding: '10px 18px', borderRadius: '10px',
                 fontWeight: 700, cursor: 'pointer', marginBottom: '24px'
               }}
             >
@@ -1114,7 +1124,7 @@ export const AdminDashboardPage: React.FC = () => {
               <span>Back to Users Directory</span>
             </button>
 
-            <div style={{ background: '#040F2B', border: '1.5px solid #00E5FF', borderRadius: '24px', padding: '32px', boxShadow: '0 0 30px rgba(0,229,255,0.15)' }}>
+            <div style={{ background: palette.surface, border: '1.5px solid #00E5FF', borderRadius: '24px', padding: '32px', boxShadow: '0 0 30px rgba(0,229,255,0.15)' }}>
               
               {/* Header */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
@@ -1124,8 +1134,8 @@ export const AdminDashboardPage: React.FC = () => {
                   </h1>
                   <p style={{ color: '#94A3B8', fontSize: '0.9rem', marginTop: '4px' }}>
                     {selectedUserForProfile.empId
-                      ? <>Employee ID: <strong style={{ color: 'white' }}>{selectedUserForProfile.empId}</strong></>
-                      : <>Phone Number: <strong style={{ color: 'white' }}>{selectedUserForProfile.phone || '—'}</strong></>}
+                      ? <>Employee ID: <strong style={{ color: palette.text }}>{selectedUserForProfile.empId}</strong></>
+                      : <>Phone Number: <strong style={{ color: palette.text }}>{selectedUserForProfile.phone || '—'}</strong></>}
                   </p>
                   <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
                     <span style={{ fontSize: '0.78rem', fontWeight: 800, padding: '4px 10px', borderRadius: '8px', color: selectedUserForProfile.form1 ? '#4ADE80' : '#EF4444', background: selectedUserForProfile.form1 ? 'rgba(74,222,128,0.1)' : 'rgba(239,68,68,0.1)', border: `1px solid ${selectedUserForProfile.form1 ? 'rgba(74,222,128,0.4)' : 'rgba(239,68,68,0.4)'}` }}>
@@ -1144,13 +1154,14 @@ export const AdminDashboardPage: React.FC = () => {
                     tags={selectedUserForProfile.tags || []}
                     customTags={customTags}
                     onToggle={(tag) => handleToggleUserTag(selectedUserForProfile, tag)}
+                    palette={palette}
                   />
                 </div>
               </div>
 
               {/* ── SECTION B: FORM 1 DETAILS ── */}
               {selectedUserForProfile.form1 ? (
-                <div style={{ marginBottom: '28px', background: '#06133B', padding: '24px', borderRadius: '18px', border: '1px solid rgba(74, 222, 128, 0.3)' }}>
+                <div style={{ marginBottom: '28px', background: palette.surfaceSoft, padding: '24px', borderRadius: '18px', border: '1px solid rgba(74, 222, 128, 0.3)' }}>
                   <h3 style={{ fontSize: '1.1rem', color: '#4ADE80', fontWeight: 800, marginBottom: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <ImageIcon size={20} /> Form 1 — Photos & Video Submission
                     <span style={{ marginLeft: 'auto', fontSize: '0.75rem', color: '#64748B', fontWeight: 400 }}>
@@ -1160,35 +1171,35 @@ export const AdminDashboardPage: React.FC = () => {
 
                   {/* Meta info row */}
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px', marginBottom: '18px', fontSize: '0.85rem' }}>
-                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '10px' }}>
+                    <div style={{ background: palette.subtleBg, padding: '12px', borderRadius: '10px' }}>
                       <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Company Name</div>
-                      <div style={{ color: '#E2E8F0' }}>{selectedUserForProfile.form1.companyName || 'N/A'}</div>
+                      <div style={{ color: palette.text }}>{selectedUserForProfile.form1.companyName || 'N/A'}</div>
                     </div>
-                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '10px' }}>
+                    <div style={{ background: palette.subtleBg, padding: '12px', borderRadius: '10px' }}>
                       <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Department</div>
-                      <div style={{ color: '#E2E8F0' }}>{selectedUserForProfile.form1.department || 'N/A'}</div>
+                      <div style={{ color: palette.text }}>{selectedUserForProfile.form1.department || 'N/A'}</div>
                     </div>
-                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '10px' }}>
+                    <div style={{ background: palette.subtleBg, padding: '12px', borderRadius: '10px' }}>
                       <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Location</div>
-                      <div style={{ color: '#E2E8F0' }}>{selectedUserForProfile.city || 'N/A'}</div>
+                      <div style={{ color: palette.text }}>{selectedUserForProfile.city || 'N/A'}</div>
                     </div>
-                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '10px' }}>
+                    <div style={{ background: palette.subtleBg, padding: '12px', borderRadius: '10px' }}>
                       <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Language</div>
-                      <div style={{ color: '#E2E8F0' }}>{selectedUserForProfile.form1.language === 'hi' ? 'Hindi' : selectedUserForProfile.form1.language === 'ta' ? 'Tamil' : 'English'}</div>
+                      <div style={{ color: palette.text }}>{selectedUserForProfile.form1.language === 'hi' ? 'Hindi' : selectedUserForProfile.form1.language === 'ta' ? 'Tamil' : 'English'}</div>
                     </div>
-                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '10px' }}>
+                    <div style={{ background: palette.subtleBg, padding: '12px', borderRadius: '10px' }}>
                       <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Submitted IP</div>
-                      <div style={{ color: '#E2E8F0', fontFamily: 'monospace' }}>{selectedUserForProfile.form1.ip || 'N/A'}</div>
+                      <div style={{ color: palette.text, fontFamily: 'monospace' }}>{selectedUserForProfile.form1.ip || 'N/A'}</div>
                     </div>
-                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '10px' }}>
+                    <div style={{ background: palette.subtleBg, padding: '12px', borderRadius: '10px' }}>
                       <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Photo 1</div>
                       <div style={{ color: selectedUserForProfile.form1.photo1Url ? '#4ADE80' : '#EF4444', fontWeight: 700 }}>{selectedUserForProfile.form1.photo1Url ? '✓ Uploaded' : '✗ Missing'}</div>
                     </div>
-                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '10px' }}>
+                    <div style={{ background: palette.subtleBg, padding: '12px', borderRadius: '10px' }}>
                       <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Photo 2</div>
                       <div style={{ color: selectedUserForProfile.form1.photo2Url ? '#4ADE80' : '#EF4444', fontWeight: 700 }}>{selectedUserForProfile.form1.photo2Url ? '✓ Uploaded' : '✗ Missing'}</div>
                     </div>
-                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '10px' }}>
+                    <div style={{ background: palette.subtleBg, padding: '12px', borderRadius: '10px' }}>
                       <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Video</div>
                       <div style={{ color: selectedUserForProfile.form1.videoUrl ? '#4ADE80' : '#EF4444', fontWeight: 700 }}>{selectedUserForProfile.form1.videoUrl ? '✓ Uploaded' : '✗ Missing'}</div>
                     </div>
@@ -1196,9 +1207,9 @@ export const AdminDashboardPage: React.FC = () => {
 
                   {/* CEO Reflection */}
                   {selectedUserForProfile.form1.ceoReflection && (
-                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '16px', borderRadius: '12px', marginBottom: '18px' }}>
+                    <div style={{ background: palette.subtleBg, padding: '16px', borderRadius: '12px', marginBottom: '18px' }}>
                       <div style={{ fontSize: '0.72rem', color: '#4ADE80', fontWeight: 800, textTransform: 'uppercase', marginBottom: '8px' }}>Reflection Message (Form 1)</div>
-                      <p style={{ margin: 0, color: '#E2E8F0', fontStyle: 'italic', lineHeight: 1.6 }}>"{selectedUserForProfile.form1.ceoReflection}"</p>
+                      <p style={{ margin: 0, color: palette.text, fontStyle: 'italic', lineHeight: 1.6 }}>"{selectedUserForProfile.form1.ceoReflection}"</p>
                     </div>
                   )}
 
@@ -1225,14 +1236,14 @@ export const AdminDashboardPage: React.FC = () => {
                   </div>
                 </div>
               ) : (
-                <div style={{ marginBottom: '28px', background: '#06133B', padding: '20px', borderRadius: '18px', border: '1px solid rgba(239,68,68,0.3)', color: '#EF4444', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ marginBottom: '28px', background: palette.surfaceSoft, padding: '20px', borderRadius: '18px', border: '1px solid rgba(239,68,68,0.3)', color: '#EF4444', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <ImageIcon size={20} /> Form 1 not yet submitted
                 </div>
               )}
 
               {/* ── SECTION C: FORM 2 DETAILS (Chairman Invites Your Thoughts) ── */}
               {selectedUserForProfile.form2 ? (
-                <div style={{ background: '#06133B', padding: '24px', borderRadius: '18px', border: '1px solid rgba(168, 85, 247, 0.3)' }}>
+                <div style={{ background: palette.surfaceSoft, padding: '24px', borderRadius: '18px', border: '1px solid rgba(168, 85, 247, 0.3)' }}>
                   <h3 style={{ fontSize: '1.1rem', color: '#C084FC', fontWeight: 800, marginBottom: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <FileVideo size={20} /> Form 2 — Chairman Invites Your Thoughts
                     <span style={{ marginLeft: 'auto', fontSize: '0.75rem', color: '#64748B', fontWeight: 400 }}>
@@ -1242,41 +1253,41 @@ export const AdminDashboardPage: React.FC = () => {
 
                   {/* Meta info row */}
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px', marginBottom: '18px', fontSize: '0.85rem' }}>
-                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '10px' }}>
+                    <div style={{ background: palette.subtleBg, padding: '12px', borderRadius: '10px' }}>
                       <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Employee Name</div>
-                      <div style={{ color: '#E2E8F0' }}>{selectedUserForProfile.empName || 'N/A'}</div>
+                      <div style={{ color: palette.text }}>{selectedUserForProfile.empName || 'N/A'}</div>
                     </div>
-                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '10px' }}>
+                    <div style={{ background: palette.subtleBg, padding: '12px', borderRadius: '10px' }}>
                       <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Employee EIN</div>
-                      <div style={{ color: '#E2E8F0' }}>{selectedUserForProfile.empId || 'N/A'}</div>
+                      <div style={{ color: palette.text }}>{selectedUserForProfile.empId || 'N/A'}</div>
                     </div>
-                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '10px' }}>
+                    <div style={{ background: palette.subtleBg, padding: '12px', borderRadius: '10px' }}>
                       <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Company Name</div>
-                      <div style={{ color: '#E2E8F0' }}>{selectedUserForProfile.form2.companyName || 'N/A'}</div>
+                      <div style={{ color: palette.text }}>{selectedUserForProfile.form2.companyName || 'N/A'}</div>
                     </div>
-                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '10px' }}>
+                    <div style={{ background: palette.subtleBg, padding: '12px', borderRadius: '10px' }}>
                       <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Department</div>
-                      <div style={{ color: '#E2E8F0' }}>{selectedUserForProfile.form2.department || 'N/A'}</div>
+                      <div style={{ color: palette.text }}>{selectedUserForProfile.form2.department || 'N/A'}</div>
                     </div>
-                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '10px' }}>
+                    <div style={{ background: palette.subtleBg, padding: '12px', borderRadius: '10px' }}>
                       <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Location</div>
-                      <div style={{ color: '#E2E8F0' }}>{selectedUserForProfile.form2.location || 'N/A'}</div>
+                      <div style={{ color: palette.text }}>{selectedUserForProfile.form2.location || 'N/A'}</div>
                     </div>
-                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '10px' }}>
+                    <div style={{ background: palette.subtleBg, padding: '12px', borderRadius: '10px' }}>
                       <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Language</div>
-                      <div style={{ color: '#E2E8F0' }}>{selectedUserForProfile.form2.language === 'hi' ? 'Hindi' : selectedUserForProfile.form2.language === 'ta' ? 'Tamil' : 'English'}</div>
+                      <div style={{ color: palette.text }}>{selectedUserForProfile.form2.language === 'hi' ? 'Hindi' : selectedUserForProfile.form2.language === 'ta' ? 'Tamil' : 'English'}</div>
                     </div>
-                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '10px' }}>
+                    <div style={{ background: palette.subtleBg, padding: '12px', borderRadius: '10px' }}>
                       <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Submitted IP</div>
-                      <div style={{ color: '#E2E8F0', fontFamily: 'monospace' }}>{selectedUserForProfile.form2.ip || 'N/A'}</div>
+                      <div style={{ color: palette.text, fontFamily: 'monospace' }}>{selectedUserForProfile.form2.ip || 'N/A'}</div>
                     </div>
                   </div>
 
                   {/* Share Your Thoughts answer */}
                   {selectedUserForProfile.form2.thoughts && (
-                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '16px', borderRadius: '12px', marginBottom: '18px' }}>
+                    <div style={{ background: palette.subtleBg, padding: '16px', borderRadius: '12px', marginBottom: '18px' }}>
                       <div style={{ fontSize: '0.72rem', color: '#C084FC', fontWeight: 800, textTransform: 'uppercase', marginBottom: '8px' }}>Share Your Thoughts</div>
-                      <p style={{ margin: 0, color: '#E2E8F0', fontStyle: 'italic', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>"{selectedUserForProfile.form2.thoughts}"</p>
+                      <p style={{ margin: 0, color: palette.text, fontStyle: 'italic', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>"{selectedUserForProfile.form2.thoughts}"</p>
                     </div>
                   )}
 
@@ -1292,7 +1303,7 @@ export const AdminDashboardPage: React.FC = () => {
                   )}
                 </div>
               ) : (
-                <div style={{ background: '#06133B', padding: '20px', borderRadius: '18px', border: '1px solid rgba(239,68,68,0.3)', color: '#EF4444', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ background: palette.surfaceSoft, padding: '20px', borderRadius: '18px', border: '1px solid rgba(239,68,68,0.3)', color: '#EF4444', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <FileVideo size={20} /> Form 2 not yet submitted
                 </div>
               )}
@@ -1314,7 +1325,7 @@ export const AdminDashboardPage: React.FC = () => {
                 value={newTagInput}
                 onChange={e => setNewTagInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleAddTag()}
-                style={{ flex: 1, padding: '12px 16px', borderRadius: '10px', background: '#040F2B', border: '1px solid rgba(255,255,255,0.2)', color: 'white', outline: 'none', fontSize: '0.9rem' }}
+                style={{ flex: 1, padding: '12px 16px', borderRadius: '10px', background: palette.surface, border: `1px solid ${palette.borderStrong}`, color: palette.text, outline: 'none', fontSize: '0.9rem' }}
               />
               <button onClick={handleAddTag} style={{ background: '#00E5FF', color: '#020817', border: 'none', padding: '12px 22px', borderRadius: '10px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.9rem' }}>
                 <Plus size={18} /> Add Tag
@@ -1323,7 +1334,7 @@ export const AdminDashboardPage: React.FC = () => {
 
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
               {customTags.map(tag => (
-                <div key={tag} style={{ background: '#091A44', border: '1.5px solid #00E5FF', padding: '10px 18px', borderRadius: '24px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div key={tag} style={{ background: palette.surfaceAlt, border: '1.5px solid #00E5FF', padding: '10px 18px', borderRadius: '24px', display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>{tag}</span>
                   <X size={16} color="#EF4444" onClick={() => setTagPendingDelete(tag)} style={{ cursor: 'pointer' }} />
                 </div>
@@ -1341,11 +1352,11 @@ export const AdminDashboardPage: React.FC = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
 
               {/* CARD 0: ELIGIBILITY WHITELIST UPLOAD */}
-              <div style={{ background: '#040F2B', padding: '28px', borderRadius: '18px', border: '1.5px solid rgba(168,85,247,0.3)' }}>
+              <div style={{ background: palette.surface, padding: '28px', borderRadius: '18px', border: '1.5px solid rgba(168,85,247,0.3)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
                   <Users size={22} color="#C084FC" />
                   <div>
-                    <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'white', margin: 0 }}>Eligibility Whitelist</h2>
+                    <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: palette.text, margin: 0 }}>Eligibility Whitelist</h2>
                     <p style={{ fontSize: '0.8rem', color: '#94A3B8', margin: 0 }}>
                       Only Employee IDs / Phone Numbers on these lists can submit Form 1 &amp; Form 2. Each upload replaces the previous list.
                     </p>
@@ -1359,8 +1370,8 @@ export const AdminDashboardPage: React.FC = () => {
                 )}
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
-                  <div style={{ background: 'rgba(255,255,255,0.04)', padding: '16px', borderRadius: '12px' }}>
-                    <div style={{ fontWeight: 700, color: 'white', marginBottom: '4px' }}>Employee ID List</div>
+                  <div style={{ background: palette.subtleBg, padding: '16px', borderRadius: '12px' }}>
+                    <div style={{ fontWeight: 700, color: palette.text, marginBottom: '4px' }}>Employee ID List</div>
                     <div style={{ fontSize: '0.8rem', color: '#94A3B8', marginBottom: '12px' }}>
                       {whitelistCounts.employees.toLocaleString()} Employee IDs currently loaded
                     </div>
@@ -1381,8 +1392,8 @@ export const AdminDashboardPage: React.FC = () => {
                     <p style={{ fontSize: '0.72rem', color: '#64748B', marginTop: '8px' }}>First column = Employee ID, first row treated as header.</p>
                   </div>
 
-                  <div style={{ background: 'rgba(255,255,255,0.04)', padding: '16px', borderRadius: '12px' }}>
-                    <div style={{ fontWeight: 700, color: 'white', marginBottom: '4px' }}>Phone Number List</div>
+                  <div style={{ background: palette.subtleBg, padding: '16px', borderRadius: '12px' }}>
+                    <div style={{ fontWeight: 700, color: palette.text, marginBottom: '4px' }}>Phone Number List</div>
                     <div style={{ fontSize: '0.8rem', color: '#94A3B8', marginBottom: '12px' }}>
                       {whitelistCounts.phones.toLocaleString()} Phone Numbers currently loaded
                     </div>
@@ -1406,11 +1417,11 @@ export const AdminDashboardPage: React.FC = () => {
               </div>
 
               {/* CARD 1: GOOGLE RECAPTCHA SECURITY SETTINGS (Req 3) */}
-              <div style={{ background: '#040F2B', padding: '28px', borderRadius: '18px', border: '1.5px solid rgba(0,229,255,0.3)' }}>
+              <div style={{ background: palette.surface, padding: '28px', borderRadius: '18px', border: '1.5px solid rgba(0,229,255,0.3)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
                   <Lock size={22} color="#00E5FF" />
                   <div>
-                    <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'white', margin: 0 }}>Google reCAPTCHA Security Settings</h2>
+                    <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: palette.text, margin: 0 }}>Google reCAPTCHA Security Settings</h2>
                     <p style={{ fontSize: '0.8rem', color: '#94A3B8', margin: 0 }}>Protect form submissions against automated spam bots</p>
                   </div>
                 </div>
@@ -1422,9 +1433,9 @@ export const AdminDashboardPage: React.FC = () => {
                 )}
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: 'rgba(255,255,255,0.04)', padding: '14px', borderRadius: '10px' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: palette.subtleBg, padding: '14px', borderRadius: '10px' }}>
                     <div>
-                      <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'white' }}>Enable Captcha Verification</div>
+                      <div style={{ fontWeight: 700, fontSize: '0.95rem', color: palette.text }}>Enable Captcha Verification</div>
                       <div style={{ fontSize: '0.78rem', color: '#94A3B8' }}>Enforce Google reCAPTCHA v3 on Form 1 & Form 2</div>
                     </div>
                     <input
@@ -1436,42 +1447,42 @@ export const AdminDashboardPage: React.FC = () => {
                   </label>
 
                   <div>
-                    <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.82rem', marginBottom: '6px' }}>reCAPTCHA Site Key</label>
+                    <label style={{ display: 'block', color: palette.textMuted2, fontSize: '0.82rem', marginBottom: '6px' }}>reCAPTCHA Site Key</label>
                     <input
                       type="text"
                       value={captchaSiteKey}
                       onChange={e => setCaptchaSiteKey(e.target.value)}
                       placeholder="From google.com/recaptcha/admin (reCAPTCHA v3)"
-                      style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.2)', color: 'white', fontSize: '0.85rem', outline: 'none' }}
+                      style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', background: palette.inputBg, border: `1px solid ${palette.borderStrong}`, color: palette.text, fontSize: '0.85rem', outline: 'none' }}
                     />
                   </div>
 
                   <div>
-                    <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.82rem', marginBottom: '6px' }}>reCAPTCHA Secret Key</label>
+                    <label style={{ display: 'block', color: palette.textMuted2, fontSize: '0.82rem', marginBottom: '6px' }}>reCAPTCHA Secret Key</label>
                     <input
                       type="password"
                       value={captchaSecretKey}
                       onChange={e => setCaptchaSecretKey(e.target.value)}
                       placeholder="Kept server-side only, never shown to the public site"
-                      style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.2)', color: 'white', fontSize: '0.85rem', outline: 'none' }}
+                      style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', background: palette.inputBg, border: `1px solid ${palette.borderStrong}`, color: palette.text, fontSize: '0.85rem', outline: 'none' }}
                     />
                   </div>
                   <p style={{ fontSize: '0.72rem', color: '#64748B', margin: 0 }}>
                     Register site type "reCAPTCHA v3" for domain <code>147.93.31.18</code> (Google accepts bare IPs as a domain entry).
                   </p>
 
-                  <button onClick={handleSaveCaptchaSettings} style={{ background: 'linear-gradient(90deg, #00C6FF 0%, #0072FF 100%)', border: 'none', color: 'white', padding: '12px', borderRadius: '10px', fontWeight: 800, cursor: 'pointer', marginTop: '6px' }}>
+                  <button onClick={handleSaveCaptchaSettings} style={{ background: 'linear-gradient(90deg, #00C6FF 0%, #0072FF 100%)', border: 'none', color: palette.text, padding: '12px', borderRadius: '10px', fontWeight: 800, cursor: 'pointer', marginTop: '6px' }}>
                     SAVE CAPTCHA SETTINGS
                   </button>
                 </div>
               </div>
 
               {/* CARD 2: GOOGLE ANALYTICS MEASUREMENT SETTINGS (Req 3) */}
-              <div style={{ background: '#040F2B', padding: '28px', borderRadius: '18px', border: '1.5px solid rgba(168,85,247,0.3)' }}>
+              <div style={{ background: palette.surface, padding: '28px', borderRadius: '18px', border: '1.5px solid rgba(168,85,247,0.3)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
                   <BarChart3 size={22} color="#C084FC" />
                   <div>
-                    <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'white', margin: 0 }}>Google Analytics Settings</h2>
+                    <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: palette.text, margin: 0 }}>Google Analytics Settings</h2>
                     <p style={{ fontSize: '0.8rem', color: '#94A3B8', margin: 0 }}>Track campaign visitor traffic and conversion metrics</p>
                   </div>
                 </div>
@@ -1484,7 +1495,7 @@ export const AdminDashboardPage: React.FC = () => {
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   <div>
-                    <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.82rem', marginBottom: '6px' }}>
+                    <label style={{ display: 'block', color: palette.textMuted2, fontSize: '0.82rem', marginBottom: '6px' }}>
                       Google Analytics Measurement ID (GA4)
                     </label>
                     <input
@@ -1492,15 +1503,15 @@ export const AdminDashboardPage: React.FC = () => {
                       value={gaId}
                       onChange={e => setGaId(e.target.value)}
                       placeholder="G-XXXXXXXXXX or UA-XXXXXXXX-X"
-                      style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.2)', color: 'white', fontSize: '0.85rem', outline: 'none' }}
+                      style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', background: palette.inputBg, border: `1px solid ${palette.borderStrong}`, color: palette.text, fontSize: '0.85rem', outline: 'none' }}
                     />
                   </div>
 
-                  <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px 14px', borderRadius: '8px', fontSize: '0.8rem', color: '#A0B2D6' }}>
+                  <div style={{ background: palette.subtleBg, padding: '12px 14px', borderRadius: '8px', fontSize: '0.8rem', color: palette.mutedText }}>
                     Status: <strong style={{ color: '#4ADE80' }}>● Active Analytics Script Injected</strong>
                   </div>
 
-                  <button onClick={handleSaveGaSettings} style={{ background: 'linear-gradient(90deg, #A855F7 0%, #7E22CE 100%)', border: 'none', color: 'white', padding: '12px', borderRadius: '10px', fontWeight: 800, cursor: 'pointer', marginTop: '6px' }}>
+                  <button onClick={handleSaveGaSettings} style={{ background: 'linear-gradient(90deg, #A855F7 0%, #7E22CE 100%)', border: 'none', color: palette.text, padding: '12px', borderRadius: '10px', fontWeight: 800, cursor: 'pointer', marginTop: '6px' }}>
                     SAVE GOOGLE ANALYTICS SETTINGS
                   </button>
                 </div>
@@ -1516,10 +1527,10 @@ export const AdminDashboardPage: React.FC = () => {
             <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: palette.pageText, marginBottom: '8px' }}>System Audit Logs</h1>
             <p style={{ color: '#94A3B8', fontSize: '0.85rem', marginBottom: '24px' }}>Immutable security audit trails (Strict append-only record — deletion disabled)</p>
 
-            <div style={{ background: '#040F2B', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', overflow: 'hidden' }}>
+            <div style={{ background: palette.surface, borderRadius: '16px', border: `1px solid ${palette.border}`, overflow: 'hidden' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
                 <thead>
-                  <tr style={{ background: '#091A44', color: '#00E5FF', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                  <tr style={{ background: palette.surfaceAlt, color: '#00E5FF', borderBottom: `1px solid ${palette.border}` }}>
                     <th style={{ padding: '14px 18px' }}>Timestamp</th>
                     <th style={{ padding: '14px 18px' }}>IP Address</th>
                     <th style={{ padding: '14px 18px' }}>Detail / Activity</th>
@@ -1531,10 +1542,10 @@ export const AdminDashboardPage: React.FC = () => {
                     { id: '1', timestamp: new Date().toLocaleString(), ip: '147.93.31.18', detail: 'System Admin Logged in', username: 'SuperAdmin' },
                     { id: '2', timestamp: new Date(Date.now() - 3600000).toLocaleString(), ip: '147.93.31.18', detail: 'Updated Settings: Captcha toggled', username: 'Admin' }
                   ]).map(log => (
-                    <tr key={log.id || (log as any)._id} style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                      <td style={{ padding: '14px 18px', color: '#CBD5E1', fontSize: '0.8rem' }}>{new Date(log.timestamp).toLocaleString()}</td>
+                    <tr key={log.id || (log as any)._id} style={{ borderBottom: `1px solid ${palette.borderFaint}` }}>
+                      <td style={{ padding: '14px 18px', color: palette.textMuted2, fontSize: '0.8rem' }}>{new Date(log.timestamp).toLocaleString()}</td>
                       <td style={{ padding: '14px 18px', color: '#00E5FF', fontWeight: 700, fontSize: '0.8rem' }}>{log.ip || '127.0.0.1'}</td>
-                      <td style={{ padding: '14px 18px', color: 'white' }}>{log.detail}</td>
+                      <td style={{ padding: '14px 18px', color: palette.text }}>{log.detail}</td>
                       <td style={{ padding: '14px 18px', color: '#94A3B8' }}>{log.username || 'Admin'}</td>
                     </tr>
                   ))}
@@ -1549,8 +1560,8 @@ export const AdminDashboardPage: React.FC = () => {
       {/* MEDIA PREVIEW MODAL */}
       {mediaModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div style={{ background: '#040F2B', border: '1px solid #00E5FF', borderRadius: '16px', padding: '24px', maxWidth: '700px', width: '100%', position: 'relative' }}>
-            <button onClick={() => setMediaModal(null)} style={{ position: 'absolute', top: '16px', right: '16px', background: 'transparent', border: 'none', color: 'white', cursor: 'pointer' }}>
+          <div style={{ background: palette.surface, border: '1px solid #00E5FF', borderRadius: '16px', padding: '24px', maxWidth: '700px', width: '100%', position: 'relative' }}>
+            <button onClick={() => setMediaModal(null)} style={{ position: 'absolute', top: '16px', right: '16px', background: 'transparent', border: 'none', color: palette.text, cursor: 'pointer' }}>
               <X size={20} />
             </button>
             <h3 style={{ fontSize: '1.1rem', color: '#00E5FF', marginBottom: '16px' }}>{mediaModal.title}</h3>
@@ -1601,8 +1612,8 @@ export const AdminDashboardPage: React.FC = () => {
       {/* ASSET GALLERY MODAL — every Form 1 / Form 2 upload for a user, with prev/next arrows */}
       {assetsModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div style={{ background: '#040F2B', border: '1px solid #00E5FF', borderRadius: '16px', padding: '24px', maxWidth: '700px', width: '100%', position: 'relative' }}>
-            <button onClick={() => setAssetsModal(null)} style={{ position: 'absolute', top: '16px', right: '16px', background: 'transparent', border: 'none', color: 'white', cursor: 'pointer' }}>
+          <div style={{ background: palette.surface, border: '1px solid #00E5FF', borderRadius: '16px', padding: '24px', maxWidth: '700px', width: '100%', position: 'relative' }}>
+            <button onClick={() => setAssetsModal(null)} style={{ position: 'absolute', top: '16px', right: '16px', background: 'transparent', border: 'none', color: palette.text, cursor: 'pointer' }}>
               <X size={20} />
             </button>
             <h3 style={{ fontSize: '1.1rem', color: '#00E5FF', marginBottom: '4px' }}>{assetsModal.items[assetsModal.index].title}</h3>
@@ -1614,7 +1625,7 @@ export const AdminDashboardPage: React.FC = () => {
               <button
                 onClick={() => setAssetsModal(m => m && ({ ...m, index: (m.index - 1 + m.items.length) % m.items.length }))}
                 disabled={assetsModal.items.length < 2}
-                style={{ flexShrink: 0, background: 'rgba(255,255,255,0.08)', border: 'none', color: 'white', width: '36px', height: '36px', borderRadius: '8px', cursor: assetsModal.items.length < 2 ? 'not-allowed' : 'pointer', opacity: assetsModal.items.length < 2 ? 0.4 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                style={{ flexShrink: 0, background: palette.inputBg, border: 'none', color: palette.text, width: '36px', height: '36px', borderRadius: '8px', cursor: assetsModal.items.length < 2 ? 'not-allowed' : 'pointer', opacity: assetsModal.items.length < 2 ? 0.4 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
               >
                 <ChevronLeft size={20} />
               </button>
@@ -1654,7 +1665,7 @@ export const AdminDashboardPage: React.FC = () => {
               <button
                 onClick={() => setAssetsModal(m => m && ({ ...m, index: (m.index + 1) % m.items.length }))}
                 disabled={assetsModal.items.length < 2}
-                style={{ flexShrink: 0, background: 'rgba(255,255,255,0.08)', border: 'none', color: 'white', width: '36px', height: '36px', borderRadius: '8px', cursor: assetsModal.items.length < 2 ? 'not-allowed' : 'pointer', opacity: assetsModal.items.length < 2 ? 0.4 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                style={{ flexShrink: 0, background: palette.inputBg, border: 'none', color: palette.text, width: '36px', height: '36px', borderRadius: '8px', cursor: assetsModal.items.length < 2 ? 'not-allowed' : 'pointer', opacity: assetsModal.items.length < 2 ? 0.4 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
               >
                 <ChevronRight size={20} />
               </button>
@@ -1675,24 +1686,24 @@ export const AdminDashboardPage: React.FC = () => {
       {/* TAG DELETE CONFIRMATION MODAL */}
       {tagPendingDelete && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div style={{ background: '#040F2B', border: '1px solid #EF4444', borderRadius: '16px', padding: '24px', maxWidth: '380px', width: '100%' }}>
+          <div style={{ background: palette.surface, border: '1px solid #EF4444', borderRadius: '16px', padding: '24px', maxWidth: '380px', width: '100%' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
               <AlertTriangle size={22} color="#EF4444" />
-              <h3 style={{ fontSize: '1.05rem', color: 'white', margin: 0 }}>Delete Tag?</h3>
+              <h3 style={{ fontSize: '1.05rem', color: palette.text, margin: 0 }}>Delete Tag?</h3>
             </div>
             <p style={{ color: '#94A3B8', fontSize: '0.88rem', marginBottom: '20px' }}>
-              Are you sure you want to delete the tag <strong style={{ color: 'white' }}>"{tagPendingDelete}"</strong>? Any users currently assigned this tag will lose it.
+              Are you sure you want to delete the tag <strong style={{ color: palette.text }}>"{tagPendingDelete}"</strong>? Any users currently assigned this tag will lose it.
             </p>
             <div style={{ display: 'flex', gap: '10px' }}>
               <button
                 onClick={() => setTagPendingDelete(null)}
-                style={{ flex: 1, padding: '10px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.2)', background: 'transparent', color: '#CBD5E1', fontWeight: 700, cursor: 'pointer' }}
+                style={{ flex: 1, padding: '10px', borderRadius: '10px', border: `1px solid ${palette.borderStrong}`, background: 'transparent', color: palette.textMuted2, fontWeight: 700, cursor: 'pointer' }}
               >
                 Cancel
               </button>
               <button
                 onClick={() => handleRemoveTag(tagPendingDelete)}
-                style={{ flex: 1, padding: '10px', borderRadius: '10px', border: 'none', background: '#EF4444', color: 'white', fontWeight: 700, cursor: 'pointer' }}
+                style={{ flex: 1, padding: '10px', borderRadius: '10px', border: 'none', background: '#EF4444', color: palette.text, fontWeight: 700, cursor: 'pointer' }}
               >
                 Delete
               </button>
@@ -1704,8 +1715,8 @@ export const AdminDashboardPage: React.FC = () => {
       {/* EMAIL CSV+ZIP EXPORT MODAL */}
       {emailExportOpen && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div style={{ background: '#040F2B', border: '1px solid #A855F7', borderRadius: '16px', padding: '24px', maxWidth: '420px', width: '100%', position: 'relative' }}>
-            <button onClick={() => setEmailExportOpen(false)} style={{ position: 'absolute', top: '16px', right: '16px', background: 'transparent', border: 'none', color: 'white', cursor: 'pointer' }}>
+          <div style={{ background: palette.surface, border: '1px solid #A855F7', borderRadius: '16px', padding: '24px', maxWidth: '420px', width: '100%', position: 'relative' }}>
+            <button onClick={() => setEmailExportOpen(false)} style={{ position: 'absolute', top: '16px', right: '16px', background: 'transparent', border: 'none', color: palette.text, cursor: 'pointer' }}>
               <X size={20} />
             </button>
             <h3 style={{ fontSize: '1.1rem', color: '#C084FC', marginBottom: '8px' }}>Email CSV + ZIP Export</h3>
@@ -1717,12 +1728,12 @@ export const AdminDashboardPage: React.FC = () => {
               value={emailExportAddress}
               onChange={e => setEmailExportAddress(e.target.value)}
               placeholder="admin@example.com"
-              style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.15)', background: '#091A44', color: '#E2E8F0', fontSize: '0.9rem', marginBottom: '16px', outline: 'none', boxSizing: 'border-box' }}
+              style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: `1px solid ${palette.border}`, background: palette.surfaceAlt, color: palette.text, fontSize: '0.9rem', marginBottom: '16px', outline: 'none', boxSizing: 'border-box' }}
             />
             <button
               onClick={handleEmailExport}
               disabled={emailExportSending || !emailExportAddress.trim()}
-              style={{ width: '100%', padding: '12px', borderRadius: '10px', border: 'none', background: 'linear-gradient(90deg, #A855F7 0%, #6366F1 100%)', color: 'white', fontWeight: 700, cursor: (emailExportSending || !emailExportAddress.trim()) ? 'not-allowed' : 'pointer', opacity: (emailExportSending || !emailExportAddress.trim()) ? 0.6 : 1 }}
+              style={{ width: '100%', padding: '12px', borderRadius: '10px', border: 'none', background: 'linear-gradient(90deg, #A855F7 0%, #6366F1 100%)', color: palette.text, fontWeight: 700, cursor: (emailExportSending || !emailExportAddress.trim()) ? 'not-allowed' : 'pointer', opacity: (emailExportSending || !emailExportAddress.trim()) ? 0.6 : 1 }}
             >
               {emailExportSending ? 'Starting…' : 'Send Export Link'}
             </button>
@@ -1732,7 +1743,7 @@ export const AdminDashboardPage: React.FC = () => {
 
       {/* TOAST NOTIFICATION */}
       {toast && (
-        <div style={{ position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)', background: '#091A44', border: '1px solid #A855F7', color: '#E2E8F0', padding: '14px 22px', borderRadius: '12px', fontSize: '0.88rem', fontWeight: 600, zIndex: 3000, boxShadow: '0 8px 24px rgba(0,0,0,0.4)', maxWidth: '90vw' }}>
+        <div style={{ position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)', background: palette.surfaceAlt, border: '1px solid #A855F7', color: palette.text, padding: '14px 22px', borderRadius: '12px', fontSize: '0.88rem', fontWeight: 600, zIndex: 3000, boxShadow: '0 8px 24px rgba(0,0,0,0.4)', maxWidth: '90vw' }}>
           {toast}
         </div>
       )}
