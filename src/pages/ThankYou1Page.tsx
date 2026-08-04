@@ -91,7 +91,7 @@ export const ThankYou1Page: React.FC = () => {
             {formData.refId || 'KANDO-2026-8942'}
           </div>
           <div style={{ fontSize: '0.85rem', color: '#64748B', marginTop: '6px' }}>
-            Submitted by: <strong style={{ color: '#CBD5E1' }}>{formData.empName || 'Yamaha Employee'}</strong> ({formData.empId || 'YMI-1049'})
+            Submitted by: <strong style={{ color: 'var(--label-muted)' }}>{formData.empName || 'Yamaha Employee'}</strong> ({formData.empId || 'YMI-1049'})
           </div>
         </div>
 
@@ -106,7 +106,7 @@ export const ThankYou1Page: React.FC = () => {
               Chairman Invites Your Thoughts — Optional
             </span>
           </div>
-          <p style={{ color: '#CBD5E1', fontSize: '0.87rem', lineHeight: 1.5, margin: 0 }}>
+          <p style={{ color: 'var(--label-muted)', fontSize: '0.87rem', lineHeight: 1.5, margin: 0 }}>
             You may optionally participate in the Chairman's initiative — share your thoughts on Yamaha's future. This is completely independent of Form 1.
           </p>
         </div>

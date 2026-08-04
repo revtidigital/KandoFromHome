@@ -78,6 +78,8 @@ interface AppContextType {
 
   navigateTo: (view: string, langOverride?: Language) => void;
   apiBaseUrl: string;
+  publicTheme: 'dark' | 'light';
+  setPublicTheme: (theme: 'dark' | 'light') => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -310,6 +312,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [allUsers, setAllUsers] = useState<any[]>([]);
   const [customTags, setCustomTags] = useState<string[]>(['Shortlisted', 'Featured', 'Flagged', 'Verified']);
 
+  // Public-site light/dark theme (independent of the admin dashboard's own
+  // toggle) — flips the shared CSS custom properties in index.css so every
+  // page that reads var(--yamaha-navy)/var(--text-main) updates at once.
+  const [publicTheme, setPublicThemeState] = useState<'dark' | 'light'>(
+    () => (localStorage.getItem('kando_public_theme') as 'dark' | 'light') || 'dark'
+  );
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', publicTheme);
+  }, [publicTheme]);
+  const setPublicTheme = (theme: 'dark' | 'light') => {
+    setPublicThemeState(theme);
+    localStorage.setItem('kando_public_theme', theme);
+  };
+
   const addAuditLog = (detail: string) => {
     const newLog: AuditLog = {
       id: Date.now().toString(),
@@ -349,7 +365,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setCustomTags,
       addAuditLog,
       navigateTo,
-      apiBaseUrl: API_BASE_URL
+      apiBaseUrl: API_BASE_URL,
+      publicTheme,
+      setPublicTheme
     }}>
       {children}
     </AppContext.Provider>

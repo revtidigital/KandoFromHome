@@ -38,7 +38,7 @@ export const ThankYou2Page: React.FC = () => {
           <Award size={52} />
         </div>
 
-        <h1 className="heading-font" style={{ fontSize: '2.4rem', color: 'white', marginBottom: '12px' }}>
+        <h1 className="heading-font" style={{ fontSize: '2.4rem', color: 'var(--text-main)', marginBottom: '12px' }}>
           {t.thankYou2Title}
         </h1>
 

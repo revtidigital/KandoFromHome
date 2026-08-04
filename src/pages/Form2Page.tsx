@@ -145,7 +145,7 @@ export const Form2Page: React.FC = () => {
     boxSizing: 'border-box' as const,
     background: 'rgba(255,255,255,0.06)',
     border: hasError ? '1px solid #EF4444' : '1px solid rgba(255,255,255,0.2)',
-    color: 'white',
+    color: 'var(--text-main)',
     outline: 'none',
     fontSize: '0.95rem'
   });
@@ -153,7 +153,7 @@ export const Form2Page: React.FC = () => {
   return (
     <div className="container" style={{ padding: '24px 12px', maxWidth: '850px', width: '100%', boxSizing: 'border-box' }}>
       <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-        <h1 className="heading-font" style={{ fontSize: 'clamp(1.6rem, 4vw, 2.2rem)', color: 'white', marginBottom: '8px' }}>
+        <h1 className="heading-font" style={{ fontSize: 'clamp(1.6rem, 4vw, 2.2rem)', color: 'var(--text-main)', marginBottom: '8px' }}>
           Chairman Invites Your Thoughts
         </h1>
         <p style={{ color: '#A0B2D6', fontSize: '0.95rem', maxWidth: '600px', margin: '0 auto' }}>
@@ -183,14 +183,14 @@ export const Form2Page: React.FC = () => {
           <div className="form-fields-grid">
             {/* Company Name */}
             <div style={{ minWidth: 0 }}>
-              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>Company Name</label>
+              <label style={{ display: 'block', color: 'var(--label-muted)', fontSize: '0.85rem', marginBottom: '6px' }}>Company Name</label>
               <input type="text" value={companyName} onChange={e => setCompanyName(e.target.value)}
                 placeholder="e.g. Yamaha Motor India" style={inputStyle()} />
             </div>
 
             {/* Employee EIN (ID) */}
             <div style={{ minWidth: 0 }}>
-              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>Employee EIN {!hasNoEmpId && '*'}</label>
+              <label style={{ display: 'block', color: 'var(--label-muted)', fontSize: '0.85rem', marginBottom: '6px' }}>Employee EIN {!hasNoEmpId && '*'}</label>
               <div style={{ position: 'relative' }}>
                 <input type="text" value={formData.empId}
                   disabled={formData.phone.trim().length > 0}
@@ -213,7 +213,7 @@ export const Form2Page: React.FC = () => {
 
             {/* Phone Number (only if no Employee ID) */}
             <div style={{ minWidth: 0 }}>
-              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>Phone Number {hasNoEmpId && '*'}</label>
+              <label style={{ display: 'block', color: 'var(--label-muted)', fontSize: '0.85rem', marginBottom: '6px' }}>Phone Number {hasNoEmpId && '*'}</label>
               <div style={{ position: 'relative' }}>
                 <input type="tel" value={formData.phone}
                   disabled={formData.empId.trim().length > 0}
@@ -232,7 +232,7 @@ export const Form2Page: React.FC = () => {
 
             {/* Employee Name */}
             <div style={{ minWidth: 0 }}>
-              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>Employee Name *</label>
+              <label style={{ display: 'block', color: 'var(--label-muted)', fontSize: '0.85rem', marginBottom: '6px' }}>Employee Name *</label>
               <input type="text" value={formData.empName}
                 onChange={e => setFormData(prev => ({ ...prev, empName: e.target.value }))}
                 placeholder="e.g. Priya Sundaram" style={inputStyle(errors.empName)} />
@@ -241,14 +241,14 @@ export const Form2Page: React.FC = () => {
 
             {/* Department */}
             <div style={{ minWidth: 0 }}>
-              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>Department</label>
+              <label style={{ display: 'block', color: 'var(--label-muted)', fontSize: '0.85rem', marginBottom: '6px' }}>Department</label>
               <input type="text" value={department} onChange={e => setDepartment(e.target.value)}
                 placeholder="e.g. Marketing" style={inputStyle()} />
             </div>
 
             {/* Location */}
             <div style={{ minWidth: 0 }}>
-              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>Location</label>
+              <label style={{ display: 'block', color: 'var(--label-muted)', fontSize: '0.85rem', marginBottom: '6px' }}>Location</label>
               <input type="text" value={location} onChange={e => setLocation(e.target.value)}
                 placeholder="e.g. Chennai Plant" style={inputStyle()} />
             </div>
@@ -273,7 +273,7 @@ export const Form2Page: React.FC = () => {
               width: '100%', padding: '14px', borderRadius: '12px', boxSizing: 'border-box',
               background: 'rgba(255,255,255,0.06)',
               border: errors.thoughts ? '1px solid #EF4444' : '1px solid rgba(255,255,255,0.2)',
-              color: 'white', outline: 'none', resize: 'vertical', fontSize: '0.95rem'
+              color: 'var(--text-main)', outline: 'none', resize: 'vertical', fontSize: '0.95rem'
             }}
           />
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4px' }}>
@@ -295,7 +295,7 @@ export const Form2Page: React.FC = () => {
           <label style={{
             display: 'flex', alignItems: 'center', gap: '12px', padding: '16px',
             borderRadius: '12px', border: errors.optionalFile ? '2px dashed #EF4444' : '2px dashed rgba(255,255,255,0.2)',
-            cursor: 'pointer', background: 'rgba(255,255,255,0.03)', color: '#CBD5E1', fontSize: '0.9rem'
+            cursor: 'pointer', background: 'rgba(255,255,255,0.03)', color: 'var(--label-muted)', fontSize: '0.9rem'
           }}>
             <Upload size={20} color="#D1B07B" />
             <span>
@@ -324,7 +324,7 @@ export const Form2Page: React.FC = () => {
               onChange={e => { setDataConsent(e.target.checked); if (e.target.checked) setErrors(prev => ({ ...prev, dataConsent: '' })); }}
               style={{ accentColor: '#D1B07B', width: '18px', height: '18px', flexShrink: 0, marginTop: '2px' }}
             />
-            <span style={{ color: '#CBD5E1', fontSize: '0.87rem', lineHeight: 1.5 }}>
+            <span style={{ color: 'var(--label-muted)', fontSize: '0.87rem', lineHeight: 1.5 }}>
               I agree to the{' '}
               <a href={`/${language}/terms`} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ color: '#D1B07B', textDecoration: 'underline' }}>
                 Terms &amp; Conditions

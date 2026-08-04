@@ -1,10 +1,10 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
 import type { Language } from '../i18n/translations';
-import { Globe } from 'lucide-react';
+import { Globe, Sun, Moon } from 'lucide-react';
 
 export const Header: React.FC = () => {
-  const { language, setLanguage, currentView, navigateTo } = useApp();
+  const { language, setLanguage, currentView, navigateTo, publicTheme, setPublicTheme } = useApp();
 
   if (currentView === 'landing' || currentView === 'admin-dashboard') {
     return null;
@@ -39,8 +39,8 @@ export const Header: React.FC = () => {
                 </svg>
               </div>
               <div>
-                <div style={{ fontWeight: 800, fontSize: '1.15rem', letterSpacing: '1px', color: 'white', lineHeight: 1 }}>YAMAHA</div>
-                <div style={{ fontSize: '0.62rem', color: '#A0B2D6', letterSpacing: '0.5px' }}>Revs Your Heart</div>
+                <div style={{ fontWeight: 800, fontSize: '1.15rem', letterSpacing: '1px', color: 'var(--text-main)', lineHeight: 1 }}>YAMAHA</div>
+                <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', letterSpacing: '0.5px' }}>Revs Your Heart</div>
               </div>
             </div>
 
@@ -48,7 +48,7 @@ export const Header: React.FC = () => {
 
             <div className="header-subtitle" style={{ display: 'flex', flexDirection: 'column' }}>
               <span style={{ fontSize: '0.65rem', color: '#00E5FF', fontWeight: 700, letterSpacing: '1px' }}>YAMAHA DAY 2026</span>
-              <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'white' }}>
+              <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-main)' }}>
                 ADMIN PORTAL
               </span>
             </div>
@@ -58,13 +58,13 @@ export const Header: React.FC = () => {
             onClick={() => navigateTo('home')}
             style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}
           >
-            <img src="/yamaha_logo.png" alt="Yamaha" style={{ height: '34px', width: 'auto', flexShrink: 0 }} />
+            <img src="/yamaha_logo.png" alt="Yamaha" className="site-logo" style={{ height: '34px', width: 'auto', flexShrink: 0 }} />
 
             <div className="header-divider" style={{ width: '1px', height: '24px', background: 'rgba(255, 255, 255, 0.2)' }} />
 
             <div className="header-subtitle" style={{ display: 'flex', flexDirection: 'column' }}>
               <span style={{ fontSize: '0.65rem', color: '#D1B07B', fontWeight: 700, letterSpacing: '1px' }}>YAMAHA DAY 2026</span>
-              <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'white' }}>
+              <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-main)' }}>
                 KANDO FROM HOME
               </span>
             </div>
@@ -72,8 +72,8 @@ export const Header: React.FC = () => {
         )}
 
         {/* Navigation Right — HIDE LANGUAGE SELECTOR ON ADMIN DASHBOARD (Req 5) */}
-        {!isAdminView && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {!isAdminView && (
             <div style={{
               position: 'relative',
               display: 'flex',
@@ -91,7 +91,7 @@ export const Header: React.FC = () => {
                 style={{
                   background: 'transparent',
                   border: 'none',
-                  color: 'white',
+                  color: 'var(--text-main)',
                   fontSize: '0.82rem',
                   fontWeight: 700,
                   outline: 'none',
@@ -103,8 +103,21 @@ export const Header: React.FC = () => {
                 <option value="ta" style={{ background: '#06133B', color: 'white' }}>தமிழ் (Tamil)</option>
               </select>
             </div>
-          </div>
-        )}
+          )}
+
+          {/* Light/dark theme switcher — every public page except Landing */}
+          <button
+            onClick={() => setPublicTheme(publicTheme === 'dark' ? 'light' : 'dark')}
+            title={publicTheme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+            style={{
+              width: '34px', height: '34px', borderRadius: '50%', flexShrink: 0,
+              background: 'rgba(209, 176, 123, 0.12)', border: '1px solid rgba(209, 176, 123, 0.35)',
+              color: '#D1B07B', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer'
+            }}
+          >
+            {publicTheme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+          </button>
+        </div>
       </div>
     </header>
   );

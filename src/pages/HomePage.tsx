@@ -63,7 +63,7 @@ export const HomePage: React.FC = () => {
           <h1 className="heading-font" style={{
             fontSize: 'clamp(2.2rem, 4vw, 3.2rem)',
             fontWeight: 800,
-            color: 'white',
+            color: 'var(--text-main)',
             lineHeight: 1.25,
             marginBottom: '16px'
           }}>
@@ -91,7 +91,7 @@ export const HomePage: React.FC = () => {
         <h2 className="heading-font" style={{
           fontSize: '1.8rem',
           textAlign: 'center',
-          color: 'white',
+          color: 'var(--text-main)',
           marginBottom: '10px'
         }}>
           {t.chooseSubmissionFormTitle}
@@ -136,7 +136,7 @@ export const HomePage: React.FC = () => {
                 {t.form1Badge}
               </div>
 
-              <h3 style={{ fontSize: '1.4rem', color: 'white', fontWeight: 800, marginBottom: '12px' }}>
+              <h3 style={{ fontSize: '1.4rem', color: 'var(--text-main)', fontWeight: 800, marginBottom: '12px' }}>
                 {t.form1CardTitle}
               </h3>
 
@@ -185,7 +185,7 @@ export const HomePage: React.FC = () => {
                 {t.form2Badge}
               </div>
 
-              <h3 style={{ fontSize: '1.4rem', color: 'white', fontWeight: 800, marginBottom: '12px' }}>
+              <h3 style={{ fontSize: '1.4rem', color: 'var(--text-main)', fontWeight: 800, marginBottom: '12px' }}>
                 {t.form2CardTitle}
               </h3>
 
@@ -278,7 +278,7 @@ export const HomePage: React.FC = () => {
         <h2 className="heading-font" style={{
           fontSize: '1.8rem',
           textAlign: 'center',
-          color: 'white',
+          color: 'var(--text-main)',
           marginBottom: '32px'
         }}>
           {t.howItWorksTitle}
@@ -305,7 +305,7 @@ export const HomePage: React.FC = () => {
             }}>
               <Heart size={24} />
             </div>
-            <h4 style={{ fontSize: '1.15rem', color: 'white', marginBottom: '8px' }}>1. {t.step1Title}</h4>
+            <h4 style={{ fontSize: '1.15rem', color: 'var(--text-main)', marginBottom: '8px' }}>1. {t.step1Title}</h4>
             <p style={{ fontSize: '0.9rem', color: '#A0B2D6', lineHeight: 1.5 }}>{t.step1Desc}</p>
           </div>
 
@@ -325,7 +325,7 @@ export const HomePage: React.FC = () => {
             }}>
               <Video size={24} />
             </div>
-            <h4 style={{ fontSize: '1.15rem', color: 'white', marginBottom: '8px' }}>2. {t.step2Title}</h4>
+            <h4 style={{ fontSize: '1.15rem', color: 'var(--text-main)', marginBottom: '8px' }}>2. {t.step2Title}</h4>
             <p style={{ fontSize: '0.9rem', color: '#A0B2D6', lineHeight: 1.5 }}>{t.step2Desc}</p>
           </div>
 
@@ -345,7 +345,7 @@ export const HomePage: React.FC = () => {
             }}>
               <UserCheck size={24} />
             </div>
-            <h4 style={{ fontSize: '1.15rem', color: 'white', marginBottom: '8px' }}>3. {t.step3Title}</h4>
+            <h4 style={{ fontSize: '1.15rem', color: 'var(--text-main)', marginBottom: '8px' }}>3. {t.step3Title}</h4>
             <p style={{ fontSize: '0.9rem', color: '#A0B2D6', lineHeight: 1.5 }}>{t.step3Desc}</p>
           </div>
 
@@ -365,7 +365,7 @@ export const HomePage: React.FC = () => {
             }}>
               <Award size={24} />
             </div>
-            <h4 style={{ fontSize: '1.15rem', color: 'white', marginBottom: '8px' }}>4. {t.step4Title}</h4>
+            <h4 style={{ fontSize: '1.15rem', color: 'var(--text-main)', marginBottom: '8px' }}>4. {t.step4Title}</h4>
             <p style={{ fontSize: '0.9rem', color: '#A0B2D6', lineHeight: 1.5 }}>{t.step4Desc}</p>
           </div>
         </div>

@@ -214,27 +214,42 @@ export const AdminDashboardPage: React.FC = () => {
   const [mediaDownloading, setMediaDownloading] = useState(false);
 
   // Signed URL for whichever asset the gallery modal is currently showing.
+  // Tracks its own error state — a silently-swallowed fetch failure used to
+  // leave the modal stuck on "Loading…" forever with no way to tell it had
+  // actually failed (expired signed URL, R2 hiccup, 403, etc).
   const [gallerySignedUrl, setGallerySignedUrl] = useState<string | null>(null);
+  const [galleryError, setGalleryError] = useState<string | null>(null);
+  const [galleryRetryKey, setGalleryRetryKey] = useState(0);
   useEffect(() => {
     if (!assetsModal) {
       setGallerySignedUrl(null);
+      setGalleryError(null);
       return;
     }
     const current = assetsModal.items[assetsModal.index];
     if (!current) return;
     if (!/^https?:\/\//i.test(current.url)) {
       setGallerySignedUrl(`${apiBaseUrl}${current.url}`);
+      setGalleryError(null);
       return;
     }
     let cancelled = false;
     setGallerySignedUrl(null);
+    setGalleryError(null);
     fetch(`${apiBaseUrl}/api/admin/media-url?url=${encodeURIComponent(current.url)}`, { headers: adminAuthHeader() })
-      .then(res => res.json())
-      .then(data => { if (!cancelled && data.url) setGallerySignedUrl(data.url); })
-      .catch(() => {});
+      .then(async res => {
+        const data = await res.json().catch(() => ({}));
+        if (cancelled) return;
+        if (!res.ok || !data.url) {
+          setGalleryError(data.error || 'Failed to load this asset.');
+          return;
+        }
+        setGallerySignedUrl(data.url);
+      })
+      .catch(() => { if (!cancelled) setGalleryError('Failed to load this asset — check your connection and retry.'); });
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [assetsModal, apiBaseUrl]);
+  }, [assetsModal, apiBaseUrl, galleryRetryKey]);
 
   // CSV+ZIP email-export modal + toast state
   const [emailExportOpen, setEmailExportOpen] = useState(false);
@@ -290,23 +305,35 @@ export const AdminDashboardPage: React.FC = () => {
 
   // R2 media is private — fetch a short-lived signed URL to view/download it.
   // Legacy relative /uploads paths (pre-R2) are served directly via apiBaseUrl.
+  const [mediaError, setMediaError] = useState<string | null>(null);
+  const [mediaRetryKey, setMediaRetryKey] = useState(0);
   useEffect(() => {
     if (!mediaModal) {
       setMediaSignedUrl(null);
+      setMediaError(null);
       return;
     }
     if (!/^https?:\/\//i.test(mediaModal.url)) {
       setMediaSignedUrl(`${apiBaseUrl}${mediaModal.url}`);
+      setMediaError(null);
       return;
     }
     let cancelled = false;
     setMediaSignedUrl(null);
+    setMediaError(null);
     fetch(`${apiBaseUrl}/api/admin/media-url?url=${encodeURIComponent(mediaModal.url)}`, { headers: adminAuthHeader() })
-      .then(res => res.json())
-      .then(data => { if (!cancelled && data.url) setMediaSignedUrl(data.url); })
-      .catch(() => {});
+      .then(async res => {
+        const data = await res.json().catch(() => ({}));
+        if (cancelled) return;
+        if (!res.ok || !data.url) {
+          setMediaError(data.error || 'Failed to load this asset.');
+          return;
+        }
+        setMediaSignedUrl(data.url);
+      })
+      .catch(() => { if (!cancelled) setMediaError('Failed to load this asset — check your connection and retry.'); });
     return () => { cancelled = true; };
-  }, [mediaModal, apiBaseUrl]);
+  }, [mediaModal, apiBaseUrl, mediaRetryKey]);
 
   // Fetch initial settings & users from API
   useEffect(() => {
@@ -1511,14 +1538,36 @@ export const AdminDashboardPage: React.FC = () => {
               <X size={20} />
             </button>
             <h3 style={{ fontSize: '1.1rem', color: '#00E5FF', marginBottom: '16px' }}>{mediaModal.title}</h3>
-            {!mediaSignedUrl ? (
+            {mediaError ? (
+              <div style={{ padding: '40px 0', textAlign: 'center' }}>
+                <p style={{ color: '#EF4444', fontWeight: 700, marginBottom: '12px' }}>{mediaError}</p>
+                <button
+                  onClick={() => setMediaRetryKey(k => k + 1)}
+                  style={{ border: '1px solid #00E5FF', color: '#00E5FF', background: 'rgba(0,229,255,0.08)', padding: '8px 16px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer' }}
+                >
+                  Retry
+                </button>
+              </div>
+            ) : !mediaSignedUrl ? (
               <div style={{ padding: '40px 0', textAlign: 'center', color: '#64748B' }}>Loading…</div>
             ) : (
               <>
                 {mediaModal.type === 'image' ? (
-                  <img src={mediaSignedUrl} alt={mediaModal.title} style={{ maxWidth: '100%', maxHeight: '70vh', borderRadius: '12px', display: 'block', margin: '0 auto' }} />
+                  <img
+                    key={mediaSignedUrl}
+                    src={mediaSignedUrl}
+                    alt={mediaModal.title}
+                    style={{ maxWidth: '100%', maxHeight: '70vh', borderRadius: '12px', display: 'block', margin: '0 auto' }}
+                    onError={() => setMediaError('This image file failed to load (it may be corrupted or missing).')}
+                  />
                 ) : (
-                  <video controls src={mediaSignedUrl} style={{ width: '100%', borderRadius: '12px' }} />
+                  <video
+                    key={mediaSignedUrl}
+                    controls
+                    src={mediaSignedUrl}
+                    style={{ width: '100%', borderRadius: '12px' }}
+                    onError={() => setMediaError('This video file failed to load (it may be corrupted or missing).')}
+                  />
                 )}
                 <button
                   onClick={handleMediaDownload}
@@ -1555,12 +1604,34 @@ export const AdminDashboardPage: React.FC = () => {
               </button>
 
               <div style={{ flex: 1, minWidth: 0 }}>
-                {!gallerySignedUrl ? (
+                {galleryError ? (
+                  <div style={{ padding: '40px 0', textAlign: 'center' }}>
+                    <p style={{ color: '#EF4444', fontWeight: 700, marginBottom: '12px' }}>{galleryError}</p>
+                    <button
+                      onClick={() => setGalleryRetryKey(k => k + 1)}
+                      style={{ border: '1px solid #00E5FF', color: '#00E5FF', background: 'rgba(0,229,255,0.08)', padding: '8px 16px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer' }}
+                    >
+                      Retry
+                    </button>
+                  </div>
+                ) : !gallerySignedUrl ? (
                   <div style={{ padding: '40px 0', textAlign: 'center', color: '#64748B' }}>Loading…</div>
                 ) : assetsModal.items[assetsModal.index].type === 'image' ? (
-                  <img src={gallerySignedUrl} alt={assetsModal.items[assetsModal.index].title} style={{ maxWidth: '100%', maxHeight: '60vh', borderRadius: '12px', display: 'block', margin: '0 auto' }} />
+                  <img
+                    key={gallerySignedUrl}
+                    src={gallerySignedUrl}
+                    alt={assetsModal.items[assetsModal.index].title}
+                    style={{ maxWidth: '100%', maxHeight: '60vh', borderRadius: '12px', display: 'block', margin: '0 auto' }}
+                    onError={() => setGalleryError('This image file failed to load (it may be corrupted or missing).')}
+                  />
                 ) : (
-                  <video controls src={gallerySignedUrl} style={{ width: '100%', borderRadius: '12px' }} />
+                  <video
+                    key={gallerySignedUrl}
+                    controls
+                    src={gallerySignedUrl}
+                    style={{ width: '100%', borderRadius: '12px' }}
+                    onError={() => setGalleryError('This video file failed to load (it may be corrupted or missing).')}
+                  />
                 )}
               </div>
 
@@ -1573,7 +1644,7 @@ export const AdminDashboardPage: React.FC = () => {
               </button>
             </div>
 
-            {gallerySignedUrl && (
+            {gallerySignedUrl && !galleryError && (
               <button
                 onClick={() => downloadR2File(assetsModal.items[assetsModal.index].url, assetsModal.items[assetsModal.index].title)}
                 style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginTop: '16px', border: '1px solid #00E5FF', borderRadius: '10px', padding: '10px 18px', color: '#00E5FF', fontSize: '0.85rem', fontWeight: 700, background: 'rgba(0,229,255,0.08)', cursor: 'pointer' }}

@@ -281,7 +281,7 @@ export const Form1Page: React.FC = () => {
 
           <div className="form-fields-grid">
             <div style={{ minWidth: 0 }}>
-              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>Company Name</label>
+              <label style={{ display: 'block', color: 'var(--label-muted)', fontSize: '0.85rem', marginBottom: '6px' }}>Company Name</label>
               <input
                 type="text"
                 value={companyName}
@@ -290,13 +290,13 @@ export const Form1Page: React.FC = () => {
                 style={{
                   width: '100%', minWidth: 0, padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
                   background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.2)',
-                  color: 'white', outline: 'none'
+                  color: 'var(--text-main)', outline: 'none'
                 }}
               />
             </div>
 
             <div style={{ minWidth: 0 }}>
-              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>{t.empId} {!hasNoEmpId && '*'}</label>
+              <label style={{ display: 'block', color: 'var(--label-muted)', fontSize: '0.85rem', marginBottom: '6px' }}>{t.empId} {!hasNoEmpId && '*'}</label>
               <div style={{ position: 'relative' }}>
                 <input
                   type="text"
@@ -326,7 +326,7 @@ export const Form1Page: React.FC = () => {
             </div>
 
             <div style={{ minWidth: 0 }}>
-              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>Phone Number {hasNoEmpId && '*'}</label>
+              <label style={{ display: 'block', color: 'var(--label-muted)', fontSize: '0.85rem', marginBottom: '6px' }}>Phone Number {hasNoEmpId && '*'}</label>
               <div style={{ position: 'relative' }}>
                 <input
                   type="tel"
@@ -352,7 +352,7 @@ export const Form1Page: React.FC = () => {
             </div>
 
             <div style={{ minWidth: 0 }}>
-              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>{t.fullName} *</label>
+              <label style={{ display: 'block', color: 'var(--label-muted)', fontSize: '0.85rem', marginBottom: '6px' }}>{t.fullName} *</label>
               <input
                 type="text"
                 value={formData.empName}
@@ -361,14 +361,14 @@ export const Form1Page: React.FC = () => {
                 style={{
                   width: '100%', minWidth: 0, padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
                   background: 'rgba(255,255,255,0.06)', border: errors.empName ? '1px solid #EF4444' : '1px solid rgba(255,255,255,0.2)',
-                  color: 'white', outline: 'none'
+                  color: 'var(--text-main)', outline: 'none'
                 }}
               />
               {errors.empName && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.empName}</p>}
             </div>
 
             <div style={{ minWidth: 0 }}>
-              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>Department</label>
+              <label style={{ display: 'block', color: 'var(--label-muted)', fontSize: '0.85rem', marginBottom: '6px' }}>Department</label>
               <input
                 type="text"
                 value={department}
@@ -377,13 +377,13 @@ export const Form1Page: React.FC = () => {
                 style={{
                   width: '100%', minWidth: 0, padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
                   background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.2)',
-                  color: 'white', outline: 'none'
+                  color: 'var(--text-main)', outline: 'none'
                 }}
               />
             </div>
 
             <div style={{ minWidth: 0 }}>
-              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>Location</label>
+              <label style={{ display: 'block', color: 'var(--label-muted)', fontSize: '0.85rem', marginBottom: '6px' }}>Location</label>
               <input
                 type="text"
                 value={formData.city}
@@ -392,7 +392,7 @@ export const Form1Page: React.FC = () => {
                 style={{
                   width: '100%', minWidth: 0, padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
                   background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.2)',
-                  color: 'white', outline: 'none'
+                  color: 'var(--text-main)', outline: 'none'
                 }}
               />
             </div>
@@ -413,7 +413,7 @@ export const Form1Page: React.FC = () => {
 
             {/* PHOTO 1 */}
             <div>
-              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>
+              <label style={{ display: 'block', color: 'var(--label-muted)', fontSize: '0.85rem', marginBottom: '6px' }}>
                 {t.photo1Label}
               </label>
               {photo1Preview ? (
@@ -430,7 +430,7 @@ export const Form1Page: React.FC = () => {
                   background: 'rgba(209, 176, 123, 0.04)', cursor: 'pointer', textAlign: 'center', padding: '16px'
                 }}>
                   <ImageIcon size={28} color="#D1B07B" />
-                  <span style={{ fontSize: '0.85rem', color: '#CBD5E1', marginTop: '8px' }}>Click to select Photo 1</span>
+                  <span style={{ fontSize: '0.85rem', color: 'var(--label-muted)', marginTop: '8px' }}>Click to select Photo 1</span>
                   <span style={{ fontSize: '0.75rem', color: '#64748B' }}>All photo formats supported (Max 5MB)</span>
                   <input type="file" accept="image/*,.png,.jpg,.jpeg,.gif,.webp,.heic,.heif,.bmp,.svg,.tiff" onChange={e => handlePhotoChange(e, 'photo1')} style={{ display: 'none' }} />
                 </label>
@@ -440,7 +440,7 @@ export const Form1Page: React.FC = () => {
 
             {/* PHOTO 2 */}
             <div>
-              <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>
+              <label style={{ display: 'block', color: 'var(--label-muted)', fontSize: '0.85rem', marginBottom: '6px' }}>
                 {t.photo2Label}
               </label>
               {photo2Preview ? (
@@ -457,7 +457,7 @@ export const Form1Page: React.FC = () => {
                   background: 'rgba(255, 255, 255, 0.02)', cursor: 'pointer', textAlign: 'center', padding: '16px'
                 }}>
                   <Upload size={28} color="#A0B2D6" />
-                  <span style={{ fontSize: '0.85rem', color: '#CBD5E1', marginTop: '8px' }}>Click to select Photo 2</span>
+                  <span style={{ fontSize: '0.85rem', color: 'var(--label-muted)', marginTop: '8px' }}>Click to select Photo 2</span>
                   <span style={{ fontSize: '0.75rem', color: '#64748B' }}>All photo formats supported (Max 5MB)</span>
                   <input type="file" accept="image/*,.png,.jpg,.jpeg,.gif,.webp,.heic,.heif,.bmp,.svg,.tiff" onChange={e => handlePhotoChange(e, 'photo2')} style={{ display: 'none' }} />
                 </label>
@@ -469,7 +469,7 @@ export const Form1Page: React.FC = () => {
 
           {/* OPTIONAL VIDEO UPLOAD IN FORM 1 */}
           <div style={{ marginTop: '20px' }}>
-            <label style={{ display: 'block', color: '#CBD5E1', fontSize: '0.85rem', marginBottom: '6px' }}>
+            <label style={{ display: 'block', color: 'var(--label-muted)', fontSize: '0.85rem', marginBottom: '6px' }}>
               {t.sec2UploadVideoTitle}
             </label>
             {videoPreview ? (
@@ -490,7 +490,7 @@ export const Form1Page: React.FC = () => {
                 background: 'rgba(209, 176, 123, 0.04)', cursor: 'pointer', textAlign: 'center', padding: '16px'
               }}>
                 <FileVideo size={32} color="#D1B07B" />
-                <span style={{ fontSize: '0.85rem', color: '#CBD5E1', marginTop: '8px', fontWeight: 600 }}>Click to select Kando Video (Max 40MB)</span>
+                <span style={{ fontSize: '0.85rem', color: 'var(--label-muted)', marginTop: '8px', fontWeight: 600 }}>Click to select Kando Video (Max 40MB)</span>
                 <span style={{ fontSize: '0.75rem', color: '#64748B' }}>All video formats supported (MP4, MOV, WEBM, AVI, MKV, WMV, etc. Max 40MB)</span>
                 <input type="file" accept="video/*,.mp4,.mov,.webm,.avi,.mkv,.wmv,.flv,.m4v,.3gp,.ts" onChange={handleVideoChange} style={{ display: 'none' }} />
               </label>
@@ -518,7 +518,7 @@ export const Form1Page: React.FC = () => {
               <input type="checkbox" checked={dataConsent}
                 onChange={e => { setDataConsent(e.target.checked); if (e.target.checked) setErrors(prev => ({ ...prev, dataConsent: '' })); }}
                 style={{ accentColor: '#D1B07B', width: '18px', height: '18px', flexShrink: 0, marginTop: '2px' }} />
-              <span style={{ color: '#CBD5E1', fontSize: '0.87rem', lineHeight: 1.5 }}>
+              <span style={{ color: 'var(--label-muted)', fontSize: '0.87rem', lineHeight: 1.5 }}>
                 I agree to the{' '}
                 <a href={`/${language}/terms`} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ color: '#D1B07B', textDecoration: 'underline' }}>
                   Terms &amp; Conditions
@@ -547,7 +547,7 @@ export const Form1Page: React.FC = () => {
               <input type="checkbox" checked={mediaConsent}
                 onChange={e => { setMediaConsent(e.target.checked); if (e.target.checked) setErrors(prev => ({ ...prev, mediaConsent: '' })); }}
                 style={{ accentColor: '#D1B07B', width: '18px', height: '18px', flexShrink: 0, marginTop: '2px' }} />
-              <span style={{ color: '#CBD5E1', fontSize: '0.87rem', lineHeight: 1.5 }}>
+              <span style={{ color: 'var(--label-muted)', fontSize: '0.87rem', lineHeight: 1.5 }}>
                 I grant Yamaha permission to feature my submission photos in internal publications. *
               </span>
             </label>

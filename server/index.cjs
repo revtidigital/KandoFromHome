@@ -1087,6 +1087,7 @@ app.get('/api/admin/export/users', exportLimiter, async (req, res) => {
         'City': u.city || '',
         'Family Members': u.familyMembers || '',
         'Form 1 Status': f1 ? 'Submitted' : 'Not Filled',
+        'Form 1 Phone': f1 ? (f1.phone || '') : '',
         'Form 1 Company Name': f1 ? f1.companyName : '',
         'Form 1 Department': f1 ? f1.department : '',
         'Form 1 Photo 1': f1 ? f1.photo1Url : '',
@@ -1094,14 +1095,17 @@ app.get('/api/admin/export/users', exportLimiter, async (req, res) => {
         'Form 1 Video': f1 ? f1.videoUrl : '',
         'Form 1 CEO Reflection': f1 ? f1.ceoReflection : '',
         'Form 1 Language': f1 ? f1.language : '',
+        'Form 1 Submitted IP': f1 ? (f1.ip || '') : '',
         'Form 1 Submitted At': f1 ? new Date(f1.submittedAt).toLocaleString() : '',
         'Form 2 Status': f2 ? 'Submitted' : 'Not Filled',
+        'Form 2 Phone': f2 ? (f2.phone || '') : '',
         'Form 2 Company Name': f2 ? f2.companyName : '',
         'Form 2 Department': f2 ? f2.department : '',
         'Form 2 Location': f2 ? f2.location : '',
         'Form 2 Thoughts': f2 ? f2.thoughts : '',
         'Form 2 Optional File': f2 ? f2.optionalFileUrl : '',
         'Form 2 Language': f2 ? f2.language : '',
+        'Form 2 Submitted IP': f2 ? (f2.ip || '') : '',
         'Form 2 Submitted At': f2 ? new Date(f2.submittedAt).toLocaleString() : '',
         'Tags': (u.tags || []).join(', '),
         'Registered At': new Date(u.createdAt).toLocaleString()
@@ -1161,15 +1165,23 @@ app.get('/api/admin/export/pdf', exportLimiter, async (req, res) => {
               <th>Emp ID</th>
               <th>Employee Name</th>
               <th>City Location</th>
+              <th>Form 1 Phone</th>
               <th>Form 1 Company</th>
               <th>Form 1 Department</th>
+              <th>Form 1 Photo 1</th>
+              <th>Form 1 Photo 2</th>
+              <th>Form 1 Video</th>
               <th>Form 1 CEO Reflection</th>
               <th>Form 1 Language</th>
+              <th>Form 1 IP</th>
+              <th>Form 2 Phone</th>
               <th>Form 2 Company</th>
               <th>Form 2 Department</th>
               <th>Form 2 Location</th>
               <th>Form 2 Thoughts</th>
+              <th>Form 2 Attachment</th>
               <th>Form 2 Language</th>
+              <th>Form 2 IP</th>
               <th>Assigned Tag</th>
             </tr>
           </thead>
@@ -1186,15 +1198,23 @@ app.get('/api/admin/export/pdf', exportLimiter, async (req, res) => {
           <td><strong>${esc(u.empId || u.phone || '')}</strong></td>
           <td>${esc(u.empName)}</td>
           <td>${esc(u.city || 'N/A')}</td>
-          <td>${f1 ? esc(f1.companyName) : 'Not Filled'}</td>
+          <td>${f1 ? esc(f1.phone) : 'Not Filled'}</td>
+          <td>${f1 ? esc(f1.companyName) : ''}</td>
           <td>${f1 ? esc(f1.department) : ''}</td>
+          <td>${f1 ? (f1.photo1Url ? '✓ Uploaded' : '') : ''}</td>
+          <td>${f1 ? (f1.photo2Url ? '✓ Uploaded' : '') : ''}</td>
+          <td>${f1 ? (f1.videoUrl ? '✓ Uploaded' : '') : ''}</td>
           <td>${f1 ? esc(f1.ceoReflection) : ''}</td>
           <td>${f1 ? esc(f1.language) : ''}</td>
-          <td>${f2 ? esc(f2.companyName) : 'Not Filled'}</td>
+          <td>${f1 ? esc(f1.ip) : ''}</td>
+          <td>${f2 ? esc(f2.phone) : 'Not Filled'}</td>
+          <td>${f2 ? esc(f2.companyName) : ''}</td>
           <td>${f2 ? esc(f2.department) : ''}</td>
           <td>${f2 ? esc(f2.location) : ''}</td>
           <td>${f2 ? esc(f2.thoughts) : ''}</td>
+          <td>${f2 ? (f2.optionalFileUrl ? '✓ Uploaded' : '') : ''}</td>
           <td>${f2 ? esc(f2.language) : ''}</td>
+          <td>${f2 ? esc(f2.ip) : ''}</td>
           <td>${esc((u.tags || []).join(', ') || 'None')}</td>
         </tr>
       `;
@@ -1249,6 +1269,8 @@ async function buildExportArchive(archive, filterReq) {
       'Name': u.empName,
       'City': u.city || '',
       'Family Members': u.familyMembers || '',
+      'Form 1 Status': f1 ? 'Submitted' : 'Not Filled',
+      'Form 1 Phone': f1 ? (f1.phone || '') : '',
       'Form 1 Company Name': f1 ? f1.companyName : '',
       'Form 1 Department': f1 ? f1.department : '',
       'Form 1 Photo 1': f1 ? f1.photo1Url : '',
@@ -1256,12 +1278,16 @@ async function buildExportArchive(archive, filterReq) {
       'Form 1 Video': f1 ? f1.videoUrl : '',
       'Form 1 CEO Reflection': f1 ? f1.ceoReflection : '',
       'Form 1 Language': f1 ? f1.language : '',
+      'Form 1 Submitted IP': f1 ? (f1.ip || '') : '',
+      'Form 2 Status': f2 ? 'Submitted' : 'Not Filled',
+      'Form 2 Phone': f2 ? (f2.phone || '') : '',
       'Form 2 Company Name': f2 ? f2.companyName : '',
       'Form 2 Department': f2 ? f2.department : '',
       'Form 2 Location': f2 ? f2.location : '',
       'Form 2 Thoughts': f2 ? f2.thoughts : '',
       'Form 2 Attachment': f2 ? f2.optionalFileUrl : '',
       'Form 2 Language': f2 ? f2.language : '',
+      'Form 2 Submitted IP': f2 ? (f2.ip || '') : '',
       'Tags': (u.tags || []).join(', ')
     });
 
