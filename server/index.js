@@ -650,9 +650,21 @@ app.get('/api/admin/export/users', async (req, res) => {
         'Email': u.email,
         'Phone': u.phone || '',
         'City': u.city || '',
+        'Family Members': u.familyMembers || '',
         'Form 1 Status': f1 ? 'Submitted' : 'Not Filled',
+        'Form 1 Photo 1': f1 ? f1.photo1Url : '',
+        'Form 1 Photo 2': f1 ? f1.photo2Url : '',
+        'Form 1 Video': f1 ? f1.videoUrl : '',
+        'Form 1 CEO Reflection': f1 ? f1.ceoReflection : '',
+        'Form 1 Language': f1 ? f1.language : '',
         'Form 1 Submitted At': f1 ? new Date(f1.submittedAt).toLocaleString() : '',
         'Form 2 Status': f2 ? 'Submitted' : 'Not Filled',
+        'Form 2 Company Name': f2 ? f2.companyName : '',
+        'Form 2 Department': f2 ? f2.department : '',
+        'Form 2 Location': f2 ? f2.location : '',
+        'Form 2 Thoughts': f2 ? f2.thoughts : '',
+        'Form 2 Optional File': f2 ? f2.optionalFileUrl : '',
+        'Form 2 Language': f2 ? f2.language : '',
         'Form 2 Submitted At': f2 ? new Date(f2.submittedAt).toLocaleString() : '',
         'Tags': (u.tags || []).join(', '),
         'Registered At': new Date(u.createdAt).toLocaleString()
@@ -712,26 +724,38 @@ app.get('/api/admin/export/pdf', async (req, res) => {
               <th>Employee Name</th>
               <th>Email Address</th>
               <th>City Location</th>
-              <th>Form 1 Status</th>
-              <th>Form 2 Status</th>
+              <th>Form 1 CEO Reflection</th>
+              <th>Form 1 Language</th>
+              <th>Form 2 Company</th>
+              <th>Form 2 Department</th>
+              <th>Form 2 Location</th>
+              <th>Form 2 Thoughts</th>
+              <th>Form 2 Language</th>
               <th>Assigned Tag</th>
             </tr>
           </thead>
           <tbody>
     `;
 
+    const esc = (v) => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
     for (const u of users) {
       const f1 = await Form1.findOne({ userId: u._id });
       const f2 = await Form2.findOne({ userId: u._id });
       html += `
         <tr>
-          <td><strong>${u.empId}</strong></td>
-          <td>${u.empName}</td>
-          <td>${u.email}</td>
-          <td>${u.city || 'N/A'}</td>
-          <td>${f1 ? '✓ Submitted' : 'Not Filled'}</td>
-          <td>${f2 ? '✓ Submitted' : 'Not Filled'}</td>
-          <td>${(u.tags || []).join(', ') || 'None'}</td>
+          <td><strong>${esc(u.empId)}</strong></td>
+          <td>${esc(u.empName)}</td>
+          <td>${esc(u.email)}</td>
+          <td>${esc(u.city || 'N/A')}</td>
+          <td>${f1 ? esc(f1.ceoReflection) : 'Not Filled'}</td>
+          <td>${f1 ? esc(f1.language) : ''}</td>
+          <td>${f2 ? esc(f2.companyName) : 'Not Filled'}</td>
+          <td>${f2 ? esc(f2.department) : ''}</td>
+          <td>${f2 ? esc(f2.location) : ''}</td>
+          <td>${f2 ? esc(f2.thoughts) : ''}</td>
+          <td>${f2 ? esc(f2.language) : ''}</td>
+          <td>${esc((u.tags || []).join(', ') || 'None')}</td>
         </tr>
       `;
     }
@@ -771,9 +795,21 @@ app.get('/api/admin/export/zip', async (req, res) => {
         'Emp ID': u.empId,
         'Name': u.empName,
         'Email': u.email,
+        'Phone': u.phone || '',
+        'City': u.city || '',
+        'Family Members': u.familyMembers || '',
         'Form 1 Photo 1': f1 ? f1.photo1Url : '',
         'Form 1 Photo 2': f1 ? f1.photo2Url : '',
-        'Form 2 Video': f2 ? f2.videoUrl : ''
+        'Form 1 Video': f1 ? f1.videoUrl : '',
+        'Form 1 CEO Reflection': f1 ? f1.ceoReflection : '',
+        'Form 1 Language': f1 ? f1.language : '',
+        'Form 2 Company Name': f2 ? f2.companyName : '',
+        'Form 2 Department': f2 ? f2.department : '',
+        'Form 2 Location': f2 ? f2.location : '',
+        'Form 2 Thoughts': f2 ? f2.thoughts : '',
+        'Form 2 Optional File': f2 ? f2.optionalFileUrl : '',
+        'Form 2 Language': f2 ? f2.language : '',
+        'Tags': (u.tags || []).join(', ')
       });
 
       if (f1 && f1.photo1Url) {
