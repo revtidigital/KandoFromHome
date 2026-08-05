@@ -165,7 +165,9 @@ export const AdminDashboardPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>('overview');
 
   // Which overview KPI card's submission list is expanded below the cards (null = none open).
-  const [expandedOverviewForm, setExpandedOverviewForm] = useState<'form1' | 'form2' | null>(null);
+  const [expandedOverviewForm, setExpandedOverviewForm] = useState<'total' | 'form1' | 'form2' | null>(null);
+  const [overviewTablePage, setOverviewTablePage] = useState(1);
+  const OVERVIEW_PAGE_SIZE = 25;
 
   // Settings tab is superadmin-only — "kandoadmin" and any other regular
   // admin account never sees the nav entry or the tab content.
@@ -903,18 +905,31 @@ export const AdminDashboardPage: React.FC = () => {
             {/* 3 KPI CARDS WITH INFO ICONS (Req 13) */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', marginBottom: '32px' }}>
               
-              <div style={{ background: palette.surfaceAlt, border: `1.5px solid rgba(${palette.accentCyanRgb},0.3))`, borderRadius: '16px', padding: '24px' }}>
+              <div
+                onClick={() => { setExpandedOverviewForm(prev => prev === 'total' ? null : 'total'); setOverviewTablePage(1); }}
+                title="Click to view all registered users"
+                style={{
+                  background: palette.surfaceAlt,
+                  border: expandedOverviewForm === 'total' ? `1.5px solid ${palette.accentCyan}` : `1.5px solid rgba(${palette.accentCyanRgb},0.3)`,
+                  borderRadius: '16px', padding: '24px', cursor: 'pointer',
+                  boxShadow: expandedOverviewForm === 'total' ? `0 0 0 3px rgba(${palette.accentCyanRgb},0.15)` : 'none',
+                  transition: 'box-shadow 0.15s, border-color 0.15s'
+                }}
+              >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
                   <span style={{ color: palette.mutedText, fontSize: '0.9rem', fontWeight: 700 }}>Total Registered Users</span>
-                  <div title="Total unique employees registered in campaign" style={{ cursor: 'pointer' }}>
+                  <div title="Total unique employees registered in campaign">
                     <Info size={18} color={palette.accentCyan} />
                   </div>
                 </div>
                 <div style={{ fontSize: '2.5rem', fontWeight: 900, color: palette.accentCyan }}>{allUsers.length}</div>
+                <div style={{ fontSize: '0.75rem', color: palette.accentCyan, fontWeight: 700, marginTop: '6px' }}>
+                  {expandedOverviewForm === 'total' ? '▲ Hide submissions' : '▼ View submissions'}
+                </div>
               </div>
 
               <div
-                onClick={() => setExpandedOverviewForm(prev => prev === 'form1' ? null : 'form1')}
+                onClick={() => { setExpandedOverviewForm(prev => prev === 'form1' ? null : 'form1'); setOverviewTablePage(1); }}
                 title="Click to view all Form 1 submissions"
                 style={{
                   background: palette.surfaceAlt,
@@ -939,7 +954,7 @@ export const AdminDashboardPage: React.FC = () => {
               </div>
 
               <div
-                onClick={() => setExpandedOverviewForm(prev => prev === 'form2' ? null : 'form2')}
+                onClick={() => { setExpandedOverviewForm(prev => prev === 'form2' ? null : 'form2'); setOverviewTablePage(1); }}
                 title="Click to view all Form 2 submissions"
                 style={{
                   background: palette.surfaceAlt,
@@ -965,16 +980,20 @@ export const AdminDashboardPage: React.FC = () => {
 
             </div>
 
-            {/* EXPANDABLE SUBMISSIONS TABLE — shown below the KPI cards when a Form 1 / Form 2 card is clicked */}
+            {/* EXPANDABLE SUBMISSIONS TABLE — shown below the KPI cards when a KPI card is clicked (Total / Form 1 / Form 2) */}
             {expandedOverviewForm && (() => {
               const formKey = expandedOverviewForm;
-              const accent = formKey === 'form1' ? '#A855F7' : '#22C55E';
-              const rows = allUsers.filter(u => (u as any)[formKey]);
+              const accent = formKey === 'total' ? palette.accentCyan : formKey === 'form1' ? '#A855F7' : '#22C55E';
+              const label = formKey === 'total' ? 'Registered Users' : formKey === 'form1' ? 'Form 1 Submissions' : 'Form 2 Submissions';
+              const allRows = formKey === 'total' ? allUsers : allUsers.filter(u => (u as any)[formKey]);
+              const totalPages = Math.max(1, Math.ceil(allRows.length / OVERVIEW_PAGE_SIZE));
+              const safePage = Math.min(overviewTablePage, totalPages);
+              const rows = allRows.slice((safePage - 1) * OVERVIEW_PAGE_SIZE, safePage * OVERVIEW_PAGE_SIZE);
               return (
                 <div style={{ background: palette.surface, border: `1px solid ${palette.border}`, borderRadius: '16px', overflow: 'hidden', marginBottom: '32px' }}>
                   <div style={{ padding: '16px 20px', borderBottom: `1px solid ${palette.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: accent }}>
-                      {formKey === 'form1' ? 'Form 1' : 'Form 2'} Submissions ({rows.length})
+                      {label} ({allRows.length})
                     </h3>
                     <button
                       onClick={() => setExpandedOverviewForm(null)}
@@ -990,7 +1009,7 @@ export const AdminDashboardPage: React.FC = () => {
                           <th style={{ padding: '12px 18px', textAlign: 'left' }}>Emp ID / Phone</th>
                           <th style={{ padding: '12px 18px', textAlign: 'left' }}>Employee Name</th>
                           <th style={{ padding: '12px 18px', textAlign: 'left' }}>Department</th>
-                          <th style={{ padding: '12px 18px', textAlign: 'left' }}>Submitted Date/Time</th>
+                          <th style={{ padding: '12px 18px', textAlign: 'left' }}>{formKey === 'total' ? 'Registered Date/Time' : 'Submitted Date/Time'}</th>
                           <th style={{ padding: '12px 18px', textAlign: 'left' }}>Status</th>
                           <th style={{ padding: '12px 18px', textAlign: 'right' }}>Action</th>
                         </tr>
@@ -999,12 +1018,28 @@ export const AdminDashboardPage: React.FC = () => {
                         {rows.length === 0 ? (
                           <tr>
                             <td colSpan={6} style={{ padding: '24px 18px', textAlign: 'center', color: palette.mutedText }}>
-                              No {formKey === 'form1' ? 'Form 1' : 'Form 2'} submissions yet.
+                              No {label.toLowerCase()} yet.
                             </td>
                           </tr>
                         ) : rows.map(user => {
-                          const submittedAt = (user as any)[formKey]?.submittedAt;
+                          const submittedAt = formKey === 'total'
+                            ? ((user as any).createdAt || user.form1?.submittedAt || user.form2?.submittedAt)
+                            : (user as any)[formKey]?.submittedAt;
+                          const department = formKey === 'total'
+                            ? (user.form1?.department || user.form2?.department || '—')
+                            : ((user as any)[formKey]?.department || '—');
                           const userId = user.id || (user as any)._id;
+                          const statusLabel = formKey !== 'total'
+                            ? '✓ Submitted'
+                            : (user.form1 && user.form2) ? '✓ Both Submitted'
+                            : user.form1 ? 'Form 1 Only'
+                            : user.form2 ? 'Form 2 Only'
+                            : 'Pending';
+                          const statusColor = formKey !== 'total'
+                            ? accent
+                            : (user.form1 && user.form2) ? '#22C55E'
+                            : (user.form1 || user.form2) ? '#EAB308'
+                            : '#64748B';
                           return (
                             <tr key={userId} style={{ borderBottom: `1px solid ${palette.borderFaint}` }}>
                               <td style={{ padding: '12px 18px', fontWeight: 800, color: palette.accentCyan }}>
@@ -1014,14 +1049,14 @@ export const AdminDashboardPage: React.FC = () => {
                                 {user.empName}
                               </td>
                               <td style={{ padding: '12px 18px', color: palette.textMuted2 }}>
-                                {(user as any)[formKey]?.department || '—'}
+                                {department}
                               </td>
                               <td style={{ padding: '12px 18px', color: palette.textMuted2, fontSize: '0.8rem' }}>
                                 {submittedAt ? new Date(submittedAt).toLocaleString() : '—'}
                               </td>
                               <td style={{ padding: '12px 18px' }}>
-                                <span style={{ background: `${accent}26`, color: accent, padding: '4px 10px', borderRadius: '12px', fontWeight: 700, fontSize: '0.75rem' }}>
-                                  ✓ Submitted
+                                <span style={{ background: `${statusColor}26`, color: statusColor, padding: '4px 10px', borderRadius: '12px', fontWeight: 700, fontSize: '0.75rem' }}>
+                                  {statusLabel}
                                 </span>
                               </td>
                               <td style={{ padding: '12px 18px', textAlign: 'right' }}>
@@ -1047,6 +1082,24 @@ export const AdminDashboardPage: React.FC = () => {
                       </tbody>
                     </table>
                   </div>
+
+                  {/* PAGINATION — 25 users per page, matches Users Directory convention */}
+                  {allRows.length > 0 && (
+                    <div style={{ padding: '14px 20px', background: palette.surfaceAlt, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: `1px solid ${palette.border}` }}>
+                      <span style={{ fontSize: '0.8rem', color: palette.mutedText }}>
+                        Showing {rows.length} of {allRows.length} entries ({OVERVIEW_PAGE_SIZE} per page)
+                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <button onClick={() => setOverviewTablePage(p => Math.max(1, p - 1))} disabled={safePage === 1} style={{ background: palette.inputBg, border: 'none', color: palette.text, padding: '6px 12px', borderRadius: '6px', cursor: safePage === 1 ? 'default' : 'pointer', opacity: safePage === 1 ? 0.5 : 1 }}>
+                          <ChevronLeft size={16} />
+                        </button>
+                        <span style={{ fontSize: '0.85rem', fontWeight: 700 }}>Page {safePage} of {totalPages}</span>
+                        <button onClick={() => setOverviewTablePage(p => Math.min(totalPages, p + 1))} disabled={safePage === totalPages} style={{ background: palette.inputBg, border: 'none', color: palette.text, padding: '6px 12px', borderRadius: '6px', cursor: safePage === totalPages ? 'default' : 'pointer', opacity: safePage === totalPages ? 0.5 : 1 }}>
+                          <ChevronRight size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })()}
