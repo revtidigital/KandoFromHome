@@ -209,7 +209,23 @@ export const Form1Page: React.FC = () => {
 
       // Save refId for thank you page
       const generatedRefId = 'KANDO-2026-' + Math.floor(1000 + Math.random() * 9000);
-      setFormData(prev => ({ ...prev, refId: generatedRefId }));
+      // Success — clear every input so this browser session starts clean if
+      // the same person (or someone else on the same device) fills the form
+      // again; server-side duplicate-blocking still applies regardless.
+      setFormData(prev => ({
+        ...prev,
+        empName: '', empId: '', phone: '', city: '', photo1: null, photo2: null,
+        refId: generatedRefId
+      }));
+      setCompanyName('');
+      setDepartment('');
+      setVideo(null);
+      setPhoto1Preview(null);
+      setPhoto2Preview(null);
+      setVideoPreview(null);
+      setDataConsent(false);
+      setMediaConsent(false);
+      setErrors({});
 
       navigateTo('thankyou1');
     } catch (err) {

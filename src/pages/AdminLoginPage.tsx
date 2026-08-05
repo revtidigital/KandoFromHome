@@ -17,7 +17,9 @@ export const AdminLoginPage: React.FC = () => {
     const ok = await adminLogin(username, password);
     setLoading(false);
     if (ok) {
-      navigateTo('admin-dashboard');
+      // replace: true — the login form itself must not stay in back-history,
+      // otherwise pressing Back after a successful login would return to it.
+      navigateTo('admin-dashboard', undefined, true);
     } else {
       setError('Invalid admin credentials.');
     }

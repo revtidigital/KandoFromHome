@@ -479,7 +479,11 @@ app.get('/api/check-submission', async (req, res) => {
       submitted: !!(f1 || f2),
       hasForm1: !!f1,
       hasForm2: !!f2,
-      user
+      user,
+      // Form 2 auto-fills its Department field from a prior Form 1 submission
+      // under the same identity — exposed here so the client doesn't need a
+      // separate endpoint just for that one field.
+      form1: f1 ? { companyName: f1.companyName || '', department: f1.department || '' } : null
     });
   } catch (err) {
     console.error(err);

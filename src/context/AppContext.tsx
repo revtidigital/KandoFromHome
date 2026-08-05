@@ -76,7 +76,7 @@ interface AppContextType {
   setCustomTags: React.Dispatch<React.SetStateAction<string[]>>;
   addAuditLog: (detail: string) => void;
 
-  navigateTo: (view: string, langOverride?: Language) => void;
+  navigateTo: (view: string, langOverride?: Language, replace?: boolean) => void;
   apiBaseUrl: string;
   publicTheme: 'dark' | 'light';
   setPublicTheme: (theme: 'dark' | 'light') => void;
@@ -185,6 +185,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
     sessionStorage.removeItem('kando_admin_cred');
     setIsAdminLoggedIn(false);
+    // Drop any protected data cached in memory from the session that just
+    // ended — otherwise it would keep sitting in React state (and be visible
+    // to anything re-rendering off stale context) even though auth is gone.
+    setAllUsers([]);
+    setCustomTags(['Shortlisted', 'Featured', 'Flagged', 'Verified']);
+    setAuditLogs([]);
+    setSubmissions([]);
   };
 
   const adminAuthHeader = (): Record<string, string> => {
@@ -232,19 +239,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  // Push the real URL for the given lang/view — one write per navigation.
-  const updatePath = (lang: Language, view: string) => {
+  // Push (or, when `replace` is true, replace) the real URL for the given
+  // lang/view — one write per navigation. `replace` is used for transitions
+  // that should not leave a forward-navigable history entry (e.g. logout,
+  // post-login redirect) so Back doesn't step through a stale auth state.
+  const updatePath = (lang: Language, view: string, replace = false) => {
     if (ADMIN_CLEAN_VIEWS.includes(view)) {
       // Admin views use a clean, language-free path in the address bar
       const targetPath = `/${view}`;
       if (window.location.pathname !== targetPath) {
-        window.history.pushState(null, '', targetPath);
+        if (replace) window.history.replaceState(null, '', targetPath);
+        else window.history.pushState(null, '', targetPath);
       }
       return;
     }
     const targetPath = view === 'landing' ? '/' : `/${lang}/${view}`;
     if (window.location.pathname !== targetPath) {
-      window.history.pushState(null, '', targetPath);
+      if (replace) window.history.replaceState(null, '', targetPath);
+      else window.history.pushState(null, '', targetPath);
     }
   };
 
@@ -254,14 +266,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     updatePath(lang, currentView);
   };
 
-  const navigateTo = (view: string, langOverride?: Language) => {
+  const navigateTo = (view: string, langOverride?: Language, replace = false) => {
     const targetLang = langOverride || language;
     if (langOverride) {
       setLanguageState(langOverride);
       localStorage.setItem('kando_lang', langOverride);
     }
     setCurrentView(view);
-    updatePath(targetLang, view);
+    updatePath(targetLang, view, replace);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 

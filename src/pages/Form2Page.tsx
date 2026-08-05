@@ -49,6 +49,31 @@ export const Form2Page: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.empId, formData.phone, hasNoEmpId]);
 
+  // Auto-fill Department from this identity's existing Form 1 submission (if
+  // any) once the ID/phone eligibility check comes back valid — saves the
+  // employee re-typing something they already told us on Form 1.
+  useEffect(() => {
+    if (idCheckStatus !== 'valid') return;
+    const cleanEmpId = formData.empId.trim();
+    const cleanPhone = formData.phone.trim();
+    if (!cleanEmpId && !cleanPhone) return;
+    const params = cleanEmpId ? `empId=${encodeURIComponent(cleanEmpId)}` : `phone=${encodeURIComponent(cleanPhone)}`;
+    let cancelled = false;
+    fetch(`${apiBaseUrl}/api/check-submission?${params}`)
+      .then(res => res.json())
+      .then(data => {
+        if (cancelled) return;
+        if (data?.form1?.department) {
+          setDepartment(prev => prev.trim() ? prev : data.form1.department);
+        }
+        if (data?.form1?.companyName) {
+          setCompanyName(prev => prev.trim() ? prev : data.form1.companyName);
+        }
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [idCheckStatus, formData.empId, formData.phone, apiBaseUrl]);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -128,7 +153,20 @@ export const Form2Page: React.FC = () => {
       }
 
       const generatedRefId = 'KANDO-2026-' + Math.floor(1000 + Math.random() * 9000);
-      setFormData(prev => ({ ...prev, refId: generatedRefId }));
+      // Success — clear every input so this browser session starts clean if
+      // the same person (or someone else on the same device) fills the form
+      // again; server-side duplicate-blocking still applies regardless.
+      setFormData(prev => ({
+        ...prev,
+        empName: '', empId: '', phone: '', city: '', refId: generatedRefId
+      }));
+      setCompanyName('');
+      setDepartment('');
+      setLocation('');
+      setThoughts('');
+      setOptionalFile(null);
+      setDataConsent(false);
+      setErrors({});
       navigateTo('thankyou2');
     } catch (err) {
       console.error('Form 2 submission error:', err);

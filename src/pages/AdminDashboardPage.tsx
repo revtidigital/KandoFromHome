@@ -518,7 +518,11 @@ export const AdminDashboardPage: React.FC = () => {
 
   const handleLogout = () => {
     adminLogout();
-    navigateTo('landing');
+    // replace: true — logging out must not leave the dashboard as a
+    // forward-navigable history entry (Back would otherwise land back on
+    // /admin-dashboard's URL, even though the route guard in App.tsx already
+    // redirects to the login page once isAdminLoggedIn is false).
+    navigateTo('landing', undefined, true);
   };
 
   // Open User Profile Page (Req 1)
@@ -761,6 +765,32 @@ export const AdminDashboardPage: React.FC = () => {
 
   const totalPages = Math.ceil(filteredUsers.length / itemsPerPage) || 1;
   const paginatedUsers = filteredUsers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  // Whenever the filtered result set changes (search/tag/form filter edited,
+  // or the underlying user list refreshes), prune any selected ids down to
+  // the intersection with what's currently filtered — a user no longer
+  // matching the active filters must not silently stay "selected" for bulk
+  // actions/exports just because they were checked before the filter changed.
+  useEffect(() => {
+    setSelectedUserIds(prev => {
+      if (prev.size === 0) return prev;
+      const visibleIds = new Set(filteredUsers.map(u => u.id || (u as any)._id));
+      let changed = false;
+      const next = new Set<string>();
+      prev.forEach(id => {
+        if (visibleIds.has(id)) next.add(id);
+        else changed = true;
+      });
+      return changed ? next : prev;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery, selectedTagFilter, selectedFormFilter, allUsers]);
+
+  // Export scope size used to drive button disabled-state + messaging: an
+  // explicit selection wins, otherwise it's whatever the filters currently
+  // match. Zero either way means there's nothing to export.
+  const exportScopeCount = selectedUserIds.size > 0 ? selectedUserIds.size : filteredUsers.length;
+  const canExport = exportScopeCount > 0;
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: palette.pageBg, color: palette.pageText, fontFamily: 'Outfit, sans-serif' }}>
@@ -1115,29 +1145,39 @@ export const AdminDashboardPage: React.FC = () => {
                 <p style={{ color: palette.mutedText, fontSize: '0.85rem', marginTop: '4px' }}>Manage candidate entries, apply classification tags & export data</p>
               </div>
 
-              {/* EXPORT BUTTONS (Req 2 - PDF Report Included) */}
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <button 
+              {/* EXPORT BUTTONS (Req 2 - PDF Report Included) — disabled whenever
+                  there's nothing matching the current filter/selection to export. */}
+              <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                {!canExport && (
+                  <span style={{ color: palette.mutedText, fontSize: '0.8rem', fontWeight: 700, marginRight: '4px' }}>
+                    No matching users to export
+                  </span>
+                )}
+                <button
                   onClick={() => handleExportData('pdf')}
-                  style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid #EF4444', color: '#FCA5A5', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}
+                  disabled={!canExport}
+                  style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid #EF4444', color: '#FCA5A5', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: canExport ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', opacity: canExport ? 1 : 0.4 }}
                 >
                   <Download size={14} /> PDF Report
                 </button>
-                <button 
+                <button
                   onClick={() => handleExportData('csv')}
-                  style={{ background: `rgba(${palette.accentCyanRgb},0.12)`, border: `1px solid ${palette.accentCyan}`, color: palette.accentCyan, padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}
+                  disabled={!canExport}
+                  style={{ background: `rgba(${palette.accentCyanRgb},0.12)`, border: `1px solid ${palette.accentCyan}`, color: palette.accentCyan, padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: canExport ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', opacity: canExport ? 1 : 0.4 }}
                 >
                   <Download size={14} /> CSV
                 </button>
-                <button 
+                <button
                   onClick={() => handleExportData('excel')}
-                  style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid #22C55E', color: '#4ADE80', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}
+                  disabled={!canExport}
+                  style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid #22C55E', color: '#4ADE80', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: canExport ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', opacity: canExport ? 1 : 0.4 }}
                 >
                   <Download size={14} /> Excel
                 </button>
                 <button
                   onClick={() => setEmailExportOpen(true)}
-                  style={{ background: 'rgba(168,85,247,0.12)', border: '1px solid #A855F7', color: '#C084FC', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}
+                  disabled={!canExport}
+                  style={{ background: 'rgba(168,85,247,0.12)', border: '1px solid #A855F7', color: '#C084FC', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: canExport ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', opacity: canExport ? 1 : 0.4 }}
                 >
                   <Download size={14} /> CSV + ZIP Media Assets
                 </button>
@@ -1190,21 +1230,27 @@ export const AdminDashboardPage: React.FC = () => {
                 <span style={{ color: palette.accentCyan, fontWeight: 800, fontSize: '0.9rem' }}>
                   {selectedUserIds.size > 0
                     ? `${selectedUserIds.size} user${selectedUserIds.size > 1 ? 's' : ''} selected`
-                    : `Filter applied — ${filteredUsers.length} user${filteredUsers.length !== 1 ? 's' : ''} match`}
+                    : filteredUsers.length === 0
+                      ? '0 users selected — no users match the current filters'
+                      : `Filter applied — ${filteredUsers.length} user${filteredUsers.length !== 1 ? 's' : ''} match`}
                 </span>
                 <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
-                  <button onClick={() => handleExportData('pdf')} style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid #EF4444', color: '#FCA5A5', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
-                    <Download size={14} /> PDF
-                  </button>
-                  <button onClick={() => handleExportData('csv')} style={{ background: `rgba(${palette.accentCyanRgb},0.12)`, border: `1px solid ${palette.accentCyan}`, color: palette.accentCyan, padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
-                    <Download size={14} /> CSV
-                  </button>
-                  <button onClick={() => handleExportData('excel')} style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid #22C55E', color: '#4ADE80', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
-                    <Download size={14} /> Excel
-                  </button>
-                  <button onClick={() => setEmailExportOpen(true)} style={{ background: 'rgba(168,85,247,0.12)', border: '1px solid #A855F7', color: '#C084FC', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
-                    <Download size={14} /> CSV + ZIP
-                  </button>
+                  {canExport && (
+                    <>
+                      <button onClick={() => handleExportData('pdf')} style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid #EF4444', color: '#FCA5A5', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
+                        <Download size={14} /> PDF
+                      </button>
+                      <button onClick={() => handleExportData('csv')} style={{ background: `rgba(${palette.accentCyanRgb},0.12)`, border: `1px solid ${palette.accentCyan}`, color: palette.accentCyan, padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
+                        <Download size={14} /> CSV
+                      </button>
+                      <button onClick={() => handleExportData('excel')} style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid #22C55E', color: '#4ADE80', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
+                        <Download size={14} /> Excel
+                      </button>
+                      <button onClick={() => setEmailExportOpen(true)} style={{ background: 'rgba(168,85,247,0.12)', border: '1px solid #A855F7', color: '#C084FC', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
+                        <Download size={14} /> CSV + ZIP
+                      </button>
+                    </>
+                  )}
                   <button
                     onClick={() => {
                       if (selectedUserIds.size > 0) {
