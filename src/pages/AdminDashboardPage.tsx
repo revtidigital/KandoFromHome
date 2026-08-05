@@ -449,6 +449,11 @@ export const AdminDashboardPage: React.FC = () => {
 
   // Fetch initial settings & users from API
   useEffect(() => {
+    // /api/admin/settings is superadmin-only (captcha/GA config) — kandoadmin
+    // gets a 403 here, which used to silently reset customTags to the
+    // hardcoded 4-tag default on every hard refresh since it was the only
+    // place customTags got populated. Tags now come from the separate
+    // /api/admin/tags endpoint below, which both roles can read.
     fetch(`${apiBaseUrl}/api/admin/settings`, { headers: adminAuthHeader() })
       .then(res => res.json())
       .then(data => {
@@ -457,8 +462,14 @@ export const AdminDashboardPage: React.FC = () => {
           if (data.captchaSiteKey !== undefined) setCaptchaSiteKey(data.captchaSiteKey);
           if (data.captchaSecretKey !== undefined) setCaptchaSecretKey(data.captchaSecretKey);
           if (data.googleAnalyticsId) setGaId(data.googleAnalyticsId);
-          if (data.customTags && Array.isArray(data.customTags)) setCustomTags(data.customTags);
         }
+      })
+      .catch(() => {});
+
+    fetch(`${apiBaseUrl}/api/admin/tags`, { headers: adminAuthHeader() })
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.customTags && Array.isArray(data.customTags)) setCustomTags(data.customTags);
       })
       .catch(() => {});
 
