@@ -662,12 +662,16 @@ export const AdminDashboardPage: React.FC = () => {
     }
   };
 
-  // Export scope: an explicit row selection always wins; otherwise whatever
-  // search/tag/form filter is currently applied on the table is what exports.
+  // Export scope: an explicit row selection always wins, but must still
+  // respect any active search/tag/form filter — filteredUsers already holds
+  // exactly that intersection (selection ∩ filters), so exports send those
+  // exact ids rather than the raw (possibly broader) selection. Otherwise,
+  // with no selection, whatever filter is currently applied is what exports.
   const buildExportParams = (): URLSearchParams => {
     const params = new URLSearchParams();
     if (selectedUserIds.size > 0) {
-      params.set('ids', Array.from(selectedUserIds).join(','));
+      const scopedIds = filteredUsers.map(u => u.id || (u as any)._id);
+      params.set('ids', scopedIds.join(','));
       return params;
     }
     if (searchQuery) params.set('search', searchQuery);
@@ -754,8 +758,17 @@ export const AdminDashboardPage: React.FC = () => {
     }
   };
 
-  // Users Filtered List
+  // Users Filtered List — when one or more users are selected, search/tag/form
+  // filters apply WITHIN that selection (intersection), not across the whole
+  // directory. The raw selection itself is never pruned by a filter change —
+  // it only shrinks when the admin clicks "Clear Selection" or manually
+  // (un)checks a row. This means filteredUsers can legitimately be empty
+  // (0 of the selected users match the current filters) while the selection
+  // itself stays intact underneath.
   const filteredUsers = allUsers.filter(u => {
+    const id = u.id || (u as any)._id;
+    if (selectedUserIds.size > 0 && !selectedUserIds.has(id)) return false;
+
     const q = searchQuery.toLowerCase();
     const matchesSearch = !searchQuery ||
       (u.empName || '').toLowerCase().includes(q) ||
@@ -765,7 +778,7 @@ export const AdminDashboardPage: React.FC = () => {
       (u.city && u.city.toLowerCase().includes(q));
 
     const matchesTag = !selectedTagFilter || (u.tags && u.tags.includes(selectedTagFilter));
-    
+
     let matchesForm = true;
     if (selectedFormFilter === 'form1') matchesForm = !!u.form1;
     if (selectedFormFilter === 'form2') matchesForm = !!u.form2;
@@ -777,30 +790,11 @@ export const AdminDashboardPage: React.FC = () => {
   const totalPages = Math.ceil(filteredUsers.length / itemsPerPage) || 1;
   const paginatedUsers = filteredUsers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-  // Whenever the filtered result set changes (search/tag/form filter edited,
-  // or the underlying user list refreshes), prune any selected ids down to
-  // the intersection with what's currently filtered — a user no longer
-  // matching the active filters must not silently stay "selected" for bulk
-  // actions/exports just because they were checked before the filter changed.
-  useEffect(() => {
-    setSelectedUserIds(prev => {
-      if (prev.size === 0) return prev;
-      const visibleIds = new Set(filteredUsers.map(u => u.id || (u as any)._id));
-      let changed = false;
-      const next = new Set<string>();
-      prev.forEach(id => {
-        if (visibleIds.has(id)) next.add(id);
-        else changed = true;
-      });
-      return changed ? next : prev;
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery, selectedTagFilter, selectedFormFilter, allUsers]);
-
-  // Export scope size used to drive button disabled-state + messaging: an
-  // explicit selection wins, otherwise it's whatever the filters currently
-  // match. Zero either way means there's nothing to export.
-  const exportScopeCount = selectedUserIds.size > 0 ? selectedUserIds.size : filteredUsers.length;
+  // Export scope size used to drive button disabled-state + messaging.
+  // filteredUsers already reflects "selection intersected with filters" when
+  // a selection is active (or just "filters" when it isn't) — zero means
+  // there's genuinely nothing to export right now, whichever mode is active.
+  const exportScopeCount = filteredUsers.length;
   const canExport = exportScopeCount > 0;
 
   return (
@@ -1240,7 +1234,9 @@ export const AdminDashboardPage: React.FC = () => {
               <div style={{ background: `rgba(${palette.accentCyanRgb},0.1)`, border: `1px solid ${palette.accentCyan}`, borderRadius: '14px', padding: '14px 18px', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
                 <span style={{ color: palette.accentCyan, fontWeight: 800, fontSize: '0.9rem' }}>
                   {selectedUserIds.size > 0
-                    ? `${selectedUserIds.size} user${selectedUserIds.size > 1 ? 's' : ''} selected`
+                    ? (filteredUsers.length === 0
+                        ? '0 users selected — no selected users match the current filters'
+                        : `${filteredUsers.length} user${filteredUsers.length !== 1 ? 's' : ''} selected`)
                     : filteredUsers.length === 0
                       ? '0 users selected — no users match the current filters'
                       : `Filter applied — ${filteredUsers.length} user${filteredUsers.length !== 1 ? 's' : ''} match`}
