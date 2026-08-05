@@ -77,13 +77,6 @@ export const Footer: React.FC = () => {
               {t.terms}
             </button>
           </div>
-
-          <div style={{ width: '100%', height: '1px', background: 'rgba(255,255,255,0.06)' }} />
-
-          {/* Copyright */}
-          <p style={{ fontSize: '0.8rem', color: 'rgba(160, 178, 214, 0.6)' }}>
-            {t.copyright}
-          </p>
         </div>
       </div>
     </footer>
