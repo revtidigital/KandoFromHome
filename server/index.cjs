@@ -1020,6 +1020,10 @@ app.delete('/api/admin/tags/:tag', async (req, res) => {
     if (settings) {
       settings.customTags = settings.customTags.filter(t => t !== tagToRemove);
       await settings.save();
+      // A deleted tag is no longer a valid option, so strip it from any
+      // user who already had it assigned — otherwise those users keep
+      // showing the retired tag forever even though it can't be re-selected.
+      await User.updateMany({ tags: tagToRemove }, { $pull: { tags: tagToRemove } });
       await recordAuditLog(req, `Removed classification tag: "${tagToRemove}"`, req.adminUser);
     }
     res.json({ success: true, customTags: settings ? settings.customTags : [] });
@@ -1071,6 +1075,70 @@ async function getUsersForExport(req) {
   return users;
 }
 
+// Canonical field list/order shared by every export format (CSV, Excel,
+// CSV+ZIP, PDF) so the columns always line up the same way everywhere.
+// A form's fields are left blank whenever that form was not filled by the
+// user — 'Form 1 Filled' / 'Form 2 Filled' say Yes/No, the rest stay empty.
+const EXPORT_COLUMNS = [
+  'Form 1 Filled',
+  'Form 1 Company Name', 'Form 1 Employee ID', 'Form 1 Phone Number', 'Form 1 Employee Full Name',
+  'Form 1 Department', 'Form 1 Location', 'Form 1 Photo 1', 'Form 1 Photo 2', 'Form 1 Kando Video',
+  'Form 2 Filled',
+  'Form 2 Company Name', 'Form 2 Employee EIN', 'Form 2 Phone Number', 'Form 2 Employee Name',
+  'Form 2 Department', 'Form 2 Location', 'Form 2 Share Your Thoughts', 'Form 2 Browse File'
+];
+
+// R2 is a private bucket — raw f1/f2 *Url fields point at the R2 S3 API and
+// 403 with an InvalidArgument/Authorization XML error if opened directly.
+// Exports must ship presigned GetObject URLs instead, same as the admin
+// dashboard's media-url/media-download routes. 7 days is R2's max presign TTL.
+const EXPORT_URL_EXPIRY_SECONDS = 7 * 24 * 60 * 60;
+
+async function exportableMediaUrl(rawUrl) {
+  if (!rawUrl || !r2Client) return rawUrl || '';
+  const key = r2KeyFromUrl(rawUrl);
+  if (!key) return rawUrl;
+  try {
+    const command = new GetObjectCommand({ Bucket: R2_BUCKET, Key: key });
+    return await getSignedUrl(r2Client, command, { expiresIn: EXPORT_URL_EXPIRY_SECONDS });
+  } catch (err) {
+    console.error('Export media URL sign error:', err.message);
+    return rawUrl;
+  }
+}
+
+async function buildExportRow(u, f1, f2) {
+  const row = {};
+  for (const col of EXPORT_COLUMNS) row[col] = '';
+
+  row['Form 1 Filled'] = f1 ? 'Yes' : 'No';
+  if (f1) {
+    row['Form 1 Company Name'] = f1.companyName || '';
+    row['Form 1 Employee ID'] = f1.empId || '';
+    row['Form 1 Phone Number'] = f1.phone || '';
+    row['Form 1 Employee Full Name'] = u.empName || '';
+    row['Form 1 Department'] = f1.department || '';
+    row['Form 1 Location'] = u.city || '';
+    row['Form 1 Photo 1'] = await exportableMediaUrl(f1.photo1Url);
+    row['Form 1 Photo 2'] = await exportableMediaUrl(f1.photo2Url);
+    row['Form 1 Kando Video'] = await exportableMediaUrl(f1.videoUrl);
+  }
+
+  row['Form 2 Filled'] = f2 ? 'Yes' : 'No';
+  if (f2) {
+    row['Form 2 Company Name'] = f2.companyName || '';
+    row['Form 2 Employee EIN'] = f2.empId || '';
+    row['Form 2 Phone Number'] = f2.phone || '';
+    row['Form 2 Employee Name'] = u.empName || '';
+    row['Form 2 Department'] = f2.department || '';
+    row['Form 2 Location'] = f2.location || '';
+    row['Form 2 Share Your Thoughts'] = f2.thoughts || '';
+    row['Form 2 Browse File'] = await exportableMediaUrl(f2.optionalFileUrl);
+  }
+
+  return row;
+}
+
 app.get('/api/admin/export/users', exportLimiter, async (req, res) => {
   try {
     const format = req.query.format || 'csv';
@@ -1079,37 +1147,7 @@ app.get('/api/admin/export/users', exportLimiter, async (req, res) => {
     const rows = await Promise.all(users.map(async u => {
       const f1 = await Form1.findOne({ userId: u._id });
       const f2 = await Form2.findOne({ userId: u._id });
-      return {
-        'User ID': u._id.toString(),
-        'Emp ID': u.empId,
-        'Name': u.empName,
-        'Phone': u.phone || '',
-        'City': u.city || '',
-        'Family Members': u.familyMembers || '',
-        'Form 1 Status': f1 ? 'Submitted' : 'Not Filled',
-        'Form 1 Phone': f1 ? (f1.phone || '') : '',
-        'Form 1 Company Name': f1 ? f1.companyName : '',
-        'Form 1 Department': f1 ? f1.department : '',
-        'Form 1 Photo 1': f1 ? f1.photo1Url : '',
-        'Form 1 Photo 2': f1 ? f1.photo2Url : '',
-        'Form 1 Video': f1 ? f1.videoUrl : '',
-        'Form 1 CEO Reflection': f1 ? f1.ceoReflection : '',
-        'Form 1 Language': f1 ? f1.language : '',
-        'Form 1 Submitted IP': f1 ? (f1.ip || '') : '',
-        'Form 1 Submitted At': f1 ? new Date(f1.submittedAt).toLocaleString() : '',
-        'Form 2 Status': f2 ? 'Submitted' : 'Not Filled',
-        'Form 2 Phone': f2 ? (f2.phone || '') : '',
-        'Form 2 Company Name': f2 ? f2.companyName : '',
-        'Form 2 Department': f2 ? f2.department : '',
-        'Form 2 Location': f2 ? f2.location : '',
-        'Form 2 Thoughts': f2 ? f2.thoughts : '',
-        'Form 2 Optional File': f2 ? f2.optionalFileUrl : '',
-        'Form 2 Language': f2 ? f2.language : '',
-        'Form 2 Submitted IP': f2 ? (f2.ip || '') : '',
-        'Form 2 Submitted At': f2 ? new Date(f2.submittedAt).toLocaleString() : '',
-        'Tags': (u.tags || []).join(', '),
-        'Registered At': new Date(u.createdAt).toLocaleString()
-      };
+      return buildExportRow(u, f1, f2);
     }));
 
     await recordAuditLog(req, `Exported Users Data in format: ${format.toUpperCase()}`, req.adminUser);
@@ -1145,6 +1183,7 @@ app.get('/api/admin/export/pdf', exportLimiter, async (req, res) => {
       <!DOCTYPE html>
       <html>
       <head>
+        <meta charset="UTF-8">
         <title>Yamaha Kando Day 2026 - Users Report</title>
         <style>
           body { font-family: Arial, sans-serif; padding: 20px; color: #111; }
@@ -1162,60 +1201,28 @@ app.get('/api/admin/export/pdf', exportLimiter, async (req, res) => {
         <table>
           <thead>
             <tr>
-              <th>Emp ID</th>
-              <th>Employee Name</th>
-              <th>City Location</th>
-              <th>Form 1 Phone</th>
-              <th>Form 1 Company</th>
-              <th>Form 1 Department</th>
-              <th>Form 1 Photo 1</th>
-              <th>Form 1 Photo 2</th>
-              <th>Form 1 Video</th>
-              <th>Form 1 CEO Reflection</th>
-              <th>Form 1 Language</th>
-              <th>Form 1 IP</th>
-              <th>Form 2 Phone</th>
-              <th>Form 2 Company</th>
-              <th>Form 2 Department</th>
-              <th>Form 2 Location</th>
-              <th>Form 2 Thoughts</th>
-              <th>Form 2 Attachment</th>
-              <th>Form 2 Language</th>
-              <th>Form 2 IP</th>
-              <th>Assigned Tag</th>
+              ${EXPORT_COLUMNS.map(col => `<th>${col}</th>`).join('\n              ')}
             </tr>
           </thead>
           <tbody>
     `;
 
     const esc = (v) => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const linkableFields = new Set(['Form 1 Photo 1', 'Form 1 Photo 2', 'Form 1 Kando Video', 'Form 2 Browse File']);
 
     for (const u of users) {
       const f1 = await Form1.findOne({ userId: u._id });
       const f2 = await Form2.findOne({ userId: u._id });
+      const row = await buildExportRow(u, f1, f2);
       html += `
         <tr>
-          <td><strong>${esc(u.empId || u.phone || '')}</strong></td>
-          <td>${esc(u.empName)}</td>
-          <td>${esc(u.city || 'N/A')}</td>
-          <td>${f1 ? esc(f1.phone) : 'Not Filled'}</td>
-          <td>${f1 ? esc(f1.companyName) : ''}</td>
-          <td>${f1 ? esc(f1.department) : ''}</td>
-          <td>${f1 ? (f1.photo1Url ? '✓ Uploaded' : '') : ''}</td>
-          <td>${f1 ? (f1.photo2Url ? '✓ Uploaded' : '') : ''}</td>
-          <td>${f1 ? (f1.videoUrl ? '✓ Uploaded' : '') : ''}</td>
-          <td>${f1 ? esc(f1.ceoReflection) : ''}</td>
-          <td>${f1 ? esc(f1.language) : ''}</td>
-          <td>${f1 ? esc(f1.ip) : ''}</td>
-          <td>${f2 ? esc(f2.phone) : 'Not Filled'}</td>
-          <td>${f2 ? esc(f2.companyName) : ''}</td>
-          <td>${f2 ? esc(f2.department) : ''}</td>
-          <td>${f2 ? esc(f2.location) : ''}</td>
-          <td>${f2 ? esc(f2.thoughts) : ''}</td>
-          <td>${f2 ? (f2.optionalFileUrl ? '✓ Uploaded' : '') : ''}</td>
-          <td>${f2 ? esc(f2.language) : ''}</td>
-          <td>${f2 ? esc(f2.ip) : ''}</td>
-          <td>${esc((u.tags || []).join(', ') || 'None')}</td>
+          ${EXPORT_COLUMNS.map(col => {
+            const val = row[col];
+            if (val && linkableFields.has(col)) {
+              return `<td><a href="${esc(val)}">${esc(val)}</a></td>`;
+            }
+            return `<td>${esc(val)}</td>`;
+          }).join('\n          ')}
         </tr>
       `;
     }
@@ -1227,7 +1234,7 @@ app.get('/api/admin/export/pdf', exportLimiter, async (req, res) => {
       </html>
     `;
 
-    res.setHeader('Content-Type', 'text/html');
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.send(html);
   } catch (err) {
     console.error(err);
@@ -1263,33 +1270,7 @@ async function buildExportArchive(archive, filterReq) {
 
     const userKey = u.empId || u.phone || u._id.toString();
 
-    rows.push({
-      'Emp ID': u.empId,
-      'Phone': u.phone || '',
-      'Name': u.empName,
-      'City': u.city || '',
-      'Family Members': u.familyMembers || '',
-      'Form 1 Status': f1 ? 'Submitted' : 'Not Filled',
-      'Form 1 Phone': f1 ? (f1.phone || '') : '',
-      'Form 1 Company Name': f1 ? f1.companyName : '',
-      'Form 1 Department': f1 ? f1.department : '',
-      'Form 1 Photo 1': f1 ? f1.photo1Url : '',
-      'Form 1 Photo 2': f1 ? f1.photo2Url : '',
-      'Form 1 Video': f1 ? f1.videoUrl : '',
-      'Form 1 CEO Reflection': f1 ? f1.ceoReflection : '',
-      'Form 1 Language': f1 ? f1.language : '',
-      'Form 1 Submitted IP': f1 ? (f1.ip || '') : '',
-      'Form 2 Status': f2 ? 'Submitted' : 'Not Filled',
-      'Form 2 Phone': f2 ? (f2.phone || '') : '',
-      'Form 2 Company Name': f2 ? f2.companyName : '',
-      'Form 2 Department': f2 ? f2.department : '',
-      'Form 2 Location': f2 ? f2.location : '',
-      'Form 2 Thoughts': f2 ? f2.thoughts : '',
-      'Form 2 Attachment': f2 ? f2.optionalFileUrl : '',
-      'Form 2 Language': f2 ? f2.language : '',
-      'Form 2 Submitted IP': f2 ? (f2.ip || '') : '',
-      'Tags': (u.tags || []).join(', ')
-    });
+    rows.push(await buildExportRow(u, f1, f2));
 
     const empFolder = `media/${userKey}`;
     if (f1?.photo1Url) await appendR2FileToArchive(archive, f1.photo1Url, `${empFolder}/${userKey}_photo1${path.extname(f1.photo1Url)}`);
