@@ -533,7 +533,7 @@ export const AdminDashboardPage: React.FC = () => {
     // forward-navigable history entry (Back would otherwise land back on
     // /admin-dashboard's URL, even though the route guard in App.tsx already
     // redirects to the login page once isAdminLoggedIn is false).
-    navigateTo('landing', undefined, true);
+    navigateTo('admin-login', undefined, true);
   };
 
   // Open User Profile Page (Req 1)
