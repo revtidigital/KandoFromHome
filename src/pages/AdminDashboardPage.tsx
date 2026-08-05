@@ -1613,23 +1613,28 @@ export const AdminDashboardPage: React.FC = () => {
               <div style={{ padding: '40px 0', textAlign: 'center', color: '#64748B' }}>Loading…</div>
             ) : (
               <>
-                {mediaModal.type === 'image' ? (
-                  <img
-                    key={mediaSignedUrl}
-                    src={mediaSignedUrl}
-                    alt={mediaModal.title}
-                    style={{ maxWidth: '100%', maxHeight: '70vh', borderRadius: '12px', display: 'block', margin: '0 auto' }}
-                    onError={() => setMediaError('This image file failed to load (it may be corrupted or missing).')}
-                  />
-                ) : (
-                  <video
-                    key={mediaSignedUrl}
-                    controls
-                    src={mediaSignedUrl}
-                    style={{ width: '100%', borderRadius: '12px' }}
-                    onError={() => setMediaError('This video file failed to load (it may be corrupted or missing).')}
-                  />
-                )}
+                {/* Fixed-size frame — height/width never change with the media's own
+                    dimensions, however large or small; object-fit: contain keeps the
+                    full image/video visible inside it without cropping or distortion. */}
+                <div style={{ width: '100%', height: '70vh', borderRadius: '12px', overflow: 'hidden', background: palette.subtleBg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {mediaModal.type === 'image' ? (
+                    <img
+                      key={mediaSignedUrl}
+                      src={mediaSignedUrl}
+                      alt={mediaModal.title}
+                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                      onError={() => setMediaError('This image file failed to load (it may be corrupted or missing).')}
+                    />
+                  ) : (
+                    <video
+                      key={mediaSignedUrl}
+                      controls
+                      src={mediaSignedUrl}
+                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                      onError={() => setMediaError('This video file failed to load (it may be corrupted or missing).')}
+                    />
+                  )}
+                </div>
                 <button
                   onClick={handleMediaDownload}
                   disabled={mediaDownloading}
@@ -1677,22 +1682,29 @@ export const AdminDashboardPage: React.FC = () => {
                   </div>
                 ) : !gallerySignedUrl ? (
                   <div style={{ padding: '40px 0', textAlign: 'center', color: '#64748B' }}>Loading…</div>
-                ) : assetsModal.items[assetsModal.index].type === 'image' ? (
-                  <img
-                    key={gallerySignedUrl}
-                    src={gallerySignedUrl}
-                    alt={assetsModal.items[assetsModal.index].title}
-                    style={{ maxWidth: '100%', maxHeight: '60vh', borderRadius: '12px', display: 'block', margin: '0 auto' }}
-                    onError={() => setGalleryError('This image file failed to load (it may be corrupted or missing).')}
-                  />
                 ) : (
-                  <video
-                    key={gallerySignedUrl}
-                    controls
-                    src={gallerySignedUrl}
-                    style={{ width: '100%', borderRadius: '12px' }}
-                    onError={() => setGalleryError('This video file failed to load (it may be corrupted or missing).')}
-                  />
+                  // Fixed-size frame — height/width never change with the media's own
+                  // dimensions; object-fit: contain keeps the full image/video visible
+                  // inside it without cropping or distortion.
+                  <div style={{ width: '100%', height: '60vh', borderRadius: '12px', overflow: 'hidden', background: palette.subtleBg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {assetsModal.items[assetsModal.index].type === 'image' ? (
+                      <img
+                        key={gallerySignedUrl}
+                        src={gallerySignedUrl}
+                        alt={assetsModal.items[assetsModal.index].title}
+                        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                        onError={() => setGalleryError('This image file failed to load (it may be corrupted or missing).')}
+                      />
+                    ) : (
+                      <video
+                        key={gallerySignedUrl}
+                        controls
+                        src={gallerySignedUrl}
+                        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                        onError={() => setGalleryError('This video file failed to load (it may be corrupted or missing).')}
+                      />
+                    )}
+                  </div>
                 )}
               </div>
 
