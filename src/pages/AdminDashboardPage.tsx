@@ -164,6 +164,9 @@ export const AdminDashboardPage: React.FC = () => {
   type Tab = 'overview' | 'users' | 'tags' | 'settings' | 'audit' | 'user-detail';
   const [activeTab, setActiveTab] = useState<Tab>('overview');
 
+  // Which overview KPI card's submission list is expanded below the cards (null = none open).
+  const [expandedOverviewForm, setExpandedOverviewForm] = useState<'form1' | 'form2' | null>(null);
+
   // Settings tab is superadmin-only — "kandoadmin" and any other regular
   // admin account never sees the nav entry or the tab content.
   const adminUsername = getAdminUsername();
@@ -910,31 +913,143 @@ export const AdminDashboardPage: React.FC = () => {
                 <div style={{ fontSize: '2.5rem', fontWeight: 900, color: palette.accentCyan }}>{allUsers.length}</div>
               </div>
 
-              <div style={{ background: palette.surfaceAlt, border: '1.5px solid rgba(168,85,247,0.3)', borderRadius: '16px', padding: '24px' }}>
+              <div
+                onClick={() => setExpandedOverviewForm(prev => prev === 'form1' ? null : 'form1')}
+                title="Click to view all Form 1 submissions"
+                style={{
+                  background: palette.surfaceAlt,
+                  border: expandedOverviewForm === 'form1' ? '1.5px solid #A855F7' : '1.5px solid rgba(168,85,247,0.3)',
+                  borderRadius: '16px', padding: '24px', cursor: 'pointer',
+                  boxShadow: expandedOverviewForm === 'form1' ? '0 0 0 3px rgba(168,85,247,0.15)' : 'none',
+                  transition: 'box-shadow 0.15s, border-color 0.15s'
+                }}
+              >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
                   <span style={{ color: palette.mutedText, fontSize: '0.9rem', fontWeight: 700 }}>Form 1 Submissions</span>
-                  <div title="Form 1 (DIY Craft Wall Photos & Reflection)" style={{ cursor: 'pointer' }}>
+                  <div title="Form 1 (DIY Craft Wall Photos & Reflection)">
                     <Info size={18} color="#A855F7" />
                   </div>
                 </div>
                 <div style={{ fontSize: '2.5rem', fontWeight: 900, color: '#A855F7' }}>
                   {allUsers.filter(u => u.form1).length}
                 </div>
+                <div style={{ fontSize: '0.75rem', color: '#A855F7', fontWeight: 700, marginTop: '6px' }}>
+                  {expandedOverviewForm === 'form1' ? '▲ Hide submissions' : '▼ View submissions'}
+                </div>
               </div>
 
-              <div style={{ background: palette.surfaceAlt, border: '1.5px solid rgba(34,197,94,0.3)', borderRadius: '16px', padding: '24px' }}>
+              <div
+                onClick={() => setExpandedOverviewForm(prev => prev === 'form2' ? null : 'form2')}
+                title="Click to view all Form 2 submissions"
+                style={{
+                  background: palette.surfaceAlt,
+                  border: expandedOverviewForm === 'form2' ? '1.5px solid #22C55E' : '1.5px solid rgba(34,197,94,0.3)',
+                  borderRadius: '16px', padding: '24px', cursor: 'pointer',
+                  boxShadow: expandedOverviewForm === 'form2' ? '0 0 0 3px rgba(34,197,94,0.15)' : 'none',
+                  transition: 'box-shadow 0.15s, border-color 0.15s'
+                }}
+              >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
                   <span style={{ color: palette.mutedText, fontSize: '0.9rem', fontWeight: 700 }}>Form 2 Submissions</span>
-                  <div title="Form 2 (Family Kando Video Submissions)" style={{ cursor: 'pointer' }}>
+                  <div title="Form 2 (Family Kando Video Submissions)">
                     <Info size={18} color="#22C55E" />
                   </div>
                 </div>
                 <div style={{ fontSize: '2.5rem', fontWeight: 900, color: '#22C55E' }}>
                   {allUsers.filter(u => u.form2).length}
                 </div>
+                <div style={{ fontSize: '0.75rem', color: '#22C55E', fontWeight: 700, marginTop: '6px' }}>
+                  {expandedOverviewForm === 'form2' ? '▲ Hide submissions' : '▼ View submissions'}
+                </div>
               </div>
 
             </div>
+
+            {/* EXPANDABLE SUBMISSIONS TABLE — shown below the KPI cards when a Form 1 / Form 2 card is clicked */}
+            {expandedOverviewForm && (() => {
+              const formKey = expandedOverviewForm;
+              const accent = formKey === 'form1' ? '#A855F7' : '#22C55E';
+              const rows = allUsers.filter(u => (u as any)[formKey]);
+              return (
+                <div style={{ background: palette.surface, border: `1px solid ${palette.border}`, borderRadius: '16px', overflow: 'hidden', marginBottom: '32px' }}>
+                  <div style={{ padding: '16px 20px', borderBottom: `1px solid ${palette.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: accent }}>
+                      {formKey === 'form1' ? 'Form 1' : 'Form 2'} Submissions ({rows.length})
+                    </h3>
+                    <button
+                      onClick={() => setExpandedOverviewForm(null)}
+                      style={{ background: 'transparent', border: 'none', color: palette.mutedText, cursor: 'pointer', fontSize: '0.8rem', fontWeight: 700 }}
+                    >
+                      Close ✕
+                    </button>
+                  </div>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                      <thead>
+                        <tr style={{ background: palette.surfaceAlt, color: palette.accentCyan, borderBottom: `1px solid ${palette.border}` }}>
+                          <th style={{ padding: '12px 18px', textAlign: 'left' }}>Emp ID / Phone</th>
+                          <th style={{ padding: '12px 18px', textAlign: 'left' }}>Employee Name</th>
+                          <th style={{ padding: '12px 18px', textAlign: 'left' }}>Department</th>
+                          <th style={{ padding: '12px 18px', textAlign: 'left' }}>Submitted Date/Time</th>
+                          <th style={{ padding: '12px 18px', textAlign: 'left' }}>Status</th>
+                          <th style={{ padding: '12px 18px', textAlign: 'right' }}>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {rows.length === 0 ? (
+                          <tr>
+                            <td colSpan={6} style={{ padding: '24px 18px', textAlign: 'center', color: palette.mutedText }}>
+                              No {formKey === 'form1' ? 'Form 1' : 'Form 2'} submissions yet.
+                            </td>
+                          </tr>
+                        ) : rows.map(user => {
+                          const submittedAt = (user as any)[formKey]?.submittedAt;
+                          const userId = user.id || (user as any)._id;
+                          return (
+                            <tr key={userId} style={{ borderBottom: `1px solid ${palette.borderFaint}` }}>
+                              <td style={{ padding: '12px 18px', fontWeight: 800, color: palette.accentCyan }}>
+                                {user.empId || user.phone || '—'}
+                              </td>
+                              <td style={{ padding: '12px 18px', fontWeight: 700, color: palette.text }}>
+                                {user.empName}
+                              </td>
+                              <td style={{ padding: '12px 18px', color: palette.textMuted2 }}>
+                                {(user as any)[formKey]?.department || '—'}
+                              </td>
+                              <td style={{ padding: '12px 18px', color: palette.textMuted2, fontSize: '0.8rem' }}>
+                                {submittedAt ? new Date(submittedAt).toLocaleString() : '—'}
+                              </td>
+                              <td style={{ padding: '12px 18px' }}>
+                                <span style={{ background: `${accent}26`, color: accent, padding: '4px 10px', borderRadius: '12px', fontWeight: 700, fontSize: '0.75rem' }}>
+                                  ✓ Submitted
+                                </span>
+                              </td>
+                              <td style={{ padding: '12px 18px', textAlign: 'right' }}>
+                                <button
+                                  onClick={() => handleOpenUserProfile(user)}
+                                  style={{
+                                    background: `rgba(${palette.accentCyanRgb},0.15)`,
+                                    border: `1px solid ${palette.accentCyan}`,
+                                    color: palette.accentCyan,
+                                    padding: '6px 12px',
+                                    borderRadius: '8px',
+                                    fontSize: '0.78rem',
+                                    fontWeight: 700,
+                                    cursor: 'pointer'
+                                  }}
+                                >
+                                  View Profile
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         )}
 
