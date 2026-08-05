@@ -422,7 +422,7 @@ async function verifyCaptcha(token, remoteIp) {
 app.get('/api/validate-empid', validateLimiter, async (req, res) => {
   const empId = (req.query.id || '').toString().trim();
   if (!empId) return res.json({ valid: false });
-  const found = await AllowedEmployee.findOne({ empId });
+  const found = await AllowedEmployee.findOne(empIdMatch(empId));
   res.json({ valid: !!found });
 });
 
@@ -465,7 +465,7 @@ app.get('/api/check-submission', async (req, res) => {
     // optional, and matching a blank string would return an arbitrary other
     // blank-field user.
     const orClauses = [];
-    if (empId) orClauses.push({ empId });
+    if (empId) orClauses.push(empIdMatch(empId.toString().trim()));
     if (email) orClauses.push({ email });
     if (phone) orClauses.push({ phone });
     const user = await User.findOne({ $or: orClauses });
@@ -501,7 +501,7 @@ async function resolveEligibleIdentity(rawEmpId, rawPhone) {
     return { ok: false, error: 'Employee ID is required. If you don\'t have one, enter your Phone Number instead.' };
   }
   if (cleanEmpId) {
-    const allowed = await AllowedEmployee.findOne({ empId: cleanEmpId });
+    const allowed = await AllowedEmployee.findOne(empIdMatch(cleanEmpId));
     if (!allowed) return { ok: false, error: 'This Employee ID was not found in company records. Please check and try again.' };
   } else {
     const allowed = await AllowedPhone.findOne({ phone: cleanPhone });
@@ -573,7 +573,7 @@ app.post('/api/submissions/form1', (req, res, next) => {
 
     // Identity anchor is Employee ID when present, otherwise Phone Number —
     // whichever one was validated against the whitelist above.
-    const identityQuery = cleanEmpId ? { empId: cleanEmpId } : { phone: cleanPhone };
+    const identityQuery = cleanEmpId ? empIdMatch(cleanEmpId) : { phone: cleanPhone };
     let user = await User.findOne(identityQuery);
     if (!user) {
       user = await User.create({
@@ -682,7 +682,7 @@ app.post('/api/submissions/form2', (req, res, next) => {
     const { cleanEmpId, cleanPhone } = identity;
 
     // Identity anchor is Employee ID when present, otherwise Phone Number.
-    const identityQuery = cleanEmpId ? { empId: cleanEmpId } : { phone: cleanPhone };
+    const identityQuery = cleanEmpId ? empIdMatch(cleanEmpId) : { phone: cleanPhone };
     let user = await User.findOne(identityQuery);
     if (!user) {
       user = await User.create({
@@ -854,6 +854,15 @@ app.get('/api/admin/media-download', async (req, res) => {
 
 function escapeRegex(str) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// Employee IDs are matched case-insensitively — the whitelist/User records
+// keep whatever case they were originally uploaded/typed in (never mutated),
+// but comparisons must not fail just because someone typed "qw1234" instead
+// of "QW1234". Used everywhere an empId is looked up against the whitelist
+// or an existing User record.
+function empIdMatch(value) {
+  return { empId: new RegExp(`^${escapeRegex(value)}$`, 'i') };
 }
 
 // Generic action logger for the admin panel — lets the frontend record
