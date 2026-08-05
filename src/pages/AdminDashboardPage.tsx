@@ -34,7 +34,9 @@ const THEMES = {
     surface: '#040F2B', surfaceAlt: '#091A44', surfaceSoft: '#06133B',
     border: 'rgba(255,255,255,0.1)', borderStrong: 'rgba(255,255,255,0.2)', borderFaint: 'rgba(255,255,255,0.06)',
     inputBg: 'rgba(255,255,255,0.06)', subtleBg: 'rgba(255,255,255,0.04)',
-    text: 'white', textMuted2: '#CBD5E1'
+    text: 'white', textMuted2: '#CBD5E1',
+    // Bright cyan reads fine on the dark navy background.
+    accentCyan: '#00E5FF', accentCyanRgb: '0,229,255'
   },
   light: {
     pageBg: '#F1F5F9', pageText: '#0F172A',
@@ -43,7 +45,10 @@ const THEMES = {
     surface: '#FFFFFF', surfaceAlt: '#F8FAFC', surfaceSoft: '#FFFFFF',
     border: 'rgba(15,23,42,0.1)', borderStrong: 'rgba(15,23,42,0.18)', borderFaint: 'rgba(15,23,42,0.06)',
     inputBg: 'rgba(15,23,42,0.04)', subtleBg: 'rgba(15,23,42,0.035)',
-    text: '#0F172A', textMuted2: '#334155'
+    text: '#0F172A', textMuted2: '#334155',
+    // Same bright cyan fails contrast on white (~1.5:1) — a darker cyan/teal
+    // (~5.4:1 against white) keeps the brand color family but stays readable.
+    accentCyan: '#0E7490', accentCyanRgb: '14,116,144'
   }
 };
 
@@ -56,7 +61,8 @@ const TagMultiSelect: React.FC<{
   onToggle: (tag: string) => void;
   accent?: string;
   palette: typeof THEMES['dark'];
-}> = ({ tags, customTags, onToggle, accent = '#00E5FF', palette }) => {
+}> = ({ tags, customTags, onToggle, accent, palette }) => {
+  accent = accent || palette.accentCyan;
   return (
     <details style={{ position: 'relative', display: 'inline-block' }}>
       <summary
@@ -705,7 +711,7 @@ export const AdminDashboardPage: React.FC = () => {
         <div>
           <div style={{ padding: '0 12px 24px 12px', borderBottom: `1px solid ${palette.sidebarBorder}`, marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div>
-              <div style={{ fontSize: '0.75rem', color: '#00E5FF', fontWeight: 800, letterSpacing: '1px', textTransform: 'uppercase' }}>
+              <div style={{ fontSize: '0.75rem', color: palette.accentCyan, fontWeight: 800, letterSpacing: '1px', textTransform: 'uppercase' }}>
                 ADMINISTRATION
               </div>
               <div style={{ fontSize: '1.2rem', fontWeight: 800, color: palette.pageText, marginTop: '2px' }}>
@@ -717,7 +723,7 @@ export const AdminDashboardPage: React.FC = () => {
               title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
               style={{
                 width: '36px', height: '36px', borderRadius: '10px', flexShrink: 0,
-                background: 'rgba(0,229,255,0.12)', border: '1px solid #00E5FF', color: '#00E5FF',
+                background: `rgba(${palette.accentCyanRgb},0.12)`, border: `1px solid ${palette.accentCyan}`, color: palette.accentCyan,
                 display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer'
               }}
             >
@@ -730,9 +736,9 @@ export const AdminDashboardPage: React.FC = () => {
               onClick={() => goToTab('overview')}
               style={{
                 display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '12px',
-                background: activeTab === 'overview' ? 'rgba(0,229,255,0.15)' : 'transparent',
-                color: activeTab === 'overview' ? '#00E5FF' : palette.mutedText,
-                border: activeTab === 'overview' ? '1px solid #00E5FF' : '1px solid transparent',
+                background: activeTab === 'overview' ? `rgba(${palette.accentCyanRgb},0.15)` : 'transparent',
+                color: activeTab === 'overview' ? palette.accentCyan : palette.mutedText,
+                border: activeTab === 'overview' ? `1px solid ${palette.accentCyan}` : '1px solid transparent',
                 fontWeight: 700, cursor: 'pointer', textAlign: 'left'
               }}
             >
@@ -744,9 +750,9 @@ export const AdminDashboardPage: React.FC = () => {
               onClick={() => goToTab('users')}
               style={{
                 display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '12px',
-                background: (activeTab === 'users' || activeTab === 'user-detail') ? 'rgba(0,229,255,0.15)' : 'transparent',
-                color: (activeTab === 'users' || activeTab === 'user-detail') ? '#00E5FF' : palette.mutedText,
-                border: (activeTab === 'users' || activeTab === 'user-detail') ? '1px solid #00E5FF' : '1px solid transparent',
+                background: (activeTab === 'users' || activeTab === 'user-detail') ? `rgba(${palette.accentCyanRgb},0.15)` : 'transparent',
+                color: (activeTab === 'users' || activeTab === 'user-detail') ? palette.accentCyan : palette.mutedText,
+                border: (activeTab === 'users' || activeTab === 'user-detail') ? `1px solid ${palette.accentCyan}` : '1px solid transparent',
                 fontWeight: 700, cursor: 'pointer', textAlign: 'left'
               }}
             >
@@ -758,9 +764,9 @@ export const AdminDashboardPage: React.FC = () => {
               onClick={() => goToTab('tags')}
               style={{
                 display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '12px',
-                background: activeTab === 'tags' ? 'rgba(0,229,255,0.15)' : 'transparent',
-                color: activeTab === 'tags' ? '#00E5FF' : palette.mutedText,
-                border: activeTab === 'tags' ? '1px solid #00E5FF' : '1px solid transparent',
+                background: activeTab === 'tags' ? `rgba(${palette.accentCyanRgb},0.15)` : 'transparent',
+                color: activeTab === 'tags' ? palette.accentCyan : palette.mutedText,
+                border: activeTab === 'tags' ? `1px solid ${palette.accentCyan}` : '1px solid transparent',
                 fontWeight: 700, cursor: 'pointer', textAlign: 'left'
               }}
             >
@@ -773,9 +779,9 @@ export const AdminDashboardPage: React.FC = () => {
               onClick={() => goToTab('settings')}
               style={{
                 display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '12px',
-                background: activeTab === 'settings' ? 'rgba(0,229,255,0.15)' : 'transparent',
-                color: activeTab === 'settings' ? '#00E5FF' : palette.mutedText,
-                border: activeTab === 'settings' ? '1px solid #00E5FF' : '1px solid transparent',
+                background: activeTab === 'settings' ? `rgba(${palette.accentCyanRgb},0.15)` : 'transparent',
+                color: activeTab === 'settings' ? palette.accentCyan : palette.mutedText,
+                border: activeTab === 'settings' ? `1px solid ${palette.accentCyan}` : '1px solid transparent',
                 fontWeight: 700, cursor: 'pointer', textAlign: 'left'
               }}
             >
@@ -788,9 +794,9 @@ export const AdminDashboardPage: React.FC = () => {
               onClick={() => goToTab('audit')}
               style={{
                 display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '12px',
-                background: activeTab === 'audit' ? 'rgba(0,229,255,0.15)' : 'transparent',
-                color: activeTab === 'audit' ? '#00E5FF' : palette.mutedText,
-                border: activeTab === 'audit' ? '1px solid #00E5FF' : '1px solid transparent',
+                background: activeTab === 'audit' ? `rgba(${palette.accentCyanRgb},0.15)` : 'transparent',
+                color: activeTab === 'audit' ? palette.accentCyan : palette.mutedText,
+                border: activeTab === 'audit' ? `1px solid ${palette.accentCyan}` : '1px solid transparent',
                 fontWeight: 700, cursor: 'pointer', textAlign: 'left'
               }}
             >
@@ -827,14 +833,14 @@ export const AdminDashboardPage: React.FC = () => {
             {/* 3 KPI CARDS WITH INFO ICONS (Req 13) */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', marginBottom: '32px' }}>
               
-              <div style={{ background: palette.surfaceAlt, border: '1.5px solid rgba(0,229,255,0.3)', borderRadius: '16px', padding: '24px' }}>
+              <div style={{ background: palette.surfaceAlt, border: `1.5px solid rgba(${palette.accentCyanRgb},0.3))`, borderRadius: '16px', padding: '24px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
                   <span style={{ color: palette.mutedText, fontSize: '0.9rem', fontWeight: 700 }}>Total Registered Users</span>
                   <div title="Total unique employees registered in campaign" style={{ cursor: 'pointer' }}>
-                    <Info size={18} color="#00E5FF" />
+                    <Info size={18} color={palette.accentCyan} />
                   </div>
                 </div>
-                <div style={{ fontSize: '2.5rem', fontWeight: 900, color: '#00E5FF' }}>{allUsers.length}</div>
+                <div style={{ fontSize: '2.5rem', fontWeight: 900, color: palette.accentCyan }}>{allUsers.length}</div>
               </div>
 
               <div style={{ background: palette.surfaceAlt, border: '1.5px solid rgba(168,85,247,0.3)', borderRadius: '16px', padding: '24px' }}>
@@ -884,7 +890,7 @@ export const AdminDashboardPage: React.FC = () => {
                 </button>
                 <button 
                   onClick={() => handleExportData('csv')}
-                  style={{ background: 'rgba(0,229,255,0.12)', border: '1px solid #00E5FF', color: '#00E5FF', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}
+                  style={{ background: `rgba(${palette.accentCyanRgb},0.12)`, border: `1px solid ${palette.accentCyan}`, color: palette.accentCyan, padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}
                 >
                   <Download size={14} /> CSV
                 </button>
@@ -945,8 +951,8 @@ export const AdminDashboardPage: React.FC = () => {
                 OR a search/tag/form filter is active, so export always matches what's
                 actually on screen instead of silently exporting everyone. */}
             {(selectedUserIds.size > 0 || !!searchQuery || !!selectedTagFilter || !!selectedFormFilter) && (
-              <div style={{ background: 'rgba(0,229,255,0.1)', border: '1px solid #00E5FF', borderRadius: '14px', padding: '14px 18px', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
-                <span style={{ color: '#00E5FF', fontWeight: 800, fontSize: '0.9rem' }}>
+              <div style={{ background: `rgba(${palette.accentCyanRgb},0.1)`, border: `1px solid ${palette.accentCyan}`, borderRadius: '14px', padding: '14px 18px', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+                <span style={{ color: palette.accentCyan, fontWeight: 800, fontSize: '0.9rem' }}>
                   {selectedUserIds.size > 0
                     ? `${selectedUserIds.size} user${selectedUserIds.size > 1 ? 's' : ''} selected`
                     : `Filter applied — ${filteredUsers.length} user${filteredUsers.length !== 1 ? 's' : ''} match`}
@@ -955,7 +961,7 @@ export const AdminDashboardPage: React.FC = () => {
                   <button onClick={() => handleExportData('pdf')} style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid #EF4444', color: '#FCA5A5', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
                     <Download size={14} /> PDF
                   </button>
-                  <button onClick={() => handleExportData('csv')} style={{ background: 'rgba(0,229,255,0.12)', border: '1px solid #00E5FF', color: '#00E5FF', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
+                  <button onClick={() => handleExportData('csv')} style={{ background: `rgba(${palette.accentCyanRgb},0.12)`, border: `1px solid ${palette.accentCyan}`, color: palette.accentCyan, padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
                     <Download size={14} /> CSV
                   </button>
                   <button onClick={() => handleExportData('excel')} style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid #22C55E', color: '#4ADE80', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
@@ -984,7 +990,7 @@ export const AdminDashboardPage: React.FC = () => {
             <div style={{ background: palette.surface, borderRadius: '16px', border: `1px solid ${palette.border}`, overflow: 'hidden' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
                 <thead>
-                  <tr style={{ background: palette.surfaceAlt, color: '#00E5FF', borderBottom: `1px solid ${palette.border}` }}>
+                  <tr style={{ background: palette.surfaceAlt, color: palette.accentCyan, borderBottom: `1px solid ${palette.border}` }}>
                     <th style={{ padding: '14px 12px', width: '36px' }}>
                       <input
                         type="checkbox"
@@ -999,7 +1005,7 @@ export const AdminDashboardPage: React.FC = () => {
                             return next;
                           });
                         }}
-                        style={{ accentColor: '#00E5FF', cursor: 'pointer', width: '16px', height: '16px' }}
+                        style={{ accentColor: palette.accentCyan, cursor: 'pointer', width: '16px', height: '16px' }}
                       />
                     </th>
                     <th style={{ padding: '14px 18px' }}>Emp ID / Phone</th>
@@ -1024,11 +1030,11 @@ export const AdminDashboardPage: React.FC = () => {
                             type="checkbox"
                             checked={selectedUserIds.has(userId)}
                             onChange={() => toggleUserSelected(userId)}
-                            style={{ accentColor: '#00E5FF', cursor: 'pointer', width: '16px', height: '16px' }}
+                            style={{ accentColor: palette.accentCyan, cursor: 'pointer', width: '16px', height: '16px' }}
                           />
                         </td>
 
-                        <td style={{ padding: '14px 18px', fontWeight: 800, color: '#00E5FF' }}>
+                        <td style={{ padding: '14px 18px', fontWeight: 800, color: palette.accentCyan }}>
                           {user.empId || user.phone || '—'}
                         </td>
 
@@ -1071,7 +1077,7 @@ export const AdminDashboardPage: React.FC = () => {
                           {assets.length > 0 ? (
                             <button
                               onClick={() => setAssetsModal({ items: assets, index: 0 })}
-                              style={{ background: 'rgba(0,229,255,0.1)', border: '1px solid #00E5FF', color: '#00E5FF', padding: '5px 10px', borderRadius: '8px', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                              style={{ background: `rgba(${palette.accentCyanRgb},0.1)`, border: `1px solid ${palette.accentCyan}`, color: palette.accentCyan, padding: '5px 10px', borderRadius: '8px', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                             >
                               <Images size={14} /> {assets.length}
                             </button>
@@ -1094,9 +1100,9 @@ export const AdminDashboardPage: React.FC = () => {
                           <button
                             onClick={() => handleOpenUserProfile(user)}
                             style={{
-                              background: 'rgba(0,229,255,0.15)',
-                              border: '1px solid #00E5FF',
-                              color: '#00E5FF',
+                              background: `rgba(${palette.accentCyanRgb},0.15)`,
+                              border: `1px solid ${palette.accentCyan}`,
+                              color: palette.accentCyan,
                               padding: '6px 12px',
                               borderRadius: '8px',
                               fontSize: '0.78rem',
@@ -1149,12 +1155,12 @@ export const AdminDashboardPage: React.FC = () => {
               <span>Back to Users Directory</span>
             </button>
 
-            <div style={{ background: palette.surface, border: '1.5px solid #00E5FF', borderRadius: '24px', padding: '32px', boxShadow: '0 0 30px rgba(0,229,255,0.15)' }}>
+            <div style={{ background: palette.surface, border: `1.5px solid ${palette.accentCyan}`, borderRadius: '24px', padding: '32px', boxShadow: `0 0 30px rgba(${palette.accentCyanRgb},0.15))` }}>
               
               {/* Header */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
                 <div>
-                  <h1 style={{ fontSize: '2rem', color: '#00E5FF', fontWeight: 900, margin: 0 }}>
+                  <h1 style={{ fontSize: '2rem', color: palette.accentCyan, fontWeight: 900, margin: 0 }}>
                     {selectedUserForProfile.empName}
                   </h1>
                   <p style={{ color: palette.mutedText, fontSize: '0.9rem', marginTop: '4px' }}>
@@ -1254,7 +1260,7 @@ export const AdminDashboardPage: React.FC = () => {
                     )}
                     {selectedUserForProfile.form1.videoUrl && (
                       <button onClick={() => setMediaModal({ type: 'video', url: selectedUserForProfile.form1.videoUrl, title: 'Form 1 — Kando Video' })}
-                        style={{ cursor: 'pointer', border: '1px solid #00E5FF', borderRadius: '10px', padding: '10px 18px', color: '#00E5FF', fontSize: '0.85rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(0,229,255,0.08)', outline: 'none' }}>
+                        style={{ cursor: 'pointer', border: `1px solid ${palette.accentCyan}`, borderRadius: '10px', padding: '10px 18px', color: palette.accentCyan, fontSize: '0.85rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', background: `rgba(${palette.accentCyanRgb},0.08)`, outline: 'none' }}>
                         <FileVideo size={16} /> Watch Video
                       </button>
                     )}
@@ -1361,14 +1367,14 @@ export const AdminDashboardPage: React.FC = () => {
                 onKeyDown={e => e.key === 'Enter' && handleAddTag()}
                 style={{ flex: 1, padding: '12px 16px', borderRadius: '10px', background: palette.surface, border: `1px solid ${palette.borderStrong}`, color: palette.text, outline: 'none', fontSize: '0.9rem' }}
               />
-              <button onClick={handleAddTag} style={{ background: '#00E5FF', color: '#020817', border: 'none', padding: '12px 22px', borderRadius: '10px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.9rem' }}>
+              <button onClick={handleAddTag} style={{ background: palette.accentCyan, color: '#020817', border: 'none', padding: '12px 22px', borderRadius: '10px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.9rem' }}>
                 <Plus size={18} /> Add Tag
               </button>
             </div>
 
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
               {customTags.map(tag => (
-                <div key={tag} style={{ background: palette.surfaceAlt, border: '1.5px solid #00E5FF', padding: '10px 18px', borderRadius: '24px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div key={tag} style={{ background: palette.surfaceAlt, border: `1.5px solid ${palette.accentCyan}`, padding: '10px 18px', borderRadius: '24px', display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>{tag}</span>
                   <X size={16} color="#EF4444" onClick={() => setTagPendingDelete(tag)} style={{ cursor: 'pointer' }} />
                 </div>
@@ -1451,9 +1457,9 @@ export const AdminDashboardPage: React.FC = () => {
               </div>
 
               {/* CARD 1: GOOGLE RECAPTCHA SECURITY SETTINGS (Req 3) */}
-              <div style={{ background: palette.surface, padding: '28px', borderRadius: '18px', border: '1.5px solid rgba(0,229,255,0.3)' }}>
+              <div style={{ background: palette.surface, padding: '28px', borderRadius: '18px', border: `1.5px solid rgba(${palette.accentCyanRgb},0.3))` }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                  <Lock size={22} color="#00E5FF" />
+                  <Lock size={22} color={palette.accentCyan} />
                   <div>
                     <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: palette.text, margin: 0 }}>Google reCAPTCHA Security Settings</h2>
                     <p style={{ fontSize: '0.8rem', color: palette.mutedText, margin: 0 }}>Protect form submissions against automated spam bots</p>
@@ -1476,7 +1482,7 @@ export const AdminDashboardPage: React.FC = () => {
                       type="checkbox"
                       checked={captchaEnabled}
                       onChange={e => setCaptchaEnabled(e.target.checked)}
-                      style={{ width: '22px', height: '22px', accentColor: '#00E5FF', cursor: 'pointer' }}
+                      style={{ width: '22px', height: '22px', accentColor: palette.accentCyan, cursor: 'pointer' }}
                     />
                   </label>
 
@@ -1564,7 +1570,7 @@ export const AdminDashboardPage: React.FC = () => {
             <div style={{ background: palette.surface, borderRadius: '16px', border: `1px solid ${palette.border}`, overflow: 'hidden' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
                 <thead>
-                  <tr style={{ background: palette.surfaceAlt, color: '#00E5FF', borderBottom: `1px solid ${palette.border}` }}>
+                  <tr style={{ background: palette.surfaceAlt, color: palette.accentCyan, borderBottom: `1px solid ${palette.border}` }}>
                     <th style={{ padding: '14px 18px' }}>Timestamp</th>
                     <th style={{ padding: '14px 18px' }}>IP Address</th>
                     <th style={{ padding: '14px 18px' }}>Detail / Activity</th>
@@ -1578,7 +1584,7 @@ export const AdminDashboardPage: React.FC = () => {
                   ]).map(log => (
                     <tr key={log.id || (log as any)._id} style={{ borderBottom: `1px solid ${palette.borderFaint}` }}>
                       <td style={{ padding: '14px 18px', color: palette.textMuted2, fontSize: '0.8rem' }}>{new Date(log.timestamp).toLocaleString()}</td>
-                      <td style={{ padding: '14px 18px', color: '#00E5FF', fontWeight: 700, fontSize: '0.8rem' }}>{log.ip || '127.0.0.1'}</td>
+                      <td style={{ padding: '14px 18px', color: palette.accentCyan, fontWeight: 700, fontSize: '0.8rem' }}>{log.ip || '127.0.0.1'}</td>
                       <td style={{ padding: '14px 18px', color: palette.text }}>{log.detail}</td>
                       <td style={{ padding: '14px 18px', color: palette.mutedText }}>{log.username || 'Admin'}</td>
                     </tr>
@@ -1594,17 +1600,17 @@ export const AdminDashboardPage: React.FC = () => {
       {/* MEDIA PREVIEW MODAL */}
       {mediaModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div style={{ background: palette.surface, border: '1px solid #00E5FF', borderRadius: '16px', padding: '24px', maxWidth: '700px', width: '100%', position: 'relative' }}>
+          <div style={{ background: palette.surface, border: `1px solid ${palette.accentCyan}`, borderRadius: '16px', padding: '24px', maxWidth: '700px', width: '100%', position: 'relative' }}>
             <button onClick={() => setMediaModal(null)} style={{ position: 'absolute', top: '16px', right: '16px', background: 'transparent', border: 'none', color: palette.text, cursor: 'pointer' }}>
               <X size={20} />
             </button>
-            <h3 style={{ fontSize: '1.1rem', color: '#00E5FF', marginBottom: '16px' }}>{mediaModal.title}</h3>
+            <h3 style={{ fontSize: '1.1rem', color: palette.accentCyan, marginBottom: '16px' }}>{mediaModal.title}</h3>
             {mediaError ? (
               <div style={{ padding: '40px 0', textAlign: 'center' }}>
                 <p style={{ color: '#EF4444', fontWeight: 700, marginBottom: '12px' }}>{mediaError}</p>
                 <button
                   onClick={() => setMediaRetryKey(k => k + 1)}
-                  style={{ border: '1px solid #00E5FF', color: '#00E5FF', background: 'rgba(0,229,255,0.08)', padding: '8px 16px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer' }}
+                  style={{ border: `1px solid ${palette.accentCyan}`, color: palette.accentCyan, background: `rgba(${palette.accentCyanRgb},0.08)`, padding: '8px 16px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer' }}
                 >
                   Retry
                 </button>
@@ -1638,7 +1644,7 @@ export const AdminDashboardPage: React.FC = () => {
                 <button
                   onClick={handleMediaDownload}
                   disabled={mediaDownloading}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginTop: '16px', border: '1px solid #00E5FF', borderRadius: '10px', padding: '10px 18px', color: '#00E5FF', fontSize: '0.85rem', fontWeight: 700, background: 'rgba(0,229,255,0.08)', cursor: mediaDownloading ? 'not-allowed' : 'pointer', opacity: mediaDownloading ? 0.6 : 1 }}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginTop: '16px', border: `1px solid ${palette.accentCyan}`, borderRadius: '10px', padding: '10px 18px', color: palette.accentCyan, fontSize: '0.85rem', fontWeight: 700, background: `rgba(${palette.accentCyanRgb},0.08)`, cursor: mediaDownloading ? 'not-allowed' : 'pointer', opacity: mediaDownloading ? 0.6 : 1 }}
                 >
                   <Download size={16} /> {mediaDownloading ? 'Downloading…' : 'Download'}
                 </button>
@@ -1651,11 +1657,11 @@ export const AdminDashboardPage: React.FC = () => {
       {/* ASSET GALLERY MODAL — every Form 1 / Form 2 upload for a user, with prev/next arrows */}
       {assetsModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div style={{ background: palette.surface, border: '1px solid #00E5FF', borderRadius: '16px', padding: '24px', maxWidth: '700px', width: '100%', position: 'relative' }}>
+          <div style={{ background: palette.surface, border: `1px solid ${palette.accentCyan}`, borderRadius: '16px', padding: '24px', maxWidth: '700px', width: '100%', position: 'relative' }}>
             <button onClick={() => setAssetsModal(null)} style={{ position: 'absolute', top: '16px', right: '16px', background: 'transparent', border: 'none', color: palette.text, cursor: 'pointer' }}>
               <X size={20} />
             </button>
-            <h3 style={{ fontSize: '1.1rem', color: '#00E5FF', marginBottom: '4px' }}>{assetsModal.items[assetsModal.index].title}</h3>
+            <h3 style={{ fontSize: '1.1rem', color: palette.accentCyan, marginBottom: '4px' }}>{assetsModal.items[assetsModal.index].title}</h3>
             <p style={{ fontSize: '0.78rem', color: '#64748B', marginBottom: '16px' }}>
               {assetsModal.index + 1} of {assetsModal.items.length}
             </p>
@@ -1675,7 +1681,7 @@ export const AdminDashboardPage: React.FC = () => {
                     <p style={{ color: '#EF4444', fontWeight: 700, marginBottom: '12px' }}>{galleryError}</p>
                     <button
                       onClick={() => setGalleryRetryKey(k => k + 1)}
-                      style={{ border: '1px solid #00E5FF', color: '#00E5FF', background: 'rgba(0,229,255,0.08)', padding: '8px 16px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer' }}
+                      style={{ border: `1px solid ${palette.accentCyan}`, color: palette.accentCyan, background: `rgba(${palette.accentCyanRgb},0.08)`, padding: '8px 16px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer' }}
                     >
                       Retry
                     </button>
@@ -1720,7 +1726,7 @@ export const AdminDashboardPage: React.FC = () => {
             {gallerySignedUrl && !galleryError && (
               <button
                 onClick={() => downloadR2File(assetsModal.items[assetsModal.index].url, assetsModal.items[assetsModal.index].title)}
-                style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginTop: '16px', border: '1px solid #00E5FF', borderRadius: '10px', padding: '10px 18px', color: '#00E5FF', fontSize: '0.85rem', fontWeight: 700, background: 'rgba(0,229,255,0.08)', cursor: 'pointer' }}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginTop: '16px', border: `1px solid ${palette.accentCyan}`, borderRadius: '10px', padding: '10px 18px', color: palette.accentCyan, fontSize: '0.85rem', fontWeight: 700, background: `rgba(${palette.accentCyanRgb},0.08)`, cursor: 'pointer' }}
               >
                 <Download size={16} /> Download
               </button>
