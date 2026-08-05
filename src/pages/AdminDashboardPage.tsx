@@ -340,7 +340,7 @@ export const AdminDashboardPage: React.FC = () => {
 
   // CSV+ZIP email-export modal + toast state
   const [emailExportOpen, setEmailExportOpen] = useState(false);
-  const [emailExportAddress, setEmailExportAddress] = useState('');
+  const [emailExportAddress, setEmailExportAddress] = useState('revtisoftwares@gmail.com');
   const [emailExportSending, setEmailExportSending] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const showToast = (msg: string) => {
