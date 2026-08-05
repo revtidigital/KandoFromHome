@@ -270,22 +270,21 @@ export const AdminDashboardPage: React.FC = () => {
     setTimeout(() => setToast(null), 4000);
   };
 
-  // R2 blocks direct browser fetches (no CORS headers on the bucket), so download
-  // via our own server, which proxies the object through with no CORS restriction.
-  // Used for both the media preview modal and any other private R2 attachment
-  // (e.g. Form 2's optional file) — any raw R2 href would 403 in the browser.
+  // Fast path: ask our server for a short-lived signed R2 URL (small JSON call,
+  // R2 itself sets Content-Disposition via ResponseContentDisposition) and let
+  // the browser download straight from R2 — no full-object buffering through
+  // our own server, which used to double the transfer time for large files.
   const downloadR2File = async (url: string, fallbackName: string) => {
-    const res = await fetch(`${apiBaseUrl}/api/admin/media-download?url=${encodeURIComponent(url)}`, { headers: adminAuthHeader() });
-    const blob = await res.blob();
-    const blobUrl = URL.createObjectURL(blob);
+    const res = await fetch(`${apiBaseUrl}/api/admin/media-url?download=1&url=${encodeURIComponent(url)}`, { headers: adminAuthHeader() });
+    const data = await res.json();
+    if (!res.ok || !data.url) throw new Error(data.error || 'Failed to get download link.');
     const filename = url.split('/').pop() || fallbackName;
     const link = document.createElement('a');
-    link.href = blobUrl;
+    link.href = data.url;
     link.download = filename;
     document.body.appendChild(link);
     link.click();
     link.remove();
-    URL.revokeObjectURL(blobUrl);
   };
 
   const handleMediaDownload = async () => {
@@ -309,6 +308,32 @@ export const AdminDashboardPage: React.FC = () => {
       console.error('Attachment download failed:', err);
     } finally {
       setAttachmentDownloading(false);
+    }
+  };
+
+  // Form 2's optional file used to only offer a full download — now opens
+  // instantly like Photo/Video: image/video go into the same preview modal,
+  // anything else (e.g. PDF) opens in a new tab via a fast signed URL.
+  const [attachmentOpening, setAttachmentOpening] = useState(false);
+  const handleAttachmentView = async (url: string) => {
+    if (/\.(mp4|mov|webm|mkv)$/i.test(url)) {
+      setMediaModal({ type: 'video', url, title: 'Form 2 — Attachment' });
+      return;
+    }
+    if (/\.(jpe?g|png|webp|gif|heic|heif)$/i.test(url)) {
+      setMediaModal({ type: 'image', url, title: 'Form 2 — Attachment' });
+      return;
+    }
+    setAttachmentOpening(true);
+    try {
+      const res = await fetch(`${apiBaseUrl}/api/admin/media-url?url=${encodeURIComponent(url)}`, { headers: adminAuthHeader() });
+      const data = await res.json();
+      if (!res.ok || !data.url) throw new Error(data.error || 'Failed to open file.');
+      window.open(data.url, '_blank', 'noopener');
+    } catch (err) {
+      console.error('Attachment view failed:', err);
+    } finally {
+      setAttachmentOpening(false);
     }
   };
 
@@ -1293,13 +1318,22 @@ export const AdminDashboardPage: React.FC = () => {
 
                   {/* Optional file attachment (if any) */}
                   {selectedUserForProfile.form2.optionalFileUrl && (
-                    <button
-                      onClick={() => handleAttachmentDownload(selectedUserForProfile.form2.optionalFileUrl)}
-                      disabled={attachmentDownloading}
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', border: '1px solid #A855F7', borderRadius: '10px', padding: '10px 18px', color: '#C084FC', fontSize: '0.85rem', fontWeight: 700, background: 'rgba(168,85,247,0.08)', cursor: attachmentDownloading ? 'not-allowed' : 'pointer', opacity: attachmentDownloading ? 0.6 : 1 }}
-                    >
-                      <Download size={16} /> {attachmentDownloading ? 'Downloading…' : 'Download Attached File'}
-                    </button>
+                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                      <button
+                        onClick={() => handleAttachmentView(selectedUserForProfile.form2.optionalFileUrl)}
+                        disabled={attachmentOpening}
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', border: '1px solid #A855F7', borderRadius: '10px', padding: '10px 18px', color: '#C084FC', fontSize: '0.85rem', fontWeight: 700, background: 'rgba(168,85,247,0.08)', cursor: attachmentOpening ? 'not-allowed' : 'pointer', opacity: attachmentOpening ? 0.6 : 1 }}
+                      >
+                        <ImageIcon size={16} /> {attachmentOpening ? 'Opening…' : 'View Attached File'}
+                      </button>
+                      <button
+                        onClick={() => handleAttachmentDownload(selectedUserForProfile.form2.optionalFileUrl)}
+                        disabled={attachmentDownloading}
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', border: '1px solid #A855F7', borderRadius: '10px', padding: '10px 18px', color: '#C084FC', fontSize: '0.85rem', fontWeight: 700, background: 'rgba(168,85,247,0.08)', cursor: attachmentDownloading ? 'not-allowed' : 'pointer', opacity: attachmentDownloading ? 0.6 : 1 }}
+                      >
+                        <Download size={16} /> {attachmentDownloading ? 'Downloading…' : 'Download'}
+                      </button>
+                    </div>
                   )}
                 </div>
               ) : (

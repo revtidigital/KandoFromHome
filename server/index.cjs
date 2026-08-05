@@ -748,6 +748,10 @@ function r2KeyFromUrl(url) {
 
 // Generates a short-lived signed URL so admins can view private R2 media
 // (<img>/<video> src) without making the bucket publicly readable.
+// Pass `download=1` to also get Content-Disposition: attachment set on the
+// R2 side (via ResponseContentDisposition), so the browser can download
+// straight from R2 — no server buffering, no extra hop, much faster than
+// proxying the whole object through this server.
 app.get('/api/admin/media-url', async (req, res) => {
   try {
     if (!r2Client) {
@@ -758,7 +762,11 @@ app.get('/api/admin/media-url', async (req, res) => {
       return res.status(400).json({ error: 'Invalid media URL.' });
     }
 
-    const command = new GetObjectCommand({ Bucket: R2_BUCKET, Key: key });
+    const commandParams = { Bucket: R2_BUCKET, Key: key };
+    if (req.query.download === '1') {
+      commandParams.ResponseContentDisposition = `attachment; filename="${path.basename(key)}"`;
+    }
+    const command = new GetObjectCommand(commandParams);
     const signedUrl = await getSignedUrl(r2Client, command, { expiresIn: 300 });
     res.json({ url: signedUrl });
   } catch (err) {
@@ -767,8 +775,9 @@ app.get('/api/admin/media-url', async (req, res) => {
   }
 });
 
-// Streams the R2 object through our own server (server-to-server fetch has no
-// CORS restriction) so the browser can force-download it as a same-origin response.
+// Legacy proxy-download route — buffers the whole object through this server.
+// Kept only as a fallback; the frontend now prefers /api/admin/media-url?download=1,
+// which lets the browser pull bytes straight from R2 instead of double-hopping here.
 app.get('/api/admin/media-download', async (req, res) => {
   try {
     if (!r2Client) {
