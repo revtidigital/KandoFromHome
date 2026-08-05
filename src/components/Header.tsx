@@ -1,10 +1,10 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
 import type { Language } from '../i18n/translations';
-import { Globe, Sun, Moon } from 'lucide-react';
+import { Globe } from 'lucide-react';
 
 export const Header: React.FC = () => {
-  const { language, setLanguage, currentView, navigateTo, publicTheme, setPublicTheme } = useApp();
+  const { language, setLanguage, currentView, navigateTo } = useApp();
 
   if (currentView === 'landing' || currentView === 'admin-dashboard') {
     return null;
@@ -104,19 +104,6 @@ export const Header: React.FC = () => {
               </select>
             </div>
           )}
-
-          {/* Light/dark theme switcher — every public page except Landing */}
-          <button
-            onClick={() => setPublicTheme(publicTheme === 'dark' ? 'light' : 'dark')}
-            title={publicTheme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
-            style={{
-              width: '34px', height: '34px', borderRadius: '50%', flexShrink: 0,
-              background: 'rgba(209, 176, 123, 0.12)', border: '1px solid rgba(209, 176, 123, 0.35)',
-              color: '#D1B07B', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer'
-            }}
-          >
-            {publicTheme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
-          </button>
         </div>
       </div>
     </header>
