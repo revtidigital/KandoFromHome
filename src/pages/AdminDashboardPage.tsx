@@ -731,7 +731,7 @@ export const AdminDashboardPage: React.FC = () => {
               style={{
                 display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '12px',
                 background: activeTab === 'overview' ? 'rgba(0,229,255,0.15)' : 'transparent',
-                color: activeTab === 'overview' ? '#00E5FF' : '#94A3B8',
+                color: activeTab === 'overview' ? '#00E5FF' : palette.mutedText,
                 border: activeTab === 'overview' ? '1px solid #00E5FF' : '1px solid transparent',
                 fontWeight: 700, cursor: 'pointer', textAlign: 'left'
               }}
@@ -745,7 +745,7 @@ export const AdminDashboardPage: React.FC = () => {
               style={{
                 display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '12px',
                 background: (activeTab === 'users' || activeTab === 'user-detail') ? 'rgba(0,229,255,0.15)' : 'transparent',
-                color: (activeTab === 'users' || activeTab === 'user-detail') ? '#00E5FF' : '#94A3B8',
+                color: (activeTab === 'users' || activeTab === 'user-detail') ? '#00E5FF' : palette.mutedText,
                 border: (activeTab === 'users' || activeTab === 'user-detail') ? '1px solid #00E5FF' : '1px solid transparent',
                 fontWeight: 700, cursor: 'pointer', textAlign: 'left'
               }}
@@ -759,7 +759,7 @@ export const AdminDashboardPage: React.FC = () => {
               style={{
                 display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '12px',
                 background: activeTab === 'tags' ? 'rgba(0,229,255,0.15)' : 'transparent',
-                color: activeTab === 'tags' ? '#00E5FF' : '#94A3B8',
+                color: activeTab === 'tags' ? '#00E5FF' : palette.mutedText,
                 border: activeTab === 'tags' ? '1px solid #00E5FF' : '1px solid transparent',
                 fontWeight: 700, cursor: 'pointer', textAlign: 'left'
               }}
@@ -774,7 +774,7 @@ export const AdminDashboardPage: React.FC = () => {
               style={{
                 display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '12px',
                 background: activeTab === 'settings' ? 'rgba(0,229,255,0.15)' : 'transparent',
-                color: activeTab === 'settings' ? '#00E5FF' : '#94A3B8',
+                color: activeTab === 'settings' ? '#00E5FF' : palette.mutedText,
                 border: activeTab === 'settings' ? '1px solid #00E5FF' : '1px solid transparent',
                 fontWeight: 700, cursor: 'pointer', textAlign: 'left'
               }}
@@ -789,7 +789,7 @@ export const AdminDashboardPage: React.FC = () => {
               style={{
                 display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '12px',
                 background: activeTab === 'audit' ? 'rgba(0,229,255,0.15)' : 'transparent',
-                color: activeTab === 'audit' ? '#00E5FF' : '#94A3B8',
+                color: activeTab === 'audit' ? '#00E5FF' : palette.mutedText,
                 border: activeTab === 'audit' ? '1px solid #00E5FF' : '1px solid transparent',
                 fontWeight: 700, cursor: 'pointer', textAlign: 'left'
               }}
@@ -821,7 +821,7 @@ export const AdminDashboardPage: React.FC = () => {
           <div>
             <div style={{ marginBottom: '28px' }}>
               <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: palette.pageText, margin: 0 }}>Campaign Overview</h1>
-              <p style={{ color: '#94A3B8', fontSize: '0.9rem', marginTop: '4px' }}>Real-time Campaign Metrics & Performance KPIs</p>
+              <p style={{ color: palette.mutedText, fontSize: '0.9rem', marginTop: '4px' }}>Real-time Campaign Metrics & Performance KPIs</p>
             </div>
 
             {/* 3 KPI CARDS WITH INFO ICONS (Req 13) */}
@@ -871,7 +871,7 @@ export const AdminDashboardPage: React.FC = () => {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
               <div>
                 <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: palette.pageText, margin: 0 }}>Registered Users Directory</h1>
-                <p style={{ color: '#94A3B8', fontSize: '0.85rem', marginTop: '4px' }}>Manage candidate entries, apply classification tags & export data</p>
+                <p style={{ color: palette.mutedText, fontSize: '0.85rem', marginTop: '4px' }}>Manage candidate entries, apply classification tags & export data</p>
               </div>
 
               {/* EXPORT BUTTONS (Req 2 - PDF Report Included) */}
@@ -906,7 +906,7 @@ export const AdminDashboardPage: React.FC = () => {
             {/* FILTERS TOOLBAR (Req 14) */}
             <div style={{ background: palette.surface, padding: '16px', borderRadius: '14px', border: `1px solid ${palette.border}`, marginBottom: '20px', display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
               <div style={{ position: 'relative', flex: 1, minWidth: '240px' }}>
-                <Search size={16} color="#94A3B8" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+                <Search size={16} color={palette.mutedText} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
                 <input 
                   type="text"
                   placeholder="Search by Name, Emp ID, Email or City..."
@@ -972,7 +972,7 @@ export const AdminDashboardPage: React.FC = () => {
                         setSearchQuery(''); setSelectedTagFilter(''); setSelectedFormFilter(''); setCurrentPage(1);
                       }
                     }}
-                    style={{ background: 'transparent', border: `1px solid ${palette.borderStrong}`, color: '#94A3B8', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem' }}
+                    style={{ background: 'transparent', border: `1px solid ${palette.borderStrong}`, color: palette.mutedText, padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem' }}
                   >
                     {selectedUserIds.size > 0 ? 'Clear Selection' : 'Clear Filters'}
                   </button>
@@ -1115,7 +1115,7 @@ export const AdminDashboardPage: React.FC = () => {
 
               {/* PAGINATION BAR (Req 8) */}
               <div style={{ padding: '16px 20px', background: palette.surfaceAlt, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: `1px solid ${palette.border}` }}>
-                <span style={{ fontSize: '0.8rem', color: '#94A3B8' }}>
+                <span style={{ fontSize: '0.8rem', color: palette.mutedText }}>
                   Showing {paginatedUsers.length} of {filteredUsers.length} entries (25 per page)
                 </span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -1157,7 +1157,7 @@ export const AdminDashboardPage: React.FC = () => {
                   <h1 style={{ fontSize: '2rem', color: '#00E5FF', fontWeight: 900, margin: 0 }}>
                     {selectedUserForProfile.empName}
                   </h1>
-                  <p style={{ color: '#94A3B8', fontSize: '0.9rem', marginTop: '4px' }}>
+                  <p style={{ color: palette.mutedText, fontSize: '0.9rem', marginTop: '4px' }}>
                     {selectedUserForProfile.empId
                       ? <>Employee ID: <strong style={{ color: palette.text }}>{selectedUserForProfile.empId}</strong></>
                       : <>Phone Number: <strong style={{ color: palette.text }}>{selectedUserForProfile.phone || '—'}</strong></>}
@@ -1174,7 +1174,7 @@ export const AdminDashboardPage: React.FC = () => {
 
                 {/* Multi-Tag Selection */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <span style={{ fontSize: '0.85rem', color: '#94A3B8', fontWeight: 700 }}>Classification Tags:</span>
+                  <span style={{ fontSize: '0.85rem', color: palette.mutedText, fontWeight: 700 }}>Classification Tags:</span>
                   <TagMultiSelect
                     tags={selectedUserForProfile.tags || []}
                     customTags={customTags}
@@ -1350,7 +1350,7 @@ export const AdminDashboardPage: React.FC = () => {
         {activeTab === 'tags' && (
           <div style={{ maxWidth: '640px' }}>
             <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: palette.pageText, marginBottom: '8px' }}>Tags Management</h1>
-            <p style={{ color: '#94A3B8', fontSize: '0.85rem', marginBottom: '24px' }}>Add or remove custom candidate classification tags (Logged in Audit Log)</p>
+            <p style={{ color: palette.mutedText, fontSize: '0.85rem', marginBottom: '24px' }}>Add or remove custom candidate classification tags (Logged in Audit Log)</p>
 
             <div style={{ display: 'flex', gap: '12px', marginBottom: '28px' }}>
               <input
@@ -1381,7 +1381,7 @@ export const AdminDashboardPage: React.FC = () => {
         {activeTab === 'settings' && isSuperAdmin && (
           <div style={{ maxWidth: '720px' }}>
             <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: palette.pageText, marginBottom: '8px' }}>System Settings</h1>
-            <p style={{ color: '#94A3B8', fontSize: '0.85rem', marginBottom: '28px' }}>Configure Google reCAPTCHA Verification & Google Analytics ID separately</p>
+            <p style={{ color: palette.mutedText, fontSize: '0.85rem', marginBottom: '28px' }}>Configure Google reCAPTCHA Verification & Google Analytics ID separately</p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
 
@@ -1391,7 +1391,7 @@ export const AdminDashboardPage: React.FC = () => {
                   <Users size={22} color="#C084FC" />
                   <div>
                     <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: palette.text, margin: 0 }}>Eligibility Whitelist</h2>
-                    <p style={{ fontSize: '0.8rem', color: '#94A3B8', margin: 0 }}>
+                    <p style={{ fontSize: '0.8rem', color: palette.mutedText, margin: 0 }}>
                       Only Employee IDs / Phone Numbers on these lists can submit Form 1 &amp; Form 2. Each upload replaces the previous list.
                     </p>
                   </div>
@@ -1406,7 +1406,7 @@ export const AdminDashboardPage: React.FC = () => {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
                   <div style={{ background: palette.subtleBg, padding: '16px', borderRadius: '12px' }}>
                     <div style={{ fontWeight: 700, color: palette.text, marginBottom: '4px' }}>Employee ID List</div>
-                    <div style={{ fontSize: '0.8rem', color: '#94A3B8', marginBottom: '12px' }}>
+                    <div style={{ fontSize: '0.8rem', color: palette.mutedText, marginBottom: '12px' }}>
                       {whitelistCounts.employees.toLocaleString()} Employee IDs currently loaded
                     </div>
                     <label style={{
@@ -1428,7 +1428,7 @@ export const AdminDashboardPage: React.FC = () => {
 
                   <div style={{ background: palette.subtleBg, padding: '16px', borderRadius: '12px' }}>
                     <div style={{ fontWeight: 700, color: palette.text, marginBottom: '4px' }}>Phone Number List</div>
-                    <div style={{ fontSize: '0.8rem', color: '#94A3B8', marginBottom: '12px' }}>
+                    <div style={{ fontSize: '0.8rem', color: palette.mutedText, marginBottom: '12px' }}>
                       {whitelistCounts.phones.toLocaleString()} Phone Numbers currently loaded
                     </div>
                     <label style={{
@@ -1456,7 +1456,7 @@ export const AdminDashboardPage: React.FC = () => {
                   <Lock size={22} color="#00E5FF" />
                   <div>
                     <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: palette.text, margin: 0 }}>Google reCAPTCHA Security Settings</h2>
-                    <p style={{ fontSize: '0.8rem', color: '#94A3B8', margin: 0 }}>Protect form submissions against automated spam bots</p>
+                    <p style={{ fontSize: '0.8rem', color: palette.mutedText, margin: 0 }}>Protect form submissions against automated spam bots</p>
                   </div>
                 </div>
 
@@ -1470,7 +1470,7 @@ export const AdminDashboardPage: React.FC = () => {
                   <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: palette.subtleBg, padding: '14px', borderRadius: '10px' }}>
                     <div>
                       <div style={{ fontWeight: 700, fontSize: '0.95rem', color: palette.text }}>Enable Captcha Verification</div>
-                      <div style={{ fontSize: '0.78rem', color: '#94A3B8' }}>Enforce Google reCAPTCHA v3 on Form 1 & Form 2</div>
+                      <div style={{ fontSize: '0.78rem', color: palette.mutedText }}>Enforce Google reCAPTCHA v3 on Form 1 & Form 2</div>
                     </div>
                     <input
                       type="checkbox"
@@ -1517,7 +1517,7 @@ export const AdminDashboardPage: React.FC = () => {
                   <BarChart3 size={22} color="#C084FC" />
                   <div>
                     <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: palette.text, margin: 0 }}>Google Analytics Settings</h2>
-                    <p style={{ fontSize: '0.8rem', color: '#94A3B8', margin: 0 }}>Track campaign visitor traffic and conversion metrics</p>
+                    <p style={{ fontSize: '0.8rem', color: palette.mutedText, margin: 0 }}>Track campaign visitor traffic and conversion metrics</p>
                   </div>
                 </div>
 
@@ -1559,7 +1559,7 @@ export const AdminDashboardPage: React.FC = () => {
         {activeTab === 'audit' && (
           <div>
             <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: palette.pageText, marginBottom: '8px' }}>System Audit Logs</h1>
-            <p style={{ color: '#94A3B8', fontSize: '0.85rem', marginBottom: '24px' }}>Immutable security audit trails (Strict append-only record — deletion disabled)</p>
+            <p style={{ color: palette.mutedText, fontSize: '0.85rem', marginBottom: '24px' }}>Immutable security audit trails (Strict append-only record — deletion disabled)</p>
 
             <div style={{ background: palette.surface, borderRadius: '16px', border: `1px solid ${palette.border}`, overflow: 'hidden' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
@@ -1580,7 +1580,7 @@ export const AdminDashboardPage: React.FC = () => {
                       <td style={{ padding: '14px 18px', color: palette.textMuted2, fontSize: '0.8rem' }}>{new Date(log.timestamp).toLocaleString()}</td>
                       <td style={{ padding: '14px 18px', color: '#00E5FF', fontWeight: 700, fontSize: '0.8rem' }}>{log.ip || '127.0.0.1'}</td>
                       <td style={{ padding: '14px 18px', color: palette.text }}>{log.detail}</td>
-                      <td style={{ padding: '14px 18px', color: '#94A3B8' }}>{log.username || 'Admin'}</td>
+                      <td style={{ padding: '14px 18px', color: palette.mutedText }}>{log.username || 'Admin'}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -1737,7 +1737,7 @@ export const AdminDashboardPage: React.FC = () => {
               <AlertTriangle size={22} color="#EF4444" />
               <h3 style={{ fontSize: '1.05rem', color: palette.text, margin: 0 }}>Delete Tag?</h3>
             </div>
-            <p style={{ color: '#94A3B8', fontSize: '0.88rem', marginBottom: '20px' }}>
+            <p style={{ color: palette.mutedText, fontSize: '0.88rem', marginBottom: '20px' }}>
               Are you sure you want to delete the tag <strong style={{ color: palette.text }}>"{tagPendingDelete}"</strong>? Any users currently assigned this tag will lose it.
             </p>
             <div style={{ display: 'flex', gap: '10px' }}>
@@ -1766,7 +1766,7 @@ export const AdminDashboardPage: React.FC = () => {
               <X size={20} />
             </button>
             <h3 style={{ fontSize: '1.1rem', color: '#C084FC', marginBottom: '8px' }}>Email CSV + ZIP Export</h3>
-            <p style={{ color: '#94A3B8', fontSize: '0.85rem', marginBottom: '16px' }}>
+            <p style={{ color: palette.mutedText, fontSize: '0.85rem', marginBottom: '16px' }}>
               We'll build the export and email you a download link — large exports can take a few minutes.
             </p>
             <input
