@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useApp } from '../context/AppContext';
 import {
   LayoutDashboard, Users, Tag, Settings as SettingsIcon, History,
@@ -53,8 +54,12 @@ const THEMES = {
 };
 
 // Native <details>/<summary> gives us a click-to-toggle popover with built-in
-// outside-click/escape handling, so a multi-select checkbox list needs no
-// extra open/close state or document-level listeners.
+// outside-click/escape handling. The popover itself is portaled to
+// document.body and positioned with `fixed` coordinates computed from the
+// summary's own bounding box — otherwise it inherits the table wrapper's
+// `overflow: hidden` (and just gets clipped) and can't escape the page's
+// bottom edge for rows near the end of a long list. Position is recomputed
+// on open and flips upward when there isn't room below.
 const TagMultiSelect: React.FC<{
   tags: string[];
   customTags: string[];
@@ -63,8 +68,54 @@ const TagMultiSelect: React.FC<{
   palette: typeof THEMES['dark'];
 }> = ({ tags, customTags, onToggle, accent, palette }) => {
   accent = accent || palette.accentCyan;
+  const detailsRef = useRef<HTMLDetailsElement>(null);
+  const [menuPos, setMenuPos] = useState<{ top: number; left: number; openUp: boolean } | null>(null);
+
+  const MENU_WIDTH = 200;
+  const MENU_MAX_HEIGHT = 260;
+
+  const computePosition = () => {
+    const el = detailsRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const openUp = spaceBelow < MENU_MAX_HEIGHT && rect.top > spaceBelow;
+    let left = rect.left;
+    if (left + MENU_WIDTH > window.innerWidth - 8) left = window.innerWidth - MENU_WIDTH - 8;
+    if (left < 8) left = 8;
+    const top = openUp ? rect.top - 6 : rect.bottom + 6;
+    setMenuPos({ top, left, openUp });
+  };
+
+  useEffect(() => {
+    const el = detailsRef.current;
+    if (!el) return;
+    const onToggleEvent = () => {
+      if (el.open) {
+        computePosition();
+      } else {
+        setMenuPos(null);
+      }
+    };
+    el.addEventListener('toggle', onToggleEvent);
+    return () => el.removeEventListener('toggle', onToggleEvent);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!menuPos) return;
+    const reposition = () => computePosition();
+    window.addEventListener('scroll', reposition, true);
+    window.addEventListener('resize', reposition);
+    return () => {
+      window.removeEventListener('scroll', reposition, true);
+      window.removeEventListener('resize', reposition);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [!!menuPos]);
+
   return (
-    <details style={{ position: 'relative', display: 'inline-block' }}>
+    <details ref={detailsRef} style={{ position: 'relative', display: 'inline-block' }}>
       <summary
         style={{
           listStyle: 'none', cursor: 'pointer', userSelect: 'none',
@@ -77,21 +128,28 @@ const TagMultiSelect: React.FC<{
       >
         {tags.length > 0 ? tags.join(', ') : 'Select Tags...'} <ChevronDown size={12} />
       </summary>
-      <div style={{
-        position: 'absolute', top: 'calc(100% + 6px)', left: 0, zIndex: 50,
-        background: palette.surfaceSoft, border: `1px solid ${accent}`, borderRadius: '10px',
-        padding: '8px', minWidth: '180px', boxShadow: '0 10px 30px rgba(0,0,0,0.4)'
-      }}>
-        {customTags.length === 0 && (
-          <div style={{ color: palette.mutedText, fontSize: '0.8rem', padding: '4px 6px' }}>No tags defined yet</div>
-        )}
-        {customTags.map(t => (
-          <label key={t} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem', color: palette.text }}>
-            <input type="checkbox" checked={tags.includes(t)} onChange={() => onToggle(t)} style={{ accentColor: accent, cursor: 'pointer' }} />
-            {t}
-          </label>
-        ))}
-      </div>
+      {menuPos && createPortal(
+        <div style={{
+          position: 'fixed',
+          top: menuPos.openUp ? undefined : menuPos.top,
+          bottom: menuPos.openUp ? window.innerHeight - menuPos.top : undefined,
+          left: menuPos.left, zIndex: 5000,
+          background: palette.surfaceSoft, border: `1px solid ${accent}`, borderRadius: '10px',
+          padding: '8px', width: `${MENU_WIDTH}px`, maxHeight: `${MENU_MAX_HEIGHT}px`, overflowY: 'auto',
+          boxShadow: '0 10px 30px rgba(0,0,0,0.4)'
+        }}>
+          {customTags.length === 0 && (
+            <div style={{ color: palette.mutedText, fontSize: '0.8rem', padding: '4px 6px' }}>No tags defined yet</div>
+          )}
+          {customTags.map(t => (
+            <label key={t} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem', color: palette.text }}>
+              <input type="checkbox" checked={tags.includes(t)} onChange={() => onToggle(t)} style={{ accentColor: accent, cursor: 'pointer' }} />
+              {t}
+            </label>
+          ))}
+        </div>,
+        document.body
+      )}
     </details>
   );
 };
