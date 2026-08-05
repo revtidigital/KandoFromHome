@@ -269,7 +269,16 @@ export const AdminDashboardPage: React.FC = () => {
       if (!res.ok) {
         setWhitelistStatusMsg(data.error || 'Upload failed.');
       } else {
-        setWhitelistStatusMsg(`${type === 'employees' ? 'Employee ID' : 'Phone Number'} whitelist updated — ${data.count} entries loaded.`);
+        const label = type === 'employees' ? 'Employee ID' : 'Phone Number';
+        const parts = [`${label} whitelist updated — ${data.count} imported`];
+        if (data.duplicatesSkipped) parts.push(`${data.duplicatesSkipped} duplicate row(s) skipped`);
+        if (data.blankSkipped) parts.push(`${data.blankSkipped} blank row(s) skipped`);
+        let msg = parts.join(', ') + '.';
+        if (data.rejected?.length) {
+          msg += ` ${data.rejected.length} row(s) rejected: ` +
+            data.rejected.map((r: { value: string; reason: string }) => `${r.value} (${r.reason})`).join('; ');
+        }
+        setWhitelistStatusMsg(msg);
         fetchWhitelistCounts();
         fetchAuditLogs();
       }

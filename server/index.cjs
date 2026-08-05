@@ -239,16 +239,55 @@ const whitelistUpload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }
 });
 
-// Reads the first column of every row after the header row.
+// Reads the first column of every row after the header row (the header row
+// is the only thing skipped — every data row through the last one is read).
+// Trims values, drops blanks, and de-dupes exact matches, returning enough
+// detail (blank/duplicate counts) for the upload response to report an
+// honest, exact picture of what will actually be imported.
 function parseWhitelistFile(buffer) {
   const wb = XLSX.read(buffer, { type: 'buffer' });
   const sheet = wb.Sheets[wb.SheetNames[0]];
-  const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-  const values = rows.slice(1)
-    .map(row => row[0])
-    .filter(cell => cell !== undefined && cell !== null && String(cell).trim() !== '')
-    .map(cell => String(cell).trim());
-  return [...new Set(values)];
+  // defval: '' so a short/blank trailing row still yields a row array
+  // instead of being omitted outright by the sheet's used-range detection.
+  const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, blankrows: true, defval: '' });
+  const dataRows = rows.slice(1);
+
+  const seen = new Set();
+  const values = [];
+  let blankCount = 0;
+  let duplicateCount = 0;
+
+  for (const row of dataRows) {
+    const raw = row && row[0];
+    const trimmed = raw === undefined || raw === null ? '' : String(raw).trim();
+    if (trimmed === '') { blankCount++; continue; }
+    if (seen.has(trimmed)) { duplicateCount++; continue; }
+    seen.add(trimmed);
+    values.push(trimmed);
+  }
+
+  return { values, totalRows: dataRows.length, blankCount, duplicateCount };
+}
+
+// insertMany with ordered:false keeps inserting past a failed doc, but on
+// any failure it throws — losing the successful count/ids unless pulled
+// back out of the error itself. Returns the true inserted count plus a
+// per-row rejection list instead of collapsing the whole upload into one
+// generic failure.
+async function insertWhitelistDocs(Model, field, values) {
+  if (!values.length) return { insertedCount: 0, rejected: [] };
+  try {
+    const result = await Model.insertMany(values.map(v => ({ [field]: v })), { ordered: false });
+    return { insertedCount: result.length, rejected: [] };
+  } catch (bulkErr) {
+    const insertedCount = bulkErr.insertedDocs ? bulkErr.insertedDocs.length : (bulkErr.result?.result?.nInserted ?? 0);
+    const writeErrors = bulkErr.writeErrors || bulkErr.result?.result?.writeErrors || [];
+    const rejected = writeErrors.map(we => ({
+      value: we.err?.op?.[field] ?? values[we.index] ?? '(unknown)',
+      reason: we.errmsg || we.err?.errmsg || 'Insert failed.'
+    }));
+    return { insertedCount, rejected };
+  }
 }
 
 // MongoDB Connection
@@ -705,11 +744,15 @@ app.use('/api/admin', requireAdmin);
 app.post('/api/admin/whitelist/employees', requireSuperAdmin, whitelistUpload.single('file'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded.' });
-    const empIds = parseWhitelistFile(req.file.buffer);
+    const { values, totalRows, blankCount, duplicateCount } = parseWhitelistFile(req.file.buffer);
     await AllowedEmployee.deleteMany({});
-    if (empIds.length) await AllowedEmployee.insertMany(empIds.map(empId => ({ empId })), { ordered: false });
-    await recordAuditLog(req, `Uploaded Employee ID whitelist (${empIds.length} entries)`, req.adminUser);
-    res.json({ success: true, count: empIds.length });
+    const { insertedCount, rejected } = await insertWhitelistDocs(AllowedEmployee, 'empId', values);
+    await recordAuditLog(
+      req,
+      `Uploaded Employee ID whitelist (${insertedCount} imported${rejected.length ? `, ${rejected.length} rejected` : ''})`,
+      req.adminUser
+    );
+    res.json({ success: true, count: insertedCount, totalRows, blankSkipped: blankCount, duplicatesSkipped: duplicateCount, rejected });
   } catch (err) {
     console.error('Whitelist upload error:', err);
     res.status(500).json({ error: 'Failed to process the uploaded file.' });
@@ -719,11 +762,15 @@ app.post('/api/admin/whitelist/employees', requireSuperAdmin, whitelistUpload.si
 app.post('/api/admin/whitelist/phones', requireSuperAdmin, whitelistUpload.single('file'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded.' });
-    const phones = parseWhitelistFile(req.file.buffer);
+    const { values, totalRows, blankCount, duplicateCount } = parseWhitelistFile(req.file.buffer);
     await AllowedPhone.deleteMany({});
-    if (phones.length) await AllowedPhone.insertMany(phones.map(phone => ({ phone })), { ordered: false });
-    await recordAuditLog(req, `Uploaded Phone Number whitelist (${phones.length} entries)`, req.adminUser);
-    res.json({ success: true, count: phones.length });
+    const { insertedCount, rejected } = await insertWhitelistDocs(AllowedPhone, 'phone', values);
+    await recordAuditLog(
+      req,
+      `Uploaded Phone Number whitelist (${insertedCount} imported${rejected.length ? `, ${rejected.length} rejected` : ''})`,
+      req.adminUser
+    );
+    res.json({ success: true, count: insertedCount, totalRows, blankSkipped: blankCount, duplicatesSkipped: duplicateCount, rejected });
   } catch (err) {
     console.error('Whitelist upload error:', err);
     res.status(500).json({ error: 'Failed to process the uploaded file.' });
