@@ -1,12 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
-import type { Language } from '../i18n/translations';
 import { AlertTriangle, CheckCircle, Upload, Loader2 } from 'lucide-react';
 import { useCaptcha } from '../hooks/useCaptcha';
-import '../kando_form2_ui.css';
 
 export const Form2Page: React.FC = () => {
-  const { t, formData, setFormData, navigateTo, language, setLanguage, apiBaseUrl } = useApp();
+  const { t, formData, setFormData, navigateTo, language, apiBaseUrl } = useApp();
   const { getCaptchaToken } = useCaptcha(apiBaseUrl);
 
   const [companyName, setCompanyName] = useState('');
@@ -140,440 +138,228 @@ export const Form2Page: React.FC = () => {
     }
   };
 
+  const inputStyle = (hasError?: string) => ({
+    width: '100%',
+    padding: '12px 14px',
+    borderRadius: '10px',
+    boxSizing: 'border-box' as const,
+    background: 'rgba(255,255,255,0.06)',
+    border: hasError ? '1px solid #EF4444' : '1px solid rgba(255,255,255,0.2)',
+    color: 'var(--text-main)',
+    outline: 'none',
+    fontSize: '0.95rem'
+  });
+
   return (
-    <div className="kando-page-f2">
-      {/* SVG Sprite */}
-      <svg className="svg-sprite" aria-hidden="true">
-        <symbol id="f2-icon-home" viewBox="0 0 24 24">
-          <path d="m3 10.5 9-7.5 9 7.5" />
-          <path d="M5 9.5V21h14V9.5" />
-          <path d="M9 21v-7h6v7" />
-        </symbol>
-        <symbol id="f2-icon-chevron-down" viewBox="0 0 24 24">
-          <path d="m6 9 6 6 6-6" />
-        </symbol>
-        <symbol id="f2-icon-chevron-left" viewBox="0 0 24 24">
-          <path d="m15 18-6-6 6-6" />
-        </symbol>
-        <symbol id="f2-icon-chevron-right" viewBox="0 0 24 24">
-          <path d="m9 18 6-6-6-6" />
-        </symbol>
-        <symbol id="f2-icon-heart" viewBox="0 0 24 24">
-          <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z" />
-        </symbol>
-        <symbol id="f2-icon-building" viewBox="0 0 24 24">
-          <path d="M4 21V5a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v16" />
-          <path d="M16 9h3a1 1 0 0 1 1 1v11" />
-          <path d="M2 21h20" />
-          <path d="M8 8h4M8 12h4M8 16h4" />
-        </symbol>
-        <symbol id="f2-icon-id-card" viewBox="0 0 24 24">
-          <rect x="2.5" y="5" width="19" height="14" rx="2" />
-          <circle cx="8" cy="10.5" r="2" />
-          <path d="M5.3 16c.6-1.6 1.6-2.4 2.7-2.4 1.2 0 2.2.8 2.8 2.4" />
-          <path d="M14.5 9h4M14.5 12.5h4M14.5 16h2.8" />
-        </symbol>
-        <symbol id="f2-icon-user" viewBox="0 0 24 24">
-          <circle cx="12" cy="7.5" r="3.5" />
-          <path d="M5 21c.9-4.1 3.3-6.2 7-6.2s6.1 2.1 7 6.2" />
-        </symbol>
-        <symbol id="f2-icon-users" viewBox="0 0 24 24">
-          <circle cx="9" cy="8" r="3" />
-          <circle cx="17.5" cy="9" r="2.4" />
-          <path d="M2.5 20c.8-4.1 3-6.1 6.5-6.1s5.7 2 6.5 6.1" />
-          <path d="M15.7 14.3c3.1.2 5 2 5.8 5.1" />
-          <path d="M3 9.8a2.4 2.4 0 0 1 0-4.6" />
-        </symbol>
-        <symbol id="f2-icon-map-pin" viewBox="0 0 24 24">
-          <path d="M20 10c0 5.3-8 11-8 11S4 15.3 4 10a8 8 0 1 1 16 0Z" />
-          <circle cx="12" cy="10" r="2.5" />
-        </symbol>
-        <symbol id="f2-icon-message" viewBox="0 0 24 24">
-          <path d="M4 5h16a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 20 17H9l-5.5 4V6.5A1.5 1.5 0 0 1 5 5Z" />
-          <path d="M8 10.5h.01M12 10.5h.01M16 10.5h.01" />
-        </symbol>
-        <symbol id="f2-icon-send" viewBox="0 0 24 24">
-          <path d="m22 2-7 20-4-9-9-4Z" />
-          <path d="M22 2 11 13" />
-        </symbol>
-        <symbol id="f2-icon-shield-check" viewBox="0 0 24 24">
-          <path d="M12 3 20 6v5.5c0 4.8-3.2 8.3-8 9.5-4.8-1.2-8-4.7-8-9.5V6Z" />
-          <path d="m8.8 12.1 2.1 2.1 4.5-4.5" />
-        </symbol>
-        <symbol id="f2-icon-family" viewBox="0 0 48 42">
-          <circle cx="24" cy="7" r="5" />
-          <circle cx="8" cy="15" r="4" />
-          <circle cx="40" cy="15" r="4" />
-          <path d="M13 35c1.2-7.3 5-11 11-11s9.8 3.7 11 11" />
-          <path d="M2 32c.7-5.5 2.8-8.3 6-8.3 2 0 3.7 1 4.8 3" />
-          <path d="M46 32c-.7-5.5-2.8-8.3-6-8.3-2 0-3.7 1-4.8 3" />
-          <path d="M24 36.5s-4.4-2.7-4.4-5.8a2.9 2.9 0 0 1 4.4-1.7 2.9 2.9 0 0 1 4.4 1.7c0 3.1-4.4 5.8-4.4 5.8Z" />
-        </symbol>
-      </svg>
+    <div className="container" style={{ padding: '24px 12px', maxWidth: '850px', width: '100%', boxSizing: 'border-box' }}>
+      <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+        <h1 className="heading-font" style={{ fontSize: 'clamp(1.6rem, 4vw, 2.2rem)', color: 'var(--text-main)', marginBottom: '8px' }}>
+          Chairman Invites Your Thoughts
+        </h1>
+        <p style={{ color: '#A0B2D6', fontSize: '0.95rem', maxWidth: '600px', margin: '0 auto' }}>
+          10 Years from now, what must our brand be doing to ensure future customers still choose us over anyone else?
+        </p>
+      </div>
 
-      {/* ============================== Header ============================== */}
-      <header className="f2-site-header">
-        <div className="f2-header-inner">
-          <a className="f2-brand" href="#" onClick={(e) => { e.preventDefault(); navigateTo('home'); }} aria-label="Yamaha — Revs Your Heart">
-            <img
-              className="f2-brand-image"
-              src="/yamaha-logo (2).png"
-              alt="Yamaha — Revs Your Heart"
-              onError={(e) => { (e.target as HTMLImageElement).src = '/yamaha_logo.png'; }}
-            />
-          </a>
-
-          <p className="f2-header-title">{t.kandoFromHome}</p>
-
-          <nav className="f2-header-nav" aria-label="Primary navigation">
-            <a className="f2-header-home" href="#" onClick={(e) => { e.preventDefault(); navigateTo('home'); }}>
-              <svg className="icon icon--22" aria-hidden="true">
-                <use href="#f2-icon-home"></use>
-              </svg>
-              <span>{t.home}</span>
-            </a>
-
-            <span className="f2-header-divider" aria-hidden="true"></span>
-
-            <select
-              className="f2-lang"
-              aria-label="Choose language"
-              value={language}
-              onChange={(e) => setLanguage(e.target.value as Language)}
-            >
-              <option value="en">English</option>
-              <option value="hi">हिन्दी</option>
-              <option value="ta">தமிழ்</option>
-            </select>
-          </nav>
+      {duplicateError && (
+        <div style={{
+          background: 'rgba(239, 68, 68, 0.15)', border: '1.5px solid #EF4444',
+          borderRadius: '12px', padding: '14px', marginBottom: '20px',
+          display: 'flex', alignItems: 'center', gap: '12px', color: '#FCA5A5'
+        }}>
+          <AlertTriangle color="#EF4444" size={24} style={{ flexShrink: 0 }} />
+          <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>{duplicateError}</span>
         </div>
-      </header>
+      )}
 
-      <main className="f2-page">
-        <div className="f2-page-background" aria-hidden="true"></div>
+      <form onSubmit={handleSubmit} className="glass-card form-card-panel" style={{ borderRadius: '20px', width: '100%', boxSizing: 'border-box' }}>
 
-        <div className="f2-page-inner">
-          <a className="back" href="#" onClick={(e) => { e.preventDefault(); navigateTo('home'); }}>
-            <svg className="icon icon--18" aria-hidden="true">
-              <use href="#f2-icon-chevron-left"></use>
-            </svg>
-            <span>Back</span>
-          </a>
+        {/* SECTION 1 — EMPLOYEE DETAILS */}
+        <div style={{ marginBottom: '28px' }}>
+          <h2 style={{ fontSize: '1.1rem', color: '#D1B07B', marginBottom: '16px', fontWeight: 700 }}>
+            Employee Details
+          </h2>
 
-          <div className="layout">
-            <section className="form-column" aria-labelledby="form-title">
-              <header className="titles">
-                <h1 id="form-title" className="titles__main">CHAIRMAN INVITES</h1>
-                <p className="titles__script">
-                  <span>Your Thoughts</span>
-                  <svg className="icon titles__heart" aria-hidden="true">
-                    <use href="#f2-icon-heart"></use>
-                  </svg>
-                </p>
-                <p className="titles__sub">Your ideas help us grow better, together.</p>
-              </header>
+          <div className="form-fields-grid">
+            {/* Company Name */}
+            <div style={{ minWidth: 0 }}>
+              <label style={{ display: 'block', color: 'var(--label-muted)', fontSize: '0.85rem', marginBottom: '6px' }}>Company Name</label>
+              <input type="text" value={companyName} onChange={e => setCompanyName(e.target.value)}
+                placeholder="e.g. Yamaha Motor India" style={inputStyle()} />
+            </div>
 
-              {duplicateError && (
-                <div className="error-banner">
-                  <AlertTriangle size={22} style={{ flexShrink: 0 }} />
-                  <span>{duplicateError}</span>
-                </div>
-              )}
-
-              <form className="form" onSubmit={handleSubmit} noValidate>
-                <div className="field field--company">
-                  <label className="label" htmlFor="companyName">
-                    <svg className="icon icon--label" aria-hidden="true">
-                      <use href="#f2-icon-building"></use>
-                    </svg>
-                    <span>Company Name</span>
-                  </label>
-                  <input
-                    className="input"
-                    id="companyName"
-                    type="text"
-                    value={companyName}
-                    onChange={e => setCompanyName(e.target.value)}
-                    placeholder="Enter company name"
-                    autoComplete="organization"
-                  />
-                </div>
-
-                <div className="form-grid">
-                  <div className="field">
-                    <label className="label" htmlFor="employeeEin">
-                      <svg className="icon icon--label" aria-hidden="true">
-                        <use href="#f2-icon-id-card"></use>
-                      </svg>
-                      <span>Employee EIN {!hasNoEmpId && '*'}</span>
-                    </label>
-                    <div className="id-field-wrap">
-                      <input
-                        className={`input${errors.empId ? ' is-invalid' : ''}`}
-                        id="employeeEin"
-                        type="text"
-                        value={formData.empId}
-                        disabled={formData.phone.trim().length > 0}
-                        onChange={e => setFormData(prev => ({ ...prev, empId: e.target.value }))}
-                        placeholder="Enter EIN"
-                        autoComplete="off"
-                        style={{ paddingRight: '40px', opacity: formData.phone.trim() ? 0.6 : 1 }}
-                      />
-                      {!hasNoEmpId && formData.empId.trim() && (
-                        <span className="id-status-icon">
-                          {idCheckStatus === 'checking' && <Loader2 size={16} color="#8d98ac" className="animate-spin" />}
-                          {idCheckStatus === 'valid' && <CheckCircle size={16} color="#2e7d3a" />}
-                          {idCheckStatus === 'invalid' && <AlertTriangle size={16} color="#b42318" />}
-                        </span>
-                      )}
-                    </div>
-                    <p className="field-hint">Don't have an Employee ID? Leave this blank and enter your Phone Number below.</p>
-                    {errors.empId && <p className="field-error">{errors.empId}</p>}
-                  </div>
-
-                  <div className="field">
-                    <label className="label" htmlFor="phoneNumber">
-                      <svg className="icon icon--label" aria-hidden="true">
-                        <use href="#f2-icon-id-card"></use>
-                      </svg>
-                      <span>Phone Number {hasNoEmpId && '*'}</span>
-                    </label>
-                    <div className="id-field-wrap">
-                      <input
-                        className="input"
-                        id="phoneNumber"
-                        type="tel"
-                        value={formData.phone}
-                        disabled={formData.empId.trim().length > 0}
-                        onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                        placeholder="Only if you have no Employee ID"
-                        style={{ paddingRight: '40px', opacity: formData.empId.trim() ? 0.6 : 1 }}
-                      />
-                      {hasNoEmpId && formData.phone.trim() && (
-                        <span className="id-status-icon">
-                          {idCheckStatus === 'checking' && <Loader2 size={16} color="#8d98ac" className="animate-spin" />}
-                          {idCheckStatus === 'valid' && <CheckCircle size={16} color="#2e7d3a" />}
-                          {idCheckStatus === 'invalid' && <AlertTriangle size={16} color="#b42318" />}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="field">
-                    <label className="label" htmlFor="employeeName">
-                      <svg className="icon icon--label" aria-hidden="true">
-                        <use href="#f2-icon-user"></use>
-                      </svg>
-                      <span>Employee Name *</span>
-                    </label>
-                    <input
-                      className={`input${errors.empName ? ' is-invalid' : ''}`}
-                      id="employeeName"
-                      type="text"
-                      value={formData.empName}
-                      onChange={e => setFormData(prev => ({ ...prev, empName: e.target.value }))}
-                      placeholder="Enter employee name"
-                      autoComplete="name"
-                    />
-                    {errors.empName && <p className="field-error">{errors.empName}</p>}
-                  </div>
-
-                  <div className="field">
-                    <label className="label" htmlFor="department">
-                      <svg className="icon icon--label" aria-hidden="true">
-                        <use href="#f2-icon-users"></use>
-                      </svg>
-                      <span>Department</span>
-                    </label>
-                    <input
-                      className="input"
-                      id="department"
-                      type="text"
-                      value={department}
-                      onChange={e => setDepartment(e.target.value)}
-                      placeholder="Enter department"
-                      autoComplete="organization-title"
-                    />
-                  </div>
-
-                  <div className="field">
-                    <label className="label" htmlFor="location">
-                      <svg className="icon icon--label" aria-hidden="true">
-                        <use href="#f2-icon-map-pin"></use>
-                      </svg>
-                      <span>Location</span>
-                    </label>
-                    <input
-                      className="input"
-                      id="location"
-                      type="text"
-                      value={location}
-                      onChange={e => setLocation(e.target.value)}
-                      placeholder="Enter location"
-                      autoComplete="address-level2"
-                    />
-                  </div>
-                </div>
-
-                <div className="field field--thoughts">
-                  <label className="label label--thoughts" htmlFor="userThoughts">
-                    <svg className="icon icon--label thoughts__icon" aria-hidden="true">
-                      <use href="#f2-icon-message"></use>
-                    </svg>
-                    <span>
-                      <strong className="thoughts__title">Share your thoughts:</strong>
-                      <span className="thoughts__description">
-                        10 Years from now, what must our brand be doing to ensure (future) customer still choose us over anyone else.
-                      </span>
-                    </span>
-                  </label>
-
-                  <textarea
-                    className={`textarea${errors.thoughts ? ' is-invalid' : ''}`}
-                    id="userThoughts"
-                    rows={4}
-                    maxLength={2000}
-                    value={thoughts}
-                    onChange={e => setThoughts(e.target.value)}
-                    placeholder="Write your thoughts here..."
-                  />
-                  <div className="char-count-row">
-                    {errors.thoughts
-                      ? <p className="field-error" style={{ margin: 0 }}>{errors.thoughts}</p>
-                      : <span />}
-                    <span className={`char-count${thoughts.length > 1800 ? ' warn' : ''}`}>{thoughts.length}/2000</span>
-                  </div>
-                </div>
-
-                {/* Optional File Upload */}
-                <div className="field field--thoughts">
-                  <label className="label" htmlFor="optionalFile">
-                    <svg className="icon icon--label" aria-hidden="true">
-                      <use href="#f2-icon-message"></use>
-                    </svg>
-                    <span>Browse (Optional) — Max Size: 50MB</span>
-                  </label>
-                  <label className={`upload-label${optionalFile ? ' has-file' : ''}`} htmlFor="optionalFile">
-                    <Upload className="upload-icon" size={20} />
-                    <span>{optionalFile ? optionalFile.name : 'Click to browse file (any format, max 50MB)'}</span>
-                  </label>
-                  <input id="optionalFile" type="file" onChange={handleFileChange} style={{ display: 'none' }} />
-                  {errors.optionalFile && <p className="field-error">{errors.optionalFile}</p>}
-                  {optionalFile && (
-                    <p className="field-hint" style={{ color: '#2e7d3a' }}>
-                      ✓ {optionalFile.name} ({(optionalFile.size / (1024 * 1024)).toFixed(2)} MB)
-                    </p>
-                  )}
-                </div>
-
-                {/* CONSENT */}
-                <label className={`consent-wrap${errors.dataConsent ? ' has-error' : ''} mt-16`}>
-                  <input
-                    type="checkbox"
-                    checked={dataConsent}
-                    onChange={e => { setDataConsent(e.target.checked); if (e.target.checked) setErrors(prev => ({ ...prev, dataConsent: '' })); }}
-                  />
-                  <span className="consent-text">
-                    I agree to the{' '}
-                    <a href={`/${language}/terms`} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}>
-                      Terms &amp; Conditions
-                    </a>{' '}
-                    and{' '}
-                    <a href={`/${language}/privacy`} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}>
-                      Privacy Policy
-                    </a>. My response may be shared internally at Yamaha. *
+            {/* Employee EIN (ID) */}
+            <div style={{ minWidth: 0 }}>
+              <label style={{ display: 'block', color: 'var(--label-muted)', fontSize: '0.85rem', marginBottom: '6px' }}>Employee EIN {!hasNoEmpId && '*'}</label>
+              <div style={{ position: 'relative' }}>
+                <input type="text" value={formData.empId}
+                  disabled={formData.phone.trim().length > 0}
+                  onChange={e => setFormData(prev => ({ ...prev, empId: e.target.value }))}
+                  placeholder="e.g. YMI-2281"
+                  style={{ ...inputStyle(errors.empId), paddingRight: '40px', opacity: formData.phone.trim() ? 0.5 : 1 }} />
+                {!hasNoEmpId && formData.empId.trim() && (
+                  <span style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)' }}>
+                    {idCheckStatus === 'checking' && <Loader2 size={16} color="#94A3B8" className="animate-spin" />}
+                    {idCheckStatus === 'valid' && <CheckCircle size={16} color="#4ADE80" />}
+                    {idCheckStatus === 'invalid' && <AlertTriangle size={16} color="#EF4444" />}
                   </span>
-                </label>
-                {errors.dataConsent && (
-                  <p className="field-error" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <AlertTriangle size={14} /> {errors.dataConsent}
-                  </p>
                 )}
-
-                <div className="actions">
-                  <button className="submit" type="submit" disabled={isSubmitting || !dataConsent}>
-                    <svg className="icon icon--22" aria-hidden="true">
-                      <use href="#f2-icon-send"></use>
-                    </svg>
-                    <span className="submit__text">{isSubmitting ? 'Submitting...' : "SUBMIT — Chairman's Invitation"}</span>
-                    <span className="submit__arrow" aria-hidden="true">
-                      <svg className="icon icon--16">
-                        <use href="#f2-icon-chevron-right"></use>
-                      </svg>
-                    </span>
-                  </button>
-
-                  <div className="privacy">
-                    <span className="privacy__badge" aria-hidden="true">
-                      <svg className="icon icon--22">
-                        <use href="#f2-icon-shield-check"></use>
-                      </svg>
-                    </span>
-                    <p className="privacy__text">
-                      <strong>Your privacy matters.</strong>
-                      Your response will be used only for Yamaha Day 2026 activities and will not be shared outside the organization.
-                    </p>
-                  </div>
-                </div>
-              </form>
-            </section>
-
-            <aside className="message-card" aria-label="Message from the Chairman">
-              <div className="message-card__body">
-                <div className="message-card__quote-row">
-                  <span className="message-card__quote" aria-hidden="true">"</span>
-                  <p className="message-card__lead">
-                    The future is built<br />
-                    by our ideas today.
-                  </p>
-                </div>
-
-                <div className="rule" aria-hidden="true">
-                  <span className="rule__line"></span>
-                  <svg className="icon rule__heart">
-                    <use href="#f2-icon-heart"></use>
-                  </svg>
-                  <span className="rule__line"></span>
-                </div>
-
-                <p className="message-card__text">
-                  Share your thoughts and help shape a stronger, more inspiring Yamaha for tomorrow.
-                </p>
               </div>
+              <p style={{ color: '#64748B', fontSize: '0.75rem', marginTop: '4px' }}>
+                Don't have an Employee ID? Leave this blank and enter your Phone Number below.
+              </p>
+              {errors.empId && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.empId}</p>}
+            </div>
 
-              <img
-                className="message-card__image"
-                src="/form2_card_image.jpg"
-                alt="Navy Yamaha gift box tied with a gold ribbon beside a handwritten thank-you note and a pen."
-                onError={(e) => { (e.target as HTMLImageElement).src = '/form2_card_image.png'; }}
-              />
-            </aside>
+            {/* Phone Number (only if no Employee ID) */}
+            <div style={{ minWidth: 0 }}>
+              <label style={{ display: 'block', color: 'var(--label-muted)', fontSize: '0.85rem', marginBottom: '6px' }}>Phone Number {hasNoEmpId && '*'}</label>
+              <div style={{ position: 'relative' }}>
+                <input type="tel" value={formData.phone}
+                  disabled={formData.empId.trim().length > 0}
+                  onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                  placeholder="Only if you have no Employee ID"
+                  style={{ ...inputStyle(), paddingRight: '40px', opacity: formData.empId.trim() ? 0.5 : 1 }} />
+                {hasNoEmpId && formData.phone.trim() && (
+                  <span style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)' }}>
+                    {idCheckStatus === 'checking' && <Loader2 size={16} color="#94A3B8" className="animate-spin" />}
+                    {idCheckStatus === 'valid' && <CheckCircle size={16} color="#4ADE80" />}
+                    {idCheckStatus === 'invalid' && <AlertTriangle size={16} color="#EF4444" />}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Employee Name */}
+            <div style={{ minWidth: 0 }}>
+              <label style={{ display: 'block', color: 'var(--label-muted)', fontSize: '0.85rem', marginBottom: '6px' }}>Employee Name *</label>
+              <input type="text" value={formData.empName}
+                onChange={e => setFormData(prev => ({ ...prev, empName: e.target.value }))}
+                placeholder="e.g. Priya Sundaram" style={inputStyle(errors.empName)} />
+              {errors.empName && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.empName}</p>}
+            </div>
+
+            {/* Department */}
+            <div style={{ minWidth: 0 }}>
+              <label style={{ display: 'block', color: 'var(--label-muted)', fontSize: '0.85rem', marginBottom: '6px' }}>Department</label>
+              <input type="text" value={department} onChange={e => setDepartment(e.target.value)}
+                placeholder="e.g. Marketing" style={inputStyle()} />
+            </div>
+
+            {/* Location */}
+            <div style={{ minWidth: 0 }}>
+              <label style={{ display: 'block', color: 'var(--label-muted)', fontSize: '0.85rem', marginBottom: '6px' }}>Location</label>
+              <input type="text" value={location} onChange={e => setLocation(e.target.value)}
+                placeholder="e.g. Chennai Plant" style={inputStyle()} />
+            </div>
           </div>
         </div>
-      </main>
 
-      {/* ============================== Footer ============================== */}
-      <footer className="f2-site-footer">
-        <div className="f2-site-footer__inner">
-          <span className="footer__family" aria-hidden="true">
-            <svg className="icon">
-              <use href="#f2-icon-family"></use>
-            </svg>
-          </span>
-
-          <p className="footer__tagline">
-            <span>Behind every Yamaha action is a family that inspires it.</span>
-            <svg className="icon footer__heart" aria-hidden="true">
-              <use href="#f2-icon-heart"></use>
-            </svg>
+        {/* SECTION 2 — SHARE YOUR THOUGHTS */}
+        <div style={{ marginBottom: '28px' }}>
+          <h2 style={{ fontSize: '1.1rem', color: '#D1B07B', marginBottom: '8px', fontWeight: 700 }}>
+            Share Your Thoughts *
+          </h2>
+          <p style={{ color: '#E2E8F0', fontStyle: 'italic', fontSize: '0.9rem', marginBottom: '12px', lineHeight: 1.5 }}>
+            "10 Years from now, what must our brand be doing to ensure (future) customer still chose us over anyone else."
           </p>
-
-          <div className="footer__meta">
-            <p className="footer__day">YAMAHA DAY 2026</p>
-            <p className="footer__kando">KANDO FROM HOME</p>
+          <textarea
+            rows={6}
+            maxLength={2000}
+            value={thoughts}
+            onChange={e => setThoughts(e.target.value)}
+            placeholder="Share your thoughts here... (Max 2000 characters)"
+            style={{
+              width: '100%', padding: '14px', borderRadius: '12px', boxSizing: 'border-box',
+              background: 'rgba(255,255,255,0.06)',
+              border: errors.thoughts ? '1px solid #EF4444' : '1px solid rgba(255,255,255,0.2)',
+              color: 'var(--text-main)', outline: 'none', resize: 'vertical', fontSize: '0.95rem'
+            }}
+          />
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4px' }}>
+            {errors.thoughts
+              ? <p style={{ color: '#EF4444', fontSize: '0.75rem' }}>{errors.thoughts}</p>
+              : <span />}
+            <span style={{ fontSize: '0.75rem', color: thoughts.length > 1800 ? '#F59E0B' : '#64748B' }}>
+              {thoughts.length}/2000
+            </span>
           </div>
         </div>
-      </footer>
+
+        {/* SECTION 3 — OPTIONAL FILE UPLOAD */}
+        <div style={{ marginBottom: '28px' }}>
+          <h2 style={{ fontSize: '1.1rem', color: '#D1B07B', marginBottom: '8px', fontWeight: 700 }}>
+            Browse (Optional)
+          </h2>
+          <p style={{ color: '#A0B2D6', fontSize: '0.85rem', marginBottom: '12px' }}>Max Size: 50MB</p>
+          <label style={{
+            display: 'flex', alignItems: 'center', gap: '12px', padding: '16px',
+            borderRadius: '12px', border: errors.optionalFile ? '2px dashed #EF4444' : '2px dashed rgba(255,255,255,0.2)',
+            cursor: 'pointer', background: 'rgba(255,255,255,0.03)', color: 'var(--label-muted)', fontSize: '0.9rem'
+          }}>
+            <Upload size={20} color="#D1B07B" />
+            <span>
+              {optionalFile ? optionalFile.name : 'Click to browse file (any format, max 50MB)'}
+            </span>
+            <input type="file" onChange={handleFileChange} style={{ display: 'none' }} />
+          </label>
+          {errors.optionalFile && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.optionalFile}</p>}
+          {optionalFile && (
+            <p style={{ color: '#4ADE80', fontSize: '0.8rem', marginTop: '6px' }}>
+              ✓ {optionalFile.name} ({(optionalFile.size / (1024 * 1024)).toFixed(2)} MB)
+            </p>
+          )}
+        </div>
+
+        {/* CONSENT */}
+        <div style={{ marginBottom: '28px' }}>
+          <label style={{
+            display: 'flex', alignItems: 'flex-start', gap: '12px', cursor: 'pointer',
+            padding: '14px', borderRadius: '12px',
+            border: errors.dataConsent ? '1px solid #EF4444' : '1px solid rgba(255,255,255,0.1)',
+            background: errors.dataConsent ? 'rgba(239,68,68,0.05)' : 'rgba(255,255,255,0.03)'
+          }}>
+            <input
+              type="checkbox" checked={dataConsent}
+              onChange={e => { setDataConsent(e.target.checked); if (e.target.checked) setErrors(prev => ({ ...prev, dataConsent: '' })); }}
+              style={{ accentColor: '#D1B07B', width: '18px', height: '18px', flexShrink: 0, marginTop: '2px' }}
+            />
+            <span style={{ color: 'var(--label-muted)', fontSize: '0.87rem', lineHeight: 1.5 }}>
+              I agree to the{' '}
+              <a href={`/${language}/terms`} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ color: '#D1B07B', textDecoration: 'underline' }}>
+                Terms &amp; Conditions
+              </a>{' '}
+              and{' '}
+              <a href={`/${language}/privacy`} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ color: '#D1B07B', textDecoration: 'underline' }}>
+                Privacy Policy
+              </a>. My response may be shared internally at Yamaha. *
+            </span>
+          </label>
+          {errors.dataConsent && (
+            <p style={{ color: '#EF4444', fontSize: '0.78rem', marginTop: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <AlertTriangle size={14} /> {errors.dataConsent}
+            </p>
+          )}
+        </div>
+
+        <button
+          type="submit"
+          disabled={isSubmitting || !dataConsent}
+          style={{
+            width: '100%', padding: '16px', borderRadius: '14px',
+            background: 'linear-gradient(90deg, #A855F7 0%, #6366F1 100%)',
+            border: 'none', color: 'white', fontSize: '1.05rem', fontWeight: 800,
+            cursor: (isSubmitting || !dataConsent) ? 'not-allowed' : 'pointer',
+            boxShadow: '0 6px 20px rgba(168, 85, 247, 0.4)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+            opacity: (isSubmitting || !dataConsent) ? 0.5 : 1
+          }}
+        >
+          {isSubmitting ? 'Submitting...' : 'SUBMIT — Chairman\'s Invitation'}
+          <CheckCircle size={18} />
+        </button>
+
+      </form>
     </div>
   );
 };
