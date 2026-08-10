@@ -173,7 +173,7 @@ export const Form1Page: React.FC = () => {
       if (checkRes.ok) {
         const checkData = await checkRes.json();
         if (checkData.hasForm1) {
-          setDuplicateError(`${identityLabel} has already submitted Form 1. Duplicate submissions are not allowed.`);
+          setDuplicateError(`${identityLabel} has already submitted Submit DIY Kondo kit. Duplicate submissions are not allowed.`);
           setIsSubmitting(false);
           return;
         }
@@ -202,7 +202,7 @@ export const Form1Page: React.FC = () => {
 
       if (!submitRes.ok) {
         const errData = await submitRes.json();
-        setDuplicateError(errData.error || 'Failed to submit Form 1.');
+        setDuplicateError(errData.error || 'Failed to submit Submit DIY Kondo kit.');
         setIsSubmitting(false);
         return;
       }
@@ -567,7 +567,7 @@ export const Form1Page: React.FC = () => {
             opacity: (isSubmitting || !dataConsent || !mediaConsent) ? 0.5 : 1
           }}
         >
-          {isSubmitting ? 'Submitting...' : 'SUBMIT FORM 1'}
+          {isSubmitting ? 'Submitting...' : 'SUBMIT DIY KONDO KIT'}
           <CheckCircle size={18} />
         </button>
 

@@ -90,13 +90,13 @@ export const Form2Page: React.FC = () => {
       const cleanPhone = formData.phone.trim();
       const identityLabel = cleanEmpId ? `Employee ID "${cleanEmpId}"` : `Phone Number "${cleanPhone}"`;
 
-      // Check duplicate Form 2
+      // Check duplicate Submit Suggestion to Chairman
       const checkParams = cleanEmpId ? `empId=${encodeURIComponent(cleanEmpId)}` : `phone=${encodeURIComponent(cleanPhone)}`;
       const checkRes = await fetch(`${apiBaseUrl}/api/check-submission?${checkParams}`);
       if (checkRes.ok) {
         const checkData = await checkRes.json();
         if (checkData.hasForm2) {
-          setDuplicateError(`${identityLabel} has already submitted Form 2. Duplicate submissions are blocked.`);
+          setDuplicateError(`${identityLabel} has already submitted Submit Suggestion to Chairman. Duplicate submissions are blocked.`);
           setIsSubmitting(false);
           return;
         }
@@ -122,7 +122,7 @@ export const Form2Page: React.FC = () => {
 
       if (!submitRes.ok) {
         const errData = await submitRes.json();
-        setDuplicateError(errData.error || 'Failed to submit Form 2.');
+        setDuplicateError(errData.error || 'Failed to submit Submit Suggestion to Chairman.');
         setIsSubmitting(false);
         return;
       }
@@ -131,7 +131,7 @@ export const Form2Page: React.FC = () => {
       setFormData(prev => ({ ...prev, refId: generatedRefId }));
       navigateTo('thankyou2');
     } catch (err) {
-      console.error('Form 2 submission error:', err);
+      console.error('Submit Suggestion to Chairman submission error:', err);
       navigateTo('thankyou2');
     } finally {
       setIsSubmitting(false);
