@@ -55,6 +55,20 @@ export const Form1Page: React.FC = () => {
   const [companyName, setCompanyName] = useState('');
   const [department, setDepartment] = useState('');
 
+  // Submit stays disabled until every required field is filled, the
+  // Employee ID / Phone has been confirmed against the whitelist, and both
+  // consent checkboxes are checked.
+  const canSubmit = Boolean(
+    (formData.empId.trim() || formData.phone.trim()) &&
+    idCheckStatus === 'valid' &&
+    formData.empName.trim() &&
+    formData.photo1 &&
+    formData.photo2 &&
+    video &&
+    dataConsent &&
+    mediaConsent
+  );
+
   const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -64,12 +78,18 @@ export const Form1Page: React.FC = () => {
     }
     setErrors(prev => ({ ...prev, video: '' }));
     setVideo(file);
-    setVideoPreview(URL.createObjectURL(file));
+    setVideoPreview(prev => {
+      if (prev) URL.revokeObjectURL(prev);
+      return URL.createObjectURL(file);
+    });
   };
 
   const handleRemoveVideo = () => {
     setVideo(null);
-    setVideoPreview(null);
+    setVideoPreview(prev => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
   };
 
   // File Upload Handler with Max 5MB per Image Limit
@@ -89,20 +109,32 @@ export const Form1Page: React.FC = () => {
 
     if (field === 'photo1') {
       setFormData(prev => ({ ...prev, photo1: file }));
-      setPhoto1Preview(objectUrl);
+      setPhoto1Preview(prev => {
+        if (prev) URL.revokeObjectURL(prev);
+        return objectUrl;
+      });
     } else {
       setFormData(prev => ({ ...prev, photo2: file }));
-      setPhoto2Preview(objectUrl);
+      setPhoto2Preview(prev => {
+        if (prev) URL.revokeObjectURL(prev);
+        return objectUrl;
+      });
     }
   };
 
   const handleRemovePhoto = (field: 'photo1' | 'photo2') => {
     if (field === 'photo1') {
       setFormData(prev => ({ ...prev, photo1: null }));
-      setPhoto1Preview(null);
+      setPhoto1Preview(prev => {
+        if (prev) URL.revokeObjectURL(prev);
+        return null;
+      });
     } else {
       setFormData(prev => ({ ...prev, photo2: null }));
-      setPhoto2Preview(null);
+      setPhoto2Preview(prev => {
+        if (prev) URL.revokeObjectURL(prev);
+        return null;
+      });
     }
   };
 
@@ -142,9 +174,29 @@ export const Form1Page: React.FC = () => {
     if (!dataConsent) {
       newErrors.dataConsent = t.errConsentRequired;
     }
+    if (!mediaConsent) {
+      newErrors.mediaConsent = t.errConsentRequired;
+    }
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
+      const fieldOrder = ['empId', 'empName', 'photo1', 'photo2', 'video', 'dataConsent', 'mediaConsent'];
+      const fieldToElementId: Record<string, string> = {
+        empId: 'ein',
+        empName: 'employee-name',
+        photo1: 'photo-one',
+        photo2: 'photo-two',
+        video: 'family-video',
+        dataConsent: 'dataConsentCheckbox',
+        mediaConsent: 'mediaConsentCheckbox'
+      };
+      const firstErrorField = fieldOrder.find(key => newErrors[key]);
+      if (firstErrorField) {
+        requestAnimationFrame(() => {
+          document.getElementById(fieldToElementId[firstErrorField])
+            ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+      }
       return;
     }
 
@@ -158,13 +210,16 @@ export const Form1Page: React.FC = () => {
       // 1. Check for a duplicate submission under this identity
       const checkParams = cleanEmpId ? `empId=${encodeURIComponent(cleanEmpId)}` : `phone=${encodeURIComponent(cleanPhone)}`;
       const checkRes = await fetch(`${apiBaseUrl}/api/check-submission?${checkParams}`);
-      if (checkRes.ok) {
-        const checkData = await checkRes.json();
-        if (checkData.hasForm1) {
-          setDuplicateError(`${identityLabel} has already submitted Form 1. Duplicate submissions are not allowed.`);
-          setIsSubmitting(false);
-          return;
-        }
+      if (!checkRes.ok) {
+        setDuplicateError('Could not verify your submission status. Please try again.');
+        setIsSubmitting(false);
+        return;
+      }
+      const checkData = await checkRes.json();
+      if (checkData.hasForm1) {
+        setDuplicateError(`${identityLabel} has already submitted Form 1. Duplicate submissions are not allowed.`);
+        setIsSubmitting(false);
+        return;
       }
 
       // 2. Prepare FormData for API submission
@@ -202,8 +257,7 @@ export const Form1Page: React.FC = () => {
       navigateTo('thankyou1');
     } catch (err) {
       console.error('Submission error:', err);
-      // Fallback redirect if backend offline
-      navigateTo('thankyou1');
+      setDuplicateError('Something went wrong while submitting. Please check your connection and try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -216,7 +270,7 @@ export const Form1Page: React.FC = () => {
         <a className="yamaha-logo" href="#" onClick={(e) => { e.preventDefault(); navigateTo('home'); }} aria-label="Yamaha home">
           <img
             className="yamaha-logo-img"
-            src="/yamaha-logo (2).png"
+            src="/yamaha-logo-v2.png"
             alt="Yamaha — Revs Your Heart"
             onError={(e) => { (e.target as HTMLImageElement).src = '/yamaha_logo.png'; }}
           />
@@ -311,6 +365,7 @@ export const Form1Page: React.FC = () => {
                   <input
                     id="ein"
                     type="text"
+                    className={errors.empId ? 'has-error' : ''}
                     value={formData.empId}
                     disabled={formData.phone.trim().length > 0}
                     onChange={e => setFormData(prev => ({ ...prev, empId: e.target.value }))}
@@ -339,6 +394,7 @@ export const Form1Page: React.FC = () => {
                   <input
                     id="phone"
                     type="tel"
+                    className={hasNoEmpId && errors.empId ? 'has-error' : ''}
                     value={formData.phone}
                     disabled={formData.empId.trim().length > 0}
                     onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))}
@@ -361,6 +417,7 @@ export const Form1Page: React.FC = () => {
                 <input
                   id="employee-name"
                   type="text"
+                  className={errors.empName ? 'has-error' : ''}
                   value={formData.empName}
                   onChange={e => setFormData(prev => ({ ...prev, empName: e.target.value }))}
                   placeholder="e.g. Rahul Sharma"
@@ -541,6 +598,7 @@ export const Form1Page: React.FC = () => {
                   }}
                 >
                   <input
+                    id="dataConsentCheckbox"
                     type="checkbox"
                     checked={dataConsent}
                     onChange={e => { setDataConsent(e.target.checked); if (e.target.checked) setErrors(prev => ({ ...prev, dataConsent: '' })); }}
@@ -567,10 +625,12 @@ export const Form1Page: React.FC = () => {
                   style={{
                     display: 'flex', alignItems: 'flex-start', gap: '12px', cursor: 'pointer',
                     padding: '14px 16px', borderRadius: '12px',
-                    border: '1px solid var(--border)', background: 'rgba(255,255,255,0.6)'
+                    border: errors.mediaConsent ? '1.5px solid #b42318' : '1px solid var(--border)',
+                    background: errors.mediaConsent ? 'rgba(180,35,24,0.04)' : 'rgba(255,255,255,0.6)'
                   }}
                 >
                   <input
+                    id="mediaConsentCheckbox"
                     type="checkbox"
                     checked={mediaConsent}
                     onChange={e => { setMediaConsent(e.target.checked); if (e.target.checked) setErrors(prev => ({ ...prev, mediaConsent: '' })); }}
@@ -580,6 +640,11 @@ export const Form1Page: React.FC = () => {
                     {t.form1MediaConsentText} *
                   </span>
                 </label>
+                {errors.mediaConsent && (
+                  <p className="file-error" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <AlertTriangle size={13} /> {errors.mediaConsent}
+                  </p>
+                )}
               </div>
 
               {/* PRIVACY CARD */}
@@ -597,11 +662,11 @@ export const Form1Page: React.FC = () => {
                 </div>
               </aside>
 
-              <button className="submit-button" type="submit" disabled={isSubmitting || !dataConsent || !mediaConsent}>
+              <button className="submit-button" type="submit" disabled={isSubmitting || !canSubmit}>
                 <svg className="submit-upload-icon" viewBox="0 0 28 28" aria-hidden="true">
                   <path d="M14 18V4m0 0L9 9m5-5 5 5M5 17v7h18v-7" />
                 </svg>
-                <span>{isSubmitting ? 'Submitting...' : 'SUBMIT FORM 1'}</span>
+                <span>{isSubmitting ? 'Submitting...' : t.form1SubmitBtn}</span>
                 <svg className="submit-arrow" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="m9 5 7 7-7 7" />
                 </svg>

@@ -99,6 +99,8 @@ export const AdminDashboardPage: React.FC = () => {
 
   type Tab = 'overview' | 'users' | 'tags' | 'settings' | 'audit' | 'user-detail';
   const [activeTab, setActiveTab] = useState<Tab>('overview');
+  // KPI cards reveal the users table inline below the overview instead of navigating away
+  const [showUsersInline, setShowUsersInline] = useState(false);
 
   // Settings tab is superadmin-only — "kandoadmin" and any other regular
   // admin account never sees the nav entry or the tab content.
@@ -126,15 +128,16 @@ export const AdminDashboardPage: React.FC = () => {
   };
 
   // Multi-item asset gallery modal (Form 1 + Form 2 uploads) with prev/next arrows.
-  const [assetsModal, setAssetsModal] = useState<{ items: MediaItem[]; index: number } | null>(null);
+  // index: null = grid view (all thumbnails at once), number = enlarged single view
+  const [assetsModal, setAssetsModal] = useState<{ items: MediaItem[]; index: number | null } | null>(null);
   const getUserAssets = (user: any): MediaItem[] => {
     const items: MediaItem[] = [];
-    if (user.form1?.photo1Url) items.push({ type: 'image', url: user.form1.photo1Url, title: 'Form 1 — Photo 1' });
-    if (user.form1?.photo2Url) items.push({ type: 'image', url: user.form1.photo2Url, title: 'Form 1 — Photo 2' });
-    if (user.form1?.videoUrl) items.push({ type: 'video', url: user.form1.videoUrl, title: 'Form 1 — Video' });
+    if (user.form1?.photo1Url) items.push({ type: 'image', url: user.form1.photo1Url, title: 'SUBMIT YOUR KANDO ENTRY — Photo 1' });
+    if (user.form1?.photo2Url) items.push({ type: 'image', url: user.form1.photo2Url, title: 'SUBMIT YOUR KANDO ENTRY — Photo 2' });
+    if (user.form1?.videoUrl) items.push({ type: 'video', url: user.form1.videoUrl, title: 'SUBMIT YOUR KANDO ENTRY — Video' });
     if (user.form2?.optionalFileUrl) {
       const isVideo = /\.(mp4|mov|webm|avi|mkv)$/i.test(user.form2.optionalFileUrl);
-      items.push({ type: isVideo ? 'video' : 'image', url: user.form2.optionalFileUrl, title: 'Form 2 — Attachment' });
+      items.push({ type: isVideo ? 'video' : 'image', url: user.form2.optionalFileUrl, title: 'CHAIRMAN INVITES YOUR THOUGHTS — Attachment' });
     }
     return items;
   };
@@ -154,6 +157,7 @@ export const AdminDashboardPage: React.FC = () => {
   const goToTab = (tab: Exclude<Tab, 'user-detail'>) => {
     setActiveTab(tab);
     if (tab !== 'users') setSelectedUserForProfile(null);
+    if (tab === 'overview') setShowUsersInline(false);
     const path = pathForTab(tab);
     if (window.location.pathname !== path) {
       window.history.pushState({ tab }, '', path);
@@ -222,43 +226,44 @@ export const AdminDashboardPage: React.FC = () => {
   const [mediaSignedUrl, setMediaSignedUrl] = useState<string | null>(null);
   const [mediaDownloading, setMediaDownloading] = useState(false);
 
-  // Signed URL for whichever asset the gallery modal is currently showing.
-  // Tracks its own error state — a silently-swallowed fetch failure used to
-  // leave the modal stuck on "Loading…" forever with no way to tell it had
-  // actually failed (expired signed URL, R2 hiccup, 403, etc).
-  const [gallerySignedUrl, setGallerySignedUrl] = useState<string | null>(null);
-  const [galleryError, setGalleryError] = useState<string | null>(null);
-  const [galleryRetryKey, setGalleryRetryKey] = useState(0);
+  // Signed URLs for every asset in the gallery modal — fetched all at once
+  // (not just the active one) so the grid view can show every thumbnail
+  // simultaneously. Keyed by item index. Each item tracks its own error state
+  // — a silently-swallowed fetch failure used to leave the modal stuck on
+  // "Loading…" forever with no way to tell it had actually failed (expired
+  // signed URL, R2 hiccup, 403, etc).
+  const [assetsSignedUrls, setAssetsSignedUrls] = useState<Record<number, string>>({});
+  const [assetsErrors, setAssetsErrors] = useState<Record<number, string>>({});
+  const [assetsRetryKey, setAssetsRetryKey] = useState(0);
   useEffect(() => {
     if (!assetsModal) {
-      setGallerySignedUrl(null);
-      setGalleryError(null);
-      return;
-    }
-    const current = assetsModal.items[assetsModal.index];
-    if (!current) return;
-    if (!/^https?:\/\//i.test(current.url)) {
-      setGallerySignedUrl(`${apiBaseUrl}${current.url}`);
-      setGalleryError(null);
+      setAssetsSignedUrls({});
+      setAssetsErrors({});
       return;
     }
     let cancelled = false;
-    setGallerySignedUrl(null);
-    setGalleryError(null);
-    fetch(`${apiBaseUrl}/api/admin/media-url?url=${encodeURIComponent(current.url)}`, { headers: adminAuthHeader() })
-      .then(async res => {
-        const data = await res.json().catch(() => ({}));
-        if (cancelled) return;
-        if (!res.ok || !data.url) {
-          setGalleryError(data.error || 'Failed to load this asset.');
-          return;
-        }
-        setGallerySignedUrl(data.url);
-      })
-      .catch(() => { if (!cancelled) setGalleryError('Failed to load this asset — check your connection and retry.'); });
+    setAssetsSignedUrls({});
+    setAssetsErrors({});
+    assetsModal.items.forEach((item, i) => {
+      if (!/^https?:\/\//i.test(item.url)) {
+        setAssetsSignedUrls(prev => ({ ...prev, [i]: `${apiBaseUrl}${item.url}` }));
+        return;
+      }
+      fetch(`${apiBaseUrl}/api/admin/media-url?url=${encodeURIComponent(item.url)}`, { headers: adminAuthHeader() })
+        .then(async res => {
+          const data = await res.json().catch(() => ({}));
+          if (cancelled) return;
+          if (!res.ok || !data.url) {
+            setAssetsErrors(prev => ({ ...prev, [i]: data.error || 'Failed to load this asset.' }));
+            return;
+          }
+          setAssetsSignedUrls(prev => ({ ...prev, [i]: data.url }));
+        })
+        .catch(() => { if (!cancelled) setAssetsErrors(prev => ({ ...prev, [i]: 'Failed to load this asset — check your connection and retry.' })); });
+    });
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [assetsModal, apiBaseUrl, galleryRetryKey]);
+  }, [assetsModal, apiBaseUrl, assetsRetryKey]);
 
   // CSV+ZIP email-export modal + toast state
   const [emailExportOpen, setEmailExportOpen] = useState(false);
@@ -354,8 +359,16 @@ export const AdminDashboardPage: React.FC = () => {
           if (data.captchaSiteKey !== undefined) setCaptchaSiteKey(data.captchaSiteKey);
           if (data.captchaSecretKey !== undefined) setCaptchaSecretKey(data.captchaSecretKey);
           if (data.googleAnalyticsId) setGaId(data.googleAnalyticsId);
-          if (data.customTags && Array.isArray(data.customTags)) setCustomTags(data.customTags);
         }
+      })
+      .catch(() => {});
+
+    // Tags are fetched separately (not via /api/admin/settings) because that
+    // endpoint is superadmin-only, while tag management is available to all admins.
+    fetch(`${apiBaseUrl}/api/admin/tags`, { headers: adminAuthHeader() })
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.customTags && Array.isArray(data.customTags)) setCustomTags(data.customTags);
       })
       .catch(() => {});
 
@@ -812,10 +825,13 @@ export const AdminDashboardPage: React.FC = () => {
                 <div style={{ fontSize: '2.5rem', fontWeight: 900, color: '#00E5FF' }}>{allUsers.length}</div>
               </div>
 
-              <div style={{ background: palette.surfaceAlt, border: '1.5px solid rgba(168,85,247,0.3)', borderRadius: '16px', padding: '24px' }}>
+              <div
+                onClick={() => { setSelectedFormFilter('form1'); setCurrentPage(1); setShowUsersInline(true); }}
+                style={{ background: palette.surfaceAlt, border: '1.5px solid rgba(168,85,247,0.3)', borderRadius: '16px', padding: '24px', cursor: 'pointer' }}
+              >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                  <span style={{ color: palette.mutedText, fontSize: '0.9rem', fontWeight: 700 }}>Form 1 Submissions</span>
-                  <div title="Form 1 (DIY Craft Wall Photos & Reflection)" style={{ cursor: 'pointer' }}>
+                  <span style={{ color: palette.mutedText, fontSize: '0.9rem', fontWeight: 700 }}>SUBMIT YOUR KANDO ENTRY</span>
+                  <div title="Click to view users who submitted SUBMIT YOUR KANDO ENTRY" style={{ cursor: 'pointer' }}>
                     <Info size={18} color="#A855F7" />
                   </div>
                 </div>
@@ -824,10 +840,13 @@ export const AdminDashboardPage: React.FC = () => {
                 </div>
               </div>
 
-              <div style={{ background: palette.surfaceAlt, border: '1.5px solid rgba(34,197,94,0.3)', borderRadius: '16px', padding: '24px' }}>
+              <div
+                onClick={() => { setSelectedFormFilter('form2'); setCurrentPage(1); setShowUsersInline(true); }}
+                style={{ background: palette.surfaceAlt, border: '1.5px solid rgba(34,197,94,0.3)', borderRadius: '16px', padding: '24px', cursor: 'pointer' }}
+              >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                  <span style={{ color: palette.mutedText, fontSize: '0.9rem', fontWeight: 700 }}>Form 2 Submissions</span>
-                  <div title="Form 2 (Family Kando Video Submissions)" style={{ cursor: 'pointer' }}>
+                  <span style={{ color: palette.mutedText, fontSize: '0.9rem', fontWeight: 700 }}>CHAIRMAN INVITES YOUR THOUGHTS</span>
+                  <div title="Click to view users who submitted CHAIRMAN INVITES YOUR THOUGHTS" style={{ cursor: 'pointer' }}>
                     <Info size={18} color="#22C55E" />
                   </div>
                 </div>
@@ -840,119 +859,123 @@ export const AdminDashboardPage: React.FC = () => {
           </div>
         )}
 
-        {/* 2. USERS DIRECTORY VIEW */}
-        {activeTab === 'users' && (
+        {/* 2. USERS DIRECTORY VIEW — also shown inline below the overview KPI cards when one is clicked */}
+        {(activeTab === 'users' || (activeTab === 'overview' && showUsersInline)) && (
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-              <div>
-                <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: palette.pageText, margin: 0 }}>Registered Users Directory</h1>
-                <p style={{ color: '#94A3B8', fontSize: '0.85rem', marginTop: '4px' }}>Manage candidate entries, apply classification tags & export data</p>
-              </div>
+            {activeTab === 'users' && (
+              <>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+                  <div>
+                    <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: palette.pageText, margin: 0 }}>Registered Users Directory</h1>
+                    <p style={{ color: '#94A3B8', fontSize: '0.85rem', marginTop: '4px' }}>Manage candidate entries, apply classification tags & export data</p>
+                  </div>
 
-              {/* EXPORT BUTTONS (Req 2 - PDF Report Included) */}
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <button 
-                  onClick={() => handleExportData('pdf')}
-                  style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid #EF4444', color: '#FCA5A5', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}
-                >
-                  <Download size={14} /> PDF Report
-                </button>
-                <button 
-                  onClick={() => handleExportData('csv')}
-                  style={{ background: 'rgba(0,229,255,0.12)', border: '1px solid #00E5FF', color: '#00E5FF', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}
-                >
-                  <Download size={14} /> CSV
-                </button>
-                <button 
-                  onClick={() => handleExportData('excel')}
-                  style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid #22C55E', color: '#4ADE80', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}
-                >
-                  <Download size={14} /> Excel
-                </button>
-                <button
-                  onClick={() => setEmailExportOpen(true)}
-                  style={{ background: 'rgba(168,85,247,0.12)', border: '1px solid #A855F7', color: '#C084FC', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}
-                >
-                  <Download size={14} /> CSV + ZIP Media Assets
-                </button>
-              </div>
-            </div>
-
-            {/* FILTERS TOOLBAR (Req 14) */}
-            <div style={{ background: palette.surface, padding: '16px', borderRadius: '14px', border: `1px solid ${palette.border}`, marginBottom: '20px', display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
-              <div style={{ position: 'relative', flex: 1, minWidth: '240px' }}>
-                <Search size={16} color="#94A3B8" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
-                <input 
-                  type="text"
-                  placeholder="Search by Name, Emp ID, Email or City..."
-                  value={searchQuery}
-                  onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-                  style={{ width: '100%', padding: '9px 12px 9px 36px', borderRadius: '8px', background: palette.inputBg, border: `1px solid ${palette.border}`, color: palette.text, fontSize: '0.85rem', outline: 'none' }}
-                />
-              </div>
-
-              {/* Tag Filter */}
-              <select
-                value={selectedTagFilter}
-                onChange={e => { setSelectedTagFilter(e.target.value); setCurrentPage(1); }}
-                style={{ padding: '9px 12px', borderRadius: '8px', background: palette.surfaceAlt, border: `1px solid ${palette.borderStrong}`, color: palette.text, fontSize: '0.85rem', outline: 'none' }}
-              >
-                <option value="">All Classification Tags</option>
-                {customTags.map(tag => (
-                  <option key={tag} value={tag}>{tag}</option>
-                ))}
-              </select>
-
-              {/* Form Filter */}
-              <select
-                value={selectedFormFilter}
-                onChange={e => { setSelectedFormFilter(e.target.value); setCurrentPage(1); }}
-                style={{ padding: '9px 12px', borderRadius: '8px', background: palette.surfaceAlt, border: `1px solid ${palette.borderStrong}`, color: palette.text, fontSize: '0.85rem', outline: 'none' }}
-              >
-                <option value="">All Form Submissions</option>
-                <option value="form1">Form 1 Submitted</option>
-                <option value="form2">Form 2 Submitted</option>
-                <option value="both">Form 1 + Form 2 Completed</option>
-              </select>
-            </div>
-
-            {/* SCOPED EXPORT TOOLBAR — appears above the table whenever rows are checked
-                OR a search/tag/form filter is active, so export always matches what's
-                actually on screen instead of silently exporting everyone. */}
-            {(selectedUserIds.size > 0 || !!searchQuery || !!selectedTagFilter || !!selectedFormFilter) && (
-              <div style={{ background: 'rgba(0,229,255,0.1)', border: '1px solid #00E5FF', borderRadius: '14px', padding: '14px 18px', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
-                <span style={{ color: '#00E5FF', fontWeight: 800, fontSize: '0.9rem' }}>
-                  {selectedUserIds.size > 0
-                    ? `${selectedUserIds.size} user${selectedUserIds.size > 1 ? 's' : ''} selected`
-                    : `Filter applied — ${filteredUsers.length} user${filteredUsers.length !== 1 ? 's' : ''} match`}
-                </span>
-                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
-                  <button onClick={() => handleExportData('pdf')} style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid #EF4444', color: '#FCA5A5', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
-                    <Download size={14} /> PDF
-                  </button>
-                  <button onClick={() => handleExportData('csv')} style={{ background: 'rgba(0,229,255,0.12)', border: '1px solid #00E5FF', color: '#00E5FF', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
-                    <Download size={14} /> CSV
-                  </button>
-                  <button onClick={() => handleExportData('excel')} style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid #22C55E', color: '#4ADE80', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
-                    <Download size={14} /> Excel
-                  </button>
-                  <button onClick={() => setEmailExportOpen(true)} style={{ background: 'rgba(168,85,247,0.12)', border: '1px solid #A855F7', color: '#C084FC', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
-                    <Download size={14} /> CSV + ZIP
-                  </button>
-                  <button
-                    onClick={() => {
-                      if (selectedUserIds.size > 0) {
-                        setSelectedUserIds(new Set());
-                      } else {
-                        setSearchQuery(''); setSelectedTagFilter(''); setSelectedFormFilter(''); setCurrentPage(1);
-                      }
-                    }}
-                    style={{ background: 'transparent', border: `1px solid ${palette.borderStrong}`, color: '#94A3B8', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem' }}
-                  >
-                    {selectedUserIds.size > 0 ? 'Clear Selection' : 'Clear Filters'}
-                  </button>
+                  {/* EXPORT BUTTONS (Req 2 - PDF Report Included) */}
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <button
+                      onClick={() => handleExportData('pdf')}
+                      style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid #EF4444', color: '#FCA5A5', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}
+                    >
+                      <Download size={14} /> PDF Report
+                    </button>
+                    <button
+                      onClick={() => handleExportData('csv')}
+                      style={{ background: 'rgba(0,229,255,0.12)', border: '1px solid #00E5FF', color: '#00E5FF', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}
+                    >
+                      <Download size={14} /> CSV
+                    </button>
+                    <button
+                      onClick={() => handleExportData('excel')}
+                      style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid #22C55E', color: '#4ADE80', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}
+                    >
+                      <Download size={14} /> Excel
+                    </button>
+                    <button
+                      onClick={() => setEmailExportOpen(true)}
+                      style={{ background: 'rgba(168,85,247,0.12)', border: '1px solid #A855F7', color: '#C084FC', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}
+                    >
+                      <Download size={14} /> CSV + ZIP Media Assets
+                    </button>
+                  </div>
                 </div>
-              </div>
+
+                {/* FILTERS TOOLBAR (Req 14) */}
+                <div style={{ background: palette.surface, padding: '16px', borderRadius: '14px', border: `1px solid ${palette.border}`, marginBottom: '20px', display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
+                  <div style={{ position: 'relative', flex: 1, minWidth: '240px' }}>
+                    <Search size={16} color="#94A3B8" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+                    <input
+                      type="text"
+                      placeholder="Search by Name, Emp ID, Email or City..."
+                      value={searchQuery}
+                      onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+                      style={{ width: '100%', padding: '9px 12px 9px 36px', borderRadius: '8px', background: palette.inputBg, border: `1px solid ${palette.border}`, color: palette.text, fontSize: '0.85rem', outline: 'none' }}
+                    />
+                  </div>
+
+                  {/* Tag Filter */}
+                  <select
+                    value={selectedTagFilter}
+                    onChange={e => { setSelectedTagFilter(e.target.value); setCurrentPage(1); }}
+                    style={{ padding: '9px 12px', borderRadius: '8px', background: palette.surfaceAlt, border: `1px solid ${palette.borderStrong}`, color: palette.text, fontSize: '0.85rem', outline: 'none' }}
+                  >
+                    <option value="">All Classification Tags</option>
+                    {customTags.map(tag => (
+                      <option key={tag} value={tag}>{tag}</option>
+                    ))}
+                  </select>
+
+                  {/* Form Filter */}
+                  <select
+                    value={selectedFormFilter}
+                    onChange={e => { setSelectedFormFilter(e.target.value); setCurrentPage(1); }}
+                    style={{ padding: '9px 12px', borderRadius: '8px', background: palette.surfaceAlt, border: `1px solid ${palette.borderStrong}`, color: palette.text, fontSize: '0.85rem', outline: 'none' }}
+                  >
+                    <option value="">All Form Submissions</option>
+                    <option value="form1">SUBMIT YOUR KANDO ENTRY Submitted</option>
+                    <option value="form2">CHAIRMAN INVITES YOUR THOUGHTS Submitted</option>
+                    <option value="both">Both Completed</option>
+                  </select>
+                </div>
+
+                {/* SCOPED EXPORT TOOLBAR — appears above the table whenever rows are checked
+                    OR a search/tag/form filter is active, so export always matches what's
+                    actually on screen instead of silently exporting everyone. */}
+                {(selectedUserIds.size > 0 || !!searchQuery || !!selectedTagFilter || !!selectedFormFilter) && (
+                  <div style={{ background: 'rgba(0,229,255,0.1)', border: '1px solid #00E5FF', borderRadius: '14px', padding: '14px 18px', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+                    <span style={{ color: '#00E5FF', fontWeight: 800, fontSize: '0.9rem' }}>
+                      {selectedUserIds.size > 0
+                        ? `${selectedUserIds.size} user${selectedUserIds.size > 1 ? 's' : ''} selected`
+                        : `Filter applied — ${filteredUsers.length} user${filteredUsers.length !== 1 ? 's' : ''} match`}
+                    </span>
+                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+                      <button onClick={() => handleExportData('pdf')} style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid #EF4444', color: '#FCA5A5', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
+                        <Download size={14} /> PDF
+                      </button>
+                      <button onClick={() => handleExportData('csv')} style={{ background: 'rgba(0,229,255,0.12)', border: '1px solid #00E5FF', color: '#00E5FF', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
+                        <Download size={14} /> CSV
+                      </button>
+                      <button onClick={() => handleExportData('excel')} style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid #22C55E', color: '#4ADE80', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
+                        <Download size={14} /> Excel
+                      </button>
+                      <button onClick={() => setEmailExportOpen(true)} style={{ background: 'rgba(168,85,247,0.12)', border: '1px solid #A855F7', color: '#C084FC', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
+                        <Download size={14} /> CSV + ZIP
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (selectedUserIds.size > 0) {
+                            setSelectedUserIds(new Set());
+                          } else {
+                            setSearchQuery(''); setSelectedTagFilter(''); setSelectedFormFilter(''); setCurrentPage(1);
+                          }
+                        }}
+                        style={{ background: 'transparent', border: `1px solid ${palette.borderStrong}`, color: '#94A3B8', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem' }}
+                      >
+                        {selectedUserIds.size > 0 ? 'Clear Selection' : 'Clear Filters'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
 
             {/* USERS TABLE — 25 ENTRIES PER PAGE (Req 8) */}
@@ -980,8 +1003,8 @@ export const AdminDashboardPage: React.FC = () => {
                     <th style={{ padding: '14px 18px' }}>Emp ID / Phone</th>
                     <th style={{ padding: '14px 18px' }}>Employee Name</th>
                     <th style={{ padding: '14px 18px' }}>Registered Date</th>
-                    <th style={{ padding: '14px 18px' }}>Form 1</th>
-                    <th style={{ padding: '14px 18px' }}>Form 2</th>
+                    <th style={{ padding: '14px 18px' }}>SUBMIT YOUR KANDO ENTRY</th>
+                    <th style={{ padding: '14px 18px' }}>CHAIRMAN INVITES YOUR THOUGHTS</th>
                     <th style={{ padding: '14px 18px' }}>Assets</th>
                     <th style={{ padding: '14px 18px' }}>Assigned Tags</th>
                     <th style={{ padding: '14px 18px', textAlign: 'right' }}>Actions</th>
@@ -1045,10 +1068,10 @@ export const AdminDashboardPage: React.FC = () => {
                         <td style={{ padding: '14px 18px' }}>
                           {assets.length > 0 ? (
                             <button
-                              onClick={() => setAssetsModal({ items: assets, index: 0 })}
+                              onClick={() => setAssetsModal({ items: assets, index: null })}
                               style={{ background: 'rgba(0,229,255,0.1)', border: '1px solid #00E5FF', color: '#00E5FF', padding: '5px 10px', borderRadius: '8px', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                             >
-                              <Images size={14} /> {assets.length}
+                              <Images size={14} /> View ({assets.length})
                             </button>
                           ) : (
                             <span style={{ color: '#64748B', fontSize: '0.75rem' }}>None</span>
@@ -1139,10 +1162,10 @@ export const AdminDashboardPage: React.FC = () => {
                   </p>
                   <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
                     <span style={{ fontSize: '0.78rem', fontWeight: 800, padding: '4px 10px', borderRadius: '8px', color: selectedUserForProfile.form1 ? '#4ADE80' : '#EF4444', background: selectedUserForProfile.form1 ? 'rgba(74,222,128,0.1)' : 'rgba(239,68,68,0.1)', border: `1px solid ${selectedUserForProfile.form1 ? 'rgba(74,222,128,0.4)' : 'rgba(239,68,68,0.4)'}` }}>
-                      Form 1: {selectedUserForProfile.form1 ? 'Yes' : 'No'}
+                      SUBMIT YOUR KANDO ENTRY: {selectedUserForProfile.form1 ? 'Yes' : 'No'}
                     </span>
                     <span style={{ fontSize: '0.78rem', fontWeight: 800, padding: '4px 10px', borderRadius: '8px', color: selectedUserForProfile.form2 ? '#4ADE80' : '#EF4444', background: selectedUserForProfile.form2 ? 'rgba(74,222,128,0.1)' : 'rgba(239,68,68,0.1)', border: `1px solid ${selectedUserForProfile.form2 ? 'rgba(74,222,128,0.4)' : 'rgba(239,68,68,0.4)'}` }}>
-                      Form 2: {selectedUserForProfile.form2 ? 'Yes' : 'No'}
+                      CHAIRMAN INVITES YOUR THOUGHTS: {selectedUserForProfile.form2 ? 'Yes' : 'No'}
                     </span>
                   </div>
                 </div>
@@ -1163,7 +1186,7 @@ export const AdminDashboardPage: React.FC = () => {
               {selectedUserForProfile.form1 ? (
                 <div style={{ marginBottom: '28px', background: palette.surfaceSoft, padding: '24px', borderRadius: '18px', border: '1px solid rgba(74, 222, 128, 0.3)' }}>
                   <h3 style={{ fontSize: '1.1rem', color: '#4ADE80', fontWeight: 800, marginBottom: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <ImageIcon size={20} /> Form 1 — Photos & Video Submission
+                    <ImageIcon size={20} /> SUBMIT YOUR KANDO ENTRY — Photos & Video Submission
                     <span style={{ marginLeft: 'auto', fontSize: '0.75rem', color: '#64748B', fontWeight: 400 }}>
                       Submitted: {new Date(selectedUserForProfile.form1.submittedAt).toLocaleString()}
                     </span>
@@ -1208,7 +1231,7 @@ export const AdminDashboardPage: React.FC = () => {
                   {/* CEO Reflection */}
                   {selectedUserForProfile.form1.ceoReflection && (
                     <div style={{ background: palette.subtleBg, padding: '16px', borderRadius: '12px', marginBottom: '18px' }}>
-                      <div style={{ fontSize: '0.72rem', color: '#4ADE80', fontWeight: 800, textTransform: 'uppercase', marginBottom: '8px' }}>Reflection Message (Form 1)</div>
+                      <div style={{ fontSize: '0.72rem', color: '#4ADE80', fontWeight: 800, textTransform: 'uppercase', marginBottom: '8px' }}>Reflection Message (SUBMIT YOUR KANDO ENTRY)</div>
                       <p style={{ margin: 0, color: palette.text, fontStyle: 'italic', lineHeight: 1.6 }}>"{selectedUserForProfile.form1.ceoReflection}"</p>
                     </div>
                   )}
@@ -1216,19 +1239,19 @@ export const AdminDashboardPage: React.FC = () => {
                   {/* Media Buttons */}
                   <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                     {selectedUserForProfile.form1.photo1Url && (
-                      <button onClick={() => setMediaModal({ type: 'image', url: selectedUserForProfile.form1.photo1Url, title: 'Form 1 — Photo 1' })}
+                      <button onClick={() => setMediaModal({ type: 'image', url: selectedUserForProfile.form1.photo1Url, title: 'SUBMIT YOUR KANDO ENTRY — Photo 1' })}
                         style={{ cursor: 'pointer', border: '1px solid #4ADE80', borderRadius: '10px', padding: '10px 18px', color: '#4ADE80', fontSize: '0.85rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(74,222,128,0.08)', outline: 'none' }}>
                         <ImageIcon size={16} /> View Photo 1
                       </button>
                     )}
                     {selectedUserForProfile.form1.photo2Url && (
-                      <button onClick={() => setMediaModal({ type: 'image', url: selectedUserForProfile.form1.photo2Url, title: 'Form 1 — Photo 2' })}
+                      <button onClick={() => setMediaModal({ type: 'image', url: selectedUserForProfile.form1.photo2Url, title: 'SUBMIT YOUR KANDO ENTRY — Photo 2' })}
                         style={{ cursor: 'pointer', border: '1px solid #4ADE80', borderRadius: '10px', padding: '10px 18px', color: '#4ADE80', fontSize: '0.85rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(74,222,128,0.08)', outline: 'none' }}>
                         <ImageIcon size={16} /> View Photo 2
                       </button>
                     )}
                     {selectedUserForProfile.form1.videoUrl && (
-                      <button onClick={() => setMediaModal({ type: 'video', url: selectedUserForProfile.form1.videoUrl, title: 'Form 1 — Kando Video' })}
+                      <button onClick={() => setMediaModal({ type: 'video', url: selectedUserForProfile.form1.videoUrl, title: 'SUBMIT YOUR KANDO ENTRY — Kando Video' })}
                         style={{ cursor: 'pointer', border: '1px solid #00E5FF', borderRadius: '10px', padding: '10px 18px', color: '#00E5FF', fontSize: '0.85rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(0,229,255,0.08)', outline: 'none' }}>
                         <FileVideo size={16} /> Watch Video
                       </button>
@@ -1237,7 +1260,7 @@ export const AdminDashboardPage: React.FC = () => {
                 </div>
               ) : (
                 <div style={{ marginBottom: '28px', background: palette.surfaceSoft, padding: '20px', borderRadius: '18px', border: '1px solid rgba(239,68,68,0.3)', color: '#EF4444', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <ImageIcon size={20} /> Form 1 not yet submitted
+                  <ImageIcon size={20} /> SUBMIT YOUR KANDO ENTRY — not yet submitted
                 </div>
               )}
 
@@ -1245,7 +1268,7 @@ export const AdminDashboardPage: React.FC = () => {
               {selectedUserForProfile.form2 ? (
                 <div style={{ background: palette.surfaceSoft, padding: '24px', borderRadius: '18px', border: '1px solid rgba(168, 85, 247, 0.3)' }}>
                   <h3 style={{ fontSize: '1.1rem', color: '#C084FC', fontWeight: 800, marginBottom: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <FileVideo size={20} /> Form 2 — Chairman Invites Your Thoughts
+                    <FileVideo size={20} /> CHAIRMAN INVITES YOUR THOUGHTS
                     <span style={{ marginLeft: 'auto', fontSize: '0.75rem', color: '#64748B', fontWeight: 400 }}>
                       Submitted: {new Date(selectedUserForProfile.form2.submittedAt).toLocaleString()}
                     </span>
@@ -1304,7 +1327,7 @@ export const AdminDashboardPage: React.FC = () => {
                 </div>
               ) : (
                 <div style={{ background: palette.surfaceSoft, padding: '20px', borderRadius: '18px', border: '1px solid rgba(239,68,68,0.3)', color: '#EF4444', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <FileVideo size={20} /> Form 2 not yet submitted
+                  <FileVideo size={20} /> CHAIRMAN INVITES YOUR THOUGHTS — not yet submitted
                 </div>
               )}
 
@@ -1358,7 +1381,7 @@ export const AdminDashboardPage: React.FC = () => {
                   <div>
                     <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: palette.text, margin: 0 }}>Eligibility Whitelist</h2>
                     <p style={{ fontSize: '0.8rem', color: '#94A3B8', margin: 0 }}>
-                      Only Employee IDs / Phone Numbers on these lists can submit Form 1 &amp; Form 2. Each upload replaces the previous list.
+                      Only Employee IDs / Phone Numbers on these lists can submit SUBMIT YOUR KANDO ENTRY &amp; CHAIRMAN INVITES YOUR THOUGHTS. Each upload replaces the previous list.
                     </p>
                   </div>
                 </div>
@@ -1436,7 +1459,7 @@ export const AdminDashboardPage: React.FC = () => {
                   <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: palette.subtleBg, padding: '14px', borderRadius: '10px' }}>
                     <div>
                       <div style={{ fontWeight: 700, fontSize: '0.95rem', color: palette.text }}>Enable Captcha Verification</div>
-                      <div style={{ fontSize: '0.78rem', color: '#94A3B8' }}>Enforce Google reCAPTCHA v3 on Form 1 & Form 2</div>
+                      <div style={{ fontSize: '0.78rem', color: '#94A3B8' }}>Enforce Google reCAPTCHA v3 on SUBMIT YOUR KANDO ENTRY & CHAIRMAN INVITES YOUR THOUGHTS</div>
                     </div>
                     <input
                       type="checkbox"
@@ -1609,76 +1632,144 @@ export const AdminDashboardPage: React.FC = () => {
         </div>
       )}
 
-      {/* ASSET GALLERY MODAL — every Form 1 / Form 2 upload for a user, with prev/next arrows */}
+      {/* ASSET GALLERY MODAL — every Form 1 / Form 2 upload for a user.
+          Grid view (index === null) shows every thumbnail at once with its
+          own Download button; clicking a thumbnail switches the same modal
+          to an enlarged single-image view with a "Back to all assets" link. */}
       {assetsModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div style={{ background: palette.surface, border: '1px solid #00E5FF', borderRadius: '16px', padding: '24px', maxWidth: '700px', width: '100%', position: 'relative' }}>
+          <div style={{ background: palette.surface, border: '1px solid #00E5FF', borderRadius: '16px', padding: '24px', width: '640px', maxWidth: '100%', height: '640px', maxHeight: '90vh', overflowY: 'auto', position: 'relative' }}>
             <button onClick={() => setAssetsModal(null)} style={{ position: 'absolute', top: '16px', right: '16px', background: 'transparent', border: 'none', color: palette.text, cursor: 'pointer' }}>
               <X size={20} />
             </button>
-            <h3 style={{ fontSize: '1.1rem', color: '#00E5FF', marginBottom: '4px' }}>{assetsModal.items[assetsModal.index].title}</h3>
-            <p style={{ fontSize: '0.78rem', color: '#64748B', marginBottom: '16px' }}>
-              {assetsModal.index + 1} of {assetsModal.items.length}
-            </p>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <button
-                onClick={() => setAssetsModal(m => m && ({ ...m, index: (m.index - 1 + m.items.length) % m.items.length }))}
-                disabled={assetsModal.items.length < 2}
-                style={{ flexShrink: 0, background: palette.inputBg, border: 'none', color: palette.text, width: '36px', height: '36px', borderRadius: '8px', cursor: assetsModal.items.length < 2 ? 'not-allowed' : 'pointer', opacity: assetsModal.items.length < 2 ? 0.4 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-              >
-                <ChevronLeft size={20} />
-              </button>
+            {assetsModal.index === null ? (
+              <>
+                <h3 style={{ fontSize: '1.1rem', color: '#00E5FF', marginBottom: '4px' }}>All Assets</h3>
+                <p style={{ fontSize: '0.78rem', color: '#64748B', marginBottom: '16px' }}>
+                  {assetsModal.items.length} file{assetsModal.items.length === 1 ? '' : 's'} — click a thumbnail to enlarge
+                </p>
 
-              <div style={{ flex: 1, minWidth: 0 }}>
-                {galleryError ? (
-                  <div style={{ padding: '40px 0', textAlign: 'center' }}>
-                    <p style={{ color: '#EF4444', fontWeight: 700, marginBottom: '12px' }}>{galleryError}</p>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '12px' }}>
+                  {assetsModal.items.map((item, i) => (
+                    <div key={i} style={{ background: palette.subtleBg, borderRadius: '12px', overflow: 'hidden', border: `1px solid ${palette.border}` }}>
+                      <button
+                        onClick={() => assetsSignedUrls[i] && setAssetsModal(m => m && ({ ...m, index: i }))}
+                        disabled={!assetsSignedUrls[i]}
+                        style={{ display: 'block', width: '100%', aspectRatio: '1', border: 'none', padding: 0, background: 'transparent', position: 'relative', cursor: assetsSignedUrls[i] ? 'zoom-in' : 'default' }}
+                      >
+                        {assetsErrors[i] ? (
+                          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#EF4444', fontSize: '0.7rem', padding: '8px', textAlign: 'center' }}>
+                            Failed to load
+                          </div>
+                        ) : !assetsSignedUrls[i] ? (
+                          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748B', fontSize: '0.75rem' }}>
+                            Loading…
+                          </div>
+                        ) : item.type === 'image' ? (
+                          <img src={assetsSignedUrls[i]} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                        ) : (
+                          <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                            <video src={assetsSignedUrls[i]} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.35)' }}>
+                              <FileVideo size={24} color="#fff" />
+                            </div>
+                          </div>
+                        )}
+                      </button>
+                      <div style={{ padding: '8px 10px' }}>
+                        <p style={{ margin: '0 0 8px', fontSize: '0.7rem', color: palette.mutedText, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {item.title}
+                        </p>
+                        <button
+                          onClick={() => downloadR2File(item.url, item.title)}
+                          disabled={!assetsSignedUrls[i]}
+                          style={{ width: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px', border: '1px solid #00E5FF', borderRadius: '8px', padding: '6px 8px', color: '#00E5FF', fontSize: '0.72rem', fontWeight: 700, background: 'rgba(0,229,255,0.08)', cursor: assetsSignedUrls[i] ? 'pointer' : 'not-allowed', opacity: assetsSignedUrls[i] ? 1 : 0.5 }}
+                        >
+                          <Download size={12} /> Download
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (() => {
+              const idx = assetsModal.index as number;
+              const activeItem = assetsModal.items[idx];
+              return (
+                <>
+                  <button
+                    onClick={() => setAssetsModal(m => m && ({ ...m, index: null }))}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'transparent', border: 'none', color: '#00E5FF', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer', marginBottom: '12px', padding: 0 }}
+                  >
+                    <ChevronLeft size={16} /> Back to all assets
+                  </button>
+                  <h3 style={{ fontSize: '1.1rem', color: '#00E5FF', marginBottom: '4px' }}>{activeItem.title}</h3>
+                  <p style={{ fontSize: '0.78rem', color: '#64748B', marginBottom: '16px' }}>
+                    {idx + 1} of {assetsModal.items.length}
+                  </p>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <button
-                      onClick={() => setGalleryRetryKey(k => k + 1)}
-                      style={{ border: '1px solid #00E5FF', color: '#00E5FF', background: 'rgba(0,229,255,0.08)', padding: '8px 16px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer' }}
+                      onClick={() => setAssetsModal(m => m && ({ ...m, index: ((m.index as number) - 1 + m.items.length) % m.items.length }))}
+                      disabled={assetsModal.items.length < 2}
+                      style={{ flexShrink: 0, background: palette.inputBg, border: 'none', color: palette.text, width: '36px', height: '36px', borderRadius: '8px', cursor: assetsModal.items.length < 2 ? 'not-allowed' : 'pointer', opacity: assetsModal.items.length < 2 ? 0.4 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                     >
-                      Retry
+                      <ChevronLeft size={20} />
+                    </button>
+
+                    <div style={{ flex: 1, minWidth: 0, height: '440px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: palette.subtleBg, borderRadius: '12px', overflow: 'hidden' }}>
+                      {assetsErrors[idx] ? (
+                        <div style={{ padding: '0 20px', textAlign: 'center' }}>
+                          <p style={{ color: '#EF4444', fontWeight: 700, marginBottom: '12px' }}>{assetsErrors[idx]}</p>
+                          <button
+                            onClick={() => setAssetsRetryKey(k => k + 1)}
+                            style={{ border: '1px solid #00E5FF', color: '#00E5FF', background: 'rgba(0,229,255,0.08)', padding: '8px 16px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer' }}
+                          >
+                            Retry
+                          </button>
+                        </div>
+                      ) : !assetsSignedUrls[idx] ? (
+                        <div style={{ color: '#64748B' }}>Loading…</div>
+                      ) : activeItem.type === 'image' ? (
+                        <img
+                          key={assetsSignedUrls[idx]}
+                          src={assetsSignedUrls[idx]}
+                          alt={activeItem.title}
+                          style={{ maxWidth: '100%', maxHeight: '100%', display: 'block' }}
+                          onError={() => setAssetsErrors(prev => ({ ...prev, [idx]: 'This image file failed to load (it may be corrupted or missing).' }))}
+                        />
+                      ) : (
+                        <video
+                          key={assetsSignedUrls[idx]}
+                          controls
+                          src={assetsSignedUrls[idx]}
+                          style={{ maxWidth: '100%', maxHeight: '100%', display: 'block' }}
+                          onError={() => setAssetsErrors(prev => ({ ...prev, [idx]: 'This video file failed to load (it may be corrupted or missing).' }))}
+                        />
+                      )}
+                    </div>
+
+                    <button
+                      onClick={() => setAssetsModal(m => m && ({ ...m, index: ((m.index as number) + 1) % m.items.length }))}
+                      disabled={assetsModal.items.length < 2}
+                      style={{ flexShrink: 0, background: palette.inputBg, border: 'none', color: palette.text, width: '36px', height: '36px', borderRadius: '8px', cursor: assetsModal.items.length < 2 ? 'not-allowed' : 'pointer', opacity: assetsModal.items.length < 2 ? 0.4 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      <ChevronRight size={20} />
                     </button>
                   </div>
-                ) : !gallerySignedUrl ? (
-                  <div style={{ padding: '40px 0', textAlign: 'center', color: '#64748B' }}>Loading…</div>
-                ) : assetsModal.items[assetsModal.index].type === 'image' ? (
-                  <img
-                    key={gallerySignedUrl}
-                    src={gallerySignedUrl}
-                    alt={assetsModal.items[assetsModal.index].title}
-                    style={{ maxWidth: '100%', maxHeight: '60vh', borderRadius: '12px', display: 'block', margin: '0 auto' }}
-                    onError={() => setGalleryError('This image file failed to load (it may be corrupted or missing).')}
-                  />
-                ) : (
-                  <video
-                    key={gallerySignedUrl}
-                    controls
-                    src={gallerySignedUrl}
-                    style={{ width: '100%', borderRadius: '12px' }}
-                    onError={() => setGalleryError('This video file failed to load (it may be corrupted or missing).')}
-                  />
-                )}
-              </div>
 
-              <button
-                onClick={() => setAssetsModal(m => m && ({ ...m, index: (m.index + 1) % m.items.length }))}
-                disabled={assetsModal.items.length < 2}
-                style={{ flexShrink: 0, background: palette.inputBg, border: 'none', color: palette.text, width: '36px', height: '36px', borderRadius: '8px', cursor: assetsModal.items.length < 2 ? 'not-allowed' : 'pointer', opacity: assetsModal.items.length < 2 ? 0.4 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-              >
-                <ChevronRight size={20} />
-              </button>
-            </div>
-
-            {gallerySignedUrl && !galleryError && (
-              <button
-                onClick={() => downloadR2File(assetsModal.items[assetsModal.index].url, assetsModal.items[assetsModal.index].title)}
-                style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginTop: '16px', border: '1px solid #00E5FF', borderRadius: '10px', padding: '10px 18px', color: '#00E5FF', fontSize: '0.85rem', fontWeight: 700, background: 'rgba(0,229,255,0.08)', cursor: 'pointer' }}
-              >
-                <Download size={16} /> Download
-              </button>
-            )}
+                  {assetsSignedUrls[idx] && !assetsErrors[idx] && (
+                    <button
+                      onClick={() => downloadR2File(activeItem.url, activeItem.title)}
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginTop: '16px', border: '1px solid #00E5FF', borderRadius: '10px', padding: '10px 18px', color: '#00E5FF', fontSize: '0.85rem', fontWeight: 700, background: 'rgba(0,229,255,0.08)', cursor: 'pointer' }}
+                    >
+                      <Download size={16} /> Download
+                    </button>
+                  )}
+                </>
+              );
+            })()}
           </div>
         </div>
       )}

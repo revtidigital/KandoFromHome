@@ -1,0 +1,1163 @@
+:root {
+  --yamaha-blue: #08277c;
+  --yamaha-blue-dark: #061b62;
+  --yamaha-blue-bright: #1746a7;
+  --gold: #dfb23c;
+  --ink: #071d5c;
+  --muted: #737783;
+  --border: #cfd2d9;
+  --privacy: #edf2fc;
+  --danger: #b42318;
+  --success: #137044;
+  --white: #ffffff;
+}
+
+.kando-page-f1 {
+  font-family: "Montserrat", Arial, sans-serif;
+  color: var(--ink);
+  background: #f9fafc;
+  min-width: 320px;
+  scroll-behavior: smooth;
+  min-height: 100vh;
+  margin: 0;
+}
+
+.kando-page-f1 * {
+  box-sizing: border-box;
+}
+
+.kando-page-f1 button,
+.kando-page-f1 input,
+.kando-page-f1 select {
+  font: inherit;
+}
+
+.kando-page-f1 button,
+.kando-page-f1 label,
+.kando-page-f1 select,
+.kando-page-f1 a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.kando-page-f1 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.kando-page-f1 img,
+.kando-page-f1 svg {
+  max-width: 100%;
+}
+
+.kando-page-f1 .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.kando-page-f1 {
+  width: 100%;
+  overflow: hidden;
+  background: #fff;
+}
+
+/* Header */
+.kando-page-f1 .site-header {
+  position: relative;
+  z-index: 30;
+  display: grid;
+  grid-template-columns: minmax(205px, 1fr) auto minmax(260px, 1fr);
+  align-items: center;
+  width: 100%;
+  height: 98px;
+  padding: 0 28px;
+  background: rgba(255, 255, 255, 0.98);
+  border-bottom: 1px solid #dedfe4;
+  box-shadow: 0 2px 8px rgba(15, 31, 70, 0.09);
+}
+
+.kando-page-f1 .yamaha-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: 6px;
+  width: max-content;
+  color: #072b92;
+}
+
+.kando-page-f1 .yamaha-logo-img {
+  height: 48px;
+  width: auto;
+}
+
+.kando-page-f1 .yamaha-emblem {
+  width: 39px;
+  height: 39px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.kando-page-f1 .yamaha-emblem path:nth-of-type(2),
+.kando-page-f1 .yamaha-emblem circle:last-child {
+  fill: #fff;
+}
+
+.kando-page-f1 .yamaha-wordmark {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1;
+}
+
+.kando-page-f1 .yamaha-wordmark strong {
+  font-family: "Arial Narrow", Impact, sans-serif;
+  font-size: 38px;
+  letter-spacing: -0.9px;
+  transform: scaleX(0.84);
+  transform-origin: left center;
+  margin-right: -25px;
+}
+
+.kando-page-f1 .yamaha-wordmark span {
+  margin: 2px 0 0 3px;
+  color: #111;
+  font-family: "Caveat", "Segoe Script", cursive;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 0.9;
+  transform: rotate(-4deg);
+}
+
+.kando-page-f1 .campaign-title {
+  justify-self: center;
+  font-size: clamp(20px, 1.8vw, 27px);
+  font-weight: 700;
+  letter-spacing: 0.1px;
+  white-space: nowrap;
+}
+
+.kando-page-f1 .header-actions {
+  display: flex;
+  align-items: center;
+  justify-self: end;
+  gap: 19px;
+  font-size: 17px;
+  font-weight: 400;
+}
+
+.kando-page-f1 .home-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 46px;
+}
+
+.kando-page-f1 .home-link svg {
+  width: 27px;
+  height: 27px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.kando-page-f1 .header-divider {
+  width: 1px;
+  height: 38px;
+  background: #d2d4da;
+}
+
+.kando-page-f1 .language-picker {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.kando-page-f1 .language-picker select {
+  width: 147px;
+  height: 48px;
+  padding: 0 44px 0 22px;
+  color: var(--ink);
+  background: #fff;
+  border: 1.6px solid var(--yamaha-blue);
+  border-radius: 26px;
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.kando-page-f1 .language-picker select:focus-visible,
+.kando-page-f1 .home-link:focus-visible,
+.kando-page-f1 .yamaha-logo:focus-visible,
+.kando-page-f1 .back-button:focus-visible {
+  outline: 3px solid rgba(22, 69, 166, 0.22);
+  outline-offset: 3px;
+}
+
+.kando-page-f1 .language-picker svg {
+  position: absolute;
+  right: 19px;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: var(--yamaha-blue);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
+/* Main area */
+.kando-page-f1 .entry-main {
+  position: relative;
+  isolation: isolate;
+  min-height: 0;
+  padding: 34px 0 38px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 84% 21%, rgba(229, 234, 245, 0.55), transparent 34%),
+    linear-gradient(116deg, rgba(228, 233, 243, 0.22), transparent 29%),
+    #fdfdfd;
+}
+
+.kando-page-f1 .paper-texture {
+  position: absolute;
+  z-index: -3;
+  inset: 0;
+  opacity: 0.43;
+  background:
+    linear-gradient(134deg, transparent 0 69%, rgba(209, 216, 231, 0.52) 69.06% 69.15%, transparent 69.2%),
+    linear-gradient(45deg, transparent 0 44%, rgba(222, 227, 238, 0.35) 44.05% 44.13%, transparent 44.2%);
+  pointer-events: none;
+}
+
+.kando-page-f1 .back-button {
+  position: relative;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+  width: 130px;
+  height: 49px;
+  margin-left: max(30px, calc((100% - 1432px) / 2));
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #c9cbd1;
+  border-radius: 28px;
+  font-size: 16px;
+  font-weight: 500;
+  transition: 0.2s ease;
+}
+
+.kando-page-f1 .back-button:hover {
+  background: #f1f4fa;
+  border-color: var(--yamaha-blue);
+}
+
+.kando-page-f1 .back-button svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.kando-page-f1 .entry-grid {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 760px) minmax(410px, 500px);
+  align-items: stretch;
+  gap: clamp(50px, 5.2vw, 82px);
+  width: min(1365px, calc(100% - 96px));
+  min-height: 0;
+  margin: 1px auto 0;
+}
+
+.kando-page-f1 .form-column {
+  min-width: 0;
+}
+
+.kando-page-f1 .intro-copy {
+  text-align: center;
+}
+
+.kando-page-f1 .headline-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.kando-page-f1 h1 {
+  margin: 0;
+  font-size: clamp(31px, 2.45vw, 41px);
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.65px;
+}
+
+.kando-page-f1 .gold-heart {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 3.1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.kando-page-f1 .intro-copy > p {
+  margin: 13px 0 8px;
+  font-family: 'Kozuka Gothic Pro', 'Outfit', sans-serif;
+  font-size: 20px;
+  line-height: 1.45;
+  font-weight: 400;
+}
+
+.kando-page-f1 .title-flourish {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 34px;
+}
+
+.kando-page-f1 .title-flourish span {
+  display: block;
+  width: 150px;
+  height: 3px;
+  border-radius: 50%;
+  background: linear-gradient(90deg, rgba(11, 47, 139, 0), #0b2f8b 67%, #0b2f8b);
+  transform: rotate(-2.3deg);
+}
+
+.kando-page-f1 .title-flourish span:last-child {
+  background: linear-gradient(90deg, #0b2f8b, #0b2f8b 33%, rgba(11, 47, 139, 0));
+  transform: rotate(2.3deg);
+}
+
+.kando-page-f1 .title-flourish svg {
+  width: 27px;
+  height: 27px;
+  fill: none;
+  stroke: #0a2d8b;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Form */
+.kando-page-f1 .entry-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: 32px;
+  row-gap: 25px;
+  margin-top: 13px;
+}
+
+.kando-page-f1 .field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.kando-page-f1 .field-full {
+  grid-column: 1 / -1;
+}
+
+.kando-page-f1 .field > label,
+.kando-page-f1 .upload-section legend {
+  font-size: 15px;
+  line-height: 1.25;
+  font-weight: 600;
+}
+
+.kando-page-f1 .field input:not([type="file"]) {
+  width: 100%;
+  height: 52px;
+  padding: 0 17px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.93);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  outline: none;
+  font-size: 15px;
+  box-shadow: 0 1px 2px rgba(8, 28, 78, 0.03);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.kando-page-f1 .field input::placeholder {
+  color: #7a7e87;
+  opacity: 1;
+}
+
+.kando-page-f1 .field input.has-error:not([type="file"]) {
+  border-color: #b42318;
+  background: rgba(180, 35, 24, 0.04);
+}
+
+.kando-page-f1 .field input:not([type="file"]):focus {
+  border-color: #2b52a2;
+  box-shadow: 0 0 0 3px rgba(23, 64, 156, 0.12);
+}
+
+.kando-page-f1 .upload-section {
+  min-width: 0;
+  margin: 1px 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.kando-page-f1 .upload-section legend {
+  padding: 0;
+}
+
+.kando-page-f1 .upload-help {
+  margin: 5px 0 12px;
+  color: #747986;
+  font-size: 12.5px;
+  font-weight: 400;
+}
+
+.kando-page-f1 .upload-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 13px;
+}
+
+.kando-page-f1 .upload-control {
+  min-width: 0;
+}
+
+.kando-page-f1 .file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.kando-page-f1 .upload-button {
+  display: grid;
+  grid-template-columns: 35px minmax(0, 1fr) 22px;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  min-height: 85px;
+  padding: 12px 12px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1.4px dashed #7d91c0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+
+.kando-page-f1 .upload-button:hover {
+  transform: translateY(-2px);
+  background: #f5f8ff;
+  border-color: var(--yamaha-blue);
+  box-shadow: 0 6px 14px rgba(8, 39, 124, 0.1);
+}
+
+.kando-page-f1 .file-input:focus-visible + .upload-button {
+  outline: 3px solid rgba(22, 69, 166, 0.22);
+  outline-offset: 3px;
+}
+
+.kando-page-f1 .upload-button.has-file {
+  background: #f0f8f4;
+  border-color: #4d9a72;
+  border-style: solid;
+}
+
+.kando-page-f1 .upload-button.has-error {
+  background: #fff6f5;
+  border-color: var(--danger);
+  border-style: solid;
+}
+
+.kando-page-f1 .upload-type-icon,
+.kando-page-f1 .mini-upload {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.kando-page-f1 .upload-type-icon {
+  width: 33px;
+  height: 33px;
+}
+
+.kando-page-f1 .mini-upload {
+  width: 21px;
+  height: 21px;
+}
+
+.kando-page-f1 .upload-button span {
+  min-width: 0;
+}
+
+.kando-page-f1 .upload-button strong,
+.kando-page-f1 .upload-button small {
+  display: block;
+}
+
+.kando-page-f1 .upload-button strong {
+  margin-bottom: 5px;
+  font-size: 12.5px;
+  line-height: 1.25;
+  font-weight: 600;
+}
+
+.kando-page-f1 .upload-button small {
+  color: #747986;
+  font-size: 9.5px;
+  line-height: 1.35;
+  font-weight: 400;
+}
+
+.kando-page-f1 .file-name,
+.kando-page-f1 .file-error {
+  max-width: 100%;
+  margin: 6px 2px 0;
+  overflow: hidden;
+  font-size: 10.5px;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kando-page-f1 .file-name {
+  color: #747986;
+}
+
+.kando-page-f1 .file-error {
+  min-height: 14px;
+  margin-top: 2px;
+  color: var(--danger);
+  font-weight: 500;
+  white-space: normal;
+}
+
+.kando-page-f1 .privacy-card {
+  grid-column: 1 / -1;
+  min-height: 105px;
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  padding: 18px 28px;
+  background: linear-gradient(100deg, #f2f5fc, #e9effb);
+  border-radius: 17px;
+  box-shadow: 0 3px 8px rgba(20, 43, 96, 0.06);
+}
+
+.kando-page-f1 .privacy-icon {
+  width: 62px;
+  height: 62px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 1.6px solid var(--yamaha-blue);
+  border-radius: 50%;
+}
+
+.kando-page-f1 .privacy-icon svg {
+  width: 47px;
+  height: 47px;
+  fill: none;
+  stroke: var(--yamaha-blue);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.kando-page-f1 .privacy-icon .shield {
+  fill: rgba(7, 31, 115, 0.08);
+}
+
+.kando-page-f1 .privacy-icon rect {
+  fill: var(--yamaha-blue);
+  stroke: var(--yamaha-blue);
+}
+
+.kando-page-f1 .privacy-card strong {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.kando-page-f1 .privacy-card p {
+  max-width: 580px;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  font-weight: 400;
+}
+
+.kando-page-f1 .submit-button {
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: min(603px, 100%);
+  height: 65px;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 30px;
+  align-items: center;
+  margin-top: -3px;
+  padding: 0 27px;
+  color: #fff;
+  background: linear-gradient(102deg, #143ca2 0%, #0b2d86 52%, #071f73 100%);
+  border: 0;
+  border-radius: 34px;
+  box-shadow: 0 8px 18px rgba(7, 31, 115, 0.22);
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.22px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.kando-page-f1 .submit-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 11px 23px rgba(7, 31, 115, 0.29);
+}
+
+.kando-page-f1 .submit-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.kando-page-f1 .submit-button:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.kando-page-f1 .submit-button:active {
+  transform: translateY(0);
+}
+
+.kando-page-f1 .submit-button:focus-visible {
+  outline: 4px solid rgba(22, 69, 166, 0.25);
+  outline-offset: 4px;
+}
+
+.kando-page-f1 .submit-button svg {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.kando-page-f1 .submit-upload-icon {
+  width: 30px;
+  height: 30px;
+}
+
+.kando-page-f1 .submit-arrow {
+  width: 26px;
+  height: 26px;
+  justify-self: end;
+}
+
+.kando-page-f1 .form-status {
+  grid-column: 1 / -1;
+  min-height: 20px;
+  margin: -10px 0 0;
+  text-align: center;
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+.kando-page-f1 .form-status.is-error {
+  color: var(--danger);
+}
+
+.kando-page-f1 .form-status:empty {
+  display: none;
+}
+
+.kando-page-f1 .form-status.is-success {
+  color: var(--success);
+}
+
+/* Right-side photo composition */
+.kando-page-f1 .visual-column {
+  position: relative;
+  align-self: start;
+  min-width: 0;
+  min-height: 0;
+  margin-top: 0;
+}
+
+.kando-page-f1 .polaroid-wrap {
+  position: relative;
+  width: calc(100% + 200px);
+  aspect-ratio: 1024 / 1536;
+  margin: -45px -100px -92px -100px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.kando-page-f1 .polaroid-frame {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  transform: none;
+}
+
+.kando-page-f1 .polaroid-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+}
+
+/* Footer */
+.kando-page-f1 .page-footer {
+  position: relative;
+  z-index: 10;
+  min-height: 122px;
+  color: #fff;
+  background: linear-gradient(103deg, #08246f 0%, #0a2f86 55%, #061958 100%);
+}
+
+.kando-page-f1 .footer-inner {
+  width: min(1042px, calc(100% - 80px));
+  min-height: 122px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 70px;
+  margin: 0 auto;
+}
+
+.kando-page-f1 .footer-message {
+  display: flex;
+  align-items: center;
+}
+
+.kando-page-f1 .footer-message svg {
+  flex: 0 0 auto;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.kando-page-f1 .footer-thanks {
+  gap: 18px;
+}
+
+.kando-page-f1 .footer-thanks svg {
+  width: 39px;
+  height: 48px;
+}
+
+.kando-page-f1 .footer-thanks strong {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 23px;
+  font-weight: 600;
+}
+
+.kando-page-f1 .footer-message p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  font-weight: 400;
+}
+
+.kando-page-f1 .footer-family {
+  gap: 24px;
+}
+
+.kando-page-f1 .footer-family svg {
+  width: 78px;
+  height: 58px;
+}
+
+/* Responsive layout */
+@media (max-width: 1300px) {
+  .kando-page-f1 .entry-main {
+    min-height: 0;
+  }
+
+  .kando-page-f1 .entry-grid {
+    grid-template-columns: minmax(0, 1fr) 390px;
+    gap: 44px;
+    width: calc(100% - 72px);
+    min-height: 0;
+  }
+
+  .kando-page-f1 h1 {
+    font-size: 31px;
+  }
+
+  .kando-page-f1 .polaroid-wrap {
+    width: calc(100% + 185px);
+    margin: -40px -70px -92px -115px;
+  }
+}
+
+@media (max-width: 1060px) {
+  .kando-page-f1 .site-header {
+    grid-template-columns: minmax(190px, 1fr) auto minmax(215px, 1fr);
+    padding: 0 20px;
+  }
+
+  .kando-page-f1 .campaign-title {
+    font-size: 19px;
+  }
+
+  .kando-page-f1 .home-link span,
+  .kando-page-f1 .header-divider {
+    display: none;
+  }
+
+  .kando-page-f1 .entry-main {
+    padding-bottom: 45px;
+  }
+
+  .kando-page-f1 .entry-grid {
+    grid-template-columns: minmax(0, 748px);
+    justify-content: center;
+    width: min(748px, calc(100% - 48px));
+    min-height: 0;
+  }
+
+  .kando-page-f1 .visual-column {
+    width: min(620px, 100%);
+    min-height: 0;
+    margin: 52px auto 0;
+  }
+
+  .kando-page-f1 .polaroid-wrap {
+    position: relative;
+    inset: auto;
+    width: min(620px, 100%);
+    margin: 0 auto;
+  }
+
+  .kando-page-f1 .polaroid-frame {
+    height: auto;
+    aspect-ratio: 2 / 3;
+  }
+
+  .kando-page-f1 .polaroid-frame img {
+    object-fit: contain;
+    object-position: center bottom;
+  }
+}
+
+@media (max-width: 820px) {
+  .kando-page-f1 .site-header {
+    grid-template-columns: 1fr auto;
+    grid-template-rows: 65px 35px;
+    height: 101px;
+    padding: 0 18px;
+  }
+
+  .kando-page-f1 .yamaha-logo {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .kando-page-f1 .header-actions {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .kando-page-f1 .campaign-title {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    align-self: start;
+    font-size: 18px;
+  }
+
+  .kando-page-f1 .entry-main {
+    padding-top: 23px;
+  }
+
+  .kando-page-f1 .back-button {
+    margin-left: 20px;
+  }
+
+  .kando-page-f1 .entry-grid {
+    margin-top: 18px;
+  }
+}
+
+@media (max-width: 700px) {
+  .kando-page-f1 .entry-grid {
+    width: calc(100% - 32px);
+  }
+
+  .kando-page-f1 .headline-row {
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .kando-page-f1 h1 {
+    max-width: 330px;
+    font-size: 28px;
+    white-space: normal;
+  }
+
+  .kando-page-f1 .gold-heart {
+    width: 35px;
+    height: 35px;
+  }
+
+  .kando-page-f1 .intro-copy > p {
+    font-size: 16px;
+  }
+
+  .kando-page-f1 .title-flourish span {
+    width: 90px;
+  }
+
+  .kando-page-f1 .entry-form {
+    grid-template-columns: 1fr;
+    row-gap: 21px;
+  }
+
+  .kando-page-f1 .field-full,
+  .kando-page-f1 .privacy-card,
+  .kando-page-f1 .submit-button,
+  .kando-page-f1 .form-status {
+    grid-column: 1;
+  }
+
+  .kando-page-f1 .upload-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .kando-page-f1 .upload-button {
+    min-height: 76px;
+    padding: 11px 16px;
+  }
+
+  .kando-page-f1 .upload-button strong {
+    font-size: 13px;
+  }
+
+  .kando-page-f1 .upload-button small {
+    font-size: 10.5px;
+  }
+
+  .kando-page-f1 .privacy-card {
+    align-items: flex-start;
+    gap: 16px;
+    padding: 19px;
+  }
+
+  .kando-page-f1 .privacy-icon {
+    width: 50px;
+    height: 50px;
+  }
+
+  .kando-page-f1 .privacy-icon svg {
+    width: 38px;
+    height: 38px;
+  }
+
+  .kando-page-f1 .submit-button {
+    grid-template-columns: 31px 1fr 24px;
+    height: 61px;
+    padding: 0 20px;
+    font-size: 13px;
+  }
+
+  .kando-page-f1 .visual-column {
+    min-height: 0;
+    width: min(560px, 100%);
+    margin-top: 38px;
+    padding: 0;
+  }
+
+  .kando-page-f1 .polaroid-wrap {
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .kando-page-f1 .polaroid-frame {
+    height: auto;
+    aspect-ratio: 2 / 3;
+    padding: 0;
+    transform: none;
+  }
+
+  .kando-page-f1 .polaroid-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center bottom;
+  }
+
+  .kando-page-f1 .page-footer {
+    min-height: 0;
+  }
+
+  .kando-page-f1 .footer-inner {
+    width: calc(100% - 34px);
+    min-height: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    padding: 27px 0;
+  }
+
+  .kando-page-f1 .footer-thanks strong {
+    font-size: 20px;
+  }
+
+  .kando-page-f1 .footer-family {
+    gap: 14px;
+  }
+}
+
+@media (max-width: 500px) {
+  .kando-page-f1 .site-header {
+    grid-template-rows: 61px 32px;
+    height: 94px;
+    padding: 0 12px;
+  }
+
+  .kando-page-f1 .yamaha-logo {
+    gap: 2px;
+  }
+
+  .kando-page-f1 .yamaha-emblem {
+    width: 31px;
+    height: 31px;
+  }
+
+  .kando-page-f1 .yamaha-wordmark strong {
+    font-size: 25px;
+  }
+
+  .kando-page-f1 .yamaha-wordmark span {
+    font-size: 11px;
+  }
+
+  .kando-page-f1 .home-link {
+    display: none;
+  }
+
+  .kando-page-f1 .language-picker select {
+    width: 102px;
+    height: 40px;
+    padding: 0 31px 0 14px;
+    font-size: 13px;
+  }
+
+  .kando-page-f1 .language-picker svg {
+    right: 12px;
+  }
+
+  .kando-page-f1 .campaign-title {
+    font-size: 15px;
+  }
+
+  .kando-page-f1 .entry-main {
+    padding-top: 18px;
+    padding-bottom: 28px;
+  }
+
+  .kando-page-f1 .back-button {
+    width: 105px;
+    height: 43px;
+    margin-left: 16px;
+    font-size: 14px;
+  }
+
+  .kando-page-f1 .entry-grid {
+    margin-top: 16px;
+  }
+
+  .kando-page-f1 h1 {
+    max-width: 265px;
+    font-size: 24px;
+  }
+
+  .kando-page-f1 .gold-heart {
+    width: 30px;
+    height: 30px;
+  }
+
+  .kando-page-f1 .title-flourish span {
+    width: 70px;
+  }
+
+  .kando-page-f1 .field input:not([type="file"]) {
+    height: 49px;
+  }
+
+  .kando-page-f1 .privacy-card p {
+    font-size: 12px;
+  }
+
+  .kando-page-f1 .submit-button {
+    padding: 0 17px;
+    font-size: 12px;
+  }
+
+  .kando-page-f1 .visual-column {
+    margin-top: 32px;
+  }
+
+  .kando-page-f1 .polaroid-wrap {
+    width: 100%;
+  }
+
+  .kando-page-f1 .polaroid-frame {
+    aspect-ratio: 2 / 3;
+    padding: 0;
+  }
+
+  .kando-page-f1 .polaroid-frame img {
+    object-fit: contain;
+    object-position: center bottom;
+  }
+
+  .kando-page-f1 .footer-message p {
+    font-size: 13px;
+  }
+
+  .kando-page-f1 .footer-family svg {
+    width: 65px;
+  }
+}

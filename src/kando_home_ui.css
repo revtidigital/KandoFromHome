@@ -1,0 +1,925 @@
+/* ==========================================================================
+   Yamaha Day 2026 — "Kando Space" Home Page Stylesheet
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Dancing+Script:wght@600;700&display=swap');
+
+.kando {
+  --navy-900: #061437;
+  --navy-800: #0a1c4d;
+  --navy-700: #0f2a6b;
+  --navy-600: #163a8f;
+  --navy-500: #1b47b0;
+  --blue-400: #2f6bd8;
+  --purple-800: #3a1d7a;
+  --purple-700: #4a2496;
+  --purple-600: #6a34c9;
+  --gold: #d9a94f;
+  --gold-light: #e9c383;
+  --paper: #ffffff;
+  --paper-soft: #f7f9fd;
+  --ink: #0a1c4d;
+
+  --font-sans: 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-script: 'Dancing Script', 'Segoe Script', cursive;
+
+  font-family: var(--font-sans);
+  color: #fff;
+  background: var(--navy-800);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.kando-script {
+  font-family: var(--font-script);
+  font-weight: 700;
+}
+
+/* ------------------------------- Header ---------------------------------- */
+
+.kd-header {
+  position: relative;
+  z-index: 5;
+  height: 122px;
+  background: #fff;
+  padding: 0;
+  overflow: hidden;
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% 77%,
+    95% 76.5%,
+    90% 75%,
+    85% 73%,
+    80% 70%,
+    75% 67%,
+    70% 64%,
+    65% 61.5%,
+    60% 57%,
+    55% 55%,
+    50% 54%,
+    45% 55%,
+    40% 58%,
+    35% 63%,
+    30% 70%,
+    25% 76%,
+    20% 82%,
+    15% 88%,
+    10% 93%,
+    5% 97%,
+    0 100%
+  );
+}
+
+.kd-header::after {
+  content: none;
+}
+
+.kd-header-inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: none;
+  height: 72px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+/* Logo */
+.kd-logo {
+  display: flex;
+  align-items: center;
+  width: 190px;
+  height: 68px;
+  margin-left: 0;
+  transform: translateY(17px);
+  text-decoration: none;
+}
+
+.kd-logo-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: left center;
+  filter: brightness(0) saturate(100%) invert(16%) sepia(41%) saturate(1967%) hue-rotate(191deg)
+    brightness(83%) contrast(105%);
+}
+
+/* Header right side */
+.kd-header-actions {
+  display: flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 28px;
+  margin-top: 24px;
+}
+
+.kd-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--navy-800);
+  font-size: 17px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.kd-home:hover {
+  color: var(--navy-500);
+}
+
+.kd-home-icon {
+  width: 24px;
+  height: 24px;
+  flex: none;
+}
+
+.kd-lang {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--navy-800);
+  background: #fff;
+  border: 1.6px solid var(--navy-700);
+  border-radius: 999px;
+  padding: 9px 20px;
+  cursor: pointer;
+}
+
+.kd-lang:hover {
+  background: var(--paper-soft);
+}
+
+.kd-chevron {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+
+/* -------------------------------- Hero ----------------------------------- */
+
+.kd-hero {
+  position: relative;
+  margin-top: -56px;
+  background: radial-gradient(120% 90% at 50% 0%, #123078 0%, #0a1c4d 55%, #061437 100%);
+  padding: 60px 0 0;
+  overflow: hidden;
+}
+
+.kd-hero-photo {
+  position: absolute;
+  top: 0;
+  height: 520px;
+  width: 33%;
+  max-width: 500px;
+  object-fit: cover;
+  opacity: 0.78;
+  pointer-events: none;
+  user-select: none;
+}
+
+.kd-hero-photo--left {
+  left: 0;
+  -webkit-mask-image: linear-gradient(to right, #000 45%, transparent 100%);
+  mask-image: linear-gradient(to right, #000 45%, transparent 100%);
+}
+
+.kd-hero-photo--right {
+  right: 0;
+  -webkit-mask-image: linear-gradient(to left, #000 45%, transparent 100%);
+  mask-image: linear-gradient(to left, #000 45%, transparent 100%);
+}
+
+.kd-hero-copy {
+  position: relative;
+  z-index: 2;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 20px;
+  text-align: center;
+}
+
+.kd-title {
+  margin: 0;
+  font-size: clamp(27px, 3.35vw, 48px);
+  white-space: nowrap;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+.kd-title .kando-script {
+  font-size: 1.08em;
+  font-weight: 700;
+}
+
+.kd-title-heart {
+  display: inline-block;
+  width: 0.52em;
+  height: 0.52em;
+  margin-left: 0.1em;
+  color: var(--gold);
+  vertical-align: 0.28em;
+}
+
+.kd-subtitle {
+  margin: 14px 0 0;
+  font-size: clamp(18px, 1.9vw, 26px);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.kd-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 14px auto 0;
+  max-width: 260px;
+}
+
+.kd-divider span {
+  height: 1.5px;
+  flex: 1;
+  background: linear-gradient(to right, transparent, var(--gold-light));
+}
+
+.kd-divider span:last-child {
+  background: linear-gradient(to left, transparent, var(--gold-light));
+}
+
+.kd-divider svg {
+  width: 15px;
+  height: 15px;
+  color: var(--gold);
+}
+
+.kd-heart-solo {
+  width: 26px;
+  height: 26px;
+  color: var(--gold);
+  margin: 12px auto 0;
+}
+
+.kd-hero-note {
+  margin: 8px auto 0;
+  max-width: 400px;
+  font-family: 'Kozuka Gothic Pro', 'Outfit', sans-serif;
+  font-size: 17px;
+  line-height: 1.5;
+  color: #e8eefc;
+  text-wrap: pretty;
+}
+
+/* -------------------------------- Cards ---------------------------------- */
+
+.kd-cards-wrap {
+  position: relative;
+  z-index: 3;
+  margin-top: 34px;
+  padding-bottom: 8px;
+}
+
+.kd-cards {
+  position: relative;
+  max-width: 1330px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 94px;
+  align-items: stretch;
+}
+
+.kd-or {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 4;
+  width: auto;
+  min-width: 72px;
+  height: 72px;
+  padding: 0 12px;
+  border-radius: 36px;
+  background: #fff;
+  color: var(--navy-800);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 30px rgba(3, 10, 35, 0.35);
+}
+
+.kd-card {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  background: #fff;
+  border-radius: 22px;
+  padding: 34px 34px 30px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 26px 60px rgba(3, 10, 35, 0.35);
+  color: var(--ink);
+}
+
+/* soft wave decoration at the bottom of each card */
+.kd-card-wave {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 190px;
+  width: 100%;
+  z-index: 0;
+}
+
+.kd-card > *:not(.kd-card-wave) {
+  position: relative;
+  z-index: 1;
+}
+
+.kd-card-head {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.kd-card-head > div,
+.kd-quote-text {
+  min-width: 0;
+}
+
+.kd-badge {
+  width: 92px;
+  height: 92px;
+  flex: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+.kd-badge svg {
+  width: 44px;
+  height: 44px;
+}
+
+.kd-card--blue .kd-badge {
+  background: linear-gradient(150deg, #1e4bb8 0%, #0e2a76 100%);
+  box-shadow: 0 10px 24px rgba(16, 44, 122, 0.35);
+}
+
+.kd-card--purple .kd-badge {
+  background: linear-gradient(150deg, #7a3ad6 0%, #45208f 100%);
+  box-shadow: 0 10px 24px rgba(84, 40, 160, 0.32);
+}
+
+.kd-card-title {
+  margin: 0;
+  font-size: clamp(20px, 2vw, 29px);
+  font-weight: 700;
+  line-height: 1.16;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+}
+
+.kd-card--blue .kd-card-title {
+  color: var(--navy-700);
+}
+
+.kd-card--purple .kd-card-title {
+  color: var(--purple-700);
+}
+
+.kd-title-rule {
+  width: 74px;
+  height: 3px;
+  border-radius: 2px;
+  margin-top: 12px;
+}
+
+.kd-card--blue .kd-title-rule {
+  background: var(--navy-600);
+}
+
+.kd-card--purple .kd-title-rule {
+  background: var(--purple-600);
+}
+
+.kd-card-desc {
+  margin: 30px 0 0;
+  text-align: center;
+  font-size: 17px;
+  line-height: 1.45;
+  color: #16224a;
+  text-wrap: pretty;
+}
+
+/* feature row */
+.kd-features {
+  margin: 30px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.kd-features li {
+  padding: 0 14px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  font-size: 14.5px;
+  line-height: 1.32;
+  color: #1a2550;
+}
+
+.kd-features li + li {
+  border-left: 1px solid #dfe4f2;
+}
+
+.kd-features svg {
+  width: 44px;
+  height: 44px;
+}
+
+.kd-card--blue .kd-features svg {
+  color: var(--navy-600);
+}
+
+.kd-card--purple .kd-features svg {
+  color: var(--purple-600);
+}
+
+/* button */
+.kd-cta {
+  margin-top: auto;
+  padding-top: 34px;
+  display: flex;
+  justify-content: center;
+}
+
+.kd-btn {
+  width: 100%;
+  min-width: 0;
+  max-width: 330px;
+  border: 0;
+  border-radius: 999px;
+  padding: 17px 26px;
+  color: #fff;
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.kd-btn svg {
+  width: 17px;
+  height: 17px;
+}
+
+.kd-btn:hover {
+  transform: translateY(-2px);
+}
+
+.kd-btn--blue {
+  background: linear-gradient(100deg, #12327f 0%, #1d49ad 55%, #12327f 100%);
+  box-shadow: 0 12px 26px rgba(18, 50, 127, 0.4);
+}
+
+.kd-btn--purple {
+  background: linear-gradient(100deg, #3c1d80 0%, #6a34c9 55%, #3c1d80 100%);
+  box-shadow: 0 12px 26px rgba(60, 29, 128, 0.4);
+}
+
+/* ------------------------------ Quote band -------------------------------- */
+
+.kd-quote {
+  background: linear-gradient(180deg, #071640 0%, #0a1d4e 100%);
+  padding: 26px 24px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+  flex-wrap: wrap;
+}
+
+.kd-quote-icon {
+  width: 72px;
+  height: 50px;
+  color: var(--gold);
+  flex: none;
+}
+
+.kd-quote-text {
+  text-align: center;
+}
+
+.kd-quote-text p {
+  margin: 0;
+  font-family: var(--font-script);
+  font-weight: 600;
+  font-style: italic;
+  font-size: clamp(20px, 2.2vw, 31px);
+  color: var(--gold-light);
+  letter-spacing: 0.01em;
+}
+
+.kd-quote-text p svg {
+  display: inline-block;
+  width: 0.62em;
+  height: 0.62em;
+  margin-left: 0.24em;
+  color: var(--gold);
+  vertical-align: 0.02em;
+}
+
+.kd-quote-rule {
+  margin: 8px auto 0;
+  height: 1.5px;
+  width: 74%;
+  background: linear-gradient(to right, transparent, rgba(217, 169, 79, 0.85), transparent);
+}
+
+/* -------------------------------- Footer --------------------------------- */
+
+.kd-footer {
+  background: #0d235c;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+  font-size: 15.5px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: #eef2fd;
+}
+
+.kd-footer-sep {
+  width: 1px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.kd-footer svg {
+  width: 22px;
+  height: 22px;
+  color: #c9d6f7;
+}
+
+/* ------------------------------ Responsive ------------------------------- */
+
+@media (max-width: 1180px) {
+  .kd-cards {
+    gap: 86px;
+  }
+
+  .kd-card {
+    padding: 30px 26px 28px;
+  }
+
+  .kd-card-head {
+    gap: 18px;
+  }
+
+  .kd-badge {
+    width: 80px;
+    height: 80px;
+  }
+
+  .kd-features li {
+    padding: 0 8px;
+  }
+}
+
+@media (max-width: 980px) {
+  .kd-cards {
+    grid-template-columns: 1fr;
+    gap: 0;
+    max-width: 720px;
+  }
+
+  .kd-card--blue {
+    grid-row: 1;
+  }
+
+  .kd-or {
+    position: relative;
+    top: auto;
+    left: auto;
+    grid-row: 2;
+    justify-self: center;
+    transform: none;
+    width: auto;
+    min-width: 64px;
+    height: 64px;
+    padding: 0 12px;
+    margin: 20px 0;
+    font-size: 18px;
+  }
+
+  .kd-card--purple {
+    grid-row: 3;
+  }
+
+  .kd-hero-photo {
+    width: 55%;
+    height: 440px;
+    opacity: 0.4;
+  }
+}
+
+@media (max-width: 720px) {
+  .kd-header {
+    height: 98px;
+  }
+
+  .kd-header-inner {
+    height: 60px;
+  }
+
+  .kd-header-inner {
+    padding: 0 18px;
+    gap: 14px;
+  }
+
+  .kd-logo {
+    width: 168px;
+    height: 57px;
+    margin-left: 0;
+    transform: translateY(14px);
+  }
+
+  .kd-header-actions {
+    gap: 14px;
+    margin-top: 20px;
+  }
+
+  .kd-home,
+  .kd-lang {
+    font-size: 15px;
+  }
+
+  .kd-lang {
+    gap: 10px;
+    padding: 8px 14px;
+  }
+
+  .kd-hero {
+    margin-top: -45px;
+    padding-top: 51px;
+  }
+
+  .kd-quote-text p {
+    white-space: normal;
+    overflow-wrap: break-word;
+  }
+}
+
+@media (max-width: 640px) {
+  .kd-title {
+    white-space: normal;
+  }
+
+  .kd-card {
+    padding: 26px 20px 24px;
+  }
+
+  .kd-card-head {
+    flex-direction: column;
+    text-align: center;
+    gap: 14px;
+  }
+
+  .kd-title-rule {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .kd-features {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+
+  .kd-features li + li {
+    border-left: 0;
+    border-top: 1px solid #dfe4f2;
+    padding-top: 20px;
+  }
+
+  .kd-footer {
+    gap: 14px;
+    font-size: 13px;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 520px) {
+  .kd-header {
+    height: 120px;
+    padding: 0;
+    clip-path: polygon(
+      0 0,
+      100% 0,
+      100% 94%,
+      90% 93%,
+      80% 92%,
+      70% 90%,
+      60% 87%,
+      50% 86%,
+      40% 87%,
+      30% 91%,
+      20% 95%,
+      10% 98%,
+      0 100%
+    );
+  }
+
+  .kd-header-inner {
+    height: 104px;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 3px;
+    padding: 0 12px;
+  }
+
+  .kd-logo {
+    width: 150px;
+    height: 51px;
+    margin-top: 5px;
+    margin-left: 0;
+    transform: none;
+  }
+
+  .kd-header-actions {
+    width: 100%;
+    justify-content: center;
+    gap: 18px;
+    margin-top: 1px;
+    align-self: auto;
+  }
+
+  .kd-home,
+  .kd-lang {
+    font-size: 14px;
+  }
+
+  .kd-lang {
+    padding: 7px 12px;
+  }
+
+  .kd-hero {
+    margin-top: -17px;
+    padding-top: 39px;
+  }
+
+  .kd-hero-photo {
+    width: 100%;
+    height: 340px;
+    opacity: 0.22;
+  }
+
+  .kd-hero-copy {
+    padding: 0 16px;
+  }
+
+  .kd-title {
+    font-size: clamp(25px, 8vw, 34px);
+    line-height: 1.18;
+  }
+
+  .kd-subtitle {
+    margin-top: 10px;
+  }
+
+  .kd-divider {
+    margin-top: 10px;
+  }
+
+  .kd-heart-solo {
+    margin-top: 9px;
+  }
+
+  .kd-hero-note {
+    font-size: 15px;
+  }
+
+  .kd-cards-wrap {
+    margin-top: 26px;
+  }
+
+  .kd-cards {
+    padding: 0 14px;
+  }
+
+  .kd-or {
+    width: auto;
+    min-width: 56px;
+    height: 56px;
+    padding: 0 10px;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+
+  .kd-card {
+    border-radius: 18px;
+    padding: 24px 16px 22px;
+  }
+
+  .kd-badge {
+    width: 72px;
+    height: 72px;
+  }
+
+  .kd-card-title {
+    font-size: 20px;
+  }
+
+  .kd-card-desc {
+    margin-top: 22px;
+    font-size: 15px;
+  }
+
+  .kd-features {
+    margin-top: 24px;
+  }
+
+  .kd-btn {
+    padding: 14px 18px;
+    font-size: 14px;
+    gap: 10px;
+  }
+
+  .kd-quote {
+    padding: 22px 16px 24px;
+    gap: 12px;
+  }
+
+  .kd-quote-icon {
+    width: 58px;
+    height: 42px;
+  }
+
+  .kd-footer {
+    padding: 16px 14px;
+    column-gap: 10px;
+    row-gap: 8px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 360px) {
+  .kd-header-actions {
+    gap: 12px;
+  }
+
+  .kd-home svg {
+    width: 21px;
+    height: 21px;
+  }
+
+  .kd-lang {
+    gap: 7px;
+    padding: 6px 10px;
+  }
+
+  .kd-card {
+    padding-left: 13px;
+    padding-right: 13px;
+  }
+
+  .kd-footer-sep {
+    display: none;
+  }
+
+  .kd-footer {
+    flex-direction: column;
+  }
+}

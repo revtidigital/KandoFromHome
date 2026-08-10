@@ -19,7 +19,20 @@ export interface Translations {
   chooseLanguage: string;
   enterSite: string;
   footerQuote: string;
-  
+
+  // Thank You (Form 1)
+  ty1Title: string;
+  ty1Lead: string;
+  ty1CopyLine1: string;
+  ty1CopyLine2: string;
+  ty1NoteText: string;
+  ty1Keep: string;
+  ty1Together: string;
+  ty1Card1Title: string;
+  ty1Card1Text: string;
+  ty1Card2Title: string;
+  ty1Card2Text: string;
+
   // Home Page
   homeHeroTitle: string;
   homeHeroDesc: string;
@@ -41,10 +54,17 @@ export interface Translations {
   chooseSubmissionFormTitle: string;
   chooseSubmissionFormDesc: string;
   form1Badge: string;
+  form1Step1: string;
+  form1Step2: string;
+  form1Step3: string;
   form1CardTitle: string;
   form1CardDesc: string;
   form1CardBtn: string;
   form2Badge: string;
+  form2Step1: string;
+  form2Step2: string;
+  form2Step3: string;
+  orDivider: string;
   form2CardTitle: string;
   form2CardDesc: string;
   form2CardBtn: string;
@@ -174,6 +194,7 @@ export interface Translations {
   consentPrivacyLink: string;
   privacyNoteTitle: string;
   form1PrivacyNoteBody: string;
+  form1SubmitBtn: string;
   form1MediaConsentText: string;
   form1ThankYouTitle: string;
   form1ThankYouBody: string;
@@ -213,6 +234,19 @@ export const translations: Record<Language, Translations> = {
     enterSite: "ENTER SITE >",
     footerQuote: "Behind every Yamaha action is a family that inspires it.",
 
+    // Thank You (Form 1)
+    ty1Title: "THANK YOU!",
+    ty1Lead: "Your Kando entry has been received.",
+    ty1CopyLine1: "Your moment of love, pride and togetherness",
+    ty1CopyLine2: "means a lot to us.",
+    ty1NoteText: "We will review your entry and may reach out if we need any additional information.",
+    ty1Keep: "Keep creating beautiful Kando Moments!",
+    ty1Together: "Together, we inspire.",
+    ty1Card1Title: "What's next?",
+    ty1Card1Text: "Stay tuned! We will share the highlights of your Kando Moments soon.",
+    ty1Card2Title: "Spread the Kando!",
+    ty1Card2Text: "Encourage your colleagues to create and share their Kando Moments too.",
+
     // Home
     homeHeroTitle: "Celebrate Yamaha Day 2026 at Home",
     homeHeroDesc: "Kando is a Japanese word for the simultaneous feelings of deep satisfaction and intense excitement that we experience when we encounter something of exceptional value. Build your DIY kit with your loved ones, share your creation, and join thousands of Yamaha families across India!",
@@ -233,20 +267,27 @@ export const translations: Record<Language, Translations> = {
     // Home Cards
     chooseSubmissionFormTitle: "Choose Your Submission Form",
     chooseSubmissionFormDesc: "Form 1 and Form 2 are independent. You can submit either or both forms for Yamaha Day 2026.",
-    form1Badge: "FORM 1 SUBMISSION",
+    form1Badge: "SUBMIT YOUR KANDO ENTRY",
     form1CardTitle: "DIY Kit Creation & Photos",
-    form1CardDesc: "Fill your employee details, upload up to 2 high-quality photos (Max 10MB each) of your assembled Family Day DIY Kit, and share your CEO reflection text.",
-    form1CardBtn: "Open & Fill Form 1 →",
-    form2Badge: "FORM 2 SUBMISSION",
+    form1CardDesc: "Share your family's Kando Moment with us.",
+    form1CardBtn: "SUBMIT ENTRY →",
+    form1Step1: "Create your Kando display at home",
+    form1Step2: "Click a family photo",
+    form1Step3: "Upload and share your Kando Moment",
+    form2Badge: "CHAIRMAN INVITES YOUR THOUGHTS",
     form2CardTitle: "Family Kando Video Submission",
-    form2CardDesc: "Authenticate your Employee ID and upload 1 family video (Max 40MB) showcasing your family's creation in action and sharing your special Kando moment.",
-    form2CardBtn: "Open & Fill Form 2 →",
+    form2CardDesc: "Share your ideas and suggestions. Your thoughts help us to grow better, together.",
+    form2CardBtn: "SHARE YOUR THOUGHTS →",
+    form2Step1: "Share your thoughts",
+    form2Step2: "Ideas for a better Yamaha",
+    form2Step3: "Together, we build the future",
+    orDivider: "OR",
 
     // Form 1 & Form 2 Fields
-    form1Title: "Form 1: Personal Details & Media Upload",
-    form1Subtitle: "Please fill out all mandatory fields and attach high-quality media of your completed DIY creation.",
+    form1Title: "SUBMIT YOUR KANDO ENTRY",
+    form1Subtitle: "Share your family's kando moment with us.",
     fullName: "Employee Full Name",
-    empId: "Employee ID",
+    empId: "Employee EIN",
     officialEmail: "Official Email Address",
     phoneNumber: "Mobile Phone Number",
     cityLocation: "City / Plant Location",
@@ -334,11 +375,11 @@ export const translations: Record<Language, Translations> = {
 
     // Section Headings & Upload Labels
     sec1EmployeeDetailsTitle: "1. Employee & Family Details",
-    sec2UploadPhotosTitle: "2. Upload Photos (Max 2 Photos, Max 10MB each)",
-    sec2UploadPhotosDesc: "Upload up to 2 high-resolution photos of your family Kando DIY Wall (All image formats supported).",
+    sec2UploadPhotosTitle: "2. Upload Photos (Max 2 Photos and 1 Video, Max 50MB)",
+    sec2UploadPhotosDesc: "Upload up to 2 high-resolution photos and video of your family Kando DIY Wall (All formats supported).",
     photo1Label: "Photo 1 (Required, Max 5MB) *",
     photo2Label: "Photo 2 (Required, Max 5MB) *",
-    sec2UploadVideoTitle: "Upload Kando Video (Required, Max 40MB) *",
+    sec2UploadVideoTitle: "Kando Video(Required, Max 40MB) *",
     sec2UploadVideoDesc: "Upload 1 video of your family making the DIY Craft Wall (MP4, WEBM, MOV, etc. Max 40MB limit).",
 
     // Validation Error Messages
@@ -366,6 +407,7 @@ export const translations: Record<Language, Translations> = {
     consentPrivacyLink: "Privacy Policy",
     privacyNoteTitle: "Your privacy matters.",
     form1PrivacyNoteBody: "Your information, photos and video will be used only for Yamaha Day 2026 activities and will not be shared outside the organization.",
+    form1SubmitBtn: "Submit DIY Kando Kit",
     form1MediaConsentText: "I grant Yamaha permission to feature my submission photos in internal publications.",
     form1ThankYouTitle: "Thank you!",
     form1ThankYouBody: "We can't wait to see your Kando Moment.",
@@ -404,6 +446,19 @@ export const translations: Record<Language, Translations> = {
     enterSite: "साइट में प्रवेश करें >",
     footerQuote: "यामाहा के हर कार्य के पीछे एक परिवार है जो इसे प्रेरित करता है।",
 
+    // Thank You (Form 1)
+    ty1Title: "धन्यवाद!",
+    ty1Lead: "आपकी कांदो एंट्री प्राप्त हो गई है।",
+    ty1CopyLine1: "प्यार, गर्व और एकजुटता का आपका यह पल",
+    ty1CopyLine2: "हमारे लिए बहुत मायने रखता है।",
+    ty1NoteText: "हम आपकी एंट्री की समीक्षा करेंगे और यदि किसी अतिरिक्त जानकारी की आवश्यकता हुई तो संपर्क कर सकते हैं।",
+    ty1Keep: "खूबसूरत कांदो मोमेंट्स बनाते रहें!",
+    ty1Together: "साथ मिलकर, हम प्रेरित करते हैं।",
+    ty1Card1Title: "आगे क्या?",
+    ty1Card1Text: "बने रहें! हम जल्द ही आपके कांदो मोमेंट्स की झलकियां साझा करेंगे।",
+    ty1Card2Title: "कांदो को फैलाएं!",
+    ty1Card2Text: "अपने सहयोगियों को भी अपने कांदो मोमेंट्स बनाने और साझा करने के लिए प्रोत्साहित करें।",
+
     // Home
     homeHeroTitle: "घर पर मनाएं यामाहा डे 2026",
     homeHeroDesc: "कांदो (Kando) एक जापानी शब्द है जिसका अर्थ है गहरा संतोष और उत्साह। अपने प्रियजनों के साथ DIY किट बनाएं, अपनी रचना साझा करें, और भारत भर के हजारों यामाहा परिवारों से जुड़ें!",
@@ -424,20 +479,27 @@ export const translations: Record<Language, Translations> = {
     // Home Cards
     chooseSubmissionFormTitle: "अपना सबमिशन फॉर्म चुनें",
     chooseSubmissionFormDesc: "फॉर्म 1 और फॉर्म 2 स्वतंत्र हैं। आप यामाहा डे 2026 के लिए इनमें से कोई भी या दोनों फॉर्म जमा कर सकते हैं।",
-    form1Badge: "फॉर्म 1 सबमिशन",
+    form1Badge: "अपनी कांदो एंट्री सबमिट करें",
     form1CardTitle: "DIY किट निर्माण और तस्वीरें",
-    form1CardDesc: "अपने कर्मचारी विवरण भरें, अपनी फैमिली डे DIY किट की अधिकतम 2 उच्च-गुणवत्ता वाली तस्वीरें (प्रत्येक अधिकतम 10MB) अपलोड करें, और अपने सीईओ विचार पाठ साझा करें।",
-    form1CardBtn: "फॉर्म 1 खोलें और भरें →",
-    form2Badge: "फॉर्म 2 सबमिशन",
+    form1CardDesc: "अपने परिवार का कांदो मोमेंट हमारे साथ साझा करें।",
+    form1CardBtn: "एंट्री सबमिट करें →",
+    form1Step1: "अपने घर पर कांदो डिस्प्ले बनाएं",
+    form1Step2: "एक पारिवारिक फोटो क्लिक करें",
+    form1Step3: "अपलोड करें और अपना कांदो मोमेंट साझा करें",
+    form2Badge: "चेयरमैन आपके विचार आमंत्रित करते हैं",
     form2CardTitle: "फैमिली कांदो वीडियो सबमिशन",
-    form2CardDesc: "अपनी कर्मचारी आईडी सत्यापित करें और अपने परिवार की रचना और विशेष कांदो क्षण प्रदर्शित करने वाला 1 पारिवारिक वीडियो (अधिकतम 40MB) अपलोड करें।",
-    form2CardBtn: "फॉर्म 2 खोलें और भरें →",
+    form2CardDesc: "अपने विचार और सुझाव साझा करें। आपके विचार हमें और बेहतर बनने में मदद करते हैं।",
+    form2CardBtn: "अपने विचार साझा करें →",
+    form2Step1: "अपने विचार साझा करें",
+    form2Step2: "एक बेहतर यामाहा के लिए विचार",
+    form2Step3: "साथ मिलकर, हम भविष्य का निर्माण करते हैं",
+    orDivider: "या",
 
     // Form 1
-    form1Title: "फॉर्म 1: व्यक्तिगत विवरण और मीडिया अपलोड",
-    form1Subtitle: "कृपया सभी अनिवार्य फ़ील्ड भरें और अपनी पूर्ण DIY रचना के उच्च-गुणवत्ता वाले मीडिया संलग्न करें।",
+    form1Title: "अपनी कांदो एंट्री सबमिट करें",
+    form1Subtitle: "अपने परिवार का कांदो पल हमारे साथ साझा करें।",
     fullName: "कर्मचारी का पूरा नाम",
-    empId: "कर्मचारी आईडी",
+    empId: "कर्मचारी EIN",
     officialEmail: "आधिकारिक ईमेल पता",
     phoneNumber: "मोबाइल फोन नंबर",
     cityLocation: "शहर / प्लांट स्थान",
@@ -557,6 +619,7 @@ export const translations: Record<Language, Translations> = {
     consentPrivacyLink: "गोपनीयता नीति",
     privacyNoteTitle: "आपकी गोपनीयता मायने रखती है।",
     form1PrivacyNoteBody: "आपकी जानकारी, तस्वीरें और वीडियो केवल यामाहा डे 2026 गतिविधियों के लिए उपयोग की जाएंगी और संगठन के बाहर साझा नहीं की जाएंगी।",
+    form1SubmitBtn: "DIY कांदो किट सबमिट करें",
     form1MediaConsentText: "मैं यामाहा को आंतरिक प्रकाशनों में अपनी सबमिशन तस्वीरें प्रदर्शित करने की अनुमति देता हूं।",
     form1ThankYouTitle: "धन्यवाद!",
     form1ThankYouBody: "हमें आपके कांदो पल को देखने का इंतज़ार है।",
@@ -595,6 +658,19 @@ export const translations: Record<Language, Translations> = {
     enterSite: "தளத்திற்குள் செல்லவும் >",
     footerQuote: "ஒவ்வொரு யமஹா செயலின் பின்னாலும் அதை ஊக்குவிக்கும் ஒரு குடும்பம் உள்ளது.",
 
+    // Thank You (Form 1)
+    ty1Title: "நன்றி!",
+    ty1Lead: "உங்கள் காண்டோ எண்ட்ரி பெறப்பட்டது.",
+    ty1CopyLine1: "அன்பு, பெருமை மற்றும் ஒற்றுமையின் இந்த தருணம்",
+    ty1CopyLine2: "எங்களுக்கு மிகவும் முக்கியமானது.",
+    ty1NoteText: "உங்கள் எண்ட்ரியை நாங்கள் மதிப்பாய்வு செய்வோம், கூடுதல் தகவல் தேவைப்பட்டால் தொடர்பு கொள்ளலாம்.",
+    ty1Keep: "அழகான காண்டோ தருணங்களை உருவாக்கிக் கொண்டே இருங்கள்!",
+    ty1Together: "ஒன்றாக, நாம் ஊக்குவிக்கிறோம்.",
+    ty1Card1Title: "அடுத்து என்ன?",
+    ty1Card1Text: "எதிர்பாருங்கள்! உங்கள் காண்டோ தருணங்களின் சிறப்பம்சங்களை விரைவில் பகிர்வோம்.",
+    ty1Card2Title: "காண்டோவைப் பரப்புங்கள்!",
+    ty1Card2Text: "உங்கள் சக ஊழியர்களையும் அவர்களின் காண்டோ தருணங்களை உருவாக்கி பகிர ஊக்குவியுங்கள்.",
+
     // Home
     homeHeroTitle: "வீட்டில் யமஹா டே 2026 ஐக் கொண்டாடுங்கள்",
     homeHeroDesc: "காண்டோ (Kando) என்பது ஜப்பானிய வார்த்தை, இது மிகுந்த திருப்தியையும் உற்சாகத்தையும் குறிக்கிறது. உங்கள் குடும்பத்துடன் DIY கிட் உருவாக்கி யமஹா குடும்பங்களுடன் இணையுங்கள்!",
@@ -615,20 +691,27 @@ export const translations: Record<Language, Translations> = {
     // Home Cards
     chooseSubmissionFormTitle: "உங்கள் சமர்ப்பிப்பு படிவத்தைத் தேர்ந்தெடுக்கவும்",
     chooseSubmissionFormDesc: "படிவம் 1 மற்றும் படிவம் 2 ஆகியவை தனித்தனி. இரண்டையும் அல்லது ஒன்றினைச் சமர்ப்பிக்கலாம்.",
-    form1Badge: "படிவம் 1 சமர்ப்பிப்பு",
+    form1Badge: "உங்கள் காண்டோ பதிவை சமர்ப்பிக்கவும்",
     form1CardTitle: "DIY கிட் உருவாக்கம் & புகைப்படங்கள்",
-    form1CardDesc: "உங்கள் விவரங்களை நிரப்பி, 2 புகைப்படங்கள் (அதிகபட்சம் 10MB) மற்றும் சிஇஓ சிந்தனையைப் பகிரவும்.",
-    form1CardBtn: "படிவம் 1 ஐத் திறந்து நிரப்பவும் →",
-    form2Badge: "படிவம் 2 சமர்ப்பிப்பு",
+    form1CardDesc: "உங்கள் குடும்பத்தின் காண்டோ தருணத்தை எங்களுடன் பகிரவும்.",
+    form1CardBtn: "பதிவை சமர்ப்பிக்கவும் →",
+    form1Step1: "வீட்டில் உங்கள் காண்டோ காட்சியை உருவாக்குங்கள்",
+    form1Step2: "ஒரு குடும்ப புகைப்படத்தை எடுக்கவும்",
+    form1Step3: "பதிவேற்றி உங்கள் காண்டோ தருணத்தைப் பகிரவும்",
+    form2Badge: "தலைவர் உங்கள் எண்ணங்களை அழைக்கிறார்",
     form2CardTitle: "குடும்ப காண்டோ வீடியோ சமர்ப்பிப்பு",
-    form2CardDesc: "பணியாளர் ஐடியை சரிபார்த்து 1 குடும்ப வீடியோவை (அதிகபட்சம் 40MB) பதிவேற்றவும்.",
-    form2CardBtn: "படிவம் 2 ஐத் திறந்து நிரப்பவும் →",
+    form2CardDesc: "உங்கள் யோசனைகள் மற்றும் பரிந்துரைகளைப் பகிரவும். உங்கள் எண்ணங்கள் நாங்கள் இணைந்து சிறப்பாக வளர உதவுகின்றன.",
+    form2CardBtn: "உங்கள் எண்ணங்களைப் பகிரவும் →",
+    form2Step1: "உங்கள் எண்ணங்களைப் பகிரவும்",
+    form2Step2: "சிறந்த யமஹாவுக்கான யோசனைகள்",
+    form2Step3: "ஒன்றாக, நாம் எதிர்காலத்தை உருவாக்குகிறோம்",
+    orDivider: "அல்லது",
 
     // Form 1
-    form1Title: "படிவம் 1: தனிப்பட்ட விவரங்கள் & ஊடகப் பதிவேற்றம்",
-    form1Subtitle: "தேவையான விவரங்களை நிரப்பி உங்கள் படைப்பின் படங்களை பதிவேற்றவும்.",
+    form1Title: "உங்கள் காண்டோ பதிவை சமர்ப்பிக்கவும்",
+    form1Subtitle: "உங்கள் குடும்பத்தின் காண்டோ தருணத்தை எங்களுடன் பகிரவும்.",
     fullName: "பணியாளர் முழுப் பெயர்",
-    empId: "பணியாளர் ஐடி",
+    empId: "பணியாளர் EIN",
     officialEmail: "அதிகாரப்பூர்வ மின்னஞ்சல்",
     phoneNumber: "கைபேசி எண்",
     cityLocation: "நகரம் / ஆலை இருப்பிடம்",
@@ -748,6 +831,7 @@ export const translations: Record<Language, Translations> = {
     consentPrivacyLink: "தனியுரிமைக் கொள்கை",
     privacyNoteTitle: "உங்கள் தனியுரிமை முக்கியம்.",
     form1PrivacyNoteBody: "உங்கள் தகவல், படங்கள் மற்றும் வீடியோ யமஹா டே 2026 நடவடிக்கைகளுக்காக மட்டுமே பயன்படுத்தப்படும், நிறுவனத்திற்கு வெளியே பகிரப்படாது.",
+    form1SubmitBtn: "DIY காண்டோ கிட் சமர்ப்பிக்கவும்",
     form1MediaConsentText: "எனது சமர்ப்பிப்பு படங்களை உள் வெளியீடுகளில் காட்ட யமஹாவுக்கு அனுமதி வழங்குகிறேன்.",
     form1ThankYouTitle: "நன்றி!",
     form1ThankYouBody: "உங்கள் காண்டோ தருணத்தைப் பார்க்க காத்திருக்கிறோம்.",

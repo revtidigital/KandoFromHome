@@ -1,7 +1,5 @@
 import React from 'react';
 import { AppProvider, useApp } from './context/AppContext';
-import { Header } from './components/Header';
-import { Footer } from './components/Footer';
 import { LandingPage } from './pages/LandingPage';
 import { HomePage } from './pages/HomePage';
 import { Form1Page } from './pages/Form1Page';
@@ -16,44 +14,30 @@ import { AdminDashboardPage } from './pages/AdminDashboardPage';
 const MainRouter: React.FC = () => {
   const { currentView, isAdminLoggedIn } = useApp();
 
-  const renderView = () => {
-    switch (currentView) {
-      case 'landing':
-        return <LandingPage />;
-      case 'home':
-        return <HomePage />;
-      case 'form1':
-        return <Form1Page />;
-      case 'thankyou1':
-        return <ThankYou1Page />;
-      case 'form2':
-        return <Form2Page />;
-      case 'thankyou2':
-        return <ThankYou2Page />;
-      case 'privacy':
-        return <PrivacyPolicyPage />;
-      case 'terms':
-        return <TermsConditionsPage />;
-      case 'admin-login':
-        return <AdminLoginPage />;
-      case 'admin-dashboard':
-        return isAdminLoggedIn ? <AdminDashboardPage /> : <AdminLoginPage />;
-      default:
-        return <LandingPage />;
-    }
-  };
-
-  const isFooterDisabled = currentView === 'landing' || currentView === 'admin-dashboard' || currentView === 'admin-login';
-
-  return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Header />
-      <main style={{ flex: 1 }}>
-        {renderView()}
-      </main>
-      {!isFooterDisabled && <Footer />}
-    </div>
-  );
+  switch (currentView) {
+    case 'landing':
+      return <LandingPage />;
+    case 'home':
+      return <HomePage />;
+    case 'form1':
+      return <Form1Page />;
+    case 'thankyou1':
+      return <ThankYou1Page />;
+    case 'form2':
+      return <Form2Page />;
+    case 'thankyou2':
+      return <ThankYou2Page />;
+    case 'privacy':
+      return <PrivacyPolicyPage />;
+    case 'terms':
+      return <TermsConditionsPage />;
+    case 'admin-login':
+      return <AdminLoginPage />;
+    case 'admin-dashboard':
+      return isAdminLoggedIn ? <AdminDashboardPage /> : <AdminLoginPage />;
+    default:
+      return <LandingPage />;
+  }
 };
 
 export function App() {

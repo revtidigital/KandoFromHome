@@ -97,8 +97,8 @@
 }
 
 .kando-page-f2 .f2-brand-image {
-  width: clamp(175px, 15vw, 205px);
-  height: auto;
+  height: 48px;
+  width: auto;
   object-fit: contain;
 }
 
@@ -106,7 +106,7 @@
   margin: 0;
   color: var(--navy);
   font-size: clamp(20px, 1.75vw, 29px);
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.025em;
   line-height: 1.1;
   text-align: center;
@@ -126,7 +126,7 @@
   gap: 9px;
   color: var(--navy);
   font-size: 17px;
-  font-weight: 600;
+  font-weight: 500;
   text-decoration: none;
   cursor: pointer;
 }
@@ -143,7 +143,7 @@
   align-items: center;
   font-family: "Montserrat", system-ui, sans-serif;
   font-size: 17px;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.25;
   color: var(--navy);
   background: #fff;
@@ -204,7 +204,7 @@
   background: rgba(255, 255, 255, 0.92);
   box-shadow: 0 4px 12px rgba(18, 63, 143, 0.06);
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 500;
   text-decoration: none;
   cursor: pointer;
 }
@@ -231,7 +231,7 @@
   margin: 0;
   color: var(--navy);
   font-size: clamp(34px, 3vw, 48px);
-  font-weight: 900;
+  font-weight: 800;
   letter-spacing: 0.006em;
   line-height: 1;
 }
@@ -260,7 +260,7 @@
   color: var(--navy);
   font-family: 'Kozuka Gothic Pro', 'Outfit', sans-serif;
   font-size: clamp(15px, 1.35vw, 18px);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 /* ========================== Form ========================== */
@@ -296,7 +296,7 @@
   gap: 10px;
   color: var(--navy);
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.25;
 }
 
@@ -370,7 +370,7 @@
   margin: 4px 0 0 2px;
   font-size: 12px;
   color: #b42318;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .kando-page-f2 .thoughts__icon {
@@ -380,7 +380,7 @@
 .kando-page-f2 .thoughts__title {
   display: block;
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .kando-page-f2 .thoughts__description {
@@ -388,7 +388,7 @@
   max-width: 610px;
   margin-top: 2px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 1.35;
 }
 
@@ -419,7 +419,7 @@
   background: rgba(18, 63, 143, 0.02);
   color: var(--muted);
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 400;
   transition: border-color 180ms ease, background 180ms ease;
 }
 
@@ -469,13 +469,13 @@
 .kando-page-f2 .consent-text {
   color: var(--navy);
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 1.55;
 }
 
 .kando-page-f2 .consent-text a {
   color: var(--navy-deep);
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: underline;
 }
 
@@ -490,7 +490,7 @@
   background: rgba(180, 35, 24, 0.06);
   color: #b42318;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
   margin-bottom: 20px;
 }
 
@@ -520,17 +520,17 @@
 .kando-page-f2 .submit {
   width: 100%;
   min-height: 59px;
-  padding: 0 18px 0 27px;
+  padding: 12px 18px 12px 27px;
   display: flex;
   align-items: center;
   gap: 14px;
   border: 0;
-  border-radius: 999px;
+  border-radius: 30px;
   color: var(--white);
   background: linear-gradient(90deg, #0d43a5 0%, #113d8b 100%);
   box-shadow: var(--shadow-button);
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.012em;
   cursor: pointer;
   transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
@@ -554,7 +554,8 @@
 .kando-page-f2 .submit__text {
   flex: 1;
   text-align: center;
-  white-space: nowrap;
+  white-space: normal;
+  line-height: 1.25;
 }
 
 .kando-page-f2 .submit__arrow {
@@ -590,7 +591,7 @@
   margin: 1px 0 0;
   color: var(--navy);
   font-size: 12.5px;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 1.43;
 }
 
@@ -598,7 +599,7 @@
   display: block;
   margin-bottom: 1px;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 /* ======================= Message card ======================= */
@@ -626,7 +627,7 @@
   color: #0c429b;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 83px;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 0.75;
 }
 
@@ -634,7 +635,7 @@
   margin: 10px 0 0;
   color: var(--navy);
   font-size: clamp(18px, 1.5vw, 22px);
-  font-weight: 650;
+  font-weight: 550;
   line-height: 1.35;
 }
 
@@ -663,7 +664,7 @@
   margin: 0;
   color: var(--navy);
   font-size: clamp(16px, 1.28vw, 19px);
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.45;
 }
 
@@ -734,7 +735,7 @@
   margin: 0;
   color: #ffffff;
   font-size: 17px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.015em;
   white-space: nowrap;
 }
@@ -745,7 +746,7 @@
   border-top: 1px solid rgba(255, 255, 255, 0.58);
   color: #ffffff;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 400;
   white-space: nowrap;
 }
 
@@ -782,7 +783,6 @@
     grid-template-columns: auto 1fr auto;
     min-height: 82px;
   }
-  .kando-page-f2 .f2-brand-image { width: 165px; }
   .kando-page-f2 .f2-header-title { font-size: 20px; }
   .kando-page-f2 .f2-header-home span,
   .kando-page-f2 .f2-header-divider { display: none; }
@@ -875,7 +875,6 @@
 
 @media (max-width: 640px) {
   .kando-page-f2 .f2-header-inner { padding-inline: 16px; }
-  .kando-page-f2 .f2-brand-image { width: 145px; }
   .kando-page-f2 .f2-header-home { padding: 8px; }
   .kando-page-f2 .lang-picker select {
     min-height: 40px;
@@ -912,7 +911,6 @@
 }
 
 @media (max-width: 420px) {
-  .kando-page-f2 .f2-brand-image { width: 124px; }
   .kando-page-f2 .f2-header-home { display: none; }
   .kando-page-f2 .f2-header-title { font-size: 16px; }
   .kando-page-f2 .titles__main { font-size: 27px; }

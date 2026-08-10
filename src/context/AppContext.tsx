@@ -310,7 +310,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const [allUsers, setAllUsers] = useState<any[]>([]);
-  const [customTags, setCustomTags] = useState<string[]>(['Shortlisted', 'Featured', 'Flagged', 'Verified']);
+  const [customTags, setCustomTags] = useState<string[]>([]);
 
   // Public-site light/dark theme (independent of the admin dashboard's own
   // toggle) — flips the shared CSS custom properties in index.css so every

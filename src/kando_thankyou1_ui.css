@@ -1,0 +1,1242 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Dancing+Script:wght@500;600;700&display=swap');
+
+/* =========================================================
+   KANDO THANK-YOU PAGE (ThankYou1Page)
+   ALL selectors are scoped under .kando-page-ty1
+   ========================================================= */
+
+.kando-page-ty1 {
+  --navy: #0b3d91;
+  --navy-deep: #07357f;
+  --navy-dark: #072f72;
+  --gold: #d9a33a;
+  --page: #f3f6fb;
+  --page-soft: #eaf0f9;
+  --white: #ffffff;
+  --note-bg: #e5ecf7;
+  --line: #dbe4f1;
+  --text: #0b357d;
+  --content-width: 1536px;
+
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--page);
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.kando-page-ty1 *,
+.kando-page-ty1 *::before,
+.kando-page-ty1 *::after {
+  box-sizing: border-box;
+}
+
+.kando-page-ty1 img,
+.kando-page-ty1 svg {
+  display: block;
+}
+
+.kando-page-ty1 img {
+  max-width: 100%;
+}
+
+.kando-page-ty1 button,
+.kando-page-ty1 a,
+.kando-page-ty1 select {
+  font: inherit;
+}
+
+/* ================= HEADER ================= */
+.kando-page-ty1 .ty1-site-header {
+  position: relative;
+  z-index: 50;
+  background: rgba(255, 255, 255, 0.97);
+  border-bottom: 1px solid var(--line);
+}
+
+.kando-page-ty1 .ty1-header-inner {
+  width: min(100%, var(--content-width));
+  min-height: 108px;
+  margin-inline: auto;
+  padding: 14px clamp(20px, 3.1vw, 52px);
+  display: grid;
+  grid-template-columns: minmax(230px, 1fr) auto minmax(230px, 1fr);
+  align-items: center;
+  gap: 24px;
+}
+
+.kando-page-ty1 .ty1-brand {
+  min-width: 0;
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--navy);
+  text-decoration: none;
+}
+
+.kando-page-ty1 .ty1-brand-logo-img {
+  height: 48px;
+  width: auto;
+}
+
+.kando-page-ty1 .ty1-header-title {
+  margin: 0;
+  color: var(--navy);
+  font-size: clamp(22px, 2vw, 31px);
+  font-weight: 700;
+  letter-spacing: 0.018em;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.kando-page-ty1 .ty1-header-utils {
+  min-width: 0;
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: clamp(12px, 1.55vw, 22px);
+}
+
+.kando-page-ty1 .ty1-home-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--navy);
+  font-size: clamp(15px, 1.25vw, 19px);
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.kando-page-ty1 .ty1-ico-home {
+  width: 25px;
+  height: 25px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.kando-page-ty1 .ty1-v-sep {
+  width: 1px;
+  height: 34px;
+  flex: 0 0 auto;
+  background: #bfcce0;
+}
+
+.kando-page-ty1 .ty1-lang-select {
+  display: inline-flex;
+  align-items: center;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--navy);
+  background: #ffffff;
+  border: 1.6px solid var(--navy);
+  border-radius: 999px;
+  padding: 9px 20px;
+  cursor: pointer;
+  outline: none;
+  pointer-events: auto !important;
+  z-index: 200;
+  position: relative;
+}
+
+.kando-page-ty1 .ty1-lang-select:hover {
+  background: #f1f5fb;
+}
+
+/* ================= MAIN ================= */
+.kando-page-ty1 .ty1-page {
+  flex: 1;
+  background:
+    radial-gradient(900px 560px at 20% 18%, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0) 67%),
+    radial-gradient(760px 520px at 88% 44%, rgba(222, 233, 248, 0.62) 0%, rgba(222, 233, 248, 0) 72%),
+    linear-gradient(145deg, #f6f8fc 0%, #eef3fa 56%, #e8eff8 100%);
+  padding-bottom: clamp(20px, 2vw, 32px);
+}
+
+.kando-page-ty1 .ty1-page-inner {
+  width: min(100%, var(--content-width));
+  margin-inline: auto;
+  padding-inline: clamp(18px, 3.1vw, 52px);
+}
+
+.kando-page-ty1 .ty1-hero {
+  padding-top: clamp(22px, 2.3vw, 38px);
+  display: grid;
+  grid-template-columns: minmax(430px, 0.94fr) minmax(500px, 1.06fr);
+  column-gap: clamp(20px, 2.8vw, 50px);
+  align-items: start;
+}
+
+.kando-page-ty1 .ty1-hero > :not(.ty1-hero-media) {
+  grid-column: 1;
+  justify-self: center;
+}
+
+/* ---------- top badge ---------- */
+.kando-page-ty1 .ty1-badge-wrap {
+  position: relative;
+  width: clamp(248px, 21vw, 322px);
+  height: clamp(150px, 12.2vw, 184px);
+  display: grid;
+  place-items: center;
+}
+
+.kando-page-ty1 .ty1-badge-circle {
+  width: clamp(132px, 10.2vw, 158px);
+  aspect-ratio: 1;
+  border: 1.5px solid #cfdbea;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, #ffffff 0%, #f4f7fc 100%);
+  box-shadow: 0 3px 10px rgba(11, 61, 145, 0.035);
+}
+
+.kando-page-ty1 .ty1-badge-doc {
+  width: 74%;
+  height: 74%;
+  overflow: visible;
+}
+
+.kando-page-ty1 .ty1-stroke-navy {
+  fill: none;
+  stroke: var(--navy);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.kando-page-ty1 .ty1-fill-navy {
+  fill: var(--navy);
+}
+
+.kando-page-ty1 .ty1-heart-cut {
+  stroke: #f5f8fc;
+  stroke-width: 5;
+  stroke-linejoin: round;
+}
+
+.kando-page-ty1 .ty1-spark {
+  position: absolute;
+  width: 25px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--navy);
+}
+
+.kando-page-ty1 .ty1-spark.gold {
+  background: var(--gold);
+}
+
+.kando-page-ty1 .ty1-spark-1 {
+  top: 31%;
+  left: 7%;
+  transform: rotate(10deg);
+}
+
+.kando-page-ty1 .ty1-spark-2 {
+  top: 17%;
+  left: 18%;
+  transform: rotate(49deg);
+}
+
+.kando-page-ty1 .ty1-spark-3 {
+  top: 51%;
+  left: 5%;
+  transform: rotate(-25deg);
+}
+
+.kando-page-ty1 .ty1-spark-4 {
+  top: 15%;
+  right: 17%;
+  transform: rotate(-55deg);
+  width: 19px;
+}
+
+.kando-page-ty1 .ty1-spark-5 {
+  top: 34%;
+  right: 9%;
+  transform: rotate(-28deg);
+}
+
+.kando-page-ty1 .ty1-spark-6 {
+  top: 53%;
+  right: 5%;
+  transform: rotate(3deg);
+  width: 16px;
+}
+
+.kando-page-ty1 .ty1-mini-dot {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border: 2px solid var(--navy);
+  border-radius: 50%;
+}
+
+.kando-page-ty1 .ty1-dot-1 {
+  left: 8%;
+  top: 41%;
+}
+
+.kando-page-ty1 .ty1-dot-2 {
+  right: 9%;
+  top: 47%;
+}
+
+.kando-page-ty1 .ty1-mini-diamond {
+  position: absolute;
+  left: 15%;
+  top: 55%;
+  width: 7px;
+  height: 7px;
+  border: 2px solid var(--navy);
+  transform: rotate(45deg);
+}
+
+.kando-page-ty1 .ty1-spark-heart {
+  position: absolute;
+  right: 4%;
+  bottom: 13%;
+  width: 36px;
+  height: 36px;
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 2.2;
+  stroke-linejoin: round;
+}
+
+/* ---------- thank-you text ---------- */
+.kando-page-ty1 .ty1-thanks-row {
+  margin-top: -1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(10px, 1.1vw, 17px);
+}
+
+.kando-page-ty1 .ty1-thanks {
+  margin: 0;
+  color: var(--navy);
+  font-size: clamp(47px, 4.6vw, 72px);
+  font-weight: 800;
+  line-height: 0.98;
+  letter-spacing: -0.022em;
+  white-space: nowrap;
+}
+
+.kando-page-ty1 .ty1-thanks-heart {
+  width: clamp(43px, 3.8vw, 58px);
+  height: clamp(43px, 3.8vw, 58px);
+  margin-top: -3px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 3;
+  stroke-linejoin: round;
+}
+
+.kando-page-ty1 .ty1-lead {
+  margin: 15px 0 0;
+  color: var(--navy);
+  font-family: 'Kozuka Gothic Pro', 'Outfit', sans-serif;
+  font-size: clamp(18px, 1.5vw, 23px);
+  font-weight: 500;
+  line-height: 1.35;
+  text-align: center;
+}
+
+/* ---------- desktop-right image ---------- */
+.kando-page-ty1 .ty1-hero-media {
+  grid-column: 2;
+  grid-row: 1 / span 8;
+  width: 100%;
+  min-width: 0;
+  margin: -4px 0 0;
+  align-self: start;
+  justify-self: center;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.kando-page-ty1 .ty1-polaroid {
+  width: min(100%, 735px);
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 16px rgba(16, 49, 102, 0.08));
+}
+
+.kando-page-ty1 .ty1-divider {
+  width: min(100%, 340px);
+  margin-top: 17px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.kando-page-ty1 .ty1-divider .rule {
+  height: 1.5px;
+  flex: 1;
+}
+
+.kando-page-ty1 .ty1-divider .rule:first-child {
+  background: linear-gradient(90deg, transparent, var(--gold));
+}
+
+.kando-page-ty1 .ty1-divider .rule:last-child {
+  background: linear-gradient(90deg, var(--gold), transparent);
+}
+
+.kando-page-ty1 .ty1-divider svg {
+  width: 24px;
+  height: 24px;
+  fill: var(--gold);
+}
+
+.kando-page-ty1 .ty1-copy {
+  margin: 16px 0 0;
+  color: var(--navy);
+  font-size: clamp(17px, 1.4vw, 21px);
+  font-weight: 400;
+  line-height: 1.46;
+  text-align: center;
+}
+
+.kando-page-ty1 .ty1-note {
+  width: min(100%, 590px);
+  margin-top: 25px;
+  padding: clamp(17px, 1.45vw, 23px) clamp(18px, 1.8vw, 29px);
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  gap: clamp(15px, 1.5vw, 22px);
+  background: rgba(225, 234, 247, 0.92);
+  text-align: left;
+}
+
+.kando-page-ty1 .ty1-note-ico {
+  width: 53px;
+  height: 53px;
+  flex: 0 0 53px;
+}
+
+.kando-page-ty1 .ty1-note-ico svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: var(--navy);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.kando-page-ty1 .ty1-note p {
+  min-width: 0;
+  margin: 0;
+  color: var(--navy);
+  font-size: clamp(16px, 1.25vw, 19px);
+  font-weight: 400;
+  line-height: 1.48;
+}
+
+.kando-page-ty1 .ty1-keep {
+  margin: 24px 0 0;
+  color: var(--navy);
+  font-size: clamp(17px, 1.35vw, 21px);
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.kando-page-ty1 .ty1-together {
+  margin: 5px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  color: var(--navy);
+  text-align: center;
+}
+
+.kando-page-ty1 .ty1-together span {
+  font-family: "Dancing Script", cursive;
+  font-size: clamp(28px, 2.25vw, 35px);
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.kando-page-ty1 .ty1-together svg {
+  width: 27px;
+  height: 27px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+}
+
+/* Reference ID Display Card */
+.kando-page-ty1 .ty1-ref-card {
+  width: min(100%, 590px);
+  margin-top: 20px;
+  padding: 18px 24px;
+  border-radius: 15px;
+  background: rgba(11, 61, 145, 0.05);
+  border: 1.5px dashed var(--gold);
+  text-align: center;
+}
+
+.kando-page-ty1 .ty1-ref-title {
+  font-size: 0.85rem;
+  color: #52637f;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.kando-page-ty1 .ty1-ref-id {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--navy);
+  letter-spacing: 2px;
+  font-family: monospace;
+}
+
+.kando-page-ty1 .ty1-ref-sub {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+/* Action Buttons Container */
+.kando-page-ty1 .ty1-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 24px;
+  width: min(100%, 590px);
+}
+
+.kando-page-ty1 .ty1-btn-primary {
+  padding: 13px 28px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #a855f7 0%, #6366f1 100%);
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(168, 85, 247, 0.3);
+  transition: transform 180ms ease;
+}
+
+.kando-page-ty1 .ty1-btn-primary:hover {
+  transform: translateY(-1px);
+}
+
+.kando-page-ty1 .ty1-btn-secondary {
+  padding: 13px 28px;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--navy);
+  border: 1.5px solid var(--navy);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 180ms ease;
+}
+
+.kando-page-ty1 .ty1-btn-secondary:hover {
+  background: #f1f5fb;
+}
+
+/* ================= BOTTOM CARDS ================= */
+.kando-page-ty1 .ty1-cards {
+  width: min(100%, 1100px);
+  margin: clamp(12px, 1.7vw, 24px) auto 0;
+  padding: clamp(20px, 2vw, 31px) clamp(22px, 2.4vw, 37px);
+  border-radius: 19px;
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) 1px minmax(0, 1.25fr);
+  align-items: center;
+  gap: clamp(24px, 2.5vw, 38px);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 8px 24px rgba(11, 61, 145, 0.06);
+}
+
+.kando-page-ty1 .ty1-card {
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(16px, 1.5vw, 22px);
+}
+
+.kando-page-ty1 .ty1-card-icon {
+  width: 66px;
+  height: 66px;
+  flex: 0 0 66px;
+  display: grid;
+  place-items: center;
+  color: var(--navy);
+}
+
+.kando-page-ty1 .ty1-card-icon svg {
+  width: 58px;
+  height: 58px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.kando-page-ty1 .ty1-card-icon-solid {
+  border-radius: 50%;
+  color: var(--white);
+  background: var(--navy);
+}
+
+.kando-page-ty1 .ty1-card-icon-solid svg {
+  width: 45px;
+  height: 45px;
+}
+
+.kando-page-ty1 .ty1-people-icon svg {
+  width: 66px;
+  height: 55px;
+}
+
+.kando-page-ty1 .ty1-card-body {
+  min-width: 0;
+  padding-top: 2px;
+}
+
+.kando-page-ty1 .ty1-card-body h3 {
+  margin: 0 0 7px;
+  color: var(--navy);
+  font-size: clamp(17px, 1.35vw, 21px);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.kando-page-ty1 .ty1-card-body p {
+  max-width: 350px;
+  margin: 0;
+  color: var(--navy);
+  font-size: clamp(15px, 1.15vw, 18px);
+  font-weight: 400;
+  line-height: 1.46;
+}
+
+.kando-page-ty1 .ty1-card-separator {
+  width: 1px;
+  height: 100%;
+  min-height: 100px;
+  background: #cad5e5;
+}
+
+.kando-page-ty1 .ty1-card-spread {
+  position: relative;
+  padding-right: clamp(65px, 7vw, 105px);
+}
+
+.kando-page-ty1 .ty1-plane {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: clamp(72px, 7vw, 99px);
+  height: auto;
+  transform: translateY(-50%);
+  fill: none;
+  stroke: var(--navy);
+  stroke-width: 2.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.kando-page-ty1 .ty1-plane-tail {
+  stroke-dasharray: 4 7;
+}
+
+.kando-page-ty1 .ty1-plane-dot {
+  stroke-dasharray: 4 5;
+}
+
+/* ================= FOOTER ================= */
+.kando-page-ty1 .ty1-site-footer {
+  background: linear-gradient(90deg, #07357f 0%, #0a3c91 52%, #07357f 100%);
+}
+
+.kando-page-ty1 .ty1-footer-inner {
+  width: min(100%, var(--content-width));
+  min-height: 109px;
+  margin-inline: auto;
+  padding: 14px clamp(28px, 4vw, 66px);
+  display: grid;
+  grid-template-columns: auto 1px minmax(0, 1fr) 1px auto;
+  align-items: center;
+  gap: clamp(24px, 3vw, 45px);
+}
+
+.kando-page-ty1 .ty1-footer-icon {
+  width: 79px;
+  height: 72px;
+  color: var(--white);
+}
+
+.kando-page-ty1 .ty1-footer-icon svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.kando-page-ty1 .ty1-footer-separator {
+  width: 1px;
+  height: 65px;
+  background: rgba(255, 255, 255, 0.42);
+}
+
+.kando-page-ty1 .ty1-footer-message {
+  min-width: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.kando-page-ty1 .ty1-footer-message p {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--gold);
+}
+
+.kando-page-ty1 .ty1-footer-message p span {
+  font-family: "Dancing Script", cursive;
+  font-size: clamp(23px, 2.1vw, 33px);
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.kando-page-ty1 .ty1-footer-heart {
+  width: 27px;
+  height: 27px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+}
+
+.kando-page-ty1 .ty1-swoosh {
+  width: min(100%, 620px);
+  height: 15px;
+  margin-top: -1px;
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+.kando-page-ty1 .ty1-footer-day {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--white);
+  white-space: nowrap;
+}
+
+.kando-page-ty1 .ty1-footer-day strong {
+  font-size: clamp(17px, 1.35vw, 21px);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.kando-page-ty1 .ty1-footer-day span {
+  font-size: clamp(15px, 1.15vw, 18px);
+  font-weight: 400;
+}
+
+/* =========================================================
+   RESPONSIVE BREAKPOINTS
+   ========================================================= */
+
+@media (max-width: 1180px) {
+  .kando-page-ty1 .ty1-header-inner {
+    grid-template-columns: minmax(210px, 1fr) auto minmax(210px, 1fr);
+    gap: 16px;
+  }
+
+  .kando-page-ty1 .ty1-hero {
+    grid-template-columns: minmax(390px, 0.92fr) minmax(430px, 1.08fr);
+    column-gap: 10px;
+  }
+
+  .kando-page-ty1 .ty1-cards {
+    width: min(100%, 1030px);
+  }
+
+  .kando-page-ty1 .ty1-footer-inner {
+    gap: 22px;
+  }
+}
+
+@media (max-width: 960px) {
+  .kando-page-ty1 .ty1-header-inner {
+    min-height: 0;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "brand utils"
+      "title title";
+    row-gap: 12px;
+    padding-block: 14px 16px;
+  }
+
+  .kando-page-ty1 .ty1-brand {
+    grid-area: brand;
+  }
+
+  .kando-page-ty1 .ty1-header-title {
+    grid-area: title;
+    white-space: normal;
+  }
+
+  .kando-page-ty1 .ty1-header-utils {
+    grid-area: utils;
+  }
+
+  .kando-page-ty1 .ty1-hero {
+    grid-template-columns: minmax(350px, 0.95fr) minmax(365px, 1.05fr);
+    column-gap: 8px;
+  }
+
+  .kando-page-ty1 .ty1-cards {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+
+  .kando-page-ty1 .ty1-card-separator {
+    width: 100%;
+    height: 1px;
+    min-height: 1px;
+  }
+
+  .kando-page-ty1 .ty1-card-body p {
+    max-width: none;
+  }
+
+  .kando-page-ty1 .ty1-footer-inner {
+    grid-template-columns: auto 1px minmax(0, 1fr);
+  }
+
+  .kando-page-ty1 .ty1-footer-inner > .ty1-footer-separator:nth-of-type(2) {
+    display: none;
+  }
+
+  .kando-page-ty1 .ty1-footer-day {
+    grid-column: 3;
+    justify-self: center;
+    align-items: center;
+    margin-top: -5px;
+  }
+}
+
+@media (max-width: 760px) {
+  .kando-page-ty1 .ty1-header-inner {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "brand"
+      "title"
+      "utils";
+    justify-items: center;
+    gap: 12px;
+    padding-inline: 16px;
+  }
+
+  .kando-page-ty1 .ty1-brand,
+  .kando-page-ty1 .ty1-header-utils {
+    justify-self: center;
+  }
+
+  .kando-page-ty1 .ty1-v-sep {
+    height: 30px;
+  }
+
+  .kando-page-ty1 .ty1-lang-select {
+    padding: 8px 18px;
+  }
+
+  .kando-page-ty1 .ty1-page-inner {
+    padding-inline: clamp(14px, 4vw, 26px);
+  }
+
+  .kando-page-ty1 .ty1-hero {
+    grid-template-columns: minmax(0, 1fr);
+    padding-top: 18px;
+  }
+
+  .kando-page-ty1 .ty1-hero > :not(.ty1-hero-media),
+  .kando-page-ty1 .ty1-hero-media {
+    grid-column: 1;
+  }
+
+  .kando-page-ty1 .ty1-hero-media {
+    grid-row: auto;
+    width: min(100%, 650px);
+    margin: clamp(18px, 5vw, 30px) auto 2px;
+    padding-inline: 0;
+  }
+
+  .kando-page-ty1 .ty1-polaroid {
+    width: 100%;
+    filter: drop-shadow(0 9px 13px rgba(16, 49, 102, 0.07));
+  }
+
+  .kando-page-ty1 .ty1-badge-wrap {
+    width: min(100%, 280px);
+    height: 158px;
+  }
+
+  .kando-page-ty1 .ty1-thanks-row {
+    width: 100%;
+  }
+
+  .kando-page-ty1 .ty1-thanks {
+    font-size: clamp(39px, 10vw, 57px);
+  }
+
+  .kando-page-ty1 .ty1-thanks-heart {
+    width: clamp(35px, 9vw, 47px);
+    height: clamp(35px, 9vw, 47px);
+  }
+
+  .kando-page-ty1 .ty1-lead {
+    padding-inline: 8px;
+  }
+
+  .kando-page-ty1 .ty1-divider {
+    margin-top: 18px;
+  }
+
+  .kando-page-ty1 .ty1-copy {
+    width: min(100%, 560px);
+  }
+
+  .kando-page-ty1 .ty1-copy br,
+  .kando-page-ty1 .ty1-note br {
+    display: none;
+  }
+
+  .kando-page-ty1 .ty1-note {
+    width: min(100%, 590px);
+  }
+
+  .kando-page-ty1 .ty1-cards {
+    width: min(100%, 650px);
+    margin-top: 22px;
+  }
+
+  .kando-page-ty1 .ty1-footer-inner {
+    min-height: 0;
+    padding: 25px 20px;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 16px;
+    text-align: center;
+  }
+
+  .kando-page-ty1 .ty1-footer-separator {
+    width: min(100%, 350px);
+    height: 1px;
+  }
+
+  .kando-page-ty1 .ty1-footer-inner > .ty1-footer-separator:nth-of-type(2) {
+    display: block;
+  }
+
+  .kando-page-ty1 .ty1-footer-day {
+    grid-column: auto;
+    margin-top: 0;
+  }
+
+  .kando-page-ty1 .ty1-footer-message p span {
+    font-size: clamp(23px, 7vw, 31px);
+  }
+
+  .kando-page-ty1 .ty1-swoosh {
+    width: min(100%, 430px);
+  }
+}
+
+@media (max-width: 520px) {
+  .kando-page-ty1 .ty1-site-header {
+    position: static;
+  }
+
+  .kando-page-ty1 .ty1-header-inner {
+    padding-top: 13px;
+  }
+
+  .kando-page-ty1 .ty1-brand-logo-img {
+    height: 42px;
+  }
+
+  .kando-page-ty1 .ty1-header-title {
+    font-size: 21px;
+  }
+
+  .kando-page-ty1 .ty1-header-utils {
+    width: 100%;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .kando-page-ty1 .ty1-home-link {
+    font-size: 15px;
+  }
+
+  .kando-page-ty1 .ty1-ico-home {
+    width: 23px;
+    height: 23px;
+  }
+
+  .kando-page-ty1 .ty1-lang-select {
+    gap: 9px;
+    font-size: 15px;
+  }
+
+  .kando-page-ty1 .ty1-page-inner {
+    padding-inline: 13px;
+  }
+
+  .kando-page-ty1 .ty1-badge-wrap {
+    width: 240px;
+    height: 144px;
+  }
+
+  .kando-page-ty1 .ty1-badge-circle {
+    width: 126px;
+  }
+
+  .kando-page-ty1 .ty1-spark-heart {
+    width: 31px;
+    height: 31px;
+  }
+
+  .kando-page-ty1 .ty1-thanks-row {
+    gap: 8px;
+  }
+
+  .kando-page-ty1 .ty1-thanks {
+    font-size: clamp(34px, 10.6vw, 47px);
+    letter-spacing: -0.035em;
+  }
+
+  .kando-page-ty1 .ty1-thanks-heart {
+    width: 35px;
+    height: 35px;
+  }
+
+  .kando-page-ty1 .ty1-lead {
+    margin-top: 11px;
+    font-size: 17px;
+  }
+
+  .kando-page-ty1 .ty1-hero-media {
+    width: 100%;
+    margin-top: 18px;
+  }
+
+  .kando-page-ty1 .ty1-divider {
+    width: min(86%, 300px);
+    gap: 10px;
+  }
+
+  .kando-page-ty1 .ty1-copy {
+    padding-inline: 8px;
+    font-size: 16px;
+  }
+
+  .kando-page-ty1 .ty1-note {
+    padding: 16px;
+    border-radius: 13px;
+    align-items: flex-start;
+    gap: 13px;
+  }
+
+  .kando-page-ty1 .ty1-note-ico {
+    width: 44px;
+    height: 44px;
+    flex-basis: 44px;
+  }
+
+  .kando-page-ty1 .ty1-note p {
+    font-size: 15px;
+  }
+
+  .kando-page-ty1 .ty1-keep {
+    margin-top: 20px;
+    padding-inline: 5px;
+    font-size: 16px;
+  }
+
+  .kando-page-ty1 .ty1-together {
+    gap: 8px;
+  }
+
+  .kando-page-ty1 .ty1-together span {
+    font-size: 29px;
+  }
+
+  .kando-page-ty1 .ty1-together svg {
+    width: 23px;
+    height: 23px;
+  }
+
+  .kando-page-ty1 .ty1-cards {
+    padding: 20px 17px;
+    border-radius: 15px;
+  }
+
+  .kando-page-ty1 .ty1-card {
+    gap: 14px;
+  }
+
+  .kando-page-ty1 .ty1-card-icon {
+    width: 54px;
+    height: 54px;
+    flex-basis: 54px;
+  }
+
+  .kando-page-ty1 .ty1-card-icon svg {
+    width: 51px;
+    height: 49px;
+  }
+
+  .kando-page-ty1 .ty1-card-icon-solid svg {
+    width: 38px;
+    height: 38px;
+  }
+
+  .kando-page-ty1 .ty1-card-body h3 {
+    font-size: 17px;
+  }
+
+  .kando-page-ty1 .ty1-card-body p {
+    font-size: 14.5px;
+  }
+
+  .kando-page-ty1 .ty1-card-spread {
+    padding-right: 0;
+  }
+
+  .kando-page-ty1 .ty1-plane {
+    position: static;
+    width: 72px;
+    margin-left: auto;
+    transform: none;
+    align-self: center;
+  }
+
+  .kando-page-ty1 .ty1-footer-icon {
+    width: 67px;
+    height: 61px;
+  }
+
+  .kando-page-ty1 .ty1-footer-message p {
+    gap: 7px;
+  }
+
+  .kando-page-ty1 .ty1-footer-heart {
+    width: 23px;
+    height: 23px;
+  }
+}
+
+@media (max-width: 380px) {
+  .kando-page-ty1 .ty1-header-utils {
+    gap: 8px;
+  }
+
+  .kando-page-ty1 .ty1-home-link {
+    gap: 5px;
+  }
+
+  .kando-page-ty1 .ty1-v-sep {
+    height: 26px;
+  }
+
+  .kando-page-ty1 .ty1-lang-select {
+    padding-inline: 13px;
+  }
+
+  .kando-page-ty1 .ty1-thanks {
+    font-size: 33px;
+  }
+
+  .kando-page-ty1 .ty1-thanks-heart {
+    width: 31px;
+    height: 31px;
+  }
+
+  .kando-page-ty1 .ty1-note {
+    gap: 10px;
+  }
+
+  .kando-page-ty1 .ty1-note-ico {
+    width: 40px;
+    height: 40px;
+    flex-basis: 40px;
+  }
+
+  .kando-page-ty1 .ty1-card {
+    gap: 11px;
+  }
+
+  .kando-page-ty1 .ty1-card-icon {
+    width: 48px;
+    height: 48px;
+    flex-basis: 48px;
+  }
+
+  .kando-page-ty1 .ty1-plane {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kando-page-ty1 *,
+  .kando-page-ty1 *::before,
+  .kando-page-ty1 *::after {
+    scroll-behavior: auto !important;
+  }
+}

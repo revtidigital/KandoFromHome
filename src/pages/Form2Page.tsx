@@ -27,6 +27,18 @@ export const Form2Page: React.FC = () => {
   const [idCheckStatus, setIdCheckStatus] = useState<'idle' | 'checking' | 'valid' | 'invalid'>('idle');
   const idCheckTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Submit stays disabled until every required field is filled, the
+  // Employee ID / Phone has been confirmed against the whitelist, and the
+  // consent checkbox is checked.
+  const canSubmit = Boolean(
+    (formData.empId.trim() || formData.phone.trim()) &&
+    idCheckStatus === 'valid' &&
+    formData.empName.trim() &&
+    thoughts.trim() &&
+    thoughts.trim().length <= 2000 &&
+    dataConsent
+  );
+
   useEffect(() => {
     const value = hasNoEmpId ? formData.phone.trim() : formData.empId.trim();
     if (idCheckTimer.current) clearTimeout(idCheckTimer.current);
@@ -83,6 +95,20 @@ export const Form2Page: React.FC = () => {
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
+      const fieldOrder = ['empId', 'empName', 'thoughts', 'dataConsent'];
+      const fieldToElementId: Record<string, string> = {
+        empId: 'employeeEin',
+        empName: 'employeeName',
+        thoughts: 'userThoughts',
+        dataConsent: 'dataConsentCheckbox'
+      };
+      const firstErrorField = fieldOrder.find(key => newErrors[key]);
+      if (firstErrorField) {
+        requestAnimationFrame(() => {
+          document.getElementById(fieldToElementId[firstErrorField])
+            ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+      }
       return;
     }
 
@@ -131,10 +157,10 @@ export const Form2Page: React.FC = () => {
 
       const generatedRefId = 'KANDO-2026-' + Math.floor(1000 + Math.random() * 9000);
       setFormData(prev => ({ ...prev, refId: generatedRefId }));
-      navigateTo('thankyou2');
+      navigateTo('thankyou1');
     } catch (err) {
       console.error('Form 2 submission error:', err);
-      navigateTo('thankyou2');
+      navigateTo('thankyou1');
     } finally {
       setIsSubmitting(false);
     }
@@ -217,7 +243,7 @@ export const Form2Page: React.FC = () => {
           <a className="f2-brand" href="#" onClick={(e) => { e.preventDefault(); navigateTo('home'); }} aria-label="Yamaha — Revs Your Heart">
             <img
               className="f2-brand-image"
-              src="/yamaha-logo (2).png"
+              src="/yamaha-logo-v2.png"
               alt="Yamaha — Revs Your Heart"
               onError={(e) => { (e.target as HTMLImageElement).src = '/yamaha_logo.png'; }}
             />
@@ -469,6 +495,7 @@ export const Form2Page: React.FC = () => {
                 {/* CONSENT */}
                 <label className={`consent-wrap${errors.dataConsent ? ' has-error' : ''} mt-16`}>
                   <input
+                    id="dataConsentCheckbox"
                     type="checkbox"
                     checked={dataConsent}
                     onChange={e => { setDataConsent(e.target.checked); if (e.target.checked) setErrors(prev => ({ ...prev, dataConsent: '' })); }}
@@ -491,7 +518,7 @@ export const Form2Page: React.FC = () => {
                 )}
 
                 <div className="actions">
-                  <button className="submit" type="submit" disabled={isSubmitting || !dataConsent}>
+                  <button className="submit" type="submit" disabled={isSubmitting || !canSubmit}>
                     <svg className="icon icon--22" aria-hidden="true">
                       <use href="#f2-icon-send"></use>
                     </svg>
