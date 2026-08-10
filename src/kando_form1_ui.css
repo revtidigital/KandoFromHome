@@ -236,9 +236,7 @@
   z-index: -3;
   inset: 0;
   opacity: 0.43;
-  background:
-    linear-gradient(134deg, transparent 0 69%, rgba(209, 216, 231, 0.52) 69.06% 69.15%, transparent 69.2%),
-    linear-gradient(45deg, transparent 0 44%, rgba(222, 227, 238, 0.35) 44.05% 44.13%, transparent 44.2%);
+  background: none;
   pointer-events: none;
 }
 

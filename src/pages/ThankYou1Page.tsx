@@ -91,7 +91,7 @@ export const ThankYou1Page: React.FC = () => {
             <figure className="ty1-hero-media" aria-label="Kando moment photo">
               <img
                 className="ty1-polaroid"
-                src="/ChatGPT Image Aug 6, 2026, 06_56_53 PM.png"
+                src="/png1.png"
                 alt="Polaroid-style family Kando moment"
                 onError={(e) => { (e.target as HTMLImageElement).src = '/user_vertical_card.png'; }}
               />

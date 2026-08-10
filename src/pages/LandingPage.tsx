@@ -49,7 +49,7 @@ export const LandingPage: React.FC = () => {
           
           {/* YAMAHA BRAND LOGO */}
           <div onClick={() => handleSelectLanguage('en')} style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
-            <img src="/yamaha_logo.png" alt="Yamaha" style={{ height: '53px', width: 'auto' }} />
+            <img src="/yamaha_logo.png" alt="Yamaha" style={{ height: '120px', width: 'auto', marginTop: '-15px' }} />
           </div>
 
           {/* TOP RIGHT MICROSITE LOGO */}

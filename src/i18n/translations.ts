@@ -375,11 +375,11 @@ export const translations: Record<Language, Translations> = {
 
     // Section Headings & Upload Labels
     sec1EmployeeDetailsTitle: "1. Employee & Family Details",
-    sec2UploadPhotosTitle: "2. Upload Photos (Max 2 Photos and 1 Video, Max 50MB)",
+    sec2UploadPhotosTitle: "Upload Photos (Max 2 Photos and 1 Video, Max 50MB)",
     sec2UploadPhotosDesc: "Upload up to 2 high-resolution photos and video of your family Kando DIY Wall (All formats supported).",
     photo1Label: "Photo 1 (Required, Max 5MB) *",
     photo2Label: "Photo 2 (Required, Max 5MB) *",
-    sec2UploadVideoTitle: "Kando Video(Required, Max 40MB) *",
+    sec2UploadVideoTitle: "Video(Required, Max 40MB) *",
     sec2UploadVideoDesc: "Upload 1 video of your family making the DIY Craft Wall (MP4, WEBM, MOV, etc. Max 40MB limit).",
 
     // Validation Error Messages
@@ -397,7 +397,7 @@ export const translations: Record<Language, Translations> = {
 
     backBtn: "Back",
     companyNameLabel: "Company Name",
-    noEmpIdNote: "Don't have an Employee ID? Leave this blank and enter your Phone Number below.",
+    noEmpIdNote: "Don't have an Employee ID? Leave this blank and enter your Phone Number.",
     departmentLabel: "Department",
     locationLabel: "Location",
     form1PhoneNumberLabel: "Phone Number",
@@ -609,7 +609,7 @@ export const translations: Record<Language, Translations> = {
 
     backBtn: "वापस",
     companyNameLabel: "कंपनी का नाम",
-    noEmpIdNote: "क्या आपके पास कर्मचारी आईडी नहीं है? इसे खाली छोड़ें और नीचे अपना फ़ोन नंबर दर्ज करें।",
+    noEmpIdNote: "क्या आपके पास कर्मचारी आईडी नहीं है? इसे खाली छोड़ें और अपना फ़ोन नंबर दर्ज करें।",
     departmentLabel: "विभाग",
     locationLabel: "स्थान",
     form1PhoneNumberLabel: "फ़ोन नंबर",
@@ -821,7 +821,7 @@ export const translations: Record<Language, Translations> = {
 
     backBtn: "பின்செல்",
     companyNameLabel: "நிறுவனத்தின் பெயர்",
-    noEmpIdNote: "பணியாளர் ஐடி இல்லையா? இதை காலியாக விட்டு கீழே உங்கள் தொலைபேசி எண்ணை உள்ளிடவும்.",
+    noEmpIdNote: "பணியாளர் ஐடி இல்லையா? இதை காலியாக விட்டு உங்கள் தொலைபேசி எண்ணை உள்ளிடவும்.",
     departmentLabel: "துறை",
     locationLabel: "இடம்",
     form1PhoneNumberLabel: "தொலைபேசி எண்",

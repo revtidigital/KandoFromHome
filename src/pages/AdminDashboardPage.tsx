@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import {
   LayoutDashboard, Users, Tag, Settings as SettingsIcon, History,
@@ -49,7 +49,11 @@ const THEMES = {
 
 // Native <details>/<summary> gives us a click-to-toggle popover with built-in
 // outside-click/escape handling, so a multi-select checkbox list needs no
-// extra open/close state or document-level listeners.
+// extra open/close state or document-level listeners. The panel stays inside
+// this same DOM subtree (no portal) — on open we just measure the row's
+// position and flip the panel above the trigger + clamp its horizontal
+// offset so it never renders past the viewport edge and never forces the
+// whole page to scroll to become visible.
 const TagMultiSelect: React.FC<{
   tags: string[];
   customTags: string[];
@@ -57,8 +61,38 @@ const TagMultiSelect: React.FC<{
   accent?: string;
   palette: typeof THEMES['dark'];
 }> = ({ tags, customTags, onToggle, accent = '#00E5FF', palette }) => {
+  const detailsRef = useRef<HTMLDetailsElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  const positionPanel = () => {
+    const details = detailsRef.current;
+    const panel = panelRef.current;
+    if (!details || !panel) return;
+    // The table's card wrapper clips overflow, so the panel must fit inside
+    // *that* box, not the viewport — measure against it, not window bounds.
+    const wrapper = details.closest('table')?.parentElement;
+    if (!wrapper) return;
+    const wrapperRect = wrapper.getBoundingClientRect();
+    const rect = details.getBoundingClientRect();
+
+    const spaceBelow = wrapperRect.bottom - rect.bottom - 6;
+    const spaceAbove = rect.top - wrapperRect.top - 6;
+    const openUpward = spaceBelow < 40 && spaceAbove > spaceBelow;
+    const available = Math.max(80, (openUpward ? spaceAbove : spaceBelow));
+    panel.style.maxHeight = `${Math.min(260, available)}px`;
+
+    panel.style.top = openUpward ? 'auto' : 'calc(100% + 6px)';
+    panel.style.bottom = openUpward ? 'calc(100% + 6px)' : 'auto';
+
+    // Clamp horizontally so the panel never extends past the wrapper's right edge.
+    const overflowRight = rect.left + panel.offsetWidth - wrapperRect.right;
+    panel.style.left = overflowRight > 0 ? `${-overflowRight - 12}px` : '0';
+  };
+
   return (
-    <details style={{ position: 'relative', display: 'inline-block' }}>
+    <details ref={detailsRef} style={{ position: 'relative', display: 'inline-block' }} onToggle={(e) => {
+      if ((e.target as HTMLDetailsElement).open) requestAnimationFrame(positionPanel);
+    }}>
       <summary
         style={{
           listStyle: 'none', cursor: 'pointer', userSelect: 'none',
@@ -71,10 +105,11 @@ const TagMultiSelect: React.FC<{
       >
         {tags.length > 0 ? tags.join(', ') : 'Select Tags...'} <ChevronDown size={12} />
       </summary>
-      <div style={{
+      <div ref={panelRef} style={{
         position: 'absolute', top: 'calc(100% + 6px)', left: 0, zIndex: 50,
         background: palette.surfaceSoft, border: `1px solid ${accent}`, borderRadius: '10px',
-        padding: '8px', minWidth: '180px', boxShadow: '0 10px 30px rgba(0,0,0,0.4)'
+        padding: '8px', minWidth: '180px', maxHeight: '260px', overflowY: 'auto',
+        boxShadow: '0 10px 30px rgba(0,0,0,0.4)'
       }}>
         {customTags.length === 0 && (
           <div style={{ color: palette.mutedText, fontSize: '0.8rem', padding: '4px 6px' }}>No tags defined yet</div>
@@ -101,6 +136,18 @@ export const AdminDashboardPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>('overview');
   // KPI cards reveal the users table inline below the overview instead of navigating away
   const [showUsersInline, setShowUsersInline] = useState(false);
+  // Toggling the same KPI's "View/Hide Submissions" button hides the inline
+  // table again; clicking a different KPI just re-filters the table that's
+  // already open instead of closing and reopening it.
+  const toggleKpiSubmissions = (formFilter: string) => {
+    if (showUsersInline && selectedFormFilter === formFilter) {
+      setShowUsersInline(false);
+    } else {
+      setSelectedFormFilter(formFilter);
+      setCurrentPage(1);
+      setShowUsersInline(true);
+    }
+  };
 
   // Settings tab is superadmin-only — "kandoadmin" and any other regular
   // admin account never sees the nav entry or the tab content.
@@ -158,6 +205,15 @@ export const AdminDashboardPage: React.FC = () => {
     setActiveTab(tab);
     if (tab !== 'users') setSelectedUserForProfile(null);
     if (tab === 'overview') setShowUsersInline(false);
+    // Navigating to the Users tab from the nav (not via a KPI card) should
+    // always land on the unfiltered directory — clear out any filter left
+    // over from a KPI's "View Submissions" click.
+    if (tab === 'users') {
+      setSearchQuery('');
+      setSelectedTagFilter('');
+      setSelectedFormFilter('');
+      setCurrentPage(1);
+    }
     const path = pathForTab(tab);
     if (window.location.pathname !== path) {
       window.history.pushState({ tab }, '', path);
@@ -411,6 +467,12 @@ export const AdminDashboardPage: React.FC = () => {
     }
     if (segment === 'users' || segment === 'tags' || segment === 'settings' || segment === 'audit') {
       setActiveTab(segment as Tab);
+      if (segment === 'users') {
+        setSearchQuery('');
+        setSelectedTagFilter('');
+        setSelectedFormFilter('');
+        setCurrentPage(1);
+      }
       return;
     }
     setActiveTab('overview');
@@ -815,18 +877,27 @@ export const AdminDashboardPage: React.FC = () => {
             {/* 3 KPI CARDS WITH INFO ICONS (Req 13) */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', marginBottom: '32px' }}>
               
-              <div style={{ background: palette.surfaceAlt, border: '1.5px solid rgba(0,229,255,0.3)', borderRadius: '16px', padding: '24px' }}>
+              <div
+                onClick={() => toggleKpiSubmissions('')}
+                style={{ background: palette.surfaceAlt, border: '1.5px solid rgba(0,229,255,0.3)', borderRadius: '16px', padding: '24px', cursor: 'pointer' }}
+              >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
                   <span style={{ color: palette.mutedText, fontSize: '0.9rem', fontWeight: 700 }}>Total Registered Users</span>
                   <div title="Total unique employees registered in campaign" style={{ cursor: 'pointer' }}>
                     <Info size={18} color="#00E5FF" />
                   </div>
                 </div>
-                <div style={{ fontSize: '2.5rem', fontWeight: 900, color: '#00E5FF' }}>{allUsers.length}</div>
+                <div style={{ fontSize: '2.5rem', fontWeight: 900, color: '#00E5FF', marginBottom: '12px' }}>{allUsers.length}</div>
+                <button
+                  onClick={(e) => { e.stopPropagation(); toggleKpiSubmissions(''); }}
+                  style={{ background: 'rgba(0,229,255,0.12)', border: '1px solid #00E5FF', color: '#00E5FF', padding: '6px 12px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', fontSize: '0.78rem' }}
+                >
+                  {showUsersInline && selectedFormFilter === '' ? 'Hide Submissions' : 'View Submissions'}
+                </button>
               </div>
 
               <div
-                onClick={() => { setSelectedFormFilter('form1'); setCurrentPage(1); setShowUsersInline(true); }}
+                onClick={() => toggleKpiSubmissions('form1')}
                 style={{ background: palette.surfaceAlt, border: '1.5px solid rgba(168,85,247,0.3)', borderRadius: '16px', padding: '24px', cursor: 'pointer' }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
@@ -835,13 +906,19 @@ export const AdminDashboardPage: React.FC = () => {
                     <Info size={18} color="#A855F7" />
                   </div>
                 </div>
-                <div style={{ fontSize: '2.5rem', fontWeight: 900, color: '#A855F7' }}>
+                <div style={{ fontSize: '2.5rem', fontWeight: 900, color: '#A855F7', marginBottom: '12px' }}>
                   {allUsers.filter(u => u.form1).length}
                 </div>
+                <button
+                  onClick={(e) => { e.stopPropagation(); toggleKpiSubmissions('form1'); }}
+                  style={{ background: 'rgba(168,85,247,0.12)', border: '1px solid #A855F7', color: '#C084FC', padding: '6px 12px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', fontSize: '0.78rem' }}
+                >
+                  {showUsersInline && selectedFormFilter === 'form1' ? 'Hide Submissions' : 'View Submissions'}
+                </button>
               </div>
 
               <div
-                onClick={() => { setSelectedFormFilter('form2'); setCurrentPage(1); setShowUsersInline(true); }}
+                onClick={() => toggleKpiSubmissions('form2')}
                 style={{ background: palette.surfaceAlt, border: '1.5px solid rgba(34,197,94,0.3)', borderRadius: '16px', padding: '24px', cursor: 'pointer' }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
@@ -850,9 +927,15 @@ export const AdminDashboardPage: React.FC = () => {
                     <Info size={18} color="#22C55E" />
                   </div>
                 </div>
-                <div style={{ fontSize: '2.5rem', fontWeight: 900, color: '#22C55E' }}>
+                <div style={{ fontSize: '2.5rem', fontWeight: 900, color: '#22C55E', marginBottom: '12px' }}>
                   {allUsers.filter(u => u.form2).length}
                 </div>
+                <button
+                  onClick={(e) => { e.stopPropagation(); toggleKpiSubmissions('form2'); }}
+                  style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid #22C55E', color: '#4ADE80', padding: '6px 12px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', fontSize: '0.78rem' }}
+                >
+                  {showUsersInline && selectedFormFilter === 'form2' ? 'Hide Submissions' : 'View Submissions'}
+                </button>
               </div>
 
             </div>

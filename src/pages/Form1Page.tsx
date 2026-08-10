@@ -360,7 +360,7 @@ export const Form1Page: React.FC = () => {
 
               {/* Employee ID */}
               <div className="field">
-                <label htmlFor="ein">{t.empId} {!hasNoEmpId && '*'}</label>
+                <label htmlFor="ein">{t.empId}{!hasNoEmpId && '*'}</label>
                 <div style={{ position: 'relative' }}>
                   <input
                     id="ein"
@@ -381,7 +381,7 @@ export const Form1Page: React.FC = () => {
                     </span>
                   )}
                 </div>
-                <p className="file-name" style={{ marginTop: '4px' }}>
+                <p className="file-name" style={{ marginTop: '4px', whiteSpace: 'normal', overflow: 'visible', textOverflow: 'clip' }}>
                   {t.noEmpIdNote}
                 </p>
                 {errors.empId && <p className="file-error">{errors.empId}</p>}
@@ -389,7 +389,7 @@ export const Form1Page: React.FC = () => {
 
               {/* Phone Number */}
               <div className="field">
-                <label htmlFor="phone">{t.form1PhoneNumberLabel} {hasNoEmpId && '*'}</label>
+                <label htmlFor="phone">{t.form1PhoneNumberLabel}{hasNoEmpId && '*'}</label>
                 <div style={{ position: 'relative' }}>
                   <input
                     id="phone"
@@ -413,7 +413,7 @@ export const Form1Page: React.FC = () => {
 
               {/* Employee Name */}
               <div className="field">
-                <label htmlFor="employee-name">{t.fullName} *</label>
+                <label htmlFor="employee-name">{t.fullName}*</label>
                 <input
                   id="employee-name"
                   type="text"
@@ -678,7 +678,7 @@ export const Form1Page: React.FC = () => {
             <div className="polaroid-wrap">
               <figure className="polaroid-frame">
                 <img
-                  src="/user_form1_composite.png"
+                  src="/png.png"
                   alt="A smiling family holding an Our Kando Moment sign"
                   onError={(e) => { (e.target as HTMLImageElement).src = '/user_form1_right.png'; }}
                 />

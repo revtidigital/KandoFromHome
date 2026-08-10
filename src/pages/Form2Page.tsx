@@ -331,7 +331,7 @@ export const Form2Page: React.FC = () => {
                       <svg className="icon icon--label" aria-hidden="true">
                         <use href="#f2-icon-id-card"></use>
                       </svg>
-                      <span>{t.form2EmpEinLabel} {!hasNoEmpId && '*'}</span>
+                      <span>{t.form2EmpEinLabel}{!hasNoEmpId && '*'}</span>
                     </label>
                     <div className="id-field-wrap">
                       <input
@@ -362,7 +362,7 @@ export const Form2Page: React.FC = () => {
                       <svg className="icon icon--label" aria-hidden="true">
                         <use href="#f2-icon-id-card"></use>
                       </svg>
-                      <span>{t.form2PhoneNumberLabel} {hasNoEmpId && '*'}</span>
+                      <span>{t.form2PhoneNumberLabel}{hasNoEmpId && '*'}</span>
                     </label>
                     <div className="id-field-wrap">
                       <input
@@ -390,7 +390,7 @@ export const Form2Page: React.FC = () => {
                       <svg className="icon icon--label" aria-hidden="true">
                         <use href="#f2-icon-user"></use>
                       </svg>
-                      <span>{t.form2EmployeeNameLabel} *</span>
+                      <span>{t.form2EmployeeNameLabel}*</span>
                     </label>
                     <input
                       className={`input${errors.empName ? ' is-invalid' : ''}`}
