@@ -256,7 +256,7 @@ export const Form1Page: React.FC = () => {
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="m14.5 18-6-6 6-6" />
           </svg>
-          <span>Back</span>
+          <span>{t.backBtn}</span>
         </a>
 
         <section className="entry-grid">
@@ -293,7 +293,7 @@ export const Form1Page: React.FC = () => {
             <form onSubmit={handleSubmit} className="entry-form" noValidate>
               {/* Company Name */}
               <div className="field field-full">
-                <label htmlFor="company">Company Name</label>
+                <label htmlFor="company">{t.companyNameLabel}</label>
                 <input
                   id="company"
                   type="text"
@@ -327,14 +327,14 @@ export const Form1Page: React.FC = () => {
                   )}
                 </div>
                 <p className="file-name" style={{ marginTop: '4px' }}>
-                  Don't have an Employee ID? Leave this blank and enter your Phone Number below.
+                  {t.noEmpIdNote}
                 </p>
                 {errors.empId && <p className="file-error">{errors.empId}</p>}
               </div>
 
               {/* Phone Number */}
               <div className="field">
-                <label htmlFor="phone">Phone Number {hasNoEmpId && '*'}</label>
+                <label htmlFor="phone">{t.form1PhoneNumberLabel} {hasNoEmpId && '*'}</label>
                 <div style={{ position: 'relative' }}>
                   <input
                     id="phone"
@@ -371,7 +371,7 @@ export const Form1Page: React.FC = () => {
 
               {/* Department */}
               <div className="field">
-                <label htmlFor="department">Department</label>
+                <label htmlFor="department">{t.departmentLabel}</label>
                 <input
                   id="department"
                   type="text"
@@ -383,7 +383,7 @@ export const Form1Page: React.FC = () => {
 
               {/* Location */}
               <div className="field">
-                <label htmlFor="location">Location</label>
+                <label htmlFor="location">{t.locationLabel}</label>
                 <input
                   id="location"
                   type="text"
@@ -547,13 +547,13 @@ export const Form1Page: React.FC = () => {
                     style={{ accentColor: 'var(--yamaha-blue)', width: '18px', height: '18px', flexShrink: 0, marginTop: '2px' }}
                   />
                   <span style={{ fontSize: '0.87rem', lineHeight: 1.5 }}>
-                    I agree to the{' '}
+                    {t.consentAgreePrefix}{' '}
                     <a href={`/${language}/terms`} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ color: 'var(--yamaha-blue)', textDecoration: 'underline' }}>
-                      Terms &amp; Conditions
+                      {t.consentTermsLink}
                     </a>{' '}
-                    and{' '}
+                    {t.consentAndWord}{' '}
                     <a href={`/${language}/privacy`} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ color: 'var(--yamaha-blue)', textDecoration: 'underline' }}>
-                      Privacy Policy
+                      {t.consentPrivacyLink}
                     </a>. *
                   </span>
                 </label>
@@ -577,7 +577,7 @@ export const Form1Page: React.FC = () => {
                     style={{ accentColor: 'var(--yamaha-blue)', width: '18px', height: '18px', flexShrink: 0, marginTop: '2px' }}
                   />
                   <span style={{ fontSize: '0.87rem', lineHeight: 1.5 }}>
-                    I grant Yamaha permission to feature my submission photos in internal publications. *
+                    {t.form1MediaConsentText} *
                   </span>
                 </label>
               </div>
@@ -592,8 +592,8 @@ export const Form1Page: React.FC = () => {
                   </svg>
                 </div>
                 <div>
-                  <strong>Your privacy matters.</strong>
-                  <p>Your information, photos and video will be used only for Yamaha Day 2026 activities and will not be shared outside the organization.</p>
+                  <strong>{t.privacyNoteTitle}</strong>
+                  <p>{t.form1PrivacyNoteBody}</p>
                 </div>
               </aside>
 
@@ -632,8 +632,8 @@ export const Form1Page: React.FC = () => {
               <path d="m18 29 6 6 13-15" />
             </svg>
             <div>
-              <strong>Thank you!</strong>
-              <p>We can't wait to see your Kando Moment.</p>
+              <strong>{t.form1ThankYouTitle}</strong>
+              <p>{t.form1ThankYouBody}</p>
             </div>
           </div>
 
@@ -645,7 +645,7 @@ export const Form1Page: React.FC = () => {
               <path d="M28 58V39c0-10 8-17 18-17s18 7 18 17v19l-18 6-18-6Z" />
               <path d="M28 37c-3-3-6-5-11-5-8 0-13 6-13 14v13h16l8-3M64 37c3-3 6-5 11-5 8 0 13 6 13 14v13H72l-8-3" />
             </svg>
-            <p>Together, we celebrate the families<br />behind every Yamaha action.</p>
+            <p>{t.form1FooterFamilyText}</p>
           </div>
         </div>
       </footer>

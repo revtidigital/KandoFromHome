@@ -160,6 +160,39 @@ export interface Translations {
   errPhoto2Required: string;
   errVideoRequired: string;
   errConsentRequired: string;
+
+  // New-UI static labels (Form1 & Form2)
+  backBtn: string;
+  companyNameLabel: string;
+  noEmpIdNote: string;
+  departmentLabel: string;
+  locationLabel: string;
+  form1PhoneNumberLabel: string;
+  consentAgreePrefix: string;
+  consentTermsLink: string;
+  consentAndWord: string;
+  consentPrivacyLink: string;
+  privacyNoteTitle: string;
+  form1PrivacyNoteBody: string;
+  form1MediaConsentText: string;
+  form1ThankYouTitle: string;
+  form1ThankYouBody: string;
+  form1FooterFamilyText: string;
+  form2ChairmanTitle: string;
+  form2ChairmanScript: string;
+  form2ChairmanSub: string;
+  form2EmpEinLabel: string;
+  form2PhoneNumberLabel: string;
+  form2EmployeeNameLabel: string;
+  form2ShareThoughtsTitle: string;
+  form2ShareThoughtsDesc: string;
+  form2BrowseOptionalLabel: string;
+  form2BrowseFileCta: string;
+  form2ConsentSuffix: string;
+  form2SubmitBtn: string;
+  form2PrivacyNoteBody: string;
+  form2MessageCardLead: string;
+  form2MessageCardText: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -321,7 +354,39 @@ export const translations: Record<Language, Translations> = {
     errPhoto1Required: "Photo 1 is required.",
     errPhoto2Required: "Photo 2 is required.",
     errVideoRequired: "Kando DIY Video submission is required.",
-    errConsentRequired: "You must agree to data processing consent to submit."
+    errConsentRequired: "You must agree to data processing consent to submit.",
+
+    backBtn: "Back",
+    companyNameLabel: "Company Name",
+    noEmpIdNote: "Don't have an Employee ID? Leave this blank and enter your Phone Number below.",
+    departmentLabel: "Department",
+    locationLabel: "Location",
+    form1PhoneNumberLabel: "Phone Number",
+    consentAgreePrefix: "I agree to the",
+    consentTermsLink: "Terms & Conditions",
+    consentAndWord: "and",
+    consentPrivacyLink: "Privacy Policy",
+    privacyNoteTitle: "Your privacy matters.",
+    form1PrivacyNoteBody: "Your information, photos and video will be used only for Yamaha Day 2026 activities and will not be shared outside the organization.",
+    form1MediaConsentText: "I grant Yamaha permission to feature my submission photos in internal publications.",
+    form1ThankYouTitle: "Thank you!",
+    form1ThankYouBody: "We can't wait to see your Kando Moment.",
+    form1FooterFamilyText: "Together, we celebrate the families behind every Yamaha action.",
+    form2ChairmanTitle: "CHAIRMAN INVITES",
+    form2ChairmanScript: "Your Thoughts",
+    form2ChairmanSub: "Your ideas help us grow better, together.",
+    form2EmpEinLabel: "Employee EIN",
+    form2PhoneNumberLabel: "Phone Number",
+    form2EmployeeNameLabel: "Employee Name",
+    form2ShareThoughtsTitle: "Share your thoughts:",
+    form2ShareThoughtsDesc: "10 Years from now, what must our brand be doing to ensure (future) customer still choose us over anyone else.",
+    form2BrowseOptionalLabel: "Browse (Optional) — Max Size: 50MB",
+    form2BrowseFileCta: "Click to browse file (any format, max 50MB)",
+    form2ConsentSuffix: "My response may be shared internally at Yamaha.",
+    form2SubmitBtn: "SUBMIT — Chairman's Invitation",
+    form2PrivacyNoteBody: "Your response will be used only for Yamaha Day 2026 activities and will not be shared outside the organization.",
+    form2MessageCardLead: "The future is built by our ideas today.",
+    form2MessageCardText: "Share your thoughts and help shape a stronger, more inspiring Yamaha for tomorrow."
   },
 
   hi: {
@@ -482,7 +547,39 @@ export const translations: Record<Language, Translations> = {
     errPhoto1Required: "फोटो 1 अनिवार्य है।",
     errPhoto2Required: "फोटो 2 अनिवार्य है।",
     errVideoRequired: "कांदो DIY वीडियो जमा करना अनिवार्य है।",
-    errConsentRequired: "सबमिट करने के लिए आपको डेटा प्रोसेसिंग सहमति स्वीकार करनी होगी।"
+    errConsentRequired: "सबमिट करने के लिए आपको डेटा प्रोसेसिंग सहमति स्वीकार करनी होगी।",
+
+    backBtn: "वापस",
+    companyNameLabel: "कंपनी का नाम",
+    noEmpIdNote: "क्या आपके पास कर्मचारी आईडी नहीं है? इसे खाली छोड़ें और नीचे अपना फ़ोन नंबर दर्ज करें।",
+    departmentLabel: "विभाग",
+    locationLabel: "स्थान",
+    form1PhoneNumberLabel: "फ़ोन नंबर",
+    consentAgreePrefix: "मैं",
+    consentTermsLink: "नियम एवं शर्तों",
+    consentAndWord: "और",
+    consentPrivacyLink: "गोपनीयता नीति",
+    privacyNoteTitle: "आपकी गोपनीयता मायने रखती है।",
+    form1PrivacyNoteBody: "आपकी जानकारी, तस्वीरें और वीडियो केवल यामाहा डे 2026 गतिविधियों के लिए उपयोग की जाएंगी और संगठन के बाहर साझा नहीं की जाएंगी।",
+    form1MediaConsentText: "मैं यामाहा को आंतरिक प्रकाशनों में अपनी सबमिशन तस्वीरें प्रदर्शित करने की अनुमति देता हूं।",
+    form1ThankYouTitle: "धन्यवाद!",
+    form1ThankYouBody: "हमें आपके कांदो पल को देखने का इंतज़ार है।",
+    form1FooterFamilyText: "हम हर यामाहा कार्रवाई के पीछे के परिवारों का जश्न मनाते हैं।",
+    form2ChairmanTitle: "अध्यक्ष आमंत्रित करते हैं",
+    form2ChairmanScript: "आपके विचार",
+    form2ChairmanSub: "आपके विचार हमें बेहतर बनने में मदद करते हैं, साथ मिलकर।",
+    form2EmpEinLabel: "कर्मचारी EIN",
+    form2PhoneNumberLabel: "फ़ोन नंबर",
+    form2EmployeeNameLabel: "कर्मचारी का नाम",
+    form2ShareThoughtsTitle: "अपने विचार साझा करें:",
+    form2ShareThoughtsDesc: "आज से 10 साल बाद, हमारे ब्रांड को क्या करना चाहिए ताकि ग्राहक हमेशा हमें ही चुनें।",
+    form2BrowseOptionalLabel: "ब्राउज़ करें (वैकल्पिक) — अधिकतम आकार: 50MB",
+    form2BrowseFileCta: "फ़ाइल ब्राउज़ करने के लिए क्लिक करें (कोई भी प्रारूप, अधिकतम 50MB)",
+    form2ConsentSuffix: "मेरी प्रतिक्रिया यामाहा के भीतर आंतरिक रूप से साझा की जा सकती है।",
+    form2SubmitBtn: "सबमिट करें — अध्यक्ष का निमंत्रण",
+    form2PrivacyNoteBody: "आपकी प्रतिक्रिया केवल यामाहा डे 2026 गतिविधियों के लिए उपयोग की जाएगी और संगठन के बाहर साझा नहीं की जाएगी।",
+    form2MessageCardLead: "भविष्य आज हमारे विचारों से बनता है।",
+    form2MessageCardText: "अपने विचार साझा करें और यामाहा को कल के लिए और मजबूत, प्रेरणादायक बनाने में मदद करें।"
   },
 
   ta: {
@@ -643,6 +740,38 @@ export const translations: Record<Language, Translations> = {
     errPhoto1Required: "புகைப்படம் 1 தேவை.",
     errPhoto2Required: "புகைப்படம் 2 தேவை.",
     errVideoRequired: "காண்டோ DIY வீடியோ சமர்ப்பிப்பு தேவை.",
-    errConsentRequired: "சமர்ப்பிக்க தரவு செயலாக்க ஒப்புதலை ஏற்க வேண்டும்."
+    errConsentRequired: "சமர்ப்பிக்க தரவு செயலாக்க ஒப்புதலை ஏற்க வேண்டும்.",
+
+    backBtn: "பின்செல்",
+    companyNameLabel: "நிறுவனத்தின் பெயர்",
+    noEmpIdNote: "பணியாளர் ஐடி இல்லையா? இதை காலியாக விட்டு கீழே உங்கள் தொலைபேசி எண்ணை உள்ளிடவும்.",
+    departmentLabel: "துறை",
+    locationLabel: "இடம்",
+    form1PhoneNumberLabel: "தொலைபேசி எண்",
+    consentAgreePrefix: "நான்",
+    consentTermsLink: "விதிமுறைகள் மற்றும் நிபந்தனைகள்",
+    consentAndWord: "மற்றும்",
+    consentPrivacyLink: "தனியுரிமைக் கொள்கை",
+    privacyNoteTitle: "உங்கள் தனியுரிமை முக்கியம்.",
+    form1PrivacyNoteBody: "உங்கள் தகவல், படங்கள் மற்றும் வீடியோ யமஹா டே 2026 நடவடிக்கைகளுக்காக மட்டுமே பயன்படுத்தப்படும், நிறுவனத்திற்கு வெளியே பகிரப்படாது.",
+    form1MediaConsentText: "எனது சமர்ப்பிப்பு படங்களை உள் வெளியீடுகளில் காட்ட யமஹாவுக்கு அனுமதி வழங்குகிறேன்.",
+    form1ThankYouTitle: "நன்றி!",
+    form1ThankYouBody: "உங்கள் காண்டோ தருணத்தைப் பார்க்க காத்திருக்கிறோம்.",
+    form1FooterFamilyText: "ஒவ்வொரு யமஹா செயலுக்குப் பின்னாலும் உள்ள குடும்பங்களை நாங்கள் கொண்டாடுகிறோம்.",
+    form2ChairmanTitle: "தலைவர் அழைக்கிறார்",
+    form2ChairmanScript: "உங்கள் கருத்துக்கள்",
+    form2ChairmanSub: "உங்கள் கருத்துக்கள் நாங்கள் இணைந்து சிறப்பாக வளர உதவுகின்றன.",
+    form2EmpEinLabel: "பணியாளர் EIN",
+    form2PhoneNumberLabel: "தொலைபேசி எண்",
+    form2EmployeeNameLabel: "பணியாளர் பெயர்",
+    form2ShareThoughtsTitle: "உங்கள் கருத்துக்களைப் பகிரவும்:",
+    form2ShareThoughtsDesc: "இன்று முதல் 10 ஆண்டுகளுக்குப் பிறகு, வாடிக்கையாளர்கள் எப்போதும் எங்களையே தேர்வு செய்ய எங்கள் பிராண்ட் என்ன செய்ய வேண்டும்.",
+    form2BrowseOptionalLabel: "உலாவவும் (விருப்பத்தேர்வு) — அதிகபட்ச அளவு: 50MB",
+    form2BrowseFileCta: "கோப்பை உலாவ கிளிக் செய்யவும் (எந்த வடிவமும், அதிகபட்சம் 50MB)",
+    form2ConsentSuffix: "எனது பதில் யமஹாவுக்குள் பகிரப்படலாம்.",
+    form2SubmitBtn: "சமர்ப்பிக்கவும் — தலைவரின் அழைப்பு",
+    form2PrivacyNoteBody: "உங்கள் பதில் யமஹா டே 2026 நடவடிக்கைகளுக்காக மட்டுமே பயன்படுத்தப்படும், நிறுவனத்திற்கு வெளியே பகிரப்படாது.",
+    form2MessageCardLead: "எதிர்காலம் இன்றைய நமது யோசனைகளால் கட்டமைக்கப்படுகிறது.",
+    form2MessageCardText: "உங்கள் கருத்துக்களைப் பகிர்ந்து, நாளையை நோக்கி வலிமையான, ஊக்கமளிக்கும் யமஹாவை உருவாக்க உதவுங்கள்."
   }
 };

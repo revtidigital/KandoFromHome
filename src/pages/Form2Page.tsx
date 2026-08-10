@@ -257,20 +257,20 @@ export const Form2Page: React.FC = () => {
             <svg className="icon icon--18" aria-hidden="true">
               <use href="#f2-icon-chevron-left"></use>
             </svg>
-            <span>Back</span>
+            <span>{t.backBtn}</span>
           </a>
 
           <div className="layout">
             <section className="form-column" aria-labelledby="form-title">
               <header className="titles">
-                <h1 id="form-title" className="titles__main">CHAIRMAN INVITES</h1>
+                <h1 id="form-title" className="titles__main">{t.form2ChairmanTitle}</h1>
                 <p className="titles__script">
-                  <span>Your Thoughts</span>
+                  <span>{t.form2ChairmanScript}</span>
                   <svg className="icon titles__heart" aria-hidden="true">
                     <use href="#f2-icon-heart"></use>
                   </svg>
                 </p>
-                <p className="titles__sub">Your ideas help us grow better, together.</p>
+                <p className="titles__sub">{t.form2ChairmanSub}</p>
               </header>
 
               {duplicateError && (
@@ -286,7 +286,7 @@ export const Form2Page: React.FC = () => {
                     <svg className="icon icon--label" aria-hidden="true">
                       <use href="#f2-icon-building"></use>
                     </svg>
-                    <span>Company Name</span>
+                    <span>{t.companyNameLabel}</span>
                   </label>
                   <input
                     className="input"
@@ -305,7 +305,7 @@ export const Form2Page: React.FC = () => {
                       <svg className="icon icon--label" aria-hidden="true">
                         <use href="#f2-icon-id-card"></use>
                       </svg>
-                      <span>Employee EIN {!hasNoEmpId && '*'}</span>
+                      <span>{t.form2EmpEinLabel} {!hasNoEmpId && '*'}</span>
                     </label>
                     <div className="id-field-wrap">
                       <input
@@ -327,7 +327,7 @@ export const Form2Page: React.FC = () => {
                         </span>
                       )}
                     </div>
-                    <p className="field-hint">Don't have an Employee ID? Leave this blank and enter your Phone Number below.</p>
+                    <p className="field-hint">{t.noEmpIdNote}</p>
                     {errors.empId && <p className="field-error">{errors.empId}</p>}
                   </div>
 
@@ -336,7 +336,7 @@ export const Form2Page: React.FC = () => {
                       <svg className="icon icon--label" aria-hidden="true">
                         <use href="#f2-icon-id-card"></use>
                       </svg>
-                      <span>Phone Number {hasNoEmpId && '*'}</span>
+                      <span>{t.form2PhoneNumberLabel} {hasNoEmpId && '*'}</span>
                     </label>
                     <div className="id-field-wrap">
                       <input
@@ -364,7 +364,7 @@ export const Form2Page: React.FC = () => {
                       <svg className="icon icon--label" aria-hidden="true">
                         <use href="#f2-icon-user"></use>
                       </svg>
-                      <span>Employee Name *</span>
+                      <span>{t.form2EmployeeNameLabel} *</span>
                     </label>
                     <input
                       className={`input${errors.empName ? ' is-invalid' : ''}`}
@@ -383,7 +383,7 @@ export const Form2Page: React.FC = () => {
                       <svg className="icon icon--label" aria-hidden="true">
                         <use href="#f2-icon-users"></use>
                       </svg>
-                      <span>Department</span>
+                      <span>{t.departmentLabel}</span>
                     </label>
                     <input
                       className="input"
@@ -401,7 +401,7 @@ export const Form2Page: React.FC = () => {
                       <svg className="icon icon--label" aria-hidden="true">
                         <use href="#f2-icon-map-pin"></use>
                       </svg>
-                      <span>Location</span>
+                      <span>{t.locationLabel}</span>
                     </label>
                     <input
                       className="input"
@@ -421,9 +421,9 @@ export const Form2Page: React.FC = () => {
                       <use href="#f2-icon-message"></use>
                     </svg>
                     <span>
-                      <strong className="thoughts__title">Share your thoughts:</strong>
+                      <strong className="thoughts__title">{t.form2ShareThoughtsTitle}</strong>
                       <span className="thoughts__description">
-                        10 Years from now, what must our brand be doing to ensure (future) customer still choose us over anyone else.
+                        {t.form2ShareThoughtsDesc}
                       </span>
                     </span>
                   </label>
@@ -451,11 +451,11 @@ export const Form2Page: React.FC = () => {
                     <svg className="icon icon--label" aria-hidden="true">
                       <use href="#f2-icon-message"></use>
                     </svg>
-                    <span>Browse (Optional) — Max Size: 50MB</span>
+                    <span>{t.form2BrowseOptionalLabel}</span>
                   </label>
                   <label className={`upload-label${optionalFile ? ' has-file' : ''}`} htmlFor="optionalFile">
                     <Upload className="upload-icon" size={20} />
-                    <span>{optionalFile ? optionalFile.name : 'Click to browse file (any format, max 50MB)'}</span>
+                    <span>{optionalFile ? optionalFile.name : t.form2BrowseFileCta}</span>
                   </label>
                   <input id="optionalFile" type="file" onChange={handleFileChange} style={{ display: 'none' }} />
                   {errors.optionalFile && <p className="field-error">{errors.optionalFile}</p>}
@@ -474,14 +474,14 @@ export const Form2Page: React.FC = () => {
                     onChange={e => { setDataConsent(e.target.checked); if (e.target.checked) setErrors(prev => ({ ...prev, dataConsent: '' })); }}
                   />
                   <span className="consent-text">
-                    I agree to the{' '}
+                    {t.consentAgreePrefix}{' '}
                     <a href={`/${language}/terms`} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}>
-                      Terms &amp; Conditions
+                      {t.consentTermsLink}
                     </a>{' '}
-                    and{' '}
+                    {t.consentAndWord}{' '}
                     <a href={`/${language}/privacy`} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}>
-                      Privacy Policy
-                    </a>. My response may be shared internally at Yamaha. *
+                      {t.consentPrivacyLink}
+                    </a>. {t.form2ConsentSuffix} *
                   </span>
                 </label>
                 {errors.dataConsent && (
@@ -495,7 +495,7 @@ export const Form2Page: React.FC = () => {
                     <svg className="icon icon--22" aria-hidden="true">
                       <use href="#f2-icon-send"></use>
                     </svg>
-                    <span className="submit__text">{isSubmitting ? 'Submitting...' : "SUBMIT — Chairman's Invitation"}</span>
+                    <span className="submit__text">{isSubmitting ? 'Submitting...' : t.form2SubmitBtn}</span>
                     <span className="submit__arrow" aria-hidden="true">
                       <svg className="icon icon--16">
                         <use href="#f2-icon-chevron-right"></use>
@@ -510,8 +510,8 @@ export const Form2Page: React.FC = () => {
                       </svg>
                     </span>
                     <p className="privacy__text">
-                      <strong>Your privacy matters.</strong>
-                      Your response will be used only for Yamaha Day 2026 activities and will not be shared outside the organization.
+                      <strong>{t.privacyNoteTitle}</strong>
+                      {t.form2PrivacyNoteBody}
                     </p>
                   </div>
                 </div>
@@ -523,8 +523,7 @@ export const Form2Page: React.FC = () => {
                 <div className="message-card__quote-row">
                   <span className="message-card__quote" aria-hidden="true">"</span>
                   <p className="message-card__lead">
-                    The future is built<br />
-                    by our ideas today.
+                    {t.form2MessageCardLead}
                   </p>
                 </div>
 
@@ -537,7 +536,7 @@ export const Form2Page: React.FC = () => {
                 </div>
 
                 <p className="message-card__text">
-                  Share your thoughts and help shape a stronger, more inspiring Yamaha for tomorrow.
+                  {t.form2MessageCardText}
                 </p>
               </div>
 
