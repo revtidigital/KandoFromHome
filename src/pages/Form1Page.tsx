@@ -1,24 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
-import { Upload, Image as ImageIcon, FileVideo, AlertTriangle, X, CheckCircle, Loader2, Star } from 'lucide-react';
+import type { Language } from '../i18n/translations';
+import { AlertTriangle, CheckCircle, Loader2, X } from 'lucide-react';
 import { useCaptcha } from '../hooks/useCaptcha';
-
-/* Numbered circular badge — echoes the "1 / 2 / 3" star badges on the
-   "My Yamaha Promise" fill-in card in the campaign artwork. */
-const StepBadge: React.FC<{ n: number }> = ({ n }) => (
-  <div style={{
-    width: '30px', height: '30px', borderRadius: '50%',
-    background: 'linear-gradient(135deg, #D1B07B 0%, #B8935E 100%)',
-    color: '#020B2A', fontWeight: 800, fontSize: '0.95rem',
-    display: 'flex', alignItems: 'center', justifyContent: 'center',
-    flexShrink: 0, boxShadow: '0 2px 8px rgba(209, 176, 123, 0.4)'
-  }}>
-    {n}
-  </div>
-);
+import '../kando_form1_ui.css';
 
 export const Form1Page: React.FC = () => {
-  const { t, formData, setFormData, navigateTo, language, apiBaseUrl } = useApp();
+  const { t, formData, setFormData, navigateTo, language, setLanguage, apiBaseUrl } = useApp();
   const { getCaptchaToken } = useCaptcha(apiBaseUrl);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -222,356 +210,445 @@ export const Form1Page: React.FC = () => {
   };
 
   return (
-    <div className="container" style={{ padding: '24px 12px', maxWidth: '900px', width: '100%', boxSizing: 'border-box' }}>
-      <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-        {/* BANNER-STYLE TITLE — echoes the ribbon banner on the campaign fill-in card */}
-        <div style={{
-          display: 'inline-block',
-          background: 'linear-gradient(135deg, #0A1A4A 0%, #081745 100%)',
-          border: '1.5px solid #D1B07B',
-          borderRadius: '10px',
-          padding: '10px 28px',
-          marginBottom: '14px',
-          boxShadow: '0 4px 16px rgba(0,0,0,0.3)'
-        }}>
-          <h1 className="heading-font" style={{ fontSize: 'clamp(1.4rem, 4vw, 2rem)', color: 'white', margin: 0 }}>
-            {t.form1Title}
-          </h1>
-        </div>
-        <p style={{ color: '#A0B2D6', fontSize: '0.95rem' }}>
-          {t.form1Subtitle}
-        </p>
-      </div>
+    <div className="kando-page-f1">
+      {/* ============================== Header ============================== */}
+      <header className="site-header">
+        <a className="yamaha-logo" href="#" onClick={(e) => { e.preventDefault(); navigateTo('home'); }} aria-label="Yamaha home">
+          <img
+            className="yamaha-logo-img"
+            src="/yamaha-logo (2).png"
+            alt="Yamaha — Revs Your Heart"
+            onError={(e) => { (e.target as HTMLImageElement).src = '/yamaha_logo.png'; }}
+          />
+        </a>
 
-      {duplicateError && (
-        <div style={{
-          background: 'rgba(239, 68, 68, 0.15)',
-          border: '1.5px solid #EF4444',
-          borderRadius: '12px',
-          padding: '14px',
-          marginBottom: '20px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          color: '#FCA5A5'
-        }}>
-          <AlertTriangle color="#EF4444" size={24} style={{ flexShrink: 0 }} />
-          <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>{duplicateError}</span>
-        </div>
-      )}
+        <div className="campaign-title">{t.kandoFromHome}</div>
 
-      <form onSubmit={handleSubmit} className="glass-card form-card-panel" style={{ borderRadius: '20px', width: '100%', boxSizing: 'border-box', position: 'relative', overflow: 'hidden' }}>
+        <nav className="header-actions" aria-label="Primary navigation">
+          <a className="home-link" href="#" onClick={(e) => { e.preventDefault(); navigateTo('home'); }}>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m3.5 10.5 8.5-7 8.5 7" />
+              <path d="M5.5 9.2V21h13V9.2M9.5 21v-6h5v6" />
+            </svg>
+            <span>{t.home}</span>
+          </a>
 
-        {/* Dashed inner frame + corner star doodles — fill-in-card feel */}
-        <div style={{
-          position: 'absolute', inset: '10px',
-          border: '1.5px dashed rgba(209, 176, 123, 0.3)',
-          borderRadius: '14px',
-          pointerEvents: 'none'
-        }} />
-        <Star size={16} color="#D1B07B" fill="#D1B07B" style={{ position: 'absolute', top: '18px', right: '22px', opacity: 0.6 }} />
-        <Star size={12} color="#D1B07B" fill="#D1B07B" style={{ position: 'absolute', bottom: '18px', left: '22px', opacity: 0.5 }} />
+          <span className="header-divider" aria-hidden="true"></span>
 
-        {/* EMPLOYEE DETAILS SECTION */}
-        <div style={{ marginBottom: '28px' }}>
-          <h2 style={{ fontSize: '1.15rem', color: '#D1B07B', marginBottom: '16px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <StepBadge n={1} />
-            {t.sec1EmployeeDetailsTitle}
-          </h2>
+          <label className="language-picker">
+            <span className="sr-only">Choose language</span>
+            <select aria-label="Choose language" value={language} onChange={(e) => setLanguage(e.target.value as Language)}>
+              <option value="en">English</option>
+              <option value="hi">हिन्दी</option>
+              <option value="ta">தமிழ்</option>
+            </select>
+            <svg viewBox="0 0 16 16" aria-hidden="true">
+              <path d="m3 6 5 5 5-5" />
+            </svg>
+          </label>
+        </nav>
+      </header>
 
-          <div className="form-fields-grid">
-            <div style={{ minWidth: 0 }}>
-              <label style={{ display: 'block', color: 'var(--label-muted)', fontSize: '0.85rem', marginBottom: '6px' }}>Company Name</label>
-              <input
-                type="text"
-                value={companyName}
-                onChange={e => setCompanyName(e.target.value)}
-                placeholder="e.g. Yamaha Motor India"
-                style={{
-                  width: '100%', minWidth: 0, padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
-                  background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.2)',
-                  color: 'var(--text-main)', outline: 'none'
-                }}
-              />
-            </div>
+      <main className="entry-main">
+        <div className="paper-texture" aria-hidden="true"></div>
 
-            <div style={{ minWidth: 0 }}>
-              <label style={{ display: 'block', color: 'var(--label-muted)', fontSize: '0.85rem', marginBottom: '6px' }}>{t.empId} {!hasNoEmpId && '*'}</label>
-              <div style={{ position: 'relative' }}>
-                <input
-                  type="text"
-                  value={formData.empId}
-                  disabled={formData.phone.trim().length > 0}
-                  onChange={e => setFormData(prev => ({ ...prev, empId: e.target.value }))}
-                  placeholder="e.g. YMI-1049"
-                  style={{
-                    width: '100%', minWidth: 0, padding: '12px 40px 12px 14px', borderRadius: '10px', boxSizing: 'border-box',
-                    background: formData.phone.trim() ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.06)',
-                    border: errors.empId ? '1px solid #EF4444' : '1px solid rgba(255,255,255,0.2)',
-                    color: formData.phone.trim() ? '#64748B' : 'white', outline: 'none'
-                  }}
-                />
-                {!hasNoEmpId && formData.empId.trim() && (
-                  <span style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)' }}>
-                    {idCheckStatus === 'checking' && <Loader2 size={16} color="#94A3B8" className="animate-spin" />}
-                    {idCheckStatus === 'valid' && <CheckCircle size={16} color="#4ADE80" />}
-                    {idCheckStatus === 'invalid' && <AlertTriangle size={16} color="#EF4444" />}
-                  </span>
-                )}
+        <a className="back-button" href="#" onClick={(e) => { e.preventDefault(); navigateTo('home'); }} aria-label="Go back">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m14.5 18-6-6 6-6" />
+          </svg>
+          <span>Back</span>
+        </a>
+
+        <section className="entry-grid">
+          <div className="form-column">
+            <div className="intro-copy">
+              <div className="headline-row">
+                <h1>{t.form1Title}</h1>
+                <svg className="gold-heart" viewBox="0 0 48 48" aria-hidden="true">
+                  <path d="M24 42S6 31.5 6 16.8C6 9.2 15.3 5.2 20.4 11L24 15l3.6-4C32.7 5.2 42 9.2 42 16.8 42 31.5 24 42 24 42Z" />
+                </svg>
               </div>
-              <p style={{ color: '#64748B', fontSize: '0.75rem', marginTop: '4px' }}>
-                Don't have an Employee ID? Leave this blank and enter your Phone Number below.
-              </p>
-              {errors.empId && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.empId}</p>}
-            </div>
+              <p>{t.form1Subtitle}</p>
 
-            <div style={{ minWidth: 0 }}>
-              <label style={{ display: 'block', color: 'var(--label-muted)', fontSize: '0.85rem', marginBottom: '6px' }}>Phone Number {hasNoEmpId && '*'}</label>
-              <div style={{ position: 'relative' }}>
-                <input
-                  type="tel"
-                  value={formData.phone}
-                  disabled={formData.empId.trim().length > 0}
-                  onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                  placeholder="Only if you have no Employee ID"
-                  style={{
-                    width: '100%', minWidth: 0, padding: '12px 40px 12px 14px', borderRadius: '10px', boxSizing: 'border-box',
-                    background: formData.empId.trim() ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.06)',
-                    border: '1px solid rgba(255,255,255,0.2)',
-                    color: formData.empId.trim() ? '#64748B' : 'white', outline: 'none'
-                  }}
-                />
-                {hasNoEmpId && formData.phone.trim() && (
-                  <span style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)' }}>
-                    {idCheckStatus === 'checking' && <Loader2 size={16} color="#94A3B8" className="animate-spin" />}
-                    {idCheckStatus === 'valid' && <CheckCircle size={16} color="#4ADE80" />}
-                    {idCheckStatus === 'invalid' && <AlertTriangle size={16} color="#EF4444" />}
-                  </span>
-                )}
+              <div className="title-flourish" aria-hidden="true">
+                <span></span>
+                <svg viewBox="0 0 30 28">
+                  <path d="M15 25S3 18 3 8.7C3 4 8.7 1.5 12 5.2L15 8.5l3-3.3C21.3 1.5 27 4 27 8.7 27 18 15 25 15 25Z" />
+                </svg>
+                <span></span>
               </div>
             </div>
 
-            <div style={{ minWidth: 0 }}>
-              <label style={{ display: 'block', color: 'var(--label-muted)', fontSize: '0.85rem', marginBottom: '6px' }}>{t.fullName} *</label>
-              <input
-                type="text"
-                value={formData.empName}
-                onChange={e => setFormData(prev => ({ ...prev, empName: e.target.value }))}
-                placeholder="e.g. Rahul Sharma"
-                style={{
-                  width: '100%', minWidth: 0, padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
-                  background: 'rgba(255,255,255,0.06)', border: errors.empName ? '1px solid #EF4444' : '1px solid rgba(255,255,255,0.2)',
-                  color: 'var(--text-main)', outline: 'none'
-                }}
-              />
-              {errors.empName && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.empName}</p>}
-            </div>
-
-            <div style={{ minWidth: 0 }}>
-              <label style={{ display: 'block', color: 'var(--label-muted)', fontSize: '0.85rem', marginBottom: '6px' }}>Department</label>
-              <input
-                type="text"
-                value={department}
-                onChange={e => setDepartment(e.target.value)}
-                placeholder="e.g. Marketing"
-                style={{
-                  width: '100%', minWidth: 0, padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
-                  background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.2)',
-                  color: 'var(--text-main)', outline: 'none'
-                }}
-              />
-            </div>
-
-            <div style={{ minWidth: 0 }}>
-              <label style={{ display: 'block', color: 'var(--label-muted)', fontSize: '0.85rem', marginBottom: '6px' }}>Location</label>
-              <input
-                type="text"
-                value={formData.city}
-                onChange={e => setFormData(prev => ({ ...prev, city: e.target.value }))}
-                placeholder="e.g. Surajpur / Chennai"
-                style={{
-                  width: '100%', minWidth: 0, padding: '12px 14px', borderRadius: '10px', boxSizing: 'border-box',
-                  background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.2)',
-                  color: 'var(--text-main)', outline: 'none'
-                }}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* MEDIA ASSETS UPLOAD SECTION */}
-        <div style={{ marginBottom: '28px' }}>
-          <h2 style={{ fontSize: '1.15rem', color: '#D1B07B', marginBottom: '8px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <StepBadge n={2} />
-            {t.sec2UploadPhotosTitle}
-          </h2>
-          <p style={{ color: '#94A3B8', fontSize: '0.85rem', marginBottom: '16px' }}>
-            {t.sec2UploadPhotosDesc}
-          </p>
-
-          <div className="form-photos-grid">
-
-            {/* PHOTO 1 */}
-            <div>
-              <label style={{ display: 'block', color: 'var(--label-muted)', fontSize: '0.85rem', marginBottom: '6px' }}>
-                {t.photo1Label}
-              </label>
-              {photo1Preview ? (
-                <div style={{ position: 'relative', height: '160px', borderRadius: '12px', overflow: 'hidden', border: '1.5px solid #D1B07B' }}>
-                  <img src={photo1Preview} alt="Preview 1" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  <button type="button" onClick={() => handleRemovePhoto('photo1')} style={{ position: 'absolute', top: '8px', right: '8px', background: 'rgba(0,0,0,0.7)', border: 'none', borderRadius: '50%', padding: '6px', color: 'white', cursor: 'pointer' }}>
-                    <X size={16} />
-                  </button>
-                </div>
-              ) : (
-                <label style={{
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                  height: '160px', borderRadius: '12px', border: '2px dashed rgba(209, 176, 123, 0.4)',
-                  background: 'rgba(209, 176, 123, 0.04)', cursor: 'pointer', textAlign: 'center', padding: '16px'
-                }}>
-                  <ImageIcon size={28} color="#D1B07B" />
-                  <span style={{ fontSize: '0.85rem', color: 'var(--label-muted)', marginTop: '8px' }}>Click to select Photo 1</span>
-                  <span style={{ fontSize: '0.75rem', color: '#64748B' }}>All photo formats supported (Max 5MB)</span>
-                  <input type="file" accept="image/*,.png,.jpg,.jpeg,.gif,.webp,.heic,.heif,.bmp,.svg,.tiff" onChange={e => handlePhotoChange(e, 'photo1')} style={{ display: 'none' }} />
-                </label>
-              )}
-              {errors.photo1 && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.photo1}</p>}
-            </div>
-
-            {/* PHOTO 2 */}
-            <div>
-              <label style={{ display: 'block', color: 'var(--label-muted)', fontSize: '0.85rem', marginBottom: '6px' }}>
-                {t.photo2Label}
-              </label>
-              {photo2Preview ? (
-                <div style={{ position: 'relative', height: '160px', borderRadius: '12px', overflow: 'hidden', border: '1.5px solid #D1B07B' }}>
-                  <img src={photo2Preview} alt="Preview 2" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  <button type="button" onClick={() => handleRemovePhoto('photo2')} style={{ position: 'absolute', top: '8px', right: '8px', background: 'rgba(0,0,0,0.7)', border: 'none', borderRadius: '50%', padding: '6px', color: 'white', cursor: 'pointer' }}>
-                    <X size={16} />
-                  </button>
-                </div>
-              ) : (
-                <label style={{
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                  height: '160px', borderRadius: '12px', border: '2px dashed rgba(255, 255, 255, 0.2)',
-                  background: 'rgba(255, 255, 255, 0.02)', cursor: 'pointer', textAlign: 'center', padding: '16px'
-                }}>
-                  <Upload size={28} color="#A0B2D6" />
-                  <span style={{ fontSize: '0.85rem', color: 'var(--label-muted)', marginTop: '8px' }}>Click to select Photo 2</span>
-                  <span style={{ fontSize: '0.75rem', color: '#64748B' }}>All photo formats supported (Max 5MB)</span>
-                  <input type="file" accept="image/*,.png,.jpg,.jpeg,.gif,.webp,.heic,.heif,.bmp,.svg,.tiff" onChange={e => handlePhotoChange(e, 'photo2')} style={{ display: 'none' }} />
-                </label>
-              )}
-              {errors.photo2 && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.photo2}</p>}
-            </div>
-
-          </div>
-
-          {/* OPTIONAL VIDEO UPLOAD IN FORM 1 */}
-          <div style={{ marginTop: '20px' }}>
-            <label style={{ display: 'block', color: 'var(--label-muted)', fontSize: '0.85rem', marginBottom: '6px' }}>
-              {t.sec2UploadVideoTitle}
-            </label>
-            {videoPreview ? (
-              <div style={{ position: 'relative', borderRadius: '14px', overflow: 'hidden', border: '1.5px solid #D1B07B', background: 'black' }}>
-                <video src={videoPreview} controls style={{ width: '100%', maxHeight: '260px', display: 'block' }} />
-                <button
-                  type="button"
-                  onClick={handleRemoveVideo}
-                  style={{ position: 'absolute', top: '8px', right: '8px', background: 'rgba(0,0,0,0.8)', border: 'none', borderRadius: '50%', padding: '6px', color: 'white', cursor: 'pointer' }}
-                >
-                  <X size={16} />
-                </button>
-              </div>
-            ) : (
-              <label style={{
-                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                height: '140px', borderRadius: '12px', border: '2px dashed rgba(209, 176, 123, 0.4)',
-                background: 'rgba(209, 176, 123, 0.04)', cursor: 'pointer', textAlign: 'center', padding: '16px'
+            {duplicateError && (
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: '12px',
+                background: 'rgba(180, 35, 24, 0.06)', border: '1.5px solid #b42318',
+                borderRadius: '12px', padding: '14px 18px', marginTop: '16px'
               }}>
-                <FileVideo size={32} color="#D1B07B" />
-                <span style={{ fontSize: '0.85rem', color: 'var(--label-muted)', marginTop: '8px', fontWeight: 600 }}>Click to select Kando Video (Max 40MB)</span>
-                <span style={{ fontSize: '0.75rem', color: '#64748B' }}>All video formats supported (MP4, MOV, WEBM, AVI, MKV, WMV, etc. Max 40MB)</span>
-                <input type="file" accept="video/*,.mp4,.mov,.webm,.avi,.mkv,.wmv,.flv,.m4v,.3gp,.ts" onChange={handleVideoChange} style={{ display: 'none' }} />
-              </label>
+                <AlertTriangle color="#b42318" size={22} style={{ flexShrink: 0 }} />
+                <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#b42318' }}>{duplicateError}</span>
+              </div>
             )}
-            {errors.video && <p style={{ color: '#EF4444', fontSize: '0.75rem', marginTop: '4px' }}>{errors.video}</p>}
+
+            <form onSubmit={handleSubmit} className="entry-form" noValidate>
+              {/* Company Name */}
+              <div className="field field-full">
+                <label htmlFor="company">Company Name</label>
+                <input
+                  id="company"
+                  type="text"
+                  value={companyName}
+                  onChange={e => setCompanyName(e.target.value)}
+                  placeholder="Enter company name"
+                  autoComplete="organization"
+                />
+              </div>
+
+              {/* Employee ID */}
+              <div className="field">
+                <label htmlFor="ein">{t.empId} {!hasNoEmpId && '*'}</label>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    id="ein"
+                    type="text"
+                    value={formData.empId}
+                    disabled={formData.phone.trim().length > 0}
+                    onChange={e => setFormData(prev => ({ ...prev, empId: e.target.value }))}
+                    placeholder="e.g. YMI-1049"
+                    autoComplete="off"
+                    style={{ paddingRight: '40px' }}
+                  />
+                  {!hasNoEmpId && formData.empId.trim() && (
+                    <span style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)' }}>
+                      {idCheckStatus === 'checking' && <Loader2 size={16} color="#8d98ac" className="animate-spin" />}
+                      {idCheckStatus === 'valid' && <CheckCircle size={16} color="#137044" />}
+                      {idCheckStatus === 'invalid' && <AlertTriangle size={16} color="#b42318" />}
+                    </span>
+                  )}
+                </div>
+                <p className="file-name" style={{ marginTop: '4px' }}>
+                  Don't have an Employee ID? Leave this blank and enter your Phone Number below.
+                </p>
+                {errors.empId && <p className="file-error">{errors.empId}</p>}
+              </div>
+
+              {/* Phone Number */}
+              <div className="field">
+                <label htmlFor="phone">Phone Number {hasNoEmpId && '*'}</label>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    id="phone"
+                    type="tel"
+                    value={formData.phone}
+                    disabled={formData.empId.trim().length > 0}
+                    onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                    placeholder="Only if you have no Employee ID"
+                    style={{ paddingRight: '40px' }}
+                  />
+                  {hasNoEmpId && formData.phone.trim() && (
+                    <span style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)' }}>
+                      {idCheckStatus === 'checking' && <Loader2 size={16} color="#8d98ac" className="animate-spin" />}
+                      {idCheckStatus === 'valid' && <CheckCircle size={16} color="#137044" />}
+                      {idCheckStatus === 'invalid' && <AlertTriangle size={16} color="#b42318" />}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Employee Name */}
+              <div className="field">
+                <label htmlFor="employee-name">{t.fullName} *</label>
+                <input
+                  id="employee-name"
+                  type="text"
+                  value={formData.empName}
+                  onChange={e => setFormData(prev => ({ ...prev, empName: e.target.value }))}
+                  placeholder="e.g. Rahul Sharma"
+                  autoComplete="name"
+                />
+                {errors.empName && <p className="file-error">{errors.empName}</p>}
+              </div>
+
+              {/* Department */}
+              <div className="field">
+                <label htmlFor="department">Department</label>
+                <input
+                  id="department"
+                  type="text"
+                  value={department}
+                  onChange={e => setDepartment(e.target.value)}
+                  placeholder="e.g. Marketing"
+                />
+              </div>
+
+              {/* Location */}
+              <div className="field">
+                <label htmlFor="location">Location</label>
+                <input
+                  id="location"
+                  type="text"
+                  value={formData.city}
+                  onChange={e => setFormData(prev => ({ ...prev, city: e.target.value }))}
+                  placeholder="e.g. Surajpur / Chennai"
+                  autoComplete="address-level2"
+                />
+              </div>
+
+              {/* MEDIA UPLOADS */}
+              <fieldset className="upload-section field-full">
+                <legend>{t.sec2UploadPhotosTitle}</legend>
+                <p className="upload-help">{t.sec2UploadPhotosDesc}</p>
+
+                <div className="upload-grid">
+                  {/* PHOTO 1 */}
+                  <div className="upload-control">
+                    <input
+                      className="file-input"
+                      id="photo-one"
+                      type="file"
+                      accept="image/*,.png,.jpg,.jpeg,.gif,.webp,.heic,.heif,.bmp,.svg,.tiff"
+                      onChange={e => handlePhotoChange(e, 'photo1')}
+                    />
+                    <label className={`upload-button${photo1Preview ? ' has-file' : ''}${errors.photo1 ? ' has-error' : ''}`} htmlFor="photo-one">
+                      {photo1Preview ? (
+                        <img src={photo1Preview} alt="Photo 1 preview" className="upload-type-icon" style={{ objectFit: 'cover', borderRadius: '4px' }} />
+                      ) : (
+                        <svg className="upload-type-icon" viewBox="0 0 32 32" aria-hidden="true">
+                          <rect x="3.5" y="5" width="25" height="22" rx="3" />
+                          <circle cx="11" cy="12" r="2.2" />
+                          <path d="m6.5 23 6.2-6.3 4.3 4.1 3.7-3.5 4.8 5.7" />
+                        </svg>
+                      )}
+                      <span>
+                        <strong>{t.photo1Label}</strong>
+                        <small>All photo formats supported · Max 5MB</small>
+                      </span>
+                      {photo1Preview ? (
+                        <span
+                          role="button"
+                          tabIndex={0}
+                          onClick={(e) => { e.preventDefault(); handleRemovePhoto('photo1'); }}
+                          style={{ cursor: 'pointer' }}
+                        >
+                          <X size={20} />
+                        </span>
+                      ) : (
+                        <svg className="mini-upload" viewBox="0 0 24 24" aria-hidden="true">
+                          <path d="M12 16V4m0 0L8 8m4-4 4 4M5 15v5h14v-5" />
+                        </svg>
+                      )}
+                    </label>
+                    <p className="file-name">{formData.photo1 ? formData.photo1.name : 'No file selected'}</p>
+                    {errors.photo1 && <p className="file-error">{errors.photo1}</p>}
+                  </div>
+
+                  {/* PHOTO 2 */}
+                  <div className="upload-control">
+                    <input
+                      className="file-input"
+                      id="photo-two"
+                      type="file"
+                      accept="image/*,.png,.jpg,.jpeg,.gif,.webp,.heic,.heif,.bmp,.svg,.tiff"
+                      onChange={e => handlePhotoChange(e, 'photo2')}
+                    />
+                    <label className={`upload-button${photo2Preview ? ' has-file' : ''}${errors.photo2 ? ' has-error' : ''}`} htmlFor="photo-two">
+                      {photo2Preview ? (
+                        <img src={photo2Preview} alt="Photo 2 preview" className="upload-type-icon" style={{ objectFit: 'cover', borderRadius: '4px' }} />
+                      ) : (
+                        <svg className="upload-type-icon" viewBox="0 0 32 32" aria-hidden="true">
+                          <rect x="3.5" y="5" width="25" height="22" rx="3" />
+                          <circle cx="11" cy="12" r="2.2" />
+                          <path d="m6.5 23 6.2-6.3 4.3 4.1 3.7-3.5 4.8 5.7" />
+                        </svg>
+                      )}
+                      <span>
+                        <strong>{t.photo2Label}</strong>
+                        <small>All photo formats supported · Max 5MB</small>
+                      </span>
+                      {photo2Preview ? (
+                        <span
+                          role="button"
+                          tabIndex={0}
+                          onClick={(e) => { e.preventDefault(); handleRemovePhoto('photo2'); }}
+                          style={{ cursor: 'pointer' }}
+                        >
+                          <X size={20} />
+                        </span>
+                      ) : (
+                        <svg className="mini-upload" viewBox="0 0 24 24" aria-hidden="true">
+                          <path d="M12 16V4m0 0L8 8m4-4 4 4M5 15v5h14v-5" />
+                        </svg>
+                      )}
+                    </label>
+                    <p className="file-name">{formData.photo2 ? formData.photo2.name : 'No file selected'}</p>
+                    {errors.photo2 && <p className="file-error">{errors.photo2}</p>}
+                  </div>
+
+                  {/* VIDEO */}
+                  <div className="upload-control">
+                    <input
+                      className="file-input"
+                      id="family-video"
+                      type="file"
+                      accept="video/*,.mp4,.mov,.webm,.avi,.mkv,.wmv,.flv,.m4v,.3gp,.ts"
+                      onChange={handleVideoChange}
+                    />
+                    <label className={`upload-button${videoPreview ? ' has-file' : ''}${errors.video ? ' has-error' : ''}`} htmlFor="family-video">
+                      <svg className="upload-type-icon" viewBox="0 0 32 32" aria-hidden="true">
+                        <rect x="3.5" y="7" width="18" height="18" rx="3" />
+                        <path d="m21.5 13 7-4v14l-7-4" />
+                        <path d="m12 12 5 4-5 4v-8Z" />
+                      </svg>
+                      <span>
+                        <strong>{t.sec2UploadVideoTitle}</strong>
+                        <small>All video formats supported · Max 40MB</small>
+                      </span>
+                      {videoPreview ? (
+                        <span
+                          role="button"
+                          tabIndex={0}
+                          onClick={(e) => { e.preventDefault(); handleRemoveVideo(); }}
+                          style={{ cursor: 'pointer' }}
+                        >
+                          <X size={20} />
+                        </span>
+                      ) : (
+                        <svg className="mini-upload" viewBox="0 0 24 24" aria-hidden="true">
+                          <path d="M12 16V4m0 0L8 8m4-4 4 4M5 15v5h14v-5" />
+                        </svg>
+                      )}
+                    </label>
+                    <p className="file-name">{video ? video.name : 'No file selected'}</p>
+                    {errors.video && <p className="file-error">{errors.video}</p>}
+                  </div>
+                </div>
+
+                {videoPreview && (
+                  <div style={{ marginTop: '14px', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border)' }}>
+                    <video src={videoPreview} controls style={{ width: '100%', maxHeight: '220px', display: 'block', background: '#000' }} />
+                  </div>
+                )}
+              </fieldset>
+
+              {/* CONSENTS */}
+              <div className="field field-full" style={{ gap: '12px' }}>
+                <label
+                  style={{
+                    display: 'flex', alignItems: 'flex-start', gap: '12px', cursor: 'pointer',
+                    padding: '14px 16px', borderRadius: '12px',
+                    border: errors.dataConsent ? '1.5px solid #b42318' : '1px solid var(--border)',
+                    background: errors.dataConsent ? 'rgba(180,35,24,0.04)' : 'rgba(255,255,255,0.6)'
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={dataConsent}
+                    onChange={e => { setDataConsent(e.target.checked); if (e.target.checked) setErrors(prev => ({ ...prev, dataConsent: '' })); }}
+                    style={{ accentColor: 'var(--yamaha-blue)', width: '18px', height: '18px', flexShrink: 0, marginTop: '2px' }}
+                  />
+                  <span style={{ fontSize: '0.87rem', lineHeight: 1.5 }}>
+                    I agree to the{' '}
+                    <a href={`/${language}/terms`} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ color: 'var(--yamaha-blue)', textDecoration: 'underline' }}>
+                      Terms &amp; Conditions
+                    </a>{' '}
+                    and{' '}
+                    <a href={`/${language}/privacy`} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ color: 'var(--yamaha-blue)', textDecoration: 'underline' }}>
+                      Privacy Policy
+                    </a>. *
+                  </span>
+                </label>
+                {errors.dataConsent && (
+                  <p className="file-error" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <AlertTriangle size={13} /> {errors.dataConsent}
+                  </p>
+                )}
+
+                <label
+                  style={{
+                    display: 'flex', alignItems: 'flex-start', gap: '12px', cursor: 'pointer',
+                    padding: '14px 16px', borderRadius: '12px',
+                    border: '1px solid var(--border)', background: 'rgba(255,255,255,0.6)'
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={mediaConsent}
+                    onChange={e => { setMediaConsent(e.target.checked); if (e.target.checked) setErrors(prev => ({ ...prev, mediaConsent: '' })); }}
+                    style={{ accentColor: 'var(--yamaha-blue)', width: '18px', height: '18px', flexShrink: 0, marginTop: '2px' }}
+                  />
+                  <span style={{ fontSize: '0.87rem', lineHeight: 1.5 }}>
+                    I grant Yamaha permission to feature my submission photos in internal publications. *
+                  </span>
+                </label>
+              </div>
+
+              {/* PRIVACY CARD */}
+              <aside className="privacy-card" aria-label="Privacy information">
+                <div className="privacy-icon" aria-hidden="true">
+                  <svg viewBox="0 0 54 54">
+                    <path className="shield" d="M27 4 46 11v14c0 12-7.8 20.7-19 25C15.8 45.7 8 37 8 25V11l19-7Z" />
+                    <rect x="20" y="23" width="14" height="13" rx="2" />
+                    <path d="M23 23v-4a4 4 0 0 1 8 0v4" />
+                  </svg>
+                </div>
+                <div>
+                  <strong>Your privacy matters.</strong>
+                  <p>Your information, photos and video will be used only for Yamaha Day 2026 activities and will not be shared outside the organization.</p>
+                </div>
+              </aside>
+
+              <button className="submit-button" type="submit" disabled={isSubmitting || !dataConsent || !mediaConsent}>
+                <svg className="submit-upload-icon" viewBox="0 0 28 28" aria-hidden="true">
+                  <path d="M14 18V4m0 0L9 9m5-5 5 5M5 17v7h18v-7" />
+                </svg>
+                <span>{isSubmitting ? 'Submitting...' : 'SUBMIT DIY KONDO KIT'}</span>
+                <svg className="submit-arrow" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="m9 5 7 7-7 7" />
+                </svg>
+              </button>
+            </form>
+          </div>
+
+          <aside className="visual-column" aria-label="Family Kando Moment">
+            <div className="polaroid-wrap">
+              <figure className="polaroid-frame">
+                <img
+                  src="/user_form1_composite.png"
+                  alt="A smiling family holding an Our Kando Moment sign"
+                  onError={(e) => { (e.target as HTMLImageElement).src = '/user_form1_right.png'; }}
+                />
+              </figure>
+            </div>
+          </aside>
+        </section>
+      </main>
+
+      {/* ============================== Footer ============================== */}
+      <footer className="page-footer">
+        <div className="footer-inner">
+          <div className="footer-message footer-thanks">
+            <svg viewBox="0 0 54 62" aria-hidden="true">
+              <path d="M27 3 48 11v17c0 14-8.7 24.4-21 29C14.7 52.4 6 42 6 28V11l21-8Z" />
+              <path d="m18 29 6 6 13-15" />
+            </svg>
+            <div>
+              <strong>Thank you!</strong>
+              <p>We can't wait to see your Kando Moment.</p>
+            </div>
+          </div>
+
+          <div className="footer-message footer-family">
+            <svg viewBox="0 0 92 66" aria-hidden="true">
+              <circle cx="46" cy="15" r="12" />
+              <circle cx="20" cy="23" r="9" />
+              <circle cx="72" cy="23" r="9" />
+              <path d="M28 58V39c0-10 8-17 18-17s18 7 18 17v19l-18 6-18-6Z" />
+              <path d="M28 37c-3-3-6-5-11-5-8 0-13 6-13 14v13h16l8-3M64 37c3-3 6-5 11-5 8 0 13 6 13 14v13H72l-8-3" />
+            </svg>
+            <p>Together, we celebrate the families<br />behind every Yamaha action.</p>
           </div>
         </div>
-
-        {/* CONSENTS & SUBMIT */}
-        <div style={{ marginBottom: '16px' }}>
-          <h2 style={{ fontSize: '1.15rem', color: '#D1B07B', marginBottom: '16px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <StepBadge n={3} />
-            Consent &amp; Submit
-          </h2>
-        </div>
-        <div style={{ marginBottom: '28px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {/* Terms & Conditions */}
-          <div>
-            <label style={{
-              display: 'flex', alignItems: 'flex-start', gap: '12px', cursor: 'pointer',
-              padding: '12px', borderRadius: '10px',
-              border: errors.dataConsent ? '1px solid #EF4444' : '1px solid rgba(255,255,255,0.1)',
-              background: errors.dataConsent ? 'rgba(239,68,68,0.05)' : 'rgba(255,255,255,0.02)'
-            }}>
-              <input type="checkbox" checked={dataConsent}
-                onChange={e => { setDataConsent(e.target.checked); if (e.target.checked) setErrors(prev => ({ ...prev, dataConsent: '' })); }}
-                style={{ accentColor: '#D1B07B', width: '18px', height: '18px', flexShrink: 0, marginTop: '2px' }} />
-              <span style={{ color: 'var(--label-muted)', fontSize: '0.87rem', lineHeight: 1.5 }}>
-                I agree to the{' '}
-                <a href={`/${language}/terms`} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ color: '#D1B07B', textDecoration: 'underline' }}>
-                  Terms &amp; Conditions
-                </a>{' '}
-                and{' '}
-                <a href={`/${language}/privacy`} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ color: '#D1B07B', textDecoration: 'underline' }}>
-                  Privacy Policy
-                </a>. *
-              </span>
-            </label>
-            {errors.dataConsent && (
-              <p style={{ color: '#EF4444', fontSize: '0.78rem', marginTop: '5px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <AlertTriangle size={13} /> {errors.dataConsent}
-              </p>
-            )}
-          </div>
-
-          {/* Media Consent */}
-          <div>
-            <label style={{
-              display: 'flex', alignItems: 'flex-start', gap: '12px', cursor: 'pointer',
-              padding: '12px', borderRadius: '10px',
-              border: errors.mediaConsent ? '1px solid #EF4444' : '1px solid rgba(255,255,255,0.1)',
-              background: errors.mediaConsent ? 'rgba(239,68,68,0.05)' : 'rgba(255,255,255,0.02)'
-            }}>
-              <input type="checkbox" checked={mediaConsent}
-                onChange={e => { setMediaConsent(e.target.checked); if (e.target.checked) setErrors(prev => ({ ...prev, mediaConsent: '' })); }}
-                style={{ accentColor: '#D1B07B', width: '18px', height: '18px', flexShrink: 0, marginTop: '2px' }} />
-              <span style={{ color: 'var(--label-muted)', fontSize: '0.87rem', lineHeight: 1.5 }}>
-                I grant Yamaha permission to feature my submission photos in internal publications. *
-              </span>
-            </label>
-          </div>
-        </div>
-
-        <button
-          type="submit"
-          disabled={isSubmitting || !dataConsent || !mediaConsent}
-          style={{
-            width: '100%', padding: '16px', borderRadius: '14px',
-            background: 'linear-gradient(90deg, #D1B07B 0%, #0072FF 100%)',
-            border: 'none', color: 'white', fontSize: '1.05rem', fontWeight: 800,
-            cursor: (isSubmitting || !dataConsent || !mediaConsent) ? 'not-allowed' : 'pointer',
-            boxShadow: '0 6px 20px rgba(209, 176, 123, 0.4)', display: 'flex',
-            alignItems: 'center', justifyContent: 'center', gap: '8px',
-            opacity: (isSubmitting || !dataConsent || !mediaConsent) ? 0.5 : 1
-          }}
-        >
-          {isSubmitting ? 'Submitting...' : 'SUBMIT DIY KONDO KIT'}
-          <CheckCircle size={18} />
-        </button>
-
-      </form>
+      </footer>
     </div>
   );
 };
