@@ -523,7 +523,8 @@ export const Form2Page: React.FC = () => {
                 <div className="message-card__quote-row">
                   <span className="message-card__quote" aria-hidden="true">"</span>
                   <p className="message-card__lead">
-                    {t.form2MessageCardLead}
+                    The future is built<br />
+                    by our ideas today.
                   </p>
                 </div>
 
@@ -536,7 +537,7 @@ export const Form2Page: React.FC = () => {
                 </div>
 
                 <p className="message-card__text">
-                  {t.form2MessageCardText}
+                  Share your thoughts and help shape a stronger, more inspiring Yamaha for tomorrow.
                 </p>
               </div>
 

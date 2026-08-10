@@ -191,8 +191,6 @@ export interface Translations {
   form2ConsentSuffix: string;
   form2SubmitBtn: string;
   form2PrivacyNoteBody: string;
-  form2MessageCardLead: string;
-  form2MessageCardText: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -385,8 +383,6 @@ export const translations: Record<Language, Translations> = {
     form2ConsentSuffix: "My response may be shared internally at Yamaha.",
     form2SubmitBtn: "SUBMIT — Chairman's Invitation",
     form2PrivacyNoteBody: "Your response will be used only for Yamaha Day 2026 activities and will not be shared outside the organization.",
-    form2MessageCardLead: "The future is built by our ideas today.",
-    form2MessageCardText: "Share your thoughts and help shape a stronger, more inspiring Yamaha for tomorrow."
   },
 
   hi: {
@@ -578,8 +574,6 @@ export const translations: Record<Language, Translations> = {
     form2ConsentSuffix: "मेरी प्रतिक्रिया यामाहा के भीतर आंतरिक रूप से साझा की जा सकती है।",
     form2SubmitBtn: "सबमिट करें — अध्यक्ष का निमंत्रण",
     form2PrivacyNoteBody: "आपकी प्रतिक्रिया केवल यामाहा डे 2026 गतिविधियों के लिए उपयोग की जाएगी और संगठन के बाहर साझा नहीं की जाएगी।",
-    form2MessageCardLead: "भविष्य आज हमारे विचारों से बनता है।",
-    form2MessageCardText: "अपने विचार साझा करें और यामाहा को कल के लिए और मजबूत, प्रेरणादायक बनाने में मदद करें।"
   },
 
   ta: {
@@ -771,7 +765,5 @@ export const translations: Record<Language, Translations> = {
     form2ConsentSuffix: "எனது பதில் யமஹாவுக்குள் பகிரப்படலாம்.",
     form2SubmitBtn: "சமர்ப்பிக்கவும் — தலைவரின் அழைப்பு",
     form2PrivacyNoteBody: "உங்கள் பதில் யமஹா டே 2026 நடவடிக்கைகளுக்காக மட்டுமே பயன்படுத்தப்படும், நிறுவனத்திற்கு வெளியே பகிரப்படாது.",
-    form2MessageCardLead: "எதிர்காலம் இன்றைய நமது யோசனைகளால் கட்டமைக்கப்படுகிறது.",
-    form2MessageCardText: "உங்கள் கருத்துக்களைப் பகிர்ந்து, நாளையை நோக்கி வலிமையான, ஊக்கமளிக்கும் யமஹாவை உருவாக்க உதவுங்கள்."
   }
 };
