@@ -1,0 +1,950 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Kaushan+Script&display=swap');
+
+/* =====================================================
+   FORM 2 — Chairman Invites Your Thoughts
+   ALL selectors are scoped under .kando-page-f2
+   to prevent any conflict with global styles.
+   ===================================================== */
+
+.kando-page-f2 {
+  --navy: #123f8f;
+  --navy-deep: #0c3278;
+  --gold: #dda91f;
+  --page: #fbfcff;
+  --white: #ffffff;
+  --line: #dfe5ef;
+  --muted: #8d98ac;
+  --card-top: #e8eef8;
+  --card-bottom: #f3f7fc;
+  --shadow-soft: 0 10px 30px rgba(18, 63, 143, 0.1);
+  --shadow-button: 0 10px 22px rgba(18, 63, 143, 0.24);
+
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--page);
+  font-family: "Montserrat", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  color: var(--navy);
+}
+
+.kando-page-f2 *,
+.kando-page-f2 *::before,
+.kando-page-f2 *::after {
+  box-sizing: border-box;
+}
+
+.kando-page-f2 button,
+.kando-page-f2 input,
+.kando-page-f2 textarea {
+  font: inherit;
+}
+
+.kando-page-f2 img,
+.kando-page-f2 svg {
+  display: block;
+}
+
+/* SVG Sprite (hidden) */
+.kando-page-f2 .svg-sprite {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.kando-page-f2 .icon {
+  width: 1em;
+  height: 1em;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.kando-page-f2 .icon--16 { font-size: 16px; }
+.kando-page-f2 .icon--18 { font-size: 18px; }
+.kando-page-f2 .icon--22 { font-size: 22px; }
+.kando-page-f2 .icon--label { font-size: 21px; }
+
+/* ========================= Header ========================= */
+.kando-page-f2 .f2-site-header {
+  position: relative;
+  z-index: 50;
+  border-bottom: 1px solid #dce3ee;
+  background: rgba(255, 255, 255, 0.98);
+}
+
+.kando-page-f2 .f2-header-inner {
+  position: relative;
+  width: min(100%, 1600px);
+  min-height: 94px;
+  margin: 0 auto;
+  padding: 12px clamp(24px, 3vw, 44px);
+  display: grid;
+  grid-template-columns: minmax(185px, 1fr) auto minmax(270px, 1fr);
+  align-items: center;
+  gap: 24px;
+}
+
+.kando-page-f2 .f2-brand {
+  width: fit-content;
+  text-decoration: none;
+}
+
+.kando-page-f2 .f2-brand-image {
+  width: clamp(175px, 15vw, 205px);
+  height: auto;
+  object-fit: contain;
+}
+
+.kando-page-f2 .f2-header-title {
+  margin: 0;
+  color: var(--navy);
+  font-size: clamp(20px, 1.75vw, 29px);
+  font-weight: 800;
+  letter-spacing: 0.025em;
+  line-height: 1.1;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.kando-page-f2 .f2-header-nav {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.kando-page-f2 .f2-header-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--navy);
+  font-size: 17px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.kando-page-f2 .f2-header-divider {
+  width: 1px;
+  height: 31px;
+  background: #b9c3d4;
+}
+
+/* === Language Selector (exact same pattern as home page kd-lang) === */
+.kando-page-f2 .f2-lang {
+  display: inline-flex;
+  align-items: center;
+  font-family: "Montserrat", system-ui, sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--navy);
+  background: #fff;
+  border: 1.6px solid var(--navy);
+  border-radius: 999px;
+  padding: 9px 20px;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  pointer-events: auto !important;
+  z-index: 200;
+  position: relative;
+}
+
+.kando-page-f2 .f2-lang:hover {
+  background: #f1f5fb;
+}
+
+
+/* ========================== Main ========================== */
+.kando-page-f2 .f2-page {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  flex: 1;
+}
+
+.kando-page-f2 .f2-page-background {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(70% 80% at 100% 18%, rgba(221, 232, 248, 0.58) 0%, rgba(255, 255, 255, 0) 72%),
+    repeating-radial-gradient(ellipse at 50% 25%, rgba(18, 63, 143, 0.022) 0 1px, transparent 1px 24px),
+    linear-gradient(180deg, #ffffff 0%, #fbfcff 78%, #f8faff 100%);
+}
+
+.kando-page-f2 .f2-page-inner {
+  width: min(100%, 1536px);
+  margin: 0 auto;
+  padding: 40px clamp(30px, 4vw, 64px) 48px;
+}
+
+.kando-page-f2 .back {
+  position: relative;
+  z-index: 5;
+  width: fit-content;
+  min-height: 44px;
+  padding: 0 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid rgba(18, 63, 143, 0.25);
+  border-radius: 999px;
+  color: var(--navy);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 4px 12px rgba(18, 63, 143, 0.06);
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.kando-page-f2 .layout {
+  margin-top: -28px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(430px, 545px);
+  align-items: center;
+  gap: clamp(36px, 5vw, 76px);
+}
+
+.kando-page-f2 .form-column {
+  min-width: 0;
+  padding-top: 18px;
+}
+
+.kando-page-f2 .titles {
+  margin: 0 0 26px;
+  text-align: center;
+}
+
+.kando-page-f2 .titles__main {
+  margin: 0;
+  color: var(--navy);
+  font-size: clamp(34px, 3vw, 48px);
+  font-weight: 900;
+  letter-spacing: 0.006em;
+  line-height: 1;
+}
+
+.kando-page-f2 .titles__script {
+  margin: 4px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: var(--gold);
+  font-family: "Kaushan Script", cursive;
+  font-size: clamp(42px, 3.8vw, 60px);
+  line-height: 1.1;
+}
+
+.kando-page-f2 .titles__heart {
+  width: 38px;
+  height: 38px;
+  color: var(--navy);
+  stroke-width: 1.8;
+}
+
+.kando-page-f2 .titles__sub {
+  margin: 11px 0 0;
+  color: var(--navy);
+  font-family: 'Kozuka Gothic Pro', 'Outfit', sans-serif;
+  font-size: clamp(15px, 1.35vw, 18px);
+  font-weight: 600;
+}
+
+/* ========================== Form ========================== */
+.kando-page-f2 .form {
+  width: min(100%, 720px);
+  margin: 0 auto;
+}
+
+.kando-page-f2 .form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: clamp(22px, 3vw, 38px);
+  row-gap: 18px;
+}
+
+.kando-page-f2 .field {
+  min-width: 0;
+}
+
+.kando-page-f2 .field--company {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.kando-page-f2 .field--thoughts {
+  margin-top: 21px;
+}
+
+.kando-page-f2 .label {
+  margin: 0 0 8px 2px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--navy);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.kando-page-f2 .label--thoughts {
+  align-items: flex-start;
+}
+
+.kando-page-f2 .input,
+.kando-page-f2 .textarea {
+  width: 100%;
+  border: 1px solid #d9e0ea;
+  border-radius: 10px;
+  outline: none;
+  color: var(--navy);
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 1px 2px rgba(18, 63, 143, 0.03);
+  transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+
+.kando-page-f2 .input {
+  height: 47px;
+  padding: 0 18px;
+  font-size: 15px;
+}
+
+.kando-page-f2 .textarea {
+  min-height: 128px;
+  padding: 14px 18px;
+  font-size: 15px;
+  line-height: 31px;
+  resize: vertical;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 30px,
+    rgba(18, 63, 143, 0.11) 30px 31px
+  );
+  background-position: 0 14px;
+}
+
+.kando-page-f2 .input::placeholder,
+.kando-page-f2 .textarea::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+
+.kando-page-f2 .input:hover,
+.kando-page-f2 .textarea:hover {
+  border-color: #bdc9da;
+}
+
+.kando-page-f2 .input:focus,
+.kando-page-f2 .textarea:focus {
+  border-color: #8ba5cf;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(18, 63, 143, 0.08);
+}
+
+.kando-page-f2 .input.is-invalid,
+.kando-page-f2 .textarea.is-invalid {
+  border-color: #b42318;
+  box-shadow: 0 0 0 3px rgba(180, 35, 24, 0.08);
+}
+
+.kando-page-f2 .field-hint {
+  margin: 4px 0 0 2px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.kando-page-f2 .field-error {
+  margin: 4px 0 0 2px;
+  font-size: 12px;
+  color: #b42318;
+  font-weight: 600;
+}
+
+.kando-page-f2 .thoughts__icon {
+  margin-top: 1px;
+}
+
+.kando-page-f2 .thoughts__title {
+  display: block;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.kando-page-f2 .thoughts__description {
+  display: block;
+  max-width: 610px;
+  margin-top: 2px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.kando-page-f2 .char-count-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+.kando-page-f2 .char-count {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.kando-page-f2 .char-count.warn {
+  color: #e0840d;
+}
+
+/* Optional File Upload */
+.kando-page-f2 .upload-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1.5px dashed #c8d4e8;
+  cursor: pointer;
+  background: rgba(18, 63, 143, 0.02);
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 500;
+  transition: border-color 180ms ease, background 180ms ease;
+}
+
+.kando-page-f2 .upload-label:hover {
+  border-color: var(--navy);
+  background: rgba(18, 63, 143, 0.04);
+}
+
+.kando-page-f2 .upload-label.has-file {
+  border-color: #2e7d3a;
+  color: #2e7d3a;
+  background: rgba(46, 125, 58, 0.04);
+}
+
+.kando-page-f2 .upload-icon {
+  flex: 0 0 auto;
+  color: var(--navy);
+}
+
+/* Consent */
+.kando-page-f2 .consent-wrap {
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: 1px solid #d9e0ea;
+  background: rgba(255,255,255,0.6);
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  transition: border-color 180ms ease;
+}
+
+.kando-page-f2 .consent-wrap.has-error {
+  border-color: #b42318;
+  background: rgba(180, 35, 24, 0.03);
+}
+
+.kando-page-f2 .consent-wrap input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  accent-color: var(--navy);
+  cursor: pointer;
+}
+
+.kando-page-f2 .consent-text {
+  color: var(--navy);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.55;
+}
+
+.kando-page-f2 .consent-text a {
+  color: var(--navy-deep);
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+/* Duplicate / general error banner */
+.kando-page-f2 .error-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: 1.5px solid #b42318;
+  background: rgba(180, 35, 24, 0.06);
+  color: #b42318;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+/* ID status indicator */
+.kando-page-f2 .id-field-wrap {
+  position: relative;
+}
+
+.kando-page-f2 .id-status-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+}
+
+/* Actions row */
+.kando-page-f2 .actions {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: minmax(330px, 360px) minmax(0, 1fr);
+  align-items: center;
+  gap: 26px;
+}
+
+.kando-page-f2 .submit {
+  width: 100%;
+  min-height: 59px;
+  padding: 0 18px 0 27px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border: 0;
+  border-radius: 999px;
+  color: var(--white);
+  background: linear-gradient(90deg, #0d43a5 0%, #113d8b 100%);
+  box-shadow: var(--shadow-button);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.012em;
+  cursor: pointer;
+  transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
+}
+
+.kando-page-f2 .submit:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.04);
+  box-shadow: 0 13px 26px rgba(18, 63, 143, 0.27);
+}
+
+.kando-page-f2 .submit:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.kando-page-f2 .submit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.kando-page-f2 .submit__text {
+  flex: 1;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.kando-page-f2 .submit__arrow {
+  width: 31px;
+  height: 31px;
+  display: grid;
+  place-items: center;
+  border: 1.6px solid rgba(255, 255, 255, 0.78);
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+.kando-page-f2 .privacy {
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+}
+
+.kando-page-f2 .privacy__badge {
+  width: 45px;
+  height: 45px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 1px solid rgba(18, 63, 143, 0.17);
+  border-radius: 50%;
+  color: var(--navy);
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.kando-page-f2 .privacy__text {
+  margin: 1px 0 0;
+  color: var(--navy);
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.43;
+}
+
+.kando-page-f2 .privacy__text strong {
+  display: block;
+  margin-bottom: 1px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+/* ======================= Message card ======================= */
+.kando-page-f2 .message-card {
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 24px;
+  background: linear-gradient(180deg, var(--card-top) 0%, var(--card-bottom) 100%);
+  box-shadow: var(--shadow-soft);
+}
+
+.kando-page-f2 .message-card__body {
+  min-height: 285px;
+  padding: 48px 62px 56px;
+}
+
+.kando-page-f2 .message-card__quote-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 19px;
+}
+
+.kando-page-f2 .message-card__quote {
+  margin-top: -13px;
+  color: #0c429b;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 83px;
+  font-weight: 700;
+  line-height: 0.75;
+}
+
+.kando-page-f2 .message-card__lead {
+  margin: 10px 0 0;
+  color: var(--navy);
+  font-size: clamp(18px, 1.5vw, 22px);
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.kando-page-f2 .rule {
+  margin: 25px 0;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.kando-page-f2 .rule__line {
+  height: 1.5px;
+  flex: 1;
+  background: rgba(221, 169, 31, 0.7);
+}
+
+.kando-page-f2 .rule__heart {
+  width: 20px;
+  height: 20px;
+  color: var(--gold);
+  fill: var(--gold);
+  stroke: var(--gold);
+}
+
+.kando-page-f2 .message-card__text {
+  margin: 0;
+  color: var(--navy);
+  font-size: clamp(16px, 1.28vw, 19px);
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.kando-page-f2 .message-card__image {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 548 / 462;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* ========================= Footer ========================= */
+.kando-page-f2 .f2-site-footer {
+  background: #0d3d87;
+  color: #ffffff;
+}
+
+.kando-page-f2 .f2-site-footer__inner {
+  width: min(100%, 1250px);
+  min-height: 108px;
+  margin: 0 auto;
+  padding: 16px 30px;
+  display: grid;
+  grid-template-columns: 100px minmax(0, 1fr) 190px;
+  align-items: center;
+  gap: 28px;
+}
+
+.kando-page-f2 .footer__family {
+  justify-self: center;
+  color: #ffffff;
+}
+
+.kando-page-f2 .footer__family .icon {
+  width: 70px;
+  height: 59px;
+  color: #ffffff;
+}
+
+.kando-page-f2 .footer__tagline {
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 4px 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 13px;
+  border-bottom: 1.5px solid rgba(221, 169, 31, 0.82);
+  color: #e4b331;
+  font-family: "Kaushan Script", cursive;
+  font-size: clamp(20px, 2vw, 28px);
+  line-height: 1.2;
+  text-align: center;
+}
+
+.kando-page-f2 .footer__heart {
+  width: 23px;
+  height: 23px;
+}
+
+.kando-page-f2 .footer__meta {
+  justify-self: end;
+  text-align: left;
+}
+
+.kando-page-f2 .footer__day {
+  margin: 0;
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 0.015em;
+  white-space: nowrap;
+}
+
+.kando-page-f2 .footer__kando {
+  margin: 6px 0 0;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.58);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* ========================= Spacing helpers ========================= */
+.kando-page-f2 .mt-5 { margin-top: 5px; }
+.kando-page-f2 .mt-16 { margin-top: 16px; }
+.kando-page-f2 .mt-20 { margin-top: 20px; }
+.kando-page-f2 .mb-20 { margin-bottom: 20px; }
+
+/* ======================= Responsive ======================= */
+@media (max-width: 1320px) {
+  .kando-page-f2 .f2-header-inner {
+    grid-template-columns: minmax(175px, 1fr) auto minmax(235px, 1fr);
+  }
+  .kando-page-f2 .f2-page-inner {
+    padding-inline: 34px;
+  }
+  .kando-page-f2 .layout {
+    grid-template-columns: minmax(0, 1fr) minmax(390px, 455px);
+    gap: 36px;
+  }
+  .kando-page-f2 .message-card__body {
+    min-height: 260px;
+    padding: 38px 42px 28px;
+  }
+  .kando-page-f2 .actions {
+    grid-template-columns: minmax(290px, 330px) minmax(0, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .kando-page-f2 .f2-header-inner {
+    grid-template-columns: auto 1fr auto;
+    min-height: 82px;
+  }
+  .kando-page-f2 .f2-brand-image { width: 165px; }
+  .kando-page-f2 .f2-header-title { font-size: 20px; }
+  .kando-page-f2 .f2-header-home span,
+  .kando-page-f2 .f2-header-divider { display: none; }
+  .kando-page-f2 .lang-picker select {
+    min-height: 44px;
+    padding: 0 36px 0 18px;
+    font-size: 15px;
+  }
+  .kando-page-f2 .f2-page-inner { padding-top: 30px; }
+  .kando-page-f2 .layout {
+    margin-top: 24px;
+    grid-template-columns: 1fr;
+    gap: 42px;
+  }
+  .kando-page-f2 .form-column { padding-top: 0; }
+  .kando-page-f2 .form { width: min(100%, 790px); }
+  .kando-page-f2 .message-card {
+    width: min(100%, 650px);
+    margin: 0 auto;
+  }
+  .kando-page-f2 .message-card__body {
+    min-height: 0;
+    padding: 38px 52px 30px;
+  }
+  .kando-page-f2 .message-card__image { aspect-ratio: 548 / 420; }
+  .kando-page-f2 .f2-site-footer__inner {
+    grid-template-columns: 80px minmax(0, 1fr) 170px;
+    gap: 18px;
+  }
+  .kando-page-f2 .footer__family .icon {
+    width: 60px;
+    height: 51px;
+  }
+}
+
+@media (max-width: 820px) {
+  .kando-page-f2 .f2-header-inner {
+    min-height: auto;
+    padding-block: 12px;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "brand nav"
+      "title title";
+    row-gap: 11px;
+  }
+  .kando-page-f2 .f2-brand { grid-area: brand; }
+  .kando-page-f2 .f2-header-title {
+    grid-area: title;
+    padding-top: 10px;
+    border-top: 1px solid #e4e9f1;
+    font-size: 18px;
+  }
+  .kando-page-f2 .f2-header-nav {
+    grid-area: nav;
+    gap: 12px;
+  }
+  .kando-page-f2 .f2-page-inner { padding: 22px 22px 38px; }
+  .kando-page-f2 .back {
+    min-height: 40px;
+    padding-inline: 15px;
+    font-size: 14px;
+  }
+  .kando-page-f2 .layout { margin-top: 22px; }
+  .kando-page-f2 .titles { margin-bottom: 24px; }
+  .kando-page-f2 .titles__main { font-size: clamp(29px, 7vw, 38px); }
+  .kando-page-f2 .titles__script { font-size: clamp(38px, 9vw, 48px); }
+  .kando-page-f2 .titles__heart { width: 31px; height: 31px; }
+  .kando-page-f2 .actions {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    gap: 20px;
+  }
+  .kando-page-f2 .submit { max-width: 430px; }
+  .kando-page-f2 .privacy { max-width: 520px; }
+  .kando-page-f2 .f2-site-footer__inner {
+    min-height: auto;
+    padding: 23px 22px;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 15px;
+  }
+  .kando-page-f2 .footer__family,
+  .kando-page-f2 .footer__meta { justify-self: center; }
+  .kando-page-f2 .footer__meta { text-align: center; }
+  .kando-page-f2 .footer__tagline {
+    order: -1;
+    font-size: 21px;
+  }
+}
+
+@media (max-width: 640px) {
+  .kando-page-f2 .f2-header-inner { padding-inline: 16px; }
+  .kando-page-f2 .f2-brand-image { width: 145px; }
+  .kando-page-f2 .f2-header-home { padding: 8px; }
+  .kando-page-f2 .lang-picker select {
+    min-height: 40px;
+    padding: 0 32px 0 13px;
+    font-size: 13px;
+  }
+  .kando-page-f2 .f2-page-inner { padding-inline: 16px; }
+  .kando-page-f2 .form-grid {
+    grid-template-columns: 1fr;
+    row-gap: 17px;
+  }
+  .kando-page-f2 .field--company {
+    width: 100%;
+    margin-bottom: 17px;
+  }
+  .kando-page-f2 .field--thoughts { margin-top: 18px; }
+  .kando-page-f2 .input { height: 46px; }
+  .kando-page-f2 .textarea { min-height: 145px; }
+  .kando-page-f2 .submit {
+    min-height: 56px;
+    padding-left: 21px;
+    font-size: 14px;
+  }
+  .kando-page-f2 .message-card { border-radius: 18px; }
+  .kando-page-f2 .message-card__body { padding: 30px 27px 25px; }
+  .kando-page-f2 .message-card__quote { font-size: 65px; }
+  .kando-page-f2 .message-card__quote-row { gap: 12px; }
+  .kando-page-f2 .rule { margin-block: 21px; }
+  .kando-page-f2 .footer__tagline { font-size: 18px; }
+  .kando-page-f2 .footer__family .icon {
+    width: 56px;
+    height: 48px;
+  }
+}
+
+@media (max-width: 420px) {
+  .kando-page-f2 .f2-brand-image { width: 124px; }
+  .kando-page-f2 .f2-header-home { display: none; }
+  .kando-page-f2 .f2-header-title { font-size: 16px; }
+  .kando-page-f2 .titles__main { font-size: 27px; }
+  .kando-page-f2 .titles__script { gap: 10px; font-size: 37px; }
+  .kando-page-f2 .titles__heart { width: 27px; height: 27px; }
+  .kando-page-f2 .submit {
+    padding-inline: 18px 13px;
+    gap: 8px;
+    font-size: 12.5px;
+  }
+  .kando-page-f2 .submit__arrow {
+    width: 28px;
+    height: 28px;
+  }
+  .kando-page-f2 .privacy__badge {
+    width: 40px;
+    height: 40px;
+  }
+  .kando-page-f2 .message-card__body { padding-inline: 22px; }
+  .kando-page-f2 .message-card__lead { font-size: 17px; }
+  .kando-page-f2 .message-card__text { font-size: 15px; }
+  .kando-page-f2 .footer__tagline {
+    align-items: flex-start;
+    font-size: 17px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kando-page-f2 *,
+  .kando-page-f2 *::before,
+  .kando-page-f2 *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
