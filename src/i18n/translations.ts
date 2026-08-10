@@ -49,7 +49,7 @@ export interface Translations {
   form2CardDesc: string;
   form2CardBtn: string;
   
-  // Submit DIY Kondo kit & Submit Suggestion to Chairman Fields
+  // Form 1 & Form 2 Fields
   form1Title: string;
   form1Subtitle: string;
   fullName: string;
@@ -94,7 +94,7 @@ export interface Translations {
   refIdLabel: string;
   proceedToForm2Btn: string;
   
-  // Submit Suggestion to Chairman
+  // Form 2
   form2Title: string;
   form2Subtitle: string;
   authGateTitle: string;
@@ -190,10 +190,10 @@ export const translations: Record<Language, Translations> = {
     howItWorksTitle: "How to Participate",
     step1Title: "Assemble Your DIY Kit",
     step1Desc: "Unpack your Family Day DIY Kit and assemble the craft board together with your family.",
-    step2Title: "Submit Submit DIY Kondo kit (Details & Media)",
+    step2Title: "Submit Form 1 (Details & Media)",
     step2Desc: "Upload 1 video and 2 photos of your completed DIY kit along with your employee details.",
     step3Title: "Answer CEO Reflective Question",
-    step3Desc: "Validate your Employee ID in Submit Suggestion to Chairman and share your reflection on family togetherness.",
+    step3Desc: "Validate your Employee ID in Form 2 and share your reflection on family togetherness.",
     step4Title: "Get Your Kando Certificate",
     step4Desc: "Receive your unique Reference ID and downloadable Yamaha Kando Family Certificate 2026.",
     startSubmissionBtn: "Start Submission Now",
@@ -201,18 +201,18 @@ export const translations: Record<Language, Translations> = {
 
     // Home Cards
     chooseSubmissionFormTitle: "Choose Your Submission Form",
-    chooseSubmissionFormDesc: "Submit DIY Kondo kit and Submit Suggestion to Chairman are independent. You can submit either or both forms for Yamaha Day 2026.",
-    form1Badge: "SUBMIT DIY KONDO KIT",
+    chooseSubmissionFormDesc: "Form 1 and Form 2 are independent. You can submit either or both forms for Yamaha Day 2026.",
+    form1Badge: "FORM 1 SUBMISSION",
     form1CardTitle: "DIY Kit Creation & Photos",
     form1CardDesc: "Fill your employee details, upload up to 2 high-quality photos (Max 10MB each) of your assembled Family Day DIY Kit, and share your CEO reflection text.",
-    form1CardBtn: "Open & Fill Submit DIY Kondo kit →",
-    form2Badge: "SUBMIT SUGGESTION TO CHAIRMAN",
+    form1CardBtn: "Open & Fill Form 1 →",
+    form2Badge: "FORM 2 SUBMISSION",
     form2CardTitle: "Family Kando Video Submission",
     form2CardDesc: "Authenticate your Employee ID and upload 1 family video (Max 40MB) showcasing your family's creation in action and sharing your special Kando moment.",
-    form2CardBtn: "Open & Fill Submit Suggestion to Chairman →",
+    form2CardBtn: "Open & Fill Form 2 →",
 
-    // Submit DIY Kondo kit & Submit Suggestion to Chairman Fields
-    form1Title: "Submit DIY Kondo kit: Personal Details & Media Upload",
+    // Form 1 & Form 2 Fields
+    form1Title: "Form 1: Personal Details & Media Upload",
     form1Subtitle: "Please fill out all mandatory fields and attach high-quality media of your completed DIY creation.",
     fullName: "Employee Full Name",
     empId: "Employee ID",
@@ -248,19 +248,19 @@ export const translations: Record<Language, Translations> = {
     // Consents
     dataConsentText: "I consent to Yamaha Motor India storing and processing my personal data for Yamaha Day 2026.",
     mediaConsentText: "I grant permission to Yamaha Motor India Group to feature my family's photos & video in internal and promotional showcases.",
-    submitForm1Btn: "Submit Submit DIY Kondo kit & Proceed to CEO Question",
+    submitForm1Btn: "Submit Form 1 & Proceed to CEO Question",
 
     // Thank You 1
-    thankYou1Title: "Submit DIY Kondo kit Submitted Successfully!",
+    thankYou1Title: "Form 1 Submitted Successfully!",
     thankYou1Subtitle: "Your employee details and media files have been safely uploaded to the server.",
-    refIdLabel: "Submit DIY Kondo kit Submission Reference ID",
-    proceedToForm2Btn: "Proceed to Submit Suggestion to Chairman (CEO Reflective Question)",
+    refIdLabel: "Form 1 Submission Reference ID",
+    proceedToForm2Btn: "Proceed to Form 2 (CEO Reflective Question)",
 
-    // Submit Suggestion to Chairman
-    form2Title: "Submit Suggestion to Chairman: CEO Reflective Question",
+    // Form 2
+    form2Title: "Form 2: CEO Reflective Question",
     form2Subtitle: "Reflect on your family's journey while completing the Kando From Home DIY kit.",
     authGateTitle: "Employee Authentication Gate",
-    authGateDesc: "Please enter your Employee ID to unlock and verify your Submit DIY Kondo kit submission.",
+    authGateDesc: "Please enter your Employee ID to unlock and verify your Form 1 submission.",
     verifyEmpBtn: "Verify Employee ID",
     verifiedBadgeText: "Verified Employee Record",
     ceoQuestionTitle: "Reflective Question from Yamaha CEO & MD",
@@ -282,7 +282,7 @@ export const translations: Record<Language, Translations> = {
     privacySec1Title: "1. Scope of Data Collection",
     privacySec1Body: "For the Yamaha Day 2026 \"Kando From Home\" campaign, Yamaha Motor India Group collects employee personal information strictly required for identity validation and campaign administration. This includes Employee Full Name, Employee ID, Official Email Address, Contact Number, Plant/City Location, Family Participation Count, and uploaded media files (photos & video).",
     privacySec2Title: "2. Purpose & Media Consent",
-    privacySec2Body: "Personal data collected is used solely for validating participation, shortlisting winning family DIY entries, issuing digital certificates, and organizing Yamaha Day 2026 events. Uploaded photos and videos will only be featured in internal communications and promotional showcases where explicit consent has been provided during Submit DIY Kondo kit submission.",
+    privacySec2Body: "Personal data collected is used solely for validating participation, shortlisting winning family DIY entries, issuing digital certificates, and organizing Yamaha Day 2026 events. Uploaded photos and videos will only be featured in internal communications and promotional showcases where explicit consent has been provided during Form 1 submission.",
     privacySec3Title: "3. Data Storage, Encryption & Security",
     privacySec3Body: "All submitted data is stored securely in encrypted MongoDB databases and server object storage with signed URL access controls. Access is strictly restricted to authorized administrative personnel with role-based access controls and detailed audit logging.",
     privacySec4Title: "4. Data Retention & Deletion",
@@ -295,7 +295,7 @@ export const translations: Record<Language, Translations> = {
     termsSec1Title: "1. Eligibility",
     termsSec1Body: "The Kando From Home DIY Kit initiative is open to all active employees of Yamaha Motor India Group and their immediate family members across all corporate offices, manufacturing plants (Surajpur, Chennai, Kanchipuram), and regional sales locations.",
     termsSec2Title: "2. Submission Guidelines & File Specifications",
-    termsSec2Body: "Each employee is permitted exactly one submission against their valid Employee ID. Submission includes Submit DIY Kondo kit (Personal details & up to 2 photos max 10MB each) and Submit Suggestion to Chairman (1 video max 40MB & CEO Reflection).",
+    termsSec2Body: "Each employee is permitted exactly one submission against their valid Employee ID. Submission includes Form 1 (Personal details & up to 2 photos max 10MB each) and Form 2 (1 video max 40MB & CEO Reflection).",
     termsSec3Title: "3. Originality & Safety",
     termsSec3Body: "All submissions must feature original DIY craft assembly completed by the employee and their family. Uploaded content must adhere to corporate conduct guidelines and contain no inappropriate material.",
     termsSec4Title: "4. Shortlisting & Recognition",
@@ -351,10 +351,10 @@ export const translations: Record<Language, Translations> = {
     howItWorksTitle: "भाग कैसे लें",
     step1Title: "अपनी DIY किट असेंबल करें",
     step1Desc: "अपनी फैमिली डे DIY किट खोलें और अपने परिवार के साथ मिलकर क्राफ्ट बोर्ड असेंबल करें।",
-    step2Title: "DIY कांडो किट सबमिट करें भरें (विवरण और मीडिया)",
+    step2Title: "फॉर्म 1 भरें (विवरण और मीडिया)",
     step2Desc: "अपने कर्मचारी विवरण के साथ अपनी तैयार DIY किट के 1 वीडियो और 2 फोटो अपलोड करें।",
     step3Title: "सीईओ के प्रश्न का उत्तर दें",
-    step3Desc: "अध्यक्ष को सुझाव सबमिट करें में अपनी एम्प्लॉई आईडी सत्यापित करें और पारिवारिक एकजुटता पर अपने विचार साझा करें।",
+    step3Desc: "फॉर्म 2 में अपनी एम्प्लॉई आईडी सत्यापित करें और पारिवारिक एकजुटता पर अपने विचार साझा करें।",
     step4Title: "अपना कांदो प्रमाणपत्र प्राप्त करें",
     step4Desc: "अपनी विशिष्ट संदर्भ आईडी और डाउनलोड करने योग्य यामाहा कांदो फैमिली सर्टिफिकेट 2026 प्राप्त करें।",
     startSubmissionBtn: "सबमिशन शुरू करें",
@@ -362,18 +362,18 @@ export const translations: Record<Language, Translations> = {
 
     // Home Cards
     chooseSubmissionFormTitle: "अपना सबमिशन फॉर्म चुनें",
-    chooseSubmissionFormDesc: "DIY कांडो किट सबमिट करें और अध्यक्ष को सुझाव सबमिट करें स्वतंत्र हैं। आप यामाहा डे 2026 के लिए इनमें से कोई भी या दोनों फॉर्म जमा कर सकते हैं।",
-    form1Badge: "DIY कांडो किट सबमिट करें सबमिशन",
+    chooseSubmissionFormDesc: "फॉर्म 1 और फॉर्म 2 स्वतंत्र हैं। आप यामाहा डे 2026 के लिए इनमें से कोई भी या दोनों फॉर्म जमा कर सकते हैं।",
+    form1Badge: "फॉर्म 1 सबमिशन",
     form1CardTitle: "DIY किट निर्माण और तस्वीरें",
     form1CardDesc: "अपने कर्मचारी विवरण भरें, अपनी फैमिली डे DIY किट की अधिकतम 2 उच्च-गुणवत्ता वाली तस्वीरें (प्रत्येक अधिकतम 10MB) अपलोड करें, और अपने सीईओ विचार पाठ साझा करें।",
-    form1CardBtn: "DIY कांडो किट सबमिट करें खोलें और भरें →",
-    form2Badge: "अध्यक्ष को सुझाव सबमिट करें सबमिशन",
+    form1CardBtn: "फॉर्म 1 खोलें और भरें →",
+    form2Badge: "फॉर्म 2 सबमिशन",
     form2CardTitle: "फैमिली कांदो वीडियो सबमिशन",
     form2CardDesc: "अपनी कर्मचारी आईडी सत्यापित करें और अपने परिवार की रचना और विशेष कांदो क्षण प्रदर्शित करने वाला 1 पारिवारिक वीडियो (अधिकतम 40MB) अपलोड करें।",
-    form2CardBtn: "अध्यक्ष को सुझाव सबमिट करें खोलें और भरें →",
+    form2CardBtn: "फॉर्म 2 खोलें और भरें →",
 
-    // Submit DIY Kondo kit
-    form1Title: "DIY कांडो किट सबमिट करें: व्यक्तिगत विवरण और मीडिया अपलोड",
+    // Form 1
+    form1Title: "फॉर्म 1: व्यक्तिगत विवरण और मीडिया अपलोड",
     form1Subtitle: "कृपया सभी अनिवार्य फ़ील्ड भरें और अपनी पूर्ण DIY रचना के उच्च-गुणवत्ता वाले मीडिया संलग्न करें।",
     fullName: "कर्मचारी का पूरा नाम",
     empId: "कर्मचारी आईडी",
@@ -409,19 +409,19 @@ export const translations: Record<Language, Translations> = {
     // Consents
     dataConsentText: "मैं यामाहा डे 2026 के लिए अपने व्यक्तिगत डेटा को संग्रहीत और संसाधित करने की सहमति देता हूं।",
     mediaConsentText: "मैं यामाहा मोटर इंडिया ग्रुप को आंतरिक और प्रचार प्रदर्शनों में अपने परिवार की तस्वीरों और वीडियो को प्रदर्शित करने की अनुमति देता हूं।",
-    submitForm1Btn: "DIY कांडो किट सबमिट करें जमा करें और सीईओ प्रश्न पर जाएं",
+    submitForm1Btn: "फॉर्म 1 जमा करें और सीईओ प्रश्न पर जाएं",
 
     // Thank You 1
-    thankYou1Title: "DIY कांडो किट सबमिट करें सफलतापूर्वक जमा हो गया!",
+    thankYou1Title: "फॉर्म 1 सफलतापूर्वक जमा हो गया!",
     thankYou1Subtitle: "आपके कर्मचारी विवरण और मीडिया फाइलें सर्वर पर सुरक्षित रूप से अपलोड कर दी गई हैं।",
-    refIdLabel: "DIY कांडो किट सबमिट करें सबमिशन संदर्भ आईडी",
-    proceedToForm2Btn: "अध्यक्ष को सुझाव सबमिट करें (सीईओ चिंतनशील प्रश्न) पर आगे बढ़ें",
+    refIdLabel: "फॉर्म 1 सबमिशन संदर्भ आईडी",
+    proceedToForm2Btn: "फॉर्म 2 (सीईओ चिंतनशील प्रश्न) पर आगे बढ़ें",
 
-    // Submit Suggestion to Chairman
-    form2Title: "अध्यक्ष को सुझाव सबमिट करें: सीईओ चिंतनशील प्रश्न",
+    // Form 2
+    form2Title: "फॉर्म 2: सीईओ चिंतनशील प्रश्न",
     form2Subtitle: "कांदो फ्रॉम होम DIY किट को पूरा करते हुए अपने परिवार की यात्रा पर विचार करें।",
     authGateTitle: "कर्मचारी प्रमाणीकरण गेट",
-    authGateDesc: "अपने DIY कांडो किट सबमिट करें सबमिशन को अनलॉक और सत्यापित करने के लिए कृपया अपनी कर्मचारी आईडी दर्ज करें।",
+    authGateDesc: "अपने फॉर्म 1 सबमिशन को अनलॉक और सत्यापित करने के लिए कृपया अपनी कर्मचारी आईडी दर्ज करें।",
     verifyEmpBtn: "कर्मचारी आईडी सत्यापित करें",
     verifiedBadgeText: "सत्यापित कर्मचारी रिकॉर्ड",
     ceoQuestionTitle: "यामाहा सीईओ और एमडी की ओर से प्रश्न",
@@ -456,7 +456,7 @@ export const translations: Record<Language, Translations> = {
     termsSec1Title: "1. पात्रता",
     termsSec1Body: "कांदो फ्रॉम होम DIY किट पहल यामाहा मोटर इंडिया ग्रुप के सभी सक्रिय कर्मचारियों और उनके निकटतम परिवार के सदस्यों के लिए खुली है।",
     termsSec2Title: "2. सबमिशन दिशानिर्देश और फ़ाइल विनिर्देश",
-    termsSec2Body: "प्रत्येक कर्मचारी को अपनी वैध कर्मचारी आईडी के विरुद्ध केवल एक सबमिशन की अनुमति है। सबमिशन में DIY कांडो किट सबमिट करें (अधिकतम 2 तस्वीरें, 10MB प्रत्येक) और अध्यक्ष को सुझाव सबमिट करें (1 वीडियो, अधिकतम 40MB और सीईओ विचार) शामिल हैं।",
+    termsSec2Body: "प्रत्येक कर्मचारी को अपनी वैध कर्मचारी आईडी के विरुद्ध केवल एक सबमिशन की अनुमति है। सबमिशन में फॉर्म 1 (अधिकतम 2 तस्वीरें, 10MB प्रत्येक) और फॉर्म 2 (1 वीडियो, अधिकतम 40MB और सीईओ विचार) शामिल हैं।",
     termsSec3Title: "3. मौलिकता और सुरक्षा",
     termsSec3Body: "सभी सबमिशन में कर्मचारी और उनके परिवार द्वारा पूरी की गई मूल DIY क्राफ्ट असेंबली होनी चाहिए।",
     termsSec4Title: "4. शॉर्टलिस्टिंग और मान्यता",
@@ -512,10 +512,10 @@ export const translations: Record<Language, Translations> = {
     howItWorksTitle: "பங்கேற்பது எப்படி",
     step1Title: "உங்கள் DIY கிட்டைக் கூடியுங்கள்",
     step1Desc: "உங்கள் குடும்ப தின DIY கிட்டைக் திறந்து கிராஃப்ட் போர்டை உங்கள் குடும்பத்தினருடன் ஒன்றுசேர்க்கவும்.",
-    step2Title: "DIY காண்டோ கிட் சமர்ப்பிக்கவும் ஐச் சமர்ப்பிக்கவும்",
+    step2Title: "படிவம் 1 ஐச் சமர்ப்பிக்கவும்",
     step2Desc: "உங்கள் விவரங்களுடன் 1 வீடியோ மற்றும் 2 புகைப்படங்களைப் பதிவேற்றவும்.",
     step3Title: "சிஇஓ கேள்விக்கு பதிலளிக்கவும்",
-    step3Desc: "தலைவருக்கு பரிந்துரையை சமர்ப்பிக்கவும் இல் உங்கள் பணியாளர் ஐடியை சரிபார்த்து கருத்துக்களைப் பகிரவும்.",
+    step3Desc: "படிவம் 2 இல் உங்கள் பணியாளர் ஐடியை சரிபார்த்து கருத்துக்களைப் பகிரவும்.",
     step4Title: "சான்றிதழைப் பெறுங்கள்",
     step4Desc: "உங்கள் தனித்துவமான குறிப்பு ஐடி மற்றும் யமஹா காண்டோ சான்றிதழ் 2026 ஐப் பெறுங்கள்.",
     startSubmissionBtn: "சமர்ப்பிக்கத் தொடங்குங்கள்",
@@ -523,18 +523,18 @@ export const translations: Record<Language, Translations> = {
 
     // Home Cards
     chooseSubmissionFormTitle: "உங்கள் சமர்ப்பிப்பு படிவத்தைத் தேர்ந்தெடுக்கவும்",
-    chooseSubmissionFormDesc: "DIY காண்டோ கிட் சமர்ப்பிக்கவும் மற்றும் தலைவருக்கு பரிந்துரையை சமர்ப்பிக்கவும் ஆகியவை தனித்தனி. இரண்டையும் அல்லது ஒன்றினைச் சமர்ப்பிக்கலாம்.",
-    form1Badge: "DIY காண்டோ கிட் சமர்ப்பிக்கவும் சமர்ப்பிப்பு",
+    chooseSubmissionFormDesc: "படிவம் 1 மற்றும் படிவம் 2 ஆகியவை தனித்தனி. இரண்டையும் அல்லது ஒன்றினைச் சமர்ப்பிக்கலாம்.",
+    form1Badge: "படிவம் 1 சமர்ப்பிப்பு",
     form1CardTitle: "DIY கிட் உருவாக்கம் & புகைப்படங்கள்",
     form1CardDesc: "உங்கள் விவரங்களை நிரப்பி, 2 புகைப்படங்கள் (அதிகபட்சம் 10MB) மற்றும் சிஇஓ சிந்தனையைப் பகிரவும்.",
-    form1CardBtn: "DIY காண்டோ கிட் சமர்ப்பிக்கவும் ஐத் திறந்து நிரப்பவும் →",
-    form2Badge: "தலைவருக்கு பரிந்துரையை சமர்ப்பிக்கவும் சமர்ப்பிப்பு",
+    form1CardBtn: "படிவம் 1 ஐத் திறந்து நிரப்பவும் →",
+    form2Badge: "படிவம் 2 சமர்ப்பிப்பு",
     form2CardTitle: "குடும்ப காண்டோ வீடியோ சமர்ப்பிப்பு",
     form2CardDesc: "பணியாளர் ஐடியை சரிபார்த்து 1 குடும்ப வீடியோவை (அதிகபட்சம் 40MB) பதிவேற்றவும்.",
-    form2CardBtn: "தலைவருக்கு பரிந்துரையை சமர்ப்பிக்கவும் ஐத் திறந்து நிரப்பவும் →",
+    form2CardBtn: "படிவம் 2 ஐத் திறந்து நிரப்பவும் →",
 
-    // Submit DIY Kondo kit
-    form1Title: "DIY காண்டோ கிட் சமர்ப்பிக்கவும்: தனிப்பட்ட விவரங்கள் & ஊடகப் பதிவேற்றம்",
+    // Form 1
+    form1Title: "படிவம் 1: தனிப்பட்ட விவரங்கள் & ஊடகப் பதிவேற்றம்",
     form1Subtitle: "தேவையான விவரங்களை நிரப்பி உங்கள் படைப்பின் படங்களை பதிவேற்றவும்.",
     fullName: "பணியாளர் முழுப் பெயர்",
     empId: "பணியாளர் ஐடி",
@@ -570,19 +570,19 @@ export const translations: Record<Language, Translations> = {
     // Consents
     dataConsentText: "யமஹா டே 2026 க்காக எனது தனிப்பட்ட தரவைச் சேமிக்க நான் ஒப்புக்கொள்கிறேன்.",
     mediaConsentText: "எனது குடும்பப் படங்களை விளம்பரங்களில் பயன்படுத்த யமஹா மோட்டார் இந்தியா குழுவிற்கு அனுமதி வழங்குகிறேன்.",
-    submitForm1Btn: "DIY காண்டோ கிட் சமர்ப்பிக்கவும் சமர்ப்பித்து சிஇஓ கேள்விக்குச் செல்லவும்",
+    submitForm1Btn: "படிவம் 1 சமர்ப்பித்து சிஇஓ கேள்விக்குச் செல்லவும்",
 
     // Thank You 1
-    thankYou1Title: "DIY காண்டோ கிட் சமர்ப்பிக்கவும் வெற்றிகரமாக சமர்ப்பிக்கப்பட்டது!",
+    thankYou1Title: "படிவம் 1 வெற்றிகரமாக சமர்ப்பிக்கப்பட்டது!",
     thankYou1Subtitle: "உங்கள் விவரங்கள் மற்றும் கோப்புகள் சேவையகத்தில் பாதுகாப்பாக பதிவேற்றப்பட்டுள்ளன.",
-    refIdLabel: "DIY காண்டோ கிட் சமர்ப்பிக்கவும் சமர்ப்பிப்பு குறிப்பு ஐடி",
-    proceedToForm2Btn: "தலைவருக்கு பரிந்துரையை சமர்ப்பிக்கவும் (சிஇஓ கேள்வி) க்குச் செல்லவும்",
+    refIdLabel: "படிவம் 1 சமர்ப்பிப்பு குறிப்பு ஐடி",
+    proceedToForm2Btn: "படிவம் 2 (சிஇஓ கேள்வி) க்குச் செல்லவும்",
 
-    // Submit Suggestion to Chairman
-    form2Title: "தலைவருக்கு பரிந்துரையை சமர்ப்பிக்கவும்: சிஇஓ பிரதிபலிப்பு கேள்வி",
+    // Form 2
+    form2Title: "படிவம் 2: சிஇஓ பிரதிபலிப்பு கேள்வி",
     form2Subtitle: "DIY கிட்டினை நிறைவு செய்தபோது உங்கள் குடும்பத்தின் அனுபவத்தை சிந்தியுங்கள்.",
     authGateTitle: "பணியாளர் அங்கீகார வாயில்",
-    authGateDesc: "உங்கள் DIY காண்டோ கிட் சமர்ப்பிக்கவும் சமர்ப்பிப்பைத் திறக்க பணியாளர் ஐடியை உள்ளிடவும்.",
+    authGateDesc: "உங்கள் படிவம் 1 சமர்ப்பிப்பைத் திறக்க பணியாளர் ஐடியை உள்ளிடவும்.",
     verifyEmpBtn: "பணியாளர் ஐடியை சரிபார்க்கவும்",
     verifiedBadgeText: "சரிபார்க்கப்பட்ட பணியாளர் பதிவு",
     ceoQuestionTitle: "யமஹா சிஇஓ அவர்களின் சிந்தனைக் கேள்வி",
@@ -617,7 +617,7 @@ export const translations: Record<Language, Translations> = {
     termsSec1Title: "1. தகுதி",
     termsSec1Body: "யமஹா மோட்டார் இந்தியா குழுமத்தின் அனைத்து ஊழியர்களும் அவர்களின் குடும்பத்தினரும் பங்கேற்கலாம்.",
     termsSec2Title: "2. கோப்பு விவரங்கள்",
-    termsSec2Body: "DIY காண்டோ கிட் சமர்ப்பிக்கவும் (2 படங்கள்) மற்றும் தலைவருக்கு பரிந்துரையை சமர்ப்பிக்கவும் (1 வீடியோ) சமர்ப்பிக்கப்பட வேண்டும்.",
+    termsSec2Body: "படிவம் 1 (2 படங்கள்) மற்றும் படிவம் 2 (1 வீடியோ) சமர்ப்பிக்கப்பட வேண்டும்.",
     termsSec3Title: "3. பாதுகாப்பு",
     termsSec3Body: "அனைத்து சமர்ப்பிப்புகளும் அசல் படைப்புகளாக இருக்க வேண்டும்.",
     termsSec4Title: "4. அங்கீகாரம்",

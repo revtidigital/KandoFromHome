@@ -229,7 +229,7 @@ app.get('/api/check-submission', async (req, res) => {
   }
 });
 
-// Submit DIY Kondo kit Submission
+// Form 1 Submission
 const form1Upload = upload.fields([
   { name: 'photo1', maxCount: 1 },
   { name: 'photo2', maxCount: 1 },
@@ -305,7 +305,7 @@ app.post('/api/submissions/form1', (req, res, next) => {
 
     const existingF1 = await Form1.findOne({ userId: user._id });
     if (existingF1) {
-      return res.status(400).json({ error: 'Submit DIY Kondo kit has already been submitted by this user.' });
+      return res.status(400).json({ error: 'Form 1 has already been submitted by this user.' });
     }
 
     // User-specific R2 folder: empId_INITIALS or last4phone_INITIALS
@@ -343,7 +343,7 @@ app.post('/api/submissions/form1', (req, res, next) => {
       ip
     });
 
-    await recordAuditLog(req, `New Submit DIY Kondo kit Submission by ${empName} (${empId})`, 'Public User');
+    await recordAuditLog(req, `New Form 1 Submission by ${empName} (${empId})`, 'Public User');
 
     res.json({ success: true, submissionId: submission._id });
   } catch (err) {
@@ -352,7 +352,7 @@ app.post('/api/submissions/form1', (req, res, next) => {
   }
 });
 
-// Submit Suggestion to Chairman Submission — Chairman Invites Your Thoughts
+// Form 2 Submission — Chairman Invites Your Thoughts
 app.post('/api/submissions/form2', upload.single('optionalFile'), async (req, res) => {
   try {
     const { empId, empName, email, phone, companyName, department, location, thoughts, language } = req.body || {};
@@ -406,7 +406,7 @@ app.post('/api/submissions/form2', upload.single('optionalFile'), async (req, re
 
     const existingF2 = await Form2.findOne({ userId: user._id });
     if (existingF2) {
-      return res.status(400).json({ error: 'Submit Suggestion to Chairman has already been submitted by this user.' });
+      return res.status(400).json({ error: 'Form 2 has already been submitted by this user.' });
     }
 
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
@@ -423,7 +423,7 @@ app.post('/api/submissions/form2', upload.single('optionalFile'), async (req, re
       ip
     });
 
-    await recordAuditLog(req, `New Submit Suggestion to Chairman Submission by ${empName} (${empId})`, 'Public User');
+    await recordAuditLog(req, `New Form 2 Submission by ${empName} (${empId})`, 'Public User');
 
     res.json({ success: true, submissionId: submission._id });
   } catch (err) {
@@ -651,21 +651,21 @@ app.get('/api/admin/export/users', async (req, res) => {
         'Phone': u.phone || '',
         'City': u.city || '',
         'Family Members': u.familyMembers || '',
-        'Submit DIY Kondo kit Status': f1 ? 'Submitted' : 'Not Filled',
-        'Submit DIY Kondo kit Photo 1': f1 ? f1.photo1Url : '',
-        'Submit DIY Kondo kit Photo 2': f1 ? f1.photo2Url : '',
-        'Submit DIY Kondo kit Video': f1 ? f1.videoUrl : '',
-        'Submit DIY Kondo kit CEO Reflection': f1 ? f1.ceoReflection : '',
-        'Submit DIY Kondo kit Language': f1 ? f1.language : '',
-        'Submit DIY Kondo kit Submitted At': f1 ? new Date(f1.submittedAt).toLocaleString() : '',
-        'Submit Suggestion to Chairman Status': f2 ? 'Submitted' : 'Not Filled',
-        'Submit Suggestion to Chairman Company Name': f2 ? f2.companyName : '',
-        'Submit Suggestion to Chairman Department': f2 ? f2.department : '',
-        'Submit Suggestion to Chairman Location': f2 ? f2.location : '',
-        'Submit Suggestion to Chairman Thoughts': f2 ? f2.thoughts : '',
-        'Submit Suggestion to Chairman Optional File': f2 ? f2.optionalFileUrl : '',
-        'Submit Suggestion to Chairman Language': f2 ? f2.language : '',
-        'Submit Suggestion to Chairman Submitted At': f2 ? new Date(f2.submittedAt).toLocaleString() : '',
+        'Form 1 Status': f1 ? 'Submitted' : 'Not Filled',
+        'Form 1 Photo 1': f1 ? f1.photo1Url : '',
+        'Form 1 Photo 2': f1 ? f1.photo2Url : '',
+        'Form 1 Video': f1 ? f1.videoUrl : '',
+        'Form 1 CEO Reflection': f1 ? f1.ceoReflection : '',
+        'Form 1 Language': f1 ? f1.language : '',
+        'Form 1 Submitted At': f1 ? new Date(f1.submittedAt).toLocaleString() : '',
+        'Form 2 Status': f2 ? 'Submitted' : 'Not Filled',
+        'Form 2 Company Name': f2 ? f2.companyName : '',
+        'Form 2 Department': f2 ? f2.department : '',
+        'Form 2 Location': f2 ? f2.location : '',
+        'Form 2 Thoughts': f2 ? f2.thoughts : '',
+        'Form 2 Optional File': f2 ? f2.optionalFileUrl : '',
+        'Form 2 Language': f2 ? f2.language : '',
+        'Form 2 Submitted At': f2 ? new Date(f2.submittedAt).toLocaleString() : '',
         'Tags': (u.tags || []).join(', '),
         'Registered At': new Date(u.createdAt).toLocaleString()
       };
@@ -724,13 +724,13 @@ app.get('/api/admin/export/pdf', async (req, res) => {
               <th>Employee Name</th>
               <th>Email Address</th>
               <th>City Location</th>
-              <th>Submit DIY Kondo kit CEO Reflection</th>
-              <th>Submit DIY Kondo kit Language</th>
-              <th>Submit Suggestion to Chairman Company</th>
-              <th>Submit Suggestion to Chairman Department</th>
-              <th>Submit Suggestion to Chairman Location</th>
-              <th>Submit Suggestion to Chairman Thoughts</th>
-              <th>Submit Suggestion to Chairman Language</th>
+              <th>Form 1 CEO Reflection</th>
+              <th>Form 1 Language</th>
+              <th>Form 2 Company</th>
+              <th>Form 2 Department</th>
+              <th>Form 2 Location</th>
+              <th>Form 2 Thoughts</th>
+              <th>Form 2 Language</th>
               <th>Assigned Tag</th>
             </tr>
           </thead>
@@ -798,17 +798,17 @@ app.get('/api/admin/export/zip', async (req, res) => {
         'Phone': u.phone || '',
         'City': u.city || '',
         'Family Members': u.familyMembers || '',
-        'Submit DIY Kondo kit Photo 1': f1 ? f1.photo1Url : '',
-        'Submit DIY Kondo kit Photo 2': f1 ? f1.photo2Url : '',
-        'Submit DIY Kondo kit Video': f1 ? f1.videoUrl : '',
-        'Submit DIY Kondo kit CEO Reflection': f1 ? f1.ceoReflection : '',
-        'Submit DIY Kondo kit Language': f1 ? f1.language : '',
-        'Submit Suggestion to Chairman Company Name': f2 ? f2.companyName : '',
-        'Submit Suggestion to Chairman Department': f2 ? f2.department : '',
-        'Submit Suggestion to Chairman Location': f2 ? f2.location : '',
-        'Submit Suggestion to Chairman Thoughts': f2 ? f2.thoughts : '',
-        'Submit Suggestion to Chairman Optional File': f2 ? f2.optionalFileUrl : '',
-        'Submit Suggestion to Chairman Language': f2 ? f2.language : '',
+        'Form 1 Photo 1': f1 ? f1.photo1Url : '',
+        'Form 1 Photo 2': f1 ? f1.photo2Url : '',
+        'Form 1 Video': f1 ? f1.videoUrl : '',
+        'Form 1 CEO Reflection': f1 ? f1.ceoReflection : '',
+        'Form 1 Language': f1 ? f1.language : '',
+        'Form 2 Company Name': f2 ? f2.companyName : '',
+        'Form 2 Department': f2 ? f2.department : '',
+        'Form 2 Location': f2 ? f2.location : '',
+        'Form 2 Thoughts': f2 ? f2.thoughts : '',
+        'Form 2 Optional File': f2 ? f2.optionalFileUrl : '',
+        'Form 2 Language': f2 ? f2.language : '',
         'Tags': (u.tags || []).join(', ')
       });
 

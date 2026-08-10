@@ -125,16 +125,16 @@ export const AdminDashboardPage: React.FC = () => {
     });
   };
 
-  // Multi-item asset gallery modal (Submit DIY Kondo kit + Submit Suggestion to Chairman uploads) with prev/next arrows.
+  // Multi-item asset gallery modal (Form 1 + Form 2 uploads) with prev/next arrows.
   const [assetsModal, setAssetsModal] = useState<{ items: MediaItem[]; index: number } | null>(null);
   const getUserAssets = (user: any): MediaItem[] => {
     const items: MediaItem[] = [];
-    if (user.form1?.photo1Url) items.push({ type: 'image', url: user.form1.photo1Url, title: 'Submit DIY Kondo kit — Photo 1' });
-    if (user.form1?.photo2Url) items.push({ type: 'image', url: user.form1.photo2Url, title: 'Submit DIY Kondo kit — Photo 2' });
-    if (user.form1?.videoUrl) items.push({ type: 'video', url: user.form1.videoUrl, title: 'Submit DIY Kondo kit — Video' });
+    if (user.form1?.photo1Url) items.push({ type: 'image', url: user.form1.photo1Url, title: 'Form 1 — Photo 1' });
+    if (user.form1?.photo2Url) items.push({ type: 'image', url: user.form1.photo2Url, title: 'Form 1 — Photo 2' });
+    if (user.form1?.videoUrl) items.push({ type: 'video', url: user.form1.videoUrl, title: 'Form 1 — Video' });
     if (user.form2?.optionalFileUrl) {
       const isVideo = /\.(mp4|mov|webm|avi|mkv)$/i.test(user.form2.optionalFileUrl);
-      items.push({ type: isVideo ? 'video' : 'image', url: user.form2.optionalFileUrl, title: 'Submit Suggestion to Chairman — Attachment' });
+      items.push({ type: isVideo ? 'video' : 'image', url: user.form2.optionalFileUrl, title: 'Form 2 — Attachment' });
     }
     return items;
   };
@@ -273,7 +273,7 @@ export const AdminDashboardPage: React.FC = () => {
   // R2 blocks direct browser fetches (no CORS headers on the bucket), so download
   // via our own server, which proxies the object through with no CORS restriction.
   // Used for both the media preview modal and any other private R2 attachment
-  // (e.g. Submit Suggestion to Chairman's optional file) — any raw R2 href would 403 in the browser.
+  // (e.g. Form 2's optional file) — any raw R2 href would 403 in the browser.
   const downloadR2File = async (url: string, fallbackName: string) => {
     const res = await fetch(`${apiBaseUrl}/api/admin/media-download?url=${encodeURIComponent(url)}`, { headers: adminAuthHeader() });
     const blob = await res.blob();
@@ -814,8 +814,8 @@ export const AdminDashboardPage: React.FC = () => {
 
               <div style={{ background: palette.surfaceAlt, border: '1.5px solid rgba(168,85,247,0.3)', borderRadius: '16px', padding: '24px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                  <span style={{ color: palette.mutedText, fontSize: '0.9rem', fontWeight: 700 }}>Submit DIY Kondo kit Submissions</span>
-                  <div title="Submit DIY Kondo kit (DIY Craft Wall Photos & Reflection)" style={{ cursor: 'pointer' }}>
+                  <span style={{ color: palette.mutedText, fontSize: '0.9rem', fontWeight: 700 }}>Form 1 Submissions</span>
+                  <div title="Form 1 (DIY Craft Wall Photos & Reflection)" style={{ cursor: 'pointer' }}>
                     <Info size={18} color="#A855F7" />
                   </div>
                 </div>
@@ -826,8 +826,8 @@ export const AdminDashboardPage: React.FC = () => {
 
               <div style={{ background: palette.surfaceAlt, border: '1.5px solid rgba(34,197,94,0.3)', borderRadius: '16px', padding: '24px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                  <span style={{ color: palette.mutedText, fontSize: '0.9rem', fontWeight: 700 }}>Submit Suggestion to Chairman Submissions</span>
-                  <div title="Submit Suggestion to Chairman (Family Kando Video Submissions)" style={{ cursor: 'pointer' }}>
+                  <span style={{ color: palette.mutedText, fontSize: '0.9rem', fontWeight: 700 }}>Form 2 Submissions</span>
+                  <div title="Form 2 (Family Kando Video Submissions)" style={{ cursor: 'pointer' }}>
                     <Info size={18} color="#22C55E" />
                   </div>
                 </div>
@@ -910,9 +910,9 @@ export const AdminDashboardPage: React.FC = () => {
                 style={{ padding: '9px 12px', borderRadius: '8px', background: palette.surfaceAlt, border: `1px solid ${palette.borderStrong}`, color: palette.text, fontSize: '0.85rem', outline: 'none' }}
               >
                 <option value="">All Form Submissions</option>
-                <option value="form1">Submit DIY Kondo kit Submitted</option>
-                <option value="form2">Submit Suggestion to Chairman Submitted</option>
-                <option value="both">Submit DIY Kondo kit + Submit Suggestion to Chairman Completed</option>
+                <option value="form1">Form 1 Submitted</option>
+                <option value="form2">Form 2 Submitted</option>
+                <option value="both">Form 1 + Form 2 Completed</option>
               </select>
             </div>
 
@@ -980,8 +980,8 @@ export const AdminDashboardPage: React.FC = () => {
                     <th style={{ padding: '14px 18px' }}>Emp ID / Phone</th>
                     <th style={{ padding: '14px 18px' }}>Employee Name</th>
                     <th style={{ padding: '14px 18px' }}>Registered Date</th>
-                    <th style={{ padding: '14px 18px' }}>Submit DIY Kondo kit</th>
-                    <th style={{ padding: '14px 18px' }}>Submit Suggestion to Chairman</th>
+                    <th style={{ padding: '14px 18px' }}>Form 1</th>
+                    <th style={{ padding: '14px 18px' }}>Form 2</th>
                     <th style={{ padding: '14px 18px' }}>Assets</th>
                     <th style={{ padding: '14px 18px' }}>Assigned Tags</th>
                     <th style={{ padding: '14px 18px', textAlign: 'right' }}>Actions</th>
@@ -1041,7 +1041,7 @@ export const AdminDashboardPage: React.FC = () => {
                           )}
                         </td>
 
-                        {/* ASSETS — every Submit DIY Kondo kit / Submit Suggestion to Chairman upload, opened in a gallery modal with arrows */}
+                        {/* ASSETS — every Form 1 / Form 2 upload, opened in a gallery modal with arrows */}
                         <td style={{ padding: '14px 18px' }}>
                           {assets.length > 0 ? (
                             <button
@@ -1139,10 +1139,10 @@ export const AdminDashboardPage: React.FC = () => {
                   </p>
                   <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
                     <span style={{ fontSize: '0.78rem', fontWeight: 800, padding: '4px 10px', borderRadius: '8px', color: selectedUserForProfile.form1 ? '#4ADE80' : '#EF4444', background: selectedUserForProfile.form1 ? 'rgba(74,222,128,0.1)' : 'rgba(239,68,68,0.1)', border: `1px solid ${selectedUserForProfile.form1 ? 'rgba(74,222,128,0.4)' : 'rgba(239,68,68,0.4)'}` }}>
-                      Submit DIY Kondo kit: {selectedUserForProfile.form1 ? 'Yes' : 'No'}
+                      Form 1: {selectedUserForProfile.form1 ? 'Yes' : 'No'}
                     </span>
                     <span style={{ fontSize: '0.78rem', fontWeight: 800, padding: '4px 10px', borderRadius: '8px', color: selectedUserForProfile.form2 ? '#4ADE80' : '#EF4444', background: selectedUserForProfile.form2 ? 'rgba(74,222,128,0.1)' : 'rgba(239,68,68,0.1)', border: `1px solid ${selectedUserForProfile.form2 ? 'rgba(74,222,128,0.4)' : 'rgba(239,68,68,0.4)'}` }}>
-                      Submit Suggestion to Chairman: {selectedUserForProfile.form2 ? 'Yes' : 'No'}
+                      Form 2: {selectedUserForProfile.form2 ? 'Yes' : 'No'}
                     </span>
                   </div>
                 </div>
@@ -1163,7 +1163,7 @@ export const AdminDashboardPage: React.FC = () => {
               {selectedUserForProfile.form1 ? (
                 <div style={{ marginBottom: '28px', background: palette.surfaceSoft, padding: '24px', borderRadius: '18px', border: '1px solid rgba(74, 222, 128, 0.3)' }}>
                   <h3 style={{ fontSize: '1.1rem', color: '#4ADE80', fontWeight: 800, marginBottom: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <ImageIcon size={20} /> Submit DIY Kondo kit — Photos & Video Submission
+                    <ImageIcon size={20} /> Form 1 — Photos & Video Submission
                     <span style={{ marginLeft: 'auto', fontSize: '0.75rem', color: '#64748B', fontWeight: 400 }}>
                       Submitted: {new Date(selectedUserForProfile.form1.submittedAt).toLocaleString()}
                     </span>
@@ -1208,7 +1208,7 @@ export const AdminDashboardPage: React.FC = () => {
                   {/* CEO Reflection */}
                   {selectedUserForProfile.form1.ceoReflection && (
                     <div style={{ background: palette.subtleBg, padding: '16px', borderRadius: '12px', marginBottom: '18px' }}>
-                      <div style={{ fontSize: '0.72rem', color: '#4ADE80', fontWeight: 800, textTransform: 'uppercase', marginBottom: '8px' }}>Reflection Message (Submit DIY Kondo kit)</div>
+                      <div style={{ fontSize: '0.72rem', color: '#4ADE80', fontWeight: 800, textTransform: 'uppercase', marginBottom: '8px' }}>Reflection Message (Form 1)</div>
                       <p style={{ margin: 0, color: palette.text, fontStyle: 'italic', lineHeight: 1.6 }}>"{selectedUserForProfile.form1.ceoReflection}"</p>
                     </div>
                   )}
@@ -1216,19 +1216,19 @@ export const AdminDashboardPage: React.FC = () => {
                   {/* Media Buttons */}
                   <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                     {selectedUserForProfile.form1.photo1Url && (
-                      <button onClick={() => setMediaModal({ type: 'image', url: selectedUserForProfile.form1.photo1Url, title: 'Submit DIY Kondo kit — Photo 1' })}
+                      <button onClick={() => setMediaModal({ type: 'image', url: selectedUserForProfile.form1.photo1Url, title: 'Form 1 — Photo 1' })}
                         style={{ cursor: 'pointer', border: '1px solid #4ADE80', borderRadius: '10px', padding: '10px 18px', color: '#4ADE80', fontSize: '0.85rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(74,222,128,0.08)', outline: 'none' }}>
                         <ImageIcon size={16} /> View Photo 1
                       </button>
                     )}
                     {selectedUserForProfile.form1.photo2Url && (
-                      <button onClick={() => setMediaModal({ type: 'image', url: selectedUserForProfile.form1.photo2Url, title: 'Submit DIY Kondo kit — Photo 2' })}
+                      <button onClick={() => setMediaModal({ type: 'image', url: selectedUserForProfile.form1.photo2Url, title: 'Form 1 — Photo 2' })}
                         style={{ cursor: 'pointer', border: '1px solid #4ADE80', borderRadius: '10px', padding: '10px 18px', color: '#4ADE80', fontSize: '0.85rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(74,222,128,0.08)', outline: 'none' }}>
                         <ImageIcon size={16} /> View Photo 2
                       </button>
                     )}
                     {selectedUserForProfile.form1.videoUrl && (
-                      <button onClick={() => setMediaModal({ type: 'video', url: selectedUserForProfile.form1.videoUrl, title: 'Submit DIY Kondo kit — Kando Video' })}
+                      <button onClick={() => setMediaModal({ type: 'video', url: selectedUserForProfile.form1.videoUrl, title: 'Form 1 — Kando Video' })}
                         style={{ cursor: 'pointer', border: '1px solid #00E5FF', borderRadius: '10px', padding: '10px 18px', color: '#00E5FF', fontSize: '0.85rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(0,229,255,0.08)', outline: 'none' }}>
                         <FileVideo size={16} /> Watch Video
                       </button>
@@ -1237,7 +1237,7 @@ export const AdminDashboardPage: React.FC = () => {
                 </div>
               ) : (
                 <div style={{ marginBottom: '28px', background: palette.surfaceSoft, padding: '20px', borderRadius: '18px', border: '1px solid rgba(239,68,68,0.3)', color: '#EF4444', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <ImageIcon size={20} /> Submit DIY Kondo kit not yet submitted
+                  <ImageIcon size={20} /> Form 1 not yet submitted
                 </div>
               )}
 
@@ -1245,7 +1245,7 @@ export const AdminDashboardPage: React.FC = () => {
               {selectedUserForProfile.form2 ? (
                 <div style={{ background: palette.surfaceSoft, padding: '24px', borderRadius: '18px', border: '1px solid rgba(168, 85, 247, 0.3)' }}>
                   <h3 style={{ fontSize: '1.1rem', color: '#C084FC', fontWeight: 800, marginBottom: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <FileVideo size={20} /> Submit Suggestion to Chairman — Chairman Invites Your Thoughts
+                    <FileVideo size={20} /> Form 2 — Chairman Invites Your Thoughts
                     <span style={{ marginLeft: 'auto', fontSize: '0.75rem', color: '#64748B', fontWeight: 400 }}>
                       Submitted: {new Date(selectedUserForProfile.form2.submittedAt).toLocaleString()}
                     </span>
@@ -1304,7 +1304,7 @@ export const AdminDashboardPage: React.FC = () => {
                 </div>
               ) : (
                 <div style={{ background: palette.surfaceSoft, padding: '20px', borderRadius: '18px', border: '1px solid rgba(239,68,68,0.3)', color: '#EF4444', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <FileVideo size={20} /> Submit Suggestion to Chairman not yet submitted
+                  <FileVideo size={20} /> Form 2 not yet submitted
                 </div>
               )}
 
@@ -1358,7 +1358,7 @@ export const AdminDashboardPage: React.FC = () => {
                   <div>
                     <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: palette.text, margin: 0 }}>Eligibility Whitelist</h2>
                     <p style={{ fontSize: '0.8rem', color: '#94A3B8', margin: 0 }}>
-                      Only Employee IDs / Phone Numbers on these lists can submit Submit DIY Kondo kit &amp; Submit Suggestion to Chairman. Each upload replaces the previous list.
+                      Only Employee IDs / Phone Numbers on these lists can submit Form 1 &amp; Form 2. Each upload replaces the previous list.
                     </p>
                   </div>
                 </div>
@@ -1436,7 +1436,7 @@ export const AdminDashboardPage: React.FC = () => {
                   <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: palette.subtleBg, padding: '14px', borderRadius: '10px' }}>
                     <div>
                       <div style={{ fontWeight: 700, fontSize: '0.95rem', color: palette.text }}>Enable Captcha Verification</div>
-                      <div style={{ fontSize: '0.78rem', color: '#94A3B8' }}>Enforce Google reCAPTCHA v3 on Submit DIY Kondo kit & Submit Suggestion to Chairman</div>
+                      <div style={{ fontSize: '0.78rem', color: '#94A3B8' }}>Enforce Google reCAPTCHA v3 on Form 1 & Form 2</div>
                     </div>
                     <input
                       type="checkbox"
@@ -1609,7 +1609,7 @@ export const AdminDashboardPage: React.FC = () => {
         </div>
       )}
 
-      {/* ASSET GALLERY MODAL — every Submit DIY Kondo kit / Submit Suggestion to Chairman upload for a user, with prev/next arrows */}
+      {/* ASSET GALLERY MODAL — every Form 1 / Form 2 upload for a user, with prev/next arrows */}
       {assetsModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
           <div style={{ background: palette.surface, border: '1px solid #00E5FF', borderRadius: '16px', padding: '24px', maxWidth: '700px', width: '100%', position: 'relative' }}>

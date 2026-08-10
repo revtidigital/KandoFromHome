@@ -161,7 +161,7 @@ export const Form1Page: React.FC = () => {
       if (checkRes.ok) {
         const checkData = await checkRes.json();
         if (checkData.hasForm1) {
-          setDuplicateError(`${identityLabel} has already submitted Submit DIY Kondo kit. Duplicate submissions are not allowed.`);
+          setDuplicateError(`${identityLabel} has already submitted Form 1. Duplicate submissions are not allowed.`);
           setIsSubmitting(false);
           return;
         }
@@ -190,7 +190,7 @@ export const Form1Page: React.FC = () => {
 
       if (!submitRes.ok) {
         const errData = await submitRes.json();
-        setDuplicateError(errData.error || 'Failed to submit Submit DIY Kondo kit.');
+        setDuplicateError(errData.error || 'Failed to submit Form 1.');
         setIsSubmitting(false);
         return;
       }
@@ -601,7 +601,7 @@ export const Form1Page: React.FC = () => {
                 <svg className="submit-upload-icon" viewBox="0 0 28 28" aria-hidden="true">
                   <path d="M14 18V4m0 0L9 9m5-5 5 5M5 17v7h18v-7" />
                 </svg>
-                <span>{isSubmitting ? 'Submitting...' : 'SUBMIT DIY KONDO KIT'}</span>
+                <span>{isSubmitting ? 'Submitting...' : 'SUBMIT FORM 1'}</span>
                 <svg className="submit-arrow" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="m9 5 7 7-7 7" />
                 </svg>
