@@ -345,7 +345,7 @@ export const Form2Page: React.FC = () => {
                     </label>
                     <div className="id-field-wrap">
                       <input
-                        className={`input${errors.empId || (!hasNoEmpId && idCheckStatus === 'invalid') ? ' is-invalid' : ''}`}
+                        className={`input${formData.empId.trim() && ((!hasNoEmpId && idCheckStatus === 'invalid') || errors.empId) ? ' is-invalid' : ''}`}
                         id="employeeEin"
                         type="text"
                         value={formData.empId}
@@ -376,7 +376,7 @@ export const Form2Page: React.FC = () => {
                     </label>
                     <div className="id-field-wrap">
                       <input
-                        className={`input${hasNoEmpId && idCheckStatus === 'invalid' ? ' is-invalid' : ''}`}
+                        className={`input${formData.phone.trim() && hasNoEmpId && (idCheckStatus === 'invalid' || errors.empId) ? ' is-invalid' : ''}`}
                         id="phoneNumber"
                         type="tel"
                         value={formData.phone}
