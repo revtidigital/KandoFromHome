@@ -244,8 +244,8 @@
   justify-content: center;
   gap: 16px;
   color: var(--gold);
-  font-family: "Alex Brush", cursive;
-  font-size: clamp(48px, 4.4vw, 68px);
+  font-family: "Kaushan Script", cursive;
+  font-size: clamp(42px, 3.8vw, 60px);
   line-height: 1.1;
 }
 
