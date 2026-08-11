@@ -606,6 +606,8 @@ export const Form2Page: React.FC = () => {
               />
             </aside>
           </div>
+
+          <div className="f2-mandatory-note">* Mandatory field</div>
         </div>
       </main>
 

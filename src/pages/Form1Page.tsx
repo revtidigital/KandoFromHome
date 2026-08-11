@@ -724,6 +724,8 @@ export const Form1Page: React.FC = () => {
             </div>
           </aside>
         </section>
+
+        <div className="mandatory-note">* Mandatory field</div>
       </main>
 
       {/* ============================== Footer ============================== */}
