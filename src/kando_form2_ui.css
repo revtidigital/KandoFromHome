@@ -361,8 +361,9 @@
 
 .kando-page-f2 .input.is-invalid,
 .kando-page-f2 .textarea.is-invalid {
-  border-color: #b42318;
-  box-shadow: 0 0 0 3px rgba(180, 35, 24, 0.08);
+  border: 2px solid #b42318;
+  background: rgba(180, 35, 24, 0.08);
+  box-shadow: 0 0 0 3px rgba(180, 35, 24, 0.12);
 }
 
 .kando-page-f2 .field-hint {

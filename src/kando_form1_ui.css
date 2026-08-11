@@ -407,8 +407,9 @@
 }
 
 .kando-page-f1 .field input.has-error:not([type="file"]) {
-  border-color: #b42318;
-  background: rgba(180, 35, 24, 0.04);
+  border: 2px solid #b42318;
+  background: rgba(180, 35, 24, 0.08);
+  box-shadow: 0 0 0 3px rgba(180, 35, 24, 0.12);
 }
 
 .kando-page-f1 .field input:not([type="file"]):focus {
