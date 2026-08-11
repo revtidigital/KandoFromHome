@@ -518,9 +518,10 @@
 
 .kd-quote-icon {
   width: 72px;
-  height: 72px;
+  height: 48px;
   object-fit: contain;
   flex: none;
+  align-self: center;
 }
 
 .kd-quote-text {
@@ -533,7 +534,7 @@
   font-weight: 600;
   font-style: italic;
   font-size: clamp(20px, 2.2vw, 31px);
-  color: var(--gold-light);
+  color: #fca51d;
   letter-spacing: 0.01em;
 }
 
@@ -542,7 +543,7 @@
   width: 0.62em;
   height: 0.62em;
   margin-left: 0.24em;
-  color: var(--gold);
+  color: #fca51d;
   vertical-align: 0.02em;
 }
 
