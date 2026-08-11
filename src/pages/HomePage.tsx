@@ -274,22 +274,8 @@ export const HomePage: React.FC = () => {
                 </svg>
 
                 <div className="kd-card-head">
-                  <span className="kd-badge" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M6 3.5h7.6L19 8.9V20a.9.9 0 0 1-.9.9H6a.9.9 0 0 1-.9-.9V4.4A.9.9 0 0 1 6 3.5Z"
-                        stroke="currentColor"
-                        strokeWidth="1.7"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M8.4 15.9l6.3-6.3 2 2-6.3 6.3-2.6.6z"
-                        stroke="currentColor"
-                        strokeWidth="1.6"
-                        strokeLinejoin="round"
-                      />
-                      <path d="M8.2 7.6h3.4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-                    </svg>
+                  <span className="kd-badge kd-badge--image" aria-hidden="true">
+                    <img src="/kando_thoughts_badge.png" alt="" />
                   </span>
                   <div>
                     <h2 className="kd-card-title">{t.form2Badge || 'Chairman invites your thoughts'}</h2>
