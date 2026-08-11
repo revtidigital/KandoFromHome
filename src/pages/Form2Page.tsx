@@ -291,7 +291,10 @@ export const Form2Page: React.FC = () => {
               <header className="titles">
                 <h1 id="form-title" className="titles__main">{t.form2ChairmanTitle}</h1>
                 <p className="titles__script">
-                  <span>{t.form2ChairmanScript}</span>
+                  <span>
+                    <span className="titles__script-firstletter">{t.form2ChairmanScript.charAt(0)}</span>
+                    {t.form2ChairmanScript.slice(1)}
+                  </span>
                   <svg className="icon titles__heart" aria-hidden="true">
                     <use href="#f2-icon-heart"></use>
                   </svg>

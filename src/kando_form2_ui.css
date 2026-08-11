@@ -248,6 +248,10 @@
   line-height: 1.1;
 }
 
+.kando-page-f2 .titles__script-firstletter {
+  font-size: 1.3em;
+}
+
 .kando-page-f2 .titles__heart {
   width: 38px;
   height: 38px;
