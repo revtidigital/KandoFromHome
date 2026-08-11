@@ -852,11 +852,12 @@
   .kando-page-f2 .titles__heart { width: 31px; height: 31px; }
   .kando-page-f2 .actions {
     grid-template-columns: 1fr;
-    align-items: stretch;
+    align-items: center;
+    justify-items: center;
     gap: 20px;
   }
-  .kando-page-f2 .submit { max-width: 430px; }
-  .kando-page-f2 .privacy { max-width: 520px; }
+  .kando-page-f2 .submit { order: 2; max-width: 430px; }
+  .kando-page-f2 .privacy { order: 1; max-width: 520px; }
   .kando-page-f2 .f2-site-footer__inner {
     min-height: auto;
     padding: 23px 22px;
