@@ -363,6 +363,16 @@
   height: 44px;
 }
 
+.kd-badge--image {
+  overflow: hidden;
+}
+
+.kd-badge--image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .kd-card--blue .kd-badge {
   background: linear-gradient(150deg, #1e4bb8 0%, #0e2a76 100%);
   box-shadow: 0 10px 24px rgba(16, 44, 122, 0.35);
