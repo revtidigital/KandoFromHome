@@ -1066,23 +1066,25 @@ export const AdminDashboardPage: React.FC = () => {
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
                 <thead>
                   <tr style={{ background: palette.surfaceAlt, color: '#00E5FF', borderBottom: `1px solid ${palette.border}` }}>
-                    <th style={{ padding: '14px 12px', width: '36px' }}>
-                      <input
-                        type="checkbox"
-                        checked={paginatedUsers.length > 0 && paginatedUsers.every(u => selectedUserIds.has(u.id || u._id))}
-                        onChange={(e) => {
-                          setSelectedUserIds(prev => {
-                            const next = new Set(prev);
-                            paginatedUsers.forEach(u => {
-                              const id = u.id || u._id;
-                              if (e.target.checked) next.add(id); else next.delete(id);
+                    {activeTab === 'users' && (
+                      <th style={{ padding: '14px 12px', width: '36px' }}>
+                        <input
+                          type="checkbox"
+                          checked={paginatedUsers.length > 0 && paginatedUsers.every(u => selectedUserIds.has(u.id || u._id))}
+                          onChange={(e) => {
+                            setSelectedUserIds(prev => {
+                              const next = new Set(prev);
+                              paginatedUsers.forEach(u => {
+                                const id = u.id || u._id;
+                                if (e.target.checked) next.add(id); else next.delete(id);
+                              });
+                              return next;
                             });
-                            return next;
-                          });
-                        }}
-                        style={{ accentColor: '#00E5FF', cursor: 'pointer', width: '16px', height: '16px' }}
-                      />
-                    </th>
+                          }}
+                          style={{ accentColor: '#00E5FF', cursor: 'pointer', width: '16px', height: '16px' }}
+                        />
+                      </th>
+                    )}
                     <th style={{ padding: '14px 18px' }}>Emp ID / Phone</th>
                     <th style={{ padding: '14px 18px' }}>Employee Name</th>
                     <th style={{ padding: '14px 18px' }}>Registered Date</th>
@@ -1100,14 +1102,16 @@ export const AdminDashboardPage: React.FC = () => {
                     const assets = getUserAssets(user);
                     return (
                       <tr key={userId} style={{ borderBottom: `1px solid ${palette.borderFaint}` }}>
-                        <td style={{ padding: '14px 12px' }}>
-                          <input
-                            type="checkbox"
-                            checked={selectedUserIds.has(userId)}
-                            onChange={() => toggleUserSelected(userId)}
-                            style={{ accentColor: '#00E5FF', cursor: 'pointer', width: '16px', height: '16px' }}
-                          />
-                        </td>
+                        {activeTab === 'users' && (
+                          <td style={{ padding: '14px 12px' }}>
+                            <input
+                              type="checkbox"
+                              checked={selectedUserIds.has(userId)}
+                              onChange={() => toggleUserSelected(userId)}
+                              style={{ accentColor: '#00E5FF', cursor: 'pointer', width: '16px', height: '16px' }}
+                            />
+                          </td>
+                        )}
 
                         <td style={{ padding: '14px 18px', fontWeight: 800, color: '#00E5FF' }}>
                           {user.empId || user.phone || '—'}
