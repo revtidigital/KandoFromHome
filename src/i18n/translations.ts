@@ -413,7 +413,7 @@ export const translations: Record<Language, Translations> = {
     form1ThankYouBody: "We can't wait to see your Kando Moment.",
     form1FooterFamilyText: "Together, we celebrate the families behind every Yamaha action.",
     form2ChairmanTitle: "CHAIRMAN INVITES",
-    form2ChairmanScript: "Your Thoughts",
+    form2ChairmanScript: "your Thoughts",
     form2ChairmanSub: "Your ideas help us grow better, together.",
     form2EmpEinLabel: "Employee EIN",
     form2PhoneNumberLabel: "Phone Number",
