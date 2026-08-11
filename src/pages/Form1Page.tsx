@@ -367,7 +367,7 @@ export const Form1Page: React.FC = () => {
                     type="text"
                     className={errors.empId ? 'has-error' : ''}
                     value={formData.empId}
-                    disabled={formData.phone.trim().length > 0}
+                    disabled={hasNoEmpId && idCheckStatus === 'valid'}
                     onChange={e => setFormData(prev => ({ ...prev, empId: e.target.value }))}
                     placeholder="Enter EIN"
                     autoComplete="off"
@@ -396,7 +396,7 @@ export const Form1Page: React.FC = () => {
                     type="tel"
                     className={hasNoEmpId && errors.empId ? 'has-error' : ''}
                     value={formData.phone}
-                    disabled={formData.empId.trim().length > 0}
+                    disabled={!hasNoEmpId && formData.empId.trim().length > 0 && idCheckStatus === 'valid'}
                     onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))}
                     placeholder="Only if you have no Employee ID"
                     style={{ paddingRight: '40px' }}
