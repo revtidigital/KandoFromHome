@@ -347,7 +347,7 @@ export const Form1Page: React.FC = () => {
             <form onSubmit={handleSubmit} className="entry-form" noValidate>
               {/* Company Name */}
               <div className="field field-full">
-                <label htmlFor="company">{t.companyNameLabel}</label>
+                <label htmlFor="company">{t.companyNameLabel}*</label>
                 <input
                   id="company"
                   type="text"
@@ -360,7 +360,7 @@ export const Form1Page: React.FC = () => {
 
               {/* Employee ID */}
               <div className="field">
-                <label htmlFor="ein">{t.empId}{!hasNoEmpId && '*'}</label>
+                <label htmlFor="ein">{t.empId}*</label>
                 <div style={{ position: 'relative' }}>
                   <input
                     id="ein"
@@ -389,7 +389,7 @@ export const Form1Page: React.FC = () => {
 
               {/* Phone Number */}
               <div className="field">
-                <label htmlFor="phone">{t.form1PhoneNumberLabel}{hasNoEmpId && '*'}</label>
+                <label htmlFor="phone">{t.form1PhoneNumberLabel}*</label>
                 <div style={{ position: 'relative' }}>
                   <input
                     id="phone"
@@ -428,7 +428,7 @@ export const Form1Page: React.FC = () => {
 
               {/* Department */}
               <div className="field">
-                <label htmlFor="department">{t.departmentLabel}</label>
+                <label htmlFor="department">{t.departmentLabel}*</label>
                 <input
                   id="department"
                   type="text"
@@ -440,7 +440,7 @@ export const Form1Page: React.FC = () => {
 
               {/* Location */}
               <div className="field">
-                <label htmlFor="location">{t.locationLabel}</label>
+                <label htmlFor="location">{t.locationLabel}*</label>
                 <input
                   id="location"
                   type="text"
@@ -612,7 +612,7 @@ export const Form1Page: React.FC = () => {
                     {t.consentAndWord}{' '}
                     <a href={`/${language}/privacy`} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ color: 'var(--yamaha-blue)', textDecoration: 'underline' }}>
                       {t.consentPrivacyLink}
-                    </a>. *
+                    </a>.*
                   </span>
                 </label>
                 {errors.dataConsent && (
@@ -637,7 +637,7 @@ export const Form1Page: React.FC = () => {
                     style={{ accentColor: 'var(--yamaha-blue)', width: '18px', height: '18px', flexShrink: 0, marginTop: '2px' }}
                   />
                   <span style={{ fontSize: '0.87rem', lineHeight: 1.5 }}>
-                    {t.form1MediaConsentText} *
+                    {t.form1MediaConsentText}*
                   </span>
                 </label>
                 {errors.mediaConsent && (
