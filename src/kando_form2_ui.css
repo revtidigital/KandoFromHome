@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Kaushan+Script&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Kaushan+Script&family=Alex+Brush&display=swap');
 
 /* =====================================================
    FORM 2 — Chairman Invites Your Thoughts
@@ -243,8 +243,8 @@
   justify-content: center;
   gap: 16px;
   color: var(--gold);
-  font-family: "Kaushan Script", cursive;
-  font-size: clamp(42px, 3.8vw, 60px);
+  font-family: "Alex Brush", cursive;
+  font-size: clamp(48px, 4.4vw, 68px);
   line-height: 1.1;
 }
 
