@@ -369,7 +369,7 @@ export const Form1Page: React.FC = () => {
                     value={formData.empId}
                     disabled={formData.phone.trim().length > 0}
                     onChange={e => setFormData(prev => ({ ...prev, empId: e.target.value }))}
-                    placeholder="e.g. YMI-1049"
+                    placeholder="Enter EIN"
                     autoComplete="off"
                     style={{ paddingRight: '40px' }}
                   />
