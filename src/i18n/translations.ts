@@ -379,7 +379,7 @@ export const translations: Record<Language, Translations> = {
     sec2UploadPhotosDesc: "Upload up to 2 high-resolution photos and video of your family Kando DIY Wall (All formats supported).",
     photo1Label: "Photo 1 (Required, Max 5MB)*",
     photo2Label: "Photo 2 (Required, Max 5MB)*",
-    sec2UploadVideoTitle: "Video(Required, Max 40MB)*",
+    sec2UploadVideoTitle: "Video (Required, Max 40MB)*",
     sec2UploadVideoDesc: "Upload 1 video of your family making the DIY Craft Wall (MP4, WEBM, MOV, etc. Max 40MB limit).",
 
     // Validation Error Messages
