@@ -342,11 +342,11 @@ export const Form2Page: React.FC = () => {
                         id="employeeEin"
                         type="text"
                         value={formData.empId}
-                        disabled={formData.phone.trim().length > 0}
+                        disabled={hasNoEmpId && idCheckStatus === 'valid'}
                         onChange={e => setFormData(prev => ({ ...prev, empId: e.target.value }))}
                         placeholder="Enter EIN"
                         autoComplete="off"
-                        style={{ paddingRight: '40px', opacity: formData.phone.trim() ? 0.6 : 1 }}
+                        style={{ paddingRight: '40px', opacity: hasNoEmpId && idCheckStatus === 'valid' ? 0.6 : 1 }}
                       />
                       {!hasNoEmpId && formData.empId.trim() && (
                         <span className="id-status-icon">
@@ -373,10 +373,10 @@ export const Form2Page: React.FC = () => {
                         id="phoneNumber"
                         type="tel"
                         value={formData.phone}
-                        disabled={formData.empId.trim().length > 0}
+                        disabled={!hasNoEmpId && formData.empId.trim().length > 0 && idCheckStatus === 'valid'}
                         onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))}
                         placeholder="Only if you have no Employee ID"
-                        style={{ paddingRight: '40px', opacity: formData.empId.trim() ? 0.6 : 1 }}
+                        style={{ paddingRight: '40px', opacity: !hasNoEmpId && formData.empId.trim().length > 0 && idCheckStatus === 'valid' ? 0.6 : 1 }}
                       />
                       {hasNoEmpId && formData.phone.trim() && (
                         <span className="id-status-icon">
