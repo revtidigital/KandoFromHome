@@ -15,49 +15,54 @@ export const TermsConditionsPage: React.FC = () => {
 
   return (
     <div className="terms-page">
-      <header className="tp-topbar">
-        <div className="tp-topbar-inner">
+      <header className="tp-site-header">
+        <a
+          className="tp-yamaha-logo"
+          href="#"
+          onClick={(e) => { e.preventDefault(); navigateTo('home'); }}
+          aria-label="Yamaha home"
+        >
+          <img
+            className="tp-yamaha-logo-img"
+            src="/yamaha-logo-v2.png"
+            alt="Yamaha — Revs Your Heart"
+            onError={(e) => { (e.target as HTMLImageElement).src = '/yamaha_logo.png'; }}
+          />
+        </a>
+
+        <div className="tp-campaign-title">{t.kandoFromHome}</div>
+
+        <nav className="tp-header-actions" aria-label="Primary navigation">
           <a
+            className="tp-home-link"
             href="#"
-            className="tp-brand"
-            aria-label="Yamaha Home"
             onClick={(e) => { e.preventDefault(); navigateTo('home'); }}
           >
-            <img
-              src="/yamaha-logo-v2.png"
-              alt="Yamaha Revs Your Heart"
-              className="tp-logo"
-              onError={(e) => { (e.target as HTMLImageElement).src = '/yamaha_logo.png'; }}
-            />
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m3.5 10.5 8.5-7 8.5 7" />
+              <path d="M5.5 9.2V21h13V9.2M9.5 21v-6h5v6" />
+            </svg>
+            <span>{t.home}</span>
           </a>
 
-          <div className="tp-campaign-title">KANDO FROM HOME</div>
+          <span className="tp-header-divider" aria-hidden="true"></span>
 
-          <div className="tp-header-actions">
-            <button
-              type="button"
-              className="tp-home-link"
-              aria-label="Home"
-              onClick={() => navigateTo('home')}
-            >
-              <span className="tp-home-icon">⌂</span>
-              <span>{t.home || 'Home'}</span>
-            </button>
-
-            <div className="tp-divider" />
-
+          <label className="tp-language-picker">
+            <span className="sr-only">Choose language</span>
             <select
-              className="tp-language-select"
-              aria-label="Language"
+              aria-label="Choose language"
               value={language}
               onChange={(e) => setLanguage(e.target.value as Language)}
             >
               <option value="en">English</option>
-              <option value="hi">हिंदी</option>
+              <option value="hi">हिन्दी</option>
               <option value="ta">தமிழ்</option>
             </select>
-          </div>
-        </div>
+            <svg viewBox="0 0 16 16" aria-hidden="true">
+              <path d="m3 6 5 5 5-5" />
+            </svg>
+          </label>
+        </nav>
       </header>
 
       <main className="tp-page">
