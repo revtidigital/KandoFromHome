@@ -381,7 +381,7 @@ export const Form1Page: React.FC = () => {
                   <input
                     id="ein"
                     type="text"
-                    className={errors.empId ? 'has-error' : ''}
+                    className={errors.empId || (!hasNoEmpId && idCheckStatus === 'invalid') ? 'has-error' : ''}
                     value={formData.empId}
                     disabled={hasNoEmpId && idCheckStatus === 'valid'}
                     onChange={e => setFormData(prev => ({ ...prev, empId: e.target.value }))}
@@ -410,7 +410,7 @@ export const Form1Page: React.FC = () => {
                   <input
                     id="phone"
                     type="tel"
-                    className={hasNoEmpId && errors.empId ? 'has-error' : ''}
+                    className={(hasNoEmpId && errors.empId) || (hasNoEmpId && idCheckStatus === 'invalid') ? 'has-error' : ''}
                     value={formData.phone}
                     disabled={!hasNoEmpId && formData.empId.trim().length > 0 && idCheckStatus === 'valid'}
                     onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))}
