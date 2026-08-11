@@ -21,18 +21,18 @@ export const Form2Page: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Most employees have an Employee ID; the ~50 without one identify by phone
-  // instead. Whichever is filled gets real-time checked against the
-  // client-supplied whitelist as the user types.
-  const hasNoEmpId = !formData.empId.trim() && formData.phone.trim().length > 0;
-  const [idCheckStatus, setIdCheckStatus] = useState<'idle' | 'checking' | 'valid' | 'invalid'>('idle');
-  const idCheckTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // instead. Both fields are checked independently in real time as the user
+  // types, so if both are filled at once, each shows its own status.
+  const [empIdCheckStatus, setEmpIdCheckStatus] = useState<'idle' | 'checking' | 'valid' | 'invalid'>('idle');
+  const [phoneCheckStatus, setPhoneCheckStatus] = useState<'idle' | 'checking' | 'valid' | 'invalid'>('idle');
+  const empIdCheckTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const phoneCheckTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Submit stays disabled until every required field is filled, the
   // Employee ID / Phone has been confirmed against the whitelist, and the
   // consent checkbox is checked.
   const canSubmit = Boolean(
-    (formData.empId.trim() || formData.phone.trim()) &&
-    idCheckStatus === 'valid' &&
+    (empIdCheckStatus === 'valid' || phoneCheckStatus === 'valid') &&
     formData.empName.trim() &&
     thoughts.trim() &&
     thoughts.trim().length <= 2000 &&
@@ -40,28 +40,44 @@ export const Form2Page: React.FC = () => {
   );
 
   useEffect(() => {
-    const value = hasNoEmpId ? formData.phone.trim() : formData.empId.trim();
-    if (idCheckTimer.current) clearTimeout(idCheckTimer.current);
+    const value = formData.empId.trim();
+    if (empIdCheckTimer.current) clearTimeout(empIdCheckTimer.current);
     if (!value) {
-      setIdCheckStatus('idle');
+      setEmpIdCheckStatus('idle');
       return;
     }
-    setIdCheckStatus('checking');
-    idCheckTimer.current = setTimeout(async () => {
+    setEmpIdCheckStatus('checking');
+    empIdCheckTimer.current = setTimeout(async () => {
       try {
-        const endpoint = hasNoEmpId
-          ? `${apiBaseUrl}/api/validate-phone?phone=${encodeURIComponent(value)}`
-          : `${apiBaseUrl}/api/validate-empid?id=${encodeURIComponent(value)}`;
-        const res = await fetch(endpoint);
+        const res = await fetch(`${apiBaseUrl}/api/validate-empid?id=${encodeURIComponent(value)}`);
         const data = await res.json();
-        setIdCheckStatus(data.valid ? 'valid' : 'invalid');
+        setEmpIdCheckStatus(data.valid ? 'valid' : 'invalid');
       } catch {
-        setIdCheckStatus('idle');
+        setEmpIdCheckStatus('idle');
       }
     }, 500);
-    return () => { if (idCheckTimer.current) clearTimeout(idCheckTimer.current); };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formData.empId, formData.phone, hasNoEmpId]);
+    return () => { if (empIdCheckTimer.current) clearTimeout(empIdCheckTimer.current); };
+  }, [formData.empId, apiBaseUrl]);
+
+  useEffect(() => {
+    const value = formData.phone.trim();
+    if (phoneCheckTimer.current) clearTimeout(phoneCheckTimer.current);
+    if (!value) {
+      setPhoneCheckStatus('idle');
+      return;
+    }
+    setPhoneCheckStatus('checking');
+    phoneCheckTimer.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`${apiBaseUrl}/api/validate-phone?phone=${encodeURIComponent(value)}`);
+        const data = await res.json();
+        setPhoneCheckStatus(data.valid ? 'valid' : 'invalid');
+      } catch {
+        setPhoneCheckStatus('idle');
+      }
+    }, 500);
+    return () => { if (phoneCheckTimer.current) clearTimeout(phoneCheckTimer.current); };
+  }, [formData.phone, apiBaseUrl]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -81,12 +97,14 @@ export const Form2Page: React.FC = () => {
 
     if (!formData.empId.trim() && !formData.phone.trim()) {
       newErrors.empId = t.errEmpIdRequired || 'Employee ID is required.';
-    } else if (idCheckStatus === 'invalid') {
-      newErrors.empId = hasNoEmpId
-        ? 'This Phone Number was not found in company records.'
-        : 'This Employee ID was not found in company records.';
-    } else if (idCheckStatus === 'checking') {
-      newErrors.empId = 'Please wait, checking eligibility...';
+    } else if (empIdCheckStatus !== 'valid' && phoneCheckStatus !== 'valid') {
+      if (empIdCheckStatus === 'checking' || phoneCheckStatus === 'checking') {
+        newErrors.empId = 'Please wait, checking eligibility...';
+      } else {
+        newErrors.empId = formData.empId.trim()
+          ? 'This Employee ID was not found in company records.'
+          : 'This Phone Number was not found in company records.';
+      }
     }
     if (!formData.empName.trim()) newErrors.empName = t.errEmpNameRequired || 'Full name is required.';
     if (!companyName.trim()) newErrors.companyName = 'Company Name is required';
@@ -345,21 +363,21 @@ export const Form2Page: React.FC = () => {
                     </label>
                     <div className="id-field-wrap">
                       <input
-                        className={`input${formData.empId.trim() && ((!hasNoEmpId && idCheckStatus === 'invalid') || errors.empId) ? ' is-invalid' : ''}`}
+                        className={`input${formData.empId.trim() && (empIdCheckStatus === 'invalid' || errors.empId) ? ' is-invalid' : ''}`}
                         id="employeeEin"
                         type="text"
                         value={formData.empId}
-                        disabled={hasNoEmpId && idCheckStatus === 'valid'}
+                        disabled={phoneCheckStatus === 'valid'}
                         onChange={e => setFormData(prev => ({ ...prev, empId: e.target.value }))}
                         placeholder="Enter EIN"
                         autoComplete="off"
-                        style={{ paddingRight: '40px', opacity: hasNoEmpId && idCheckStatus === 'valid' ? 0.6 : 1 }}
+                        style={{ paddingRight: '40px', opacity: phoneCheckStatus === 'valid' ? 0.6 : 1 }}
                       />
-                      {!hasNoEmpId && formData.empId.trim() && (
+                      {formData.empId.trim() && (
                         <span className="id-status-icon">
-                          {idCheckStatus === 'checking' && <Loader2 size={16} color="#8d98ac" className="animate-spin" />}
-                          {idCheckStatus === 'valid' && <CheckCircle size={16} color="#2e7d3a" />}
-                          {idCheckStatus === 'invalid' && <AlertTriangle size={16} color="#b42318" />}
+                          {empIdCheckStatus === 'checking' && <Loader2 size={16} color="#8d98ac" className="animate-spin" />}
+                          {empIdCheckStatus === 'valid' && <CheckCircle size={16} color="#2e7d3a" />}
+                          {empIdCheckStatus === 'invalid' && <AlertTriangle size={16} color="#b42318" />}
                         </span>
                       )}
                     </div>
@@ -376,20 +394,20 @@ export const Form2Page: React.FC = () => {
                     </label>
                     <div className="id-field-wrap">
                       <input
-                        className={`input${formData.phone.trim() && hasNoEmpId && (idCheckStatus === 'invalid' || errors.empId) ? ' is-invalid' : ''}`}
+                        className={`input${formData.phone.trim() && (phoneCheckStatus === 'invalid' || errors.empId) ? ' is-invalid' : ''}`}
                         id="phoneNumber"
                         type="tel"
                         value={formData.phone}
-                        disabled={!hasNoEmpId && formData.empId.trim().length > 0 && idCheckStatus === 'valid'}
+                        disabled={empIdCheckStatus === 'valid'}
                         onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))}
                         placeholder="Only if you have no Employee ID"
-                        style={{ paddingRight: '40px', opacity: !hasNoEmpId && formData.empId.trim().length > 0 && idCheckStatus === 'valid' ? 0.6 : 1 }}
+                        style={{ paddingRight: '40px', opacity: empIdCheckStatus === 'valid' ? 0.6 : 1 }}
                       />
-                      {hasNoEmpId && formData.phone.trim() && (
+                      {formData.phone.trim() && (
                         <span className="id-status-icon">
-                          {idCheckStatus === 'checking' && <Loader2 size={16} color="#8d98ac" className="animate-spin" />}
-                          {idCheckStatus === 'valid' && <CheckCircle size={16} color="#2e7d3a" />}
-                          {idCheckStatus === 'invalid' && <AlertTriangle size={16} color="#b42318" />}
+                          {phoneCheckStatus === 'checking' && <Loader2 size={16} color="#8d98ac" className="animate-spin" />}
+                          {phoneCheckStatus === 'valid' && <CheckCircle size={16} color="#2e7d3a" />}
+                          {phoneCheckStatus === 'invalid' && <AlertTriangle size={16} color="#b42318" />}
                         </span>
                       )}
                     </div>
