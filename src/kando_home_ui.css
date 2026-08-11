@@ -105,8 +105,6 @@
   height: 100%;
   object-fit: contain;
   object-position: left center;
-  filter: brightness(0) saturate(100%) invert(16%) sepia(41%) saturate(1967%) hue-rotate(191deg)
-    brightness(83%) contrast(105%);
 }
 
 /* Header right side */

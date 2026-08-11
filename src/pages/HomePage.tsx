@@ -14,9 +14,9 @@ export const HomePage: React.FC = () => {
           <a className="kd-logo" href="#" onClick={(e) => { e.preventDefault(); navigateTo('home'); }} aria-label="Yamaha — Revs Your Heart">
             <img
               className="kd-logo-image"
-              src="/yamaha-logo-v2.png"
+              src="/slgn_flat_red_rgb.svg"
               alt="Yamaha — Revs Your Heart"
-              onError={(e) => { (e.target as HTMLImageElement).src = '/yamaha_logo.png'; }}
+              onError={(e) => { (e.target as HTMLImageElement).src = '/yamaha-logo-v2.png'; }}
             />
           </a>
 
@@ -84,16 +84,16 @@ export const HomePage: React.FC = () => {
           {/* 1st image in left corner */}
           <img
             className="kd-hero-photo kd-hero-photo--left"
-            src="/image_5.png"
+            src="/image_5.webp"
             alt="A family crafting blue and white decorations together at home"
-            onError={(e) => { (e.target as HTMLImageElement).src = '/kando_family.png'; }}
+            onError={(e) => { (e.target as HTMLImageElement).src = '/image_5.png'; }}
           />
           {/* 2nd image in right corner */}
           <img
             className="kd-hero-photo kd-hero-photo--right"
-            src="/image_3.png"
+            src="/image_3.webp"
             alt="A handmade Our Kando Moment display with paper hearts, notes and fairy lights"
-            onError={(e) => { (e.target as HTMLImageElement).src = '/kando_chairman_gift.png'; }}
+            onError={(e) => { (e.target as HTMLImageElement).src = '/image_3.png'; }}
           />
 
           <div className="kd-hero-copy">
@@ -406,7 +406,7 @@ export const HomePage: React.FC = () => {
         {/* ============================ Quote band =========================== */}
         <section className="kd-quote">
           <div className="kd-quote-row">
-            <img src="/quote_family_icon.png" alt="Family" className="kd-quote-icon" />
+            <img src="/quote_family_icon.webp" onError={(e) => { (e.target as HTMLImageElement).src = '/quote_family_icon.png'; }} alt="Family" className="kd-quote-icon" />
 
             <div className="kd-quote-text">
               <p>

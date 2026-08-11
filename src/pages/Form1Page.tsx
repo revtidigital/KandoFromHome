@@ -302,9 +302,9 @@ export const Form1Page: React.FC = () => {
         <a className="yamaha-logo" href="#" onClick={(e) => { e.preventDefault(); navigateTo('home'); }} aria-label="Yamaha home">
           <img
             className="yamaha-logo-img"
-            src="/yamaha-logo-v2.png"
+            src="/slgn_flat_red_rgb.svg"
             alt="Yamaha — Revs Your Heart"
-            onError={(e) => { (e.target as HTMLImageElement).src = '/yamaha_logo.png'; }}
+            onError={(e) => { (e.target as HTMLImageElement).src = '/yamaha-logo-v2.png'; }}
           />
         </a>
 
@@ -716,9 +716,12 @@ export const Form1Page: React.FC = () => {
             <div className="polaroid-wrap">
               <figure className="polaroid-frame">
                 <img
-                  src="/png.png"
+                  src="/png.webp"
                   alt="A smiling family holding an Our Kando Moment sign"
-                  onError={(e) => { (e.target as HTMLImageElement).src = '/user_form1_right.png'; }}
+                  onError={(e) => {
+                    const img = e.target as HTMLImageElement;
+                    img.src = img.src.includes('.webp') ? '/png.png' : '/user_form1_right.png';
+                  }}
                 />
               </figure>
             </div>

@@ -14,7 +14,8 @@ export const ThankYou1Page: React.FC = () => {
           <a className="ty1-brand" href="#" onClick={(e) => { e.preventDefault(); navigateTo('home'); }} aria-label="Yamaha — Revs Your Heart">
             <img
               className="ty1-brand-logo-img"
-              src="/yamaha-logo-v2.png"
+              src="/slgn_flat_red_rgb.svg"
+              onError={(e) => { (e.target as HTMLImageElement).src = '/yamaha-logo-v2.png'; }}
               alt="Yamaha — Revs Your Heart"
             />
           </a>
@@ -91,9 +92,12 @@ export const ThankYou1Page: React.FC = () => {
             <figure className="ty1-hero-media" aria-label="Kando moment photo">
               <img
                 className="ty1-polaroid"
-                src="/png1.png"
+                src="/png1.webp"
                 alt="Polaroid-style family Kando moment"
-                onError={(e) => { (e.target as HTMLImageElement).src = '/user_vertical_card.png'; }}
+                onError={(e) => {
+                  const img = e.target as HTMLImageElement;
+                  img.src = img.src.includes('.webp') ? '/png1.png' : '/user_vertical_card.png';
+                }}
               />
             </figure>
 

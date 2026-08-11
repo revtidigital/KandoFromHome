@@ -267,9 +267,9 @@ export const Form2Page: React.FC = () => {
           <a className="f2-brand" href="#" onClick={(e) => { e.preventDefault(); navigateTo('home'); }} aria-label="Yamaha — Revs Your Heart">
             <img
               className="f2-brand-image"
-              src="/yamaha-logo-v2.png"
+              src="/slgn_flat_red_rgb.svg"
               alt="Yamaha — Revs Your Heart"
-              onError={(e) => { (e.target as HTMLImageElement).src = '/yamaha_logo.png'; }}
+              onError={(e) => { (e.target as HTMLImageElement).src = '/yamaha-logo-v2.png'; }}
             />
           </a>
 

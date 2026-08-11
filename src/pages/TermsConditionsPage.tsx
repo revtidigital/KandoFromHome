@@ -24,9 +24,9 @@ export const TermsConditionsPage: React.FC = () => {
         >
           <img
             className="tp-yamaha-logo-img"
-            src="/yamaha-logo-v2.png"
+            src="/slgn_flat_red_rgb.svg"
             alt="Yamaha — Revs Your Heart"
-            onError={(e) => { (e.target as HTMLImageElement).src = '/yamaha_logo.png'; }}
+            onError={(e) => { (e.target as HTMLImageElement).src = '/yamaha-logo-v2.png'; }}
           />
         </a>
 

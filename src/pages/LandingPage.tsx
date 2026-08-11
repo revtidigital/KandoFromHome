@@ -20,8 +20,9 @@ export const LandingPage: React.FC = () => {
       
       {/* ── BACKGROUND LAYER: FAMILY PHOTO ON RIGHT ── */}
       <div className="landing-bg-image">
-        <img 
-          src="/new_right_family.png"
+        <img
+          src="/new_right_family.webp"
+          onError={(e) => { (e.target as HTMLImageElement).src = '/new_right_family.png'; }}
           alt="Yamaha Family DIY Craft Wall"
           style={{
             width: '100%',
@@ -53,7 +54,7 @@ export const LandingPage: React.FC = () => {
           </div>
 
           {/* TOP RIGHT MICROSITE LOGO */}
-          <img src="/topright_badge.png" alt="Yamaha Day 2026 · Kando Together" style={{ height: '52px', width: 'auto' }} />
+          <img src="/topright_badge.webp" onError={(e) => { (e.target as HTMLImageElement).src = '/topright_badge.png'; }} alt="Yamaha Day 2026 · Kando Together" style={{ height: '52px', width: 'auto' }} />
         </header>
 
         {/* MAIN BODY AREA — FULL LEFT HALF (52% WIDTH, MAX 720PX) */}
@@ -184,7 +185,7 @@ export const LandingPage: React.FC = () => {
             {/* CURSIVE SLOGAN BELOW CARDS */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', marginTop: '4px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <img src="/slogan_family_icon.png" alt="Family" style={{ height: '52px', width: 'auto' }} />
+                <img src="/slogan_family_icon.webp" onError={(e) => { (e.target as HTMLImageElement).src = '/slogan_family_icon.png'; }} alt="Family" style={{ height: '52px', width: 'auto' }} />
               </div>
               <p className="landing-slogan">
                 Behind every Yamaha action<br />is a family that inspires it.
