@@ -48,12 +48,12 @@ const THEMES = {
 };
 
 // Native <details>/<summary> gives us a click-to-toggle popover with built-in
-// outside-click/escape handling, so a multi-select checkbox list needs no
-// extra open/close state or document-level listeners. The panel stays inside
-// this same DOM subtree (no portal) — on open we just measure the row's
-// position and flip the panel above the trigger + clamp its horizontal
-// offset so it never renders past the viewport edge and never forces the
-// whole page to scroll to become visible.
+// escape handling, but it does NOT auto-close on an outside click, so we add
+// a document-level listener for that. The panel stays inside this same DOM
+// subtree (no portal) — on open we just measure the row's position and flip
+// the panel above the trigger + clamp its horizontal offset so it never
+// renders past the viewport edge and never forces the whole page to scroll
+// to become visible.
 const TagMultiSelect: React.FC<{
   tags: string[];
   customTags: string[];
@@ -63,6 +63,17 @@ const TagMultiSelect: React.FC<{
 }> = ({ tags, customTags, onToggle, accent = '#00E5FF', palette }) => {
   const detailsRef = useRef<HTMLDetailsElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      const details = detailsRef.current;
+      if (details && details.open && !details.contains(e.target as Node)) {
+        details.open = false;
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, []);
 
   const positionPanel = () => {
     const details = detailsRef.current;
