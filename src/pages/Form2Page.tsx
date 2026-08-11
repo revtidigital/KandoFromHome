@@ -312,7 +312,7 @@ export const Form2Page: React.FC = () => {
                     <svg className="icon icon--label" aria-hidden="true">
                       <use href="#f2-icon-building"></use>
                     </svg>
-                    <span>{t.companyNameLabel}</span>
+                    <span>{t.companyNameLabel}*</span>
                   </label>
                   <input
                     className="input"
@@ -331,7 +331,7 @@ export const Form2Page: React.FC = () => {
                       <svg className="icon icon--label" aria-hidden="true">
                         <use href="#f2-icon-id-card"></use>
                       </svg>
-                      <span>{t.form2EmpEinLabel}{!hasNoEmpId && '*'}</span>
+                      <span>{t.form2EmpEinLabel}*</span>
                     </label>
                     <div className="id-field-wrap">
                       <input
@@ -362,7 +362,7 @@ export const Form2Page: React.FC = () => {
                       <svg className="icon icon--label" aria-hidden="true">
                         <use href="#f2-icon-id-card"></use>
                       </svg>
-                      <span>{t.form2PhoneNumberLabel}{hasNoEmpId && '*'}</span>
+                      <span>{t.form2PhoneNumberLabel}*</span>
                     </label>
                     <div className="id-field-wrap">
                       <input
@@ -409,7 +409,7 @@ export const Form2Page: React.FC = () => {
                       <svg className="icon icon--label" aria-hidden="true">
                         <use href="#f2-icon-users"></use>
                       </svg>
-                      <span>{t.departmentLabel}</span>
+                      <span>{t.departmentLabel}*</span>
                     </label>
                     <input
                       className="input"
@@ -427,7 +427,7 @@ export const Form2Page: React.FC = () => {
                       <svg className="icon icon--label" aria-hidden="true">
                         <use href="#f2-icon-map-pin"></use>
                       </svg>
-                      <span>{t.locationLabel}</span>
+                      <span>{t.locationLabel}*</span>
                     </label>
                     <input
                       className="input"
@@ -447,7 +447,7 @@ export const Form2Page: React.FC = () => {
                       <use href="#f2-icon-message"></use>
                     </svg>
                     <span>
-                      <strong className="thoughts__title">{t.form2ShareThoughtsTitle}</strong>
+                      <strong className="thoughts__title">{t.form2ShareThoughtsTitle}*</strong>
                       <span className="thoughts__description">
                         {t.form2ShareThoughtsDesc}
                       </span>
@@ -508,7 +508,7 @@ export const Form2Page: React.FC = () => {
                     {t.consentAndWord}{' '}
                     <a href={`/${language}/privacy`} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}>
                       {t.consentPrivacyLink}
-                    </a>. {t.form2ConsentSuffix} *
+                    </a>. {t.form2ConsentSuffix}*
                   </span>
                 </label>
                 {errors.dataConsent && (
