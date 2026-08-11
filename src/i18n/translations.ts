@@ -228,7 +228,7 @@ export const translations: Record<Language, Translations> = {
 
     // Landing
     createYour: "Create Your",
-    kandoMoment: "Kando Moment ♡",
+    kandoMoment: "Create. Share. Inspire.",
     landingSubtitle: "A feeling of joy, pride and togetherness. This Yamaha Day, create a special moment with your family and share it with Yamaha.",
     chooseLanguage: "CHOOSE YOUR LANGUAGE",
     enterSite: "ENTER SITE >",

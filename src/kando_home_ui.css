@@ -236,6 +236,7 @@
   font-size: clamp(18px, 1.9vw, 26px);
   font-weight: 600;
   letter-spacing: 0.01em;
+  color: #ffffff;
 }
 
 .kd-divider {
