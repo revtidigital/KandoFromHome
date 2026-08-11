@@ -449,7 +449,7 @@ export const Form2Page: React.FC = () => {
                     <span>
                       <strong className="thoughts__title">{t.form2ShareThoughtsTitle}*</strong>
                       <span className="thoughts__description">
-                        {t.form2ShareThoughtsDesc}
+                        <strong>{t.form2ShareThoughtsDesc}</strong>
                       </span>
                     </span>
                   </label>
