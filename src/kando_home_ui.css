@@ -211,24 +211,24 @@
   margin: 0;
   font-size: clamp(27px, 3.35vw, 48px);
   white-space: nowrap;
-  font-weight: 700;
+  font-weight: 500;
   letter-spacing: -0.01em;
   line-height: 1.1;
   text-wrap: balance;
 }
 
 .kd-title .kando-script {
-  font-size: 1.08em;
+  font-size: 1.3em;
   font-weight: 700;
 }
 
 .kd-title-heart {
   display: inline-block;
-  width: 0.52em;
-  height: 0.52em;
-  margin-left: 0.1em;
+  width: 0.7em;
+  height: 0.7em;
+  margin-left: 0.12em;
   color: var(--gold);
-  vertical-align: 0.28em;
+  vertical-align: 0.15em;
 }
 
 .kd-subtitle {
