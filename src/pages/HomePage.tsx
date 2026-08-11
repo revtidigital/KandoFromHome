@@ -405,35 +405,7 @@ export const HomePage: React.FC = () => {
 
         {/* ============================ Quote band =========================== */}
         <section className="kd-quote">
-          <svg className="kd-quote-icon" viewBox="0 0 72 50" fill="none" aria-hidden="true">
-            <circle cx="13" cy="11" r="5.6" stroke="currentColor" strokeWidth="2" />
-            <circle cx="36" cy="9" r="6.4" stroke="currentColor" strokeWidth="2" />
-            <circle cx="59" cy="11" r="5.6" stroke="currentColor" strokeWidth="2" />
-            <path
-              d="M3.5 44V30.5a9.5 9.5 0 0 1 19 0V44"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-            <path
-              d="M24.5 46V30a11.5 11.5 0 0 1 23 0v16"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-            <path
-              d="M49.5 44V30.5a9.5 9.5 0 0 1 19 0V44"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-            <path
-              d="M13 30v14M36 28v18M59 30v14"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-          </svg>
+          <img src="/quote_family_icon.png" alt="Family" className="kd-quote-icon" />
 
           <div className="kd-quote-text">
             <p>
