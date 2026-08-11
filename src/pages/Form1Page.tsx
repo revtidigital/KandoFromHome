@@ -420,7 +420,7 @@ export const Form1Page: React.FC = () => {
                   className={errors.empName ? 'has-error' : ''}
                   value={formData.empName}
                   onChange={e => setFormData(prev => ({ ...prev, empName: e.target.value }))}
-                  placeholder="e.g. Rahul Sharma"
+                  placeholder="Enter employee name"
                   autoComplete="name"
                 />
                 {errors.empName && <p className="file-error">{errors.empName}</p>}
@@ -434,7 +434,7 @@ export const Form1Page: React.FC = () => {
                   type="text"
                   value={department}
                   onChange={e => setDepartment(e.target.value)}
-                  placeholder="e.g. Marketing"
+                  placeholder="Enter department"
                 />
               </div>
 
@@ -446,7 +446,7 @@ export const Form1Page: React.FC = () => {
                   type="text"
                   value={formData.city}
                   onChange={e => setFormData(prev => ({ ...prev, city: e.target.value }))}
-                  placeholder="e.g. Surajpur / Chennai"
+                  placeholder="Enter location"
                   autoComplete="address-level2"
                 />
               </div>
