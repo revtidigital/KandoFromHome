@@ -1,50 +1,101 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
-import { FileText } from 'lucide-react';
+import type { Language } from '../i18n/translations';
+import './TermsConditionsPage.css';
+
+const sections = [
+  { titleKey: 'termsSec1Title', bodyKey: 'termsSec1Body' },
+  { titleKey: 'termsSec2Title', bodyKey: 'termsSec2Body' },
+  { titleKey: 'termsSec3Title', bodyKey: 'termsSec3Body' },
+  { titleKey: 'termsSec4Title', bodyKey: 'termsSec4Body' },
+] as const;
 
 export const TermsConditionsPage: React.FC = () => {
-  const { t } = useApp();
+  const { t, language, setLanguage, navigateTo } = useApp();
 
   return (
-    <div className="container" style={{ padding: '40px 20px', maxWidth: '900px' }}>
-      <div className="glass-panel" style={{ padding: '40px' }}>
-        
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#D1B07B', marginBottom: '16px' }}>
-          <FileText size={32} />
-          <h1 className="heading-font" style={{ fontSize: '2.2rem', color: 'var(--text-main)' }}>
-            {t.termsConditionsTitle}
-          </h1>
+    <div className="terms-page">
+      <header className="tp-topbar">
+        <div className="tp-topbar-inner">
+          <a
+            href="#"
+            className="tp-brand"
+            aria-label="Yamaha Home"
+            onClick={(e) => { e.preventDefault(); navigateTo('home'); }}
+          >
+            <img
+              src="/yamaha-logo-v2.png"
+              alt="Yamaha Revs Your Heart"
+              className="tp-logo"
+              onError={(e) => { (e.target as HTMLImageElement).src = '/yamaha_logo.png'; }}
+            />
+          </a>
+
+          <div className="tp-campaign-title">KANDO FROM HOME</div>
+
+          <div className="tp-header-actions">
+            <button
+              type="button"
+              className="tp-home-link"
+              aria-label="Home"
+              onClick={() => navigateTo('home')}
+            >
+              <span className="tp-home-icon">⌂</span>
+              <span>{t.home || 'Home'}</span>
+            </button>
+
+            <div className="tp-divider" />
+
+            <select
+              className="tp-language-select"
+              aria-label="Language"
+              value={language}
+              onChange={(e) => setLanguage(e.target.value as Language)}
+            >
+              <option value="en">English</option>
+              <option value="hi">हिंदी</option>
+              <option value="ta">தமிழ்</option>
+            </select>
+          </div>
         </div>
+      </header>
 
-        <p style={{ color: '#A0B2D6', marginBottom: '24px', fontSize: '0.95rem' }}>
-          {t.termsSubtitle}
-        </p>
+      <main className="tp-page">
+        <section className="tp-hero-intro">
+          <div className="tp-icon-wrap">
+            <svg viewBox="0 0 80 80" aria-hidden="true">
+              <circle cx="40" cy="40" r="36" fill="#ffffff" stroke="#cfdcf2" strokeWidth="1.5" />
+              <path d="M27 20h20l9 9v31H27z" fill="none" stroke="#0b4699" strokeWidth="3" strokeLinejoin="round" />
+              <path d="M47 20v10h10" fill="none" stroke="#0b4699" strokeWidth="3" strokeLinejoin="round" />
+              <path d="M33 38h16M33 45h16M33 52h10" stroke="#0b4699" strokeWidth="3" strokeLinecap="round" />
+            </svg>
+          </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', color: 'var(--label-muted)', lineHeight: 1.7 }}>
-          
-          <section>
-            <h3 style={{ color: 'var(--text-main)', fontSize: '1.2rem', marginBottom: '8px' }}>{t.termsSec1Title}</h3>
-            <p>{t.termsSec1Body}</p>
-          </section>
+          <div className="tp-hero-copy">
+            <span className="tp-eyebrow">Yamaha Day 2026 • Kando From Home</span>
+            <h1>{t.termsConditionsTitle}</h1>
+            <p>{t.termsSubtitle}</p>
+          </div>
+        </section>
 
-          <section>
-            <h3 style={{ color: 'var(--text-main)', fontSize: '1.2rem', marginBottom: '8px' }}>{t.termsSec2Title}</h3>
-            <p>{t.termsSec2Body}</p>
-          </section>
+        <section className="tp-terms-card">
+          {sections.map((section, index) => (
+            <article className="tp-term-block" key={section.titleKey}>
+              <div className="tp-number">{String(index + 1).padStart(2, '0')}</div>
+              <div className="tp-term-content">
+                <h2>{t[section.titleKey].replace(/^\d+\.\s*/, '')}</h2>
+                <p>{t[section.bodyKey]}</p>
+              </div>
+            </article>
+          ))}
+        </section>
 
-          <section>
-            <h3 style={{ color: 'var(--text-main)', fontSize: '1.2rem', marginBottom: '8px' }}>{t.termsSec3Title}</h3>
-            <p>{t.termsSec3Body}</p>
-          </section>
-
-          <section>
-            <h3 style={{ color: 'var(--text-main)', fontSize: '1.2rem', marginBottom: '8px' }}>{t.termsSec4Title}</h3>
-            <p>{t.termsSec4Body}</p>
-          </section>
-
+        <div className="tp-bottom-note">
+          <span className="tp-line" />
+          <span className="tp-mini-heart">♥</span>
+          <span className="tp-line" />
         </div>
-
-      </div>
+      </main>
     </div>
   );
 };
