@@ -239,29 +239,12 @@
   color: #ffffff;
 }
 
-.kd-divider {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
+.kd-divider-curve {
+  display: block;
+  width: 260px;
+  max-width: 70%;
+  height: 14px;
   margin: 14px auto 0;
-  max-width: 260px;
-}
-
-.kd-divider span {
-  height: 1.5px;
-  flex: 1;
-  background: linear-gradient(to right, transparent, var(--gold-light));
-}
-
-.kd-divider span:last-child {
-  background: linear-gradient(to left, transparent, var(--gold-light));
-}
-
-.kd-divider svg {
-  width: 15px;
-  height: 15px;
-  color: var(--gold);
 }
 
 .kd-heart-solo {
@@ -820,7 +803,7 @@
     margin-top: 10px;
   }
 
-  .kd-divider {
+  .kd-divider-curve {
     margin-top: 10px;
   }
 

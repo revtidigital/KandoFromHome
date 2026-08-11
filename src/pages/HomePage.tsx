@@ -112,19 +112,22 @@ export const HomePage: React.FC = () => {
 
             <p className="kd-subtitle">{t.kandoMoment || 'Create. Share. Inspire.'}</p>
 
-            <div className="kd-divider" aria-hidden="true">
-              <span></span>
-              <svg viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M12 20.5s-7.5-4.6-7.5-9.7A4.3 4.3 0 0 1 12 8.2a4.3 4.3 0 0 1 7.5 2.6c0 5.1-7.5 9.7-7.5 9.7Z"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <span></span>
-            </div>
+            <svg className="kd-divider-curve" viewBox="0 0 260 14" preserveAspectRatio="none" aria-hidden="true">
+              <path
+                d="M0 10 Q130 -2 260 10"
+                stroke="url(#kd-divider-gradient)"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                fill="none"
+              />
+              <defs>
+                <linearGradient id="kd-divider-gradient" x1="0" y1="0" x2="260" y2="0" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stopColor="var(--gold-light)" stopOpacity="0" />
+                  <stop offset="50%" stopColor="var(--gold-light)" stopOpacity="1" />
+                  <stop offset="100%" stopColor="var(--gold-light)" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+            </svg>
 
             <svg className="kd-heart-solo" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path
