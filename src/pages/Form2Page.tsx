@@ -89,16 +89,22 @@ export const Form2Page: React.FC = () => {
       newErrors.empId = 'Please wait, checking eligibility...';
     }
     if (!formData.empName.trim()) newErrors.empName = t.errEmpNameRequired || 'Full name is required.';
+    if (!companyName.trim()) newErrors.companyName = 'Company Name is required';
+    if (!department.trim()) newErrors.department = 'Department is required';
+    if (!location.trim()) newErrors.location = 'Location is required';
     if (!thoughts.trim()) newErrors.thoughts = 'Please share your thoughts (required).';
     else if (thoughts.trim().length > 2000) newErrors.thoughts = 'Thoughts must be 2000 characters or less.';
     if (!dataConsent) newErrors.dataConsent = 'You must agree to the Terms & Conditions to proceed.';
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      const fieldOrder = ['empId', 'empName', 'thoughts', 'dataConsent'];
+      const fieldOrder = ['companyName', 'empId', 'empName', 'department', 'location', 'thoughts', 'dataConsent'];
       const fieldToElementId: Record<string, string> = {
+        companyName: 'companyName',
         empId: 'employeeEin',
         empName: 'employeeName',
+        department: 'department',
+        location: 'location',
         thoughts: 'userThoughts',
         dataConsent: 'dataConsentCheckbox'
       };
@@ -318,7 +324,7 @@ export const Form2Page: React.FC = () => {
                     <span>{t.companyNameLabel}*</span>
                   </label>
                   <input
-                    className="input"
+                    className={`input${errors.companyName ? ' is-invalid' : ''}`}
                     id="companyName"
                     type="text"
                     value={companyName}
@@ -326,6 +332,7 @@ export const Form2Page: React.FC = () => {
                     placeholder="Enter company name"
                     autoComplete="organization"
                   />
+                  {errors.companyName && <p className="field-error">{errors.companyName}</p>}
                 </div>
 
                 <div className="form-grid">
@@ -415,7 +422,7 @@ export const Form2Page: React.FC = () => {
                       <span>{t.departmentLabel}*</span>
                     </label>
                     <input
-                      className="input"
+                      className={`input${errors.department ? ' is-invalid' : ''}`}
                       id="department"
                       type="text"
                       value={department}
@@ -423,6 +430,7 @@ export const Form2Page: React.FC = () => {
                       placeholder="Enter department"
                       autoComplete="organization-title"
                     />
+                    {errors.department && <p className="field-error">{errors.department}</p>}
                   </div>
 
                   <div className="field">
@@ -433,7 +441,7 @@ export const Form2Page: React.FC = () => {
                       <span>{t.locationLabel}*</span>
                     </label>
                     <input
-                      className="input"
+                      className={`input${errors.location ? ' is-invalid' : ''}`}
                       id="location"
                       type="text"
                       value={location}
@@ -441,6 +449,7 @@ export const Form2Page: React.FC = () => {
                       placeholder="Enter location"
                       autoComplete="address-level2"
                     />
+                    {errors.location && <p className="field-error">{errors.location}</p>}
                   </div>
                 </div>
 

@@ -159,6 +159,17 @@ export const Form1Page: React.FC = () => {
       newErrors.empName = t.errEmpNameRequired;
     }
 
+    // 2b. Company Name / Department / Location Validation
+    if (!companyName.trim()) {
+      newErrors.companyName = 'Company Name is required';
+    }
+    if (!department.trim()) {
+      newErrors.department = 'Department is required';
+    }
+    if (!formData.city.trim()) {
+      newErrors.location = 'Location is required';
+    }
+
     // 3. Photo & Video Mandatory Validation
     if (!formData.photo1) {
       newErrors.photo1 = t.errPhoto1Required;
@@ -180,10 +191,13 @@ export const Form1Page: React.FC = () => {
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      const fieldOrder = ['empId', 'empName', 'photo1', 'photo2', 'video', 'dataConsent', 'mediaConsent'];
+      const fieldOrder = ['companyName', 'empId', 'empName', 'department', 'location', 'photo1', 'photo2', 'video', 'dataConsent', 'mediaConsent'];
       const fieldToElementId: Record<string, string> = {
+        companyName: 'company',
         empId: 'ein',
         empName: 'employee-name',
+        department: 'department',
+        location: 'location',
         photo1: 'photo-one',
         photo2: 'photo-two',
         video: 'family-video',
@@ -351,11 +365,13 @@ export const Form1Page: React.FC = () => {
                 <input
                   id="company"
                   type="text"
+                  className={errors.companyName ? 'has-error' : ''}
                   value={companyName}
                   onChange={e => setCompanyName(e.target.value)}
                   placeholder="Enter company name"
                   autoComplete="organization"
                 />
+                {errors.companyName && <p className="file-error">{errors.companyName}</p>}
               </div>
 
               {/* Employee ID */}
@@ -432,10 +448,12 @@ export const Form1Page: React.FC = () => {
                 <input
                   id="department"
                   type="text"
+                  className={errors.department ? 'has-error' : ''}
                   value={department}
                   onChange={e => setDepartment(e.target.value)}
                   placeholder="Enter department"
                 />
+                {errors.department && <p className="file-error">{errors.department}</p>}
               </div>
 
               {/* Location */}
@@ -444,11 +462,13 @@ export const Form1Page: React.FC = () => {
                 <input
                   id="location"
                   type="text"
+                  className={errors.location ? 'has-error' : ''}
                   value={formData.city}
                   onChange={e => setFormData(prev => ({ ...prev, city: e.target.value }))}
                   placeholder="Enter location"
                   autoComplete="address-level2"
                 />
+                {errors.location && <p className="file-error">{errors.location}</p>}
               </div>
 
               {/* MEDIA UPLOADS */}
