@@ -232,7 +232,7 @@
   color: var(--navy);
   font-family: "Montserrat", sans-serif;
   font-size: clamp(34px, 3vw, 48px);
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 0.006em;
   line-height: 1;
 }
