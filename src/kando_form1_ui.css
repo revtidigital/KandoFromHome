@@ -449,11 +449,14 @@
 .kando-page-f1 .upload-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
   gap: 13px;
 }
 
 .kando-page-f1 .upload-control {
   min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .kando-page-f1 .file-input {
@@ -471,6 +474,7 @@
   gap: 9px;
   width: 100%;
   min-height: 85px;
+  flex: 1 0 auto;
   padding: 12px 12px;
   color: var(--ink);
   background: rgba(255, 255, 255, 0.95);

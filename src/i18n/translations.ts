@@ -11,10 +11,14 @@ export interface Translations {
   privacy: string;
   adminPortal: string;
   changeLanguage: string;
+  mandatoryField: string;
   
   // Landing Page
   createYour: string;
   kandoMoment: string;
+  welcomeToYour: string;
+  kandoSpace: string;
+  heroWelcomeSuffix: string;
   landingSubtitle: string;
   chooseLanguage: string;
   enterSite: string;
@@ -91,7 +95,16 @@ export interface Translations {
   cityPlaceholder: string;
   familyCountLabel: string;
   familyCountPlaceholder: string;
-  
+  form2SkipBtn: string;
+  noFileSelected: string;
+  companyNamePlaceholder: string;
+  einPlaceholder: string;
+  phoneNoEinPlaceholder: string;
+  employeeNamePlaceholder: string;
+  departmentPlaceholder: string;
+  locationPlaceholder: string;
+  thoughtsPlaceholder: string;
+
   // Media Uploads
   mediaUploadTitle: string;
   mediaUploadSubtitle: string;
@@ -165,8 +178,10 @@ export interface Translations {
   sec2UploadPhotosDesc: string;
   photo1Label: string;
   photo2Label: string;
+  photoFormatsHint: string;
   sec2UploadVideoTitle: string;
   sec2UploadVideoDesc: string;
+  videoFormatsHint: string;
 
   // Validation Error Messages
   errEmpNameRequired: string;
@@ -202,6 +217,9 @@ export interface Translations {
   form2ChairmanTitle: string;
   form2ChairmanScript: string;
   form2ChairmanSub: string;
+  form2ChairmanQuoteLine1: string;
+  form2ChairmanQuoteLine2: string;
+  form2ChairmanQuoteText: string;
   form2EmpEinLabel: string;
   form2PhoneNumberLabel: string;
   form2EmployeeNameLabel: string;
@@ -225,10 +243,14 @@ export const translations: Record<Language, Translations> = {
     privacy: "Privacy Policy",
     adminPortal: "Admin Portal",
     changeLanguage: "Change Language",
+    mandatoryField: "* Mandatory field",
 
     // Landing
     createYour: "Create Your",
     kandoMoment: "Create. Share. Inspire.",
+    welcomeToYour: "Welcome to Your",
+    kandoSpace: "Kando Space",
+    heroWelcomeSuffix: "",
     landingSubtitle: "This Yamaha Day, let's celebrate the families behind every Yamaha action.",
     chooseLanguage: "CHOOSE YOUR LANGUAGE",
     enterSite: "ENTER SITE >",
@@ -305,6 +327,15 @@ export const translations: Record<Language, Translations> = {
     cityPlaceholder: "e.g. Surajpur / Chennai / Kanchipuram / Gurgaon",
     familyCountLabel: "Number of Participating Family Members *",
     familyCountPlaceholder: "e.g. 4",
+    form2SkipBtn: "Skip >",
+    noFileSelected: "No file selected",
+    companyNamePlaceholder: "Enter company name",
+    einPlaceholder: "Enter EIN",
+    phoneNoEinPlaceholder: "Only if you have no Employee ID",
+    employeeNamePlaceholder: "Enter employee name",
+    departmentPlaceholder: "Enter department",
+    locationPlaceholder: "Enter location",
+    thoughtsPlaceholder: "Write your thoughts here...",
 
     // Media
     mediaUploadTitle: "DIY Creation Media Upload",
@@ -375,11 +406,13 @@ export const translations: Record<Language, Translations> = {
 
     // Section Headings & Upload Labels
     sec1EmployeeDetailsTitle: "1. Employee & Family Details",
-    sec2UploadPhotosTitle: "Upload Photos (Max 2 Photos and 1 Video, Max 50MB)",
+    sec2UploadPhotosTitle: "Upload Photos (Max 2 Photos and 1 Video, Max 40MB)",
     sec2UploadPhotosDesc: "Upload up to 2 high-resolution photos and video of your family Kando DIY Wall (All formats supported).",
     photo1Label: "Photo 1 (Required, Max 5MB)*",
     photo2Label: "Photo 2 (Required, Max 5MB)*",
+    photoFormatsHint: "All photo formats supported · Max 5MB",
     sec2UploadVideoTitle: "Video (Required, Max 40MB)*",
+    videoFormatsHint: "All video formats supported · Max 40MB",
     sec2UploadVideoDesc: "Upload 1 video of your family making the DIY Craft Wall (MP4, WEBM, MOV, etc. Max 40MB limit).",
 
     // Validation Error Messages
@@ -415,6 +448,9 @@ export const translations: Record<Language, Translations> = {
     form2ChairmanTitle: "CHAIRMAN INVITES",
     form2ChairmanScript: "your Thoughts",
     form2ChairmanSub: "Your ideas help us grow better, together.",
+    form2ChairmanQuoteLine1: "The future is built",
+    form2ChairmanQuoteLine2: "by our ideas today.",
+    form2ChairmanQuoteText: "Share your thoughts and help shape a stronger, more inspiring Yamaha for tomorrow.",
     form2EmpEinLabel: "Employee EIN",
     form2PhoneNumberLabel: "Phone Number",
     form2EmployeeNameLabel: "Employee Name",
@@ -428,42 +464,46 @@ export const translations: Record<Language, Translations> = {
   },
 
   hi: {
-    siteTitle: "यामाहा डे 2026 · कांदो फ्रॉम होम",
-    yamahaDay: "यामाहा डे 2026",
-    kandoFromHome: "कांदो फ्रॉम होम",
+    siteTitle: "यामाहा दिवस 2026 · कांडो फ्रॉम होम",
+    yamahaDay: "यामाहा दिवस 2026",
+    kandoFromHome: "कांडो फ्रॉम होम",
     copyright: "© 2026 यामाहा मोटर इंडिया ग्रुप। सर्वाधिकार सुरक्षित।",
     home: "होम",
     terms: "नियम और शर्तें",
     privacy: "गोपनीयता नीति",
-    adminPortal: "एडमिन पोर्टल",
+    adminPortal: "प्रशासन पोर्टल",
     changeLanguage: "भाषा बदलें",
+    mandatoryField: "* अनिवार्य फ़ील्ड",
 
     // Landing
     createYour: "बनाएं अपना",
-    kandoMoment: "कांदो मोमेंट ♡",
-    landingSubtitle: "आनंद, गर्व और एकजुटता की भावना। इस यामाहा डे पर, अपने परिवार के साथ एक विशेष क्षण बनाएं और इसे यामाहा के साथ साझा करें।",
+    kandoMoment: "बनाएं। साझा करें। प्रेरित करें।",
+    welcomeToYour: "आपके",
+    kandoSpace: "कांडो स्पेस",
+    heroWelcomeSuffix: "में स्वागत है",
+    landingSubtitle: "आनंद, गर्व और एकजुटता की भावना। इस यामाहा दिवस पर, अपने परिवार के साथ एक विशेष क्षण बनाएं और इसे यामाहा के साथ साझा करें।",
     chooseLanguage: "अपनी भाषा चुनें",
     enterSite: "साइट में प्रवेश करें >",
     footerQuote: "यामाहा के हर कार्य के पीछे एक परिवार है जो इसे प्रेरित करता है।",
 
     // Thank You (Form 1)
     ty1Title: "धन्यवाद!",
-    ty1Lead: "आपकी कांदो एंट्री प्राप्त हो गई है।",
+    ty1Lead: "आपकी कांडो प्रविष्टि प्राप्त हो गई है।",
     ty1CopyLine1: "प्यार, गर्व और एकजुटता का आपका यह पल",
     ty1CopyLine2: "हमारे लिए बहुत मायने रखता है।",
-    ty1NoteText: "हम आपकी एंट्री की समीक्षा करेंगे और यदि किसी अतिरिक्त जानकारी की आवश्यकता हुई तो संपर्क कर सकते हैं।",
-    ty1Keep: "खूबसूरत कांदो मोमेंट्स बनाते रहें!",
+    ty1NoteText: "हम आपकी प्रविष्टि की समीक्षा करेंगे और यदि किसी अतिरिक्त जानकारी की आवश्यकता हुई तो संपर्क कर सकते हैं।",
+    ty1Keep: "खूबसूरत कांडो मोमेंट्स बनाते रहें!",
     ty1Together: "साथ मिलकर, हम प्रेरित करते हैं।",
     ty1Card1Title: "आगे क्या?",
-    ty1Card1Text: "बने रहें! हम जल्द ही आपके कांदो मोमेंट्स की झलकियां साझा करेंगे।",
-    ty1Card2Title: "कांदो को फैलाएं!",
-    ty1Card2Text: "अपने सहयोगियों को भी अपने कांदो मोमेंट्स बनाने और साझा करने के लिए प्रोत्साहित करें।",
+    ty1Card1Text: "बने रहें! हम जल्द ही आपके कांडो मोमेंट्स की झलकियां साझा करेंगे।",
+    ty1Card2Title: "कांडो को फैलाएं!",
+    ty1Card2Text: "अपने सहयोगियों को भी अपने कांडो मोमेंट्स बनाने और साझा करने के लिए प्रोत्साहित करें।",
 
     // Home
-    homeHeroTitle: "घर पर मनाएं यामाहा डे 2026",
-    homeHeroDesc: "कांदो (Kando) एक जापानी शब्द है जिसका अर्थ है गहरा संतोष और उत्साह। अपने प्रियजनों के साथ DIY किट बनाएं, अपनी रचना साझा करें, और भारत भर के हजारों यामाहा परिवारों से जुड़ें!",
+    homeHeroTitle: "घर पर मनाएं यामाहा दिवस 2026",
+    homeHeroDesc: "कांडो (Kando) एक जापानी शब्द है जिसका अर्थ है गहरा संतोष और उत्साह। अपने प्रियजनों के साथ DIY किट बनाएं, अपनी रचना साझा करें, और भारत भर के हजारों यामाहा परिवारों से जुड़ें!",
     ceoMessageTitle: "यामाहा नेतृत्व से एक विशेष संदेश",
-    ceoMessageBody: "प्रिय यामाहा परिवार, इस यामाहा डे पर हम आपके समर्पण और आपके परिवारों के अद्भुत समर्थन का सम्मान करते हैं। कांदो फ्रॉम होम DIY किट आपकी संयुक्त रचनात्मकता को हमारी श्रद्धांजलि है।",
+    ceoMessageBody: "प्रिय यामाहा परिवार, इस यामाहा दिवस पर हम आपके समर्पण और आपके परिवारों के अद्भुत समर्थन का सम्मान करते हैं। कांडो फ्रॉम होम DIY किट आपकी संयुक्त रचनात्मकता को हमारी श्रद्धांजलि है।",
     howItWorksTitle: "भाग कैसे लें",
     step1Title: "अपनी DIY किट असेंबल करें",
     step1Desc: "अपनी फैमिली डे DIY किट खोलें और अपने परिवार के साथ मिलकर क्राफ्ट बोर्ड असेंबल करें।",
@@ -471,23 +511,23 @@ export const translations: Record<Language, Translations> = {
     step2Desc: "अपने कर्मचारी विवरण के साथ अपनी तैयार DIY किट के 1 वीडियो और 2 फोटो अपलोड करें।",
     step3Title: "सीईओ के प्रश्न का उत्तर दें",
     step3Desc: "फॉर्म 2 में अपनी एम्प्लॉई आईडी सत्यापित करें और पारिवारिक एकजुटता पर अपने विचार साझा करें।",
-    step4Title: "अपना कांदो प्रमाणपत्र प्राप्त करें",
-    step4Desc: "अपनी विशिष्ट संदर्भ आईडी और डाउनलोड करने योग्य यामाहा कांदो फैमिली सर्टिफिकेट 2026 प्राप्त करें।",
-    startSubmissionBtn: "सबमिशन शुरू करें",
+    step4Title: "अपना कांडो प्रमाणपत्र प्राप्त करें",
+    step4Desc: "अपनी विशिष्ट संदर्भ आईडी और डाउनलोड करने योग्य यामाहा कांडो फैमिली सर्टिफिकेट 2026 प्राप्त करें।",
+    startSubmissionBtn: "प्रविष्टि शुरू करें",
     submissionDeadlineText: "अभियान जमा करने की अवधि: 27 जुलाई 2026 - 15 अगस्त 2026",
 
     // Home Cards
-    chooseSubmissionFormTitle: "अपना सबमिशन फॉर्म चुनें",
-    chooseSubmissionFormDesc: "फॉर्म 1 और फॉर्म 2 स्वतंत्र हैं। आप यामाहा डे 2026 के लिए इनमें से कोई भी या दोनों फॉर्म जमा कर सकते हैं।",
-    form1Badge: "अपनी कांदो एंट्री सबमिट करें",
+    chooseSubmissionFormTitle: "अपना प्रविष्टि फॉर्म चुनें",
+    chooseSubmissionFormDesc: "फॉर्म 1 और फॉर्म 2 स्वतंत्र हैं। आप यामाहा दिवस 2026 के लिए इनमें से कोई भी या दोनों फॉर्म जमा कर सकते हैं।",
+    form1Badge: "अपनी कांडो प्रविष्टि जमा करें",
     form1CardTitle: "DIY किट निर्माण और तस्वीरें",
-    form1CardDesc: "अपने परिवार का कांदो मोमेंट हमारे साथ साझा करें।",
-    form1CardBtn: "एंट्री सबमिट करें >",
-    form1Step1: "अपने घर पर कांदो डिस्प्ले बनाएं",
+    form1CardDesc: "अपने परिवार का कांडो मोमेंट हमारे साथ साझा करें।",
+    form1CardBtn: "प्रविष्टि जमा करें >",
+    form1Step1: "अपने घर पर कांडो डिस्प्ले बनाएं",
     form1Step2: "एक पारिवारिक फोटो क्लिक करें",
-    form1Step3: "अपलोड करें और अपना कांदो मोमेंट साझा करें",
+    form1Step3: "अपलोड करें और अपना कांडो मोमेंट साझा करें",
     form2Badge: "चेयरमैन आपके विचार आमंत्रित करते हैं",
-    form2CardTitle: "फैमिली कांदो वीडियो सबमिशन",
+    form2CardTitle: "पारिवारिक कांडो वीडियो प्रविष्टि",
     form2CardDesc: "अपने विचार और सुझाव साझा करें। आपके विचार हमें और बेहतर बनने में मदद करते हैं।",
     form2CardBtn: "अपने विचार साझा करें >",
     form2Step1: "अपने विचार साझा करें",
@@ -496,8 +536,8 @@ export const translations: Record<Language, Translations> = {
     orDivider: "या",
 
     // Form 1
-    form1Title: "अपनी कांदो एंट्री सबमिट करें",
-    form1Subtitle: "अपने परिवार का कांदो पल हमारे साथ साझा करें।",
+    form1Title: "अपनी कांडो प्रविष्टि जमा करें",
+    form1Subtitle: "अपने परिवार का कांडो पल हमारे साथ साझा करें।",
     fullName: "कर्मचारी का पूरा नाम",
     empId: "कर्मचारी EIN",
     officialEmail: "आधिकारिक ईमेल पता",
@@ -517,6 +557,15 @@ export const translations: Record<Language, Translations> = {
     cityPlaceholder: "उदा. सूरजपुर / चेन्नई / कांचीपुरम / गुड़गांव",
     familyCountLabel: "भाग लेने वाले परिवार के सदस्यों की संख्या *",
     familyCountPlaceholder: "उदा. 4",
+    form2SkipBtn: "छोड़ें >",
+    noFileSelected: "कोई फ़ाइल चयनित नहीं",
+    companyNamePlaceholder: "कंपनी का नाम दर्ज करें",
+    einPlaceholder: "EIN दर्ज करें",
+    phoneNoEinPlaceholder: "केवल तभी भरें जब आपके पास कर्मचारी आईडी न हो",
+    employeeNamePlaceholder: "कर्मचारी का नाम दर्ज करें",
+    departmentPlaceholder: "विभाग दर्ज करें",
+    locationPlaceholder: "स्थान दर्ज करें",
+    thoughtsPlaceholder: "अपने विचार यहाँ लिखें...",
 
     // Media
     mediaUploadTitle: "DIY क्रिएशन मीडिया अपलोड",
@@ -525,73 +574,75 @@ export const translations: Record<Language, Translations> = {
     photo1UploadLabel: "DIY निर्माण फोटो 1 (अधिकतम 10MB) *",
     photo2UploadLabel: "DIY निर्माण फोटो 2 (अधिकतम 10MB) *",
     uploadDragDropText: "फ़ाइल यहाँ खींचें और छोड़ें, या",
-    uploadBrowseText: "फ़ाइल ब्राउज़ करें",
+    uploadBrowseText: "फ़ाइल चुनें",
     maxSizeText: "स्वीकृत प्रारूप: MP4, MOV, JPG, PNG (अधिकतम 10MB फोटो, 40MB वीडियो)",
     fileSelectedText: "फ़ाइल सफलतापूर्वक संलग्न की गई",
 
     // Consents
-    dataConsentText: "मैं यामाहा डे 2026 के लिए अपने व्यक्तिगत डेटा को संग्रहीत और संसाधित करने की सहमति देता हूं।",
+    dataConsentText: "मैं यामाहा दिवस 2026 के लिए अपने व्यक्तिगत डेटा को संग्रहीत और संसाधित करने की सहमति देता हूं।",
     mediaConsentText: "मैं यामाहा मोटर इंडिया ग्रुप को आंतरिक और प्रचार प्रदर्शनों में अपने परिवार की तस्वीरों और वीडियो को प्रदर्शित करने की अनुमति देता हूं।",
     submitForm1Btn: "फॉर्म 1 जमा करें और सीईओ प्रश्न पर जाएं",
 
     // Thank You 1
     thankYou1Title: "फॉर्म 1 सफलतापूर्वक जमा हो गया!",
     thankYou1Subtitle: "आपके कर्मचारी विवरण और मीडिया फाइलें सर्वर पर सुरक्षित रूप से अपलोड कर दी गई हैं।",
-    refIdLabel: "फॉर्म 1 सबमिशन संदर्भ आईडी",
+    refIdLabel: "फॉर्म 1 प्रविष्टि संदर्भ आईडी",
     proceedToForm2Btn: "फॉर्म 2 (सीईओ चिंतनशील प्रश्न) पर आगे बढ़ें",
 
     // Form 2
     form2Title: "फॉर्म 2: सीईओ चिंतनशील प्रश्न",
-    form2Subtitle: "कांदो फ्रॉम होम DIY किट को पूरा करते हुए अपने परिवार की यात्रा पर विचार करें।",
+    form2Subtitle: "कांडो फ्रॉम होम DIY किट को पूरा करते हुए अपने परिवार की यात्रा पर विचार करें।",
     authGateTitle: "कर्मचारी प्रमाणीकरण गेट",
-    authGateDesc: "अपने फॉर्म 1 सबमिशन को अनलॉक और सत्यापित करने के लिए कृपया अपनी कर्मचारी आईडी दर्ज करें।",
+    authGateDesc: "अपने फॉर्म 1 प्रविष्टि को अनलॉक और सत्यापित करने के लिए कृपया अपनी कर्मचारी आईडी दर्ज करें।",
     verifyEmpBtn: "कर्मचारी आईडी सत्यापित करें",
     verifiedBadgeText: "सत्यापित कर्मचारी रिकॉर्ड",
     ceoQuestionTitle: "यामाहा सीईओ और एमडी की ओर से प्रश्न",
-    ceoQuestionText: "\"इस DIY किट को एक साथ पूरा करते समय आपके परिवार ने कौन सा सबसे विशेष क्षण अनुभव किया, और यह आपके दैनिक जीवन में यामाहा की कांदो भावना को कैसे दर्शाता है?\"",
+    ceoQuestionText: "\"इस DIY किट को एक साथ पूरा करते समय आपके परिवार ने कौन सा सबसे विशेष क्षण अनुभव किया, और यह आपके दैनिक जीवन में यामाहा की कांडो भावना को कैसे दर्शाता है?\"",
     reflectionPlaceholder: "अपने परिवार की कहानी, भावनाओं और एक साथ काम करने के अनुभव को साझा करें...",
-    submitForm2Btn: "अंतिम सबमिशन पूरा करें और प्रमाणपत्र प्राप्त करें",
+    submitForm2Btn: "अंतिम प्रविष्टि पूरी करें और प्रमाणपत्र प्राप्त करें",
 
     // Thank You 2
-    thankYou2Title: "बधाई हो! आपका सबमिशन पूरा हो गया है",
-    thankYou2Subtitle: "यामाहा डे 2026 कांदो फ्रॉम होम में भाग लेने के लिए धन्यवाद। आपकी प्रविष्टि को एडमिन समीक्षा के लिए शॉर्टलिस्ट कर लिया गया है।",
+    thankYou2Title: "बधाई हो! आपकी प्रविष्टि पूरी हो गई है",
+    thankYou2Subtitle: "यामाहा दिवस 2026 कांडो फ्रॉम होम में भाग लेने के लिए धन्यवाद। आपकी प्रविष्टि को प्रशासनिक समीक्षा के लिए शॉर्टलिस्ट कर लिया गया है।",
     finalRefIdLabel: "अंतिम अभियान संदर्भ आईडी",
-    certBadgeTitle: "यामाहा कांदो फैमिली सर्टिफाइड 2026",
-    downloadCertBtn: "डिजिटल कांदो प्रमाणपत्र डाउनलोड करें (PDF)",
+    certBadgeTitle: "यामाहा कांडो फैमिली सर्टिफाइड 2026",
+    downloadCertBtn: "डिजिटल कांडो प्रमाणपत्र डाउनलोड करें (PDF)",
     backHomeBtn: "मुख्य पृष्ठ पर वापस जाएं",
 
     // Legal
     privacyPolicyTitle: "डेटा गोपनीयता और PII सुरक्षा नीति",
     privacySubtitle: "अंतिम अद्यतन: 27 जुलाई 2026 | डिजिटल व्यक्तिगत डेटा संरक्षण (DPDP) मानकों के अनुरूप",
     privacySec1Title: "1. डेटा संग्रह का दायरा",
-    privacySec1Body: "यामाहा डे 2026 \"कांदो फ्रॉम होम\" अभियान के लिए, यामाहा मोटर इंडिया ग्रुप केवल पहचान सत्यापन और अभियान प्रशासन के लिए आवश्यक कर्मचारी व्यक्तिगत जानकारी एकत्र करता है। इसमें कर्मचारी का पूरा नाम, कर्मचारी आईडी, आधिकारिक ईमेल पता, संपर्क नंबर, प्लांट/शहर का स्थान, परिवार की भागीदारी संख्या और अपलोड की गई मीडिया फ़ाइलें शामिल हैं।",
+    privacySec1Body: "यामाहा दिवस 2026 \"कांडो फ्रॉम होम\" अभियान के लिए, यामाहा मोटर इंडिया ग्रुप केवल पहचान सत्यापन और अभियान प्रशासन के लिए आवश्यक कर्मचारी व्यक्तिगत जानकारी एकत्र करता है। इसमें कर्मचारी का पूरा नाम, कर्मचारी आईडी, आधिकारिक ईमेल पता, संपर्क नंबर, प्लांट/शहर का स्थान, परिवार की भागीदारी संख्या और अपलोड की गई मीडिया फ़ाइलें शामिल हैं।",
     privacySec2Title: "2. उद्देश्य और मीडिया सहमति",
-    privacySec2Body: "एकत्रित व्यक्तिगत डेटा का उपयोग केवल भागीदारी को सत्यापित करने, विजेता पारिवारिक DIY प्रविष्टियों को शॉर्टलिस्ट करने, डिजिटल प्रमाणपत्र जारी करने और यामाहा डे 2026 कार्यक्रमों का आयोजन करने के लिए किया जाता है। अपलोड की गई तस्वीरें और वीडियो केवल आंतरिक संचार और प्रचार प्रदर्शनों में दिखाए जाएंगे जहां सहमति प्रदान की गई है।",
+    privacySec2Body: "एकत्रित व्यक्तिगत डेटा का उपयोग केवल भागीदारी को सत्यापित करने, विजेता पारिवारिक DIY प्रविष्टियों को शॉर्टलिस्ट करने, डिजिटल प्रमाणपत्र जारी करने और यामाहा दिवस 2026 कार्यक्रमों का आयोजन करने के लिए किया जाता है। अपलोड की गई तस्वीरें और वीडियो केवल आंतरिक संचार और प्रचार प्रदर्शनों में दिखाए जाएंगे जहां सहमति प्रदान की गई है।",
     privacySec3Title: "3. डेटा संग्रहण, एन्क्रिप्शन और सुरक्षा",
-    privacySec3Body: "सभी सबमिट किया गया डेटा एन्क्रिप्टेड MongoDB डेटाबेस और सर्वर ऑब्जेक्ट स्टोरेज में सुरक्षित रूप से संग्रहीत किया जाता है। एक्सेस केवल अधिकृत प्रशासनिक कर्मियों तक ही सीमित है।",
+    privacySec3Body: "सभी जमा किया गया डेटा एन्क्रिप्टेड MongoDB डेटाबेस और सर्वर ऑब्जेक्ट स्टोरेज में सुरक्षित रूप से संग्रहीत किया जाता है। पहुँच केवल अधिकृत प्रशासनिक कर्मियों तक ही सीमित है।",
     privacySec4Title: "4. डेटा अवधारण और विलोपन",
-    privacySec4Body: "अभियान सबमिशन को यामाहा डे 2026 के समापन के बाद 180 दिनों के लिए संग्रहीत किया जाएगा, जिसके बाद कर्मचारी के लिखित अनुरोध पर मीडिया को सुरक्षित रूप से हटा दिया जाएगा।",
+    privacySec4Body: "अभियान प्रविष्टियों को यामाहा दिवस 2026 के समापन के बाद 180 दिनों के लिए संग्रहीत किया जाएगा, जिसके बाद कर्मचारी के लिखित अनुरोध पर मीडिया को सुरक्षित रूप से हटा दिया जाएगा।",
     privacySec5Title: "5. डेटा संरक्षण अधिकारी से संपर्क करें",
     privacySec5Body: "गोपनीयता पूछताछ या डेटा अधिकारों के अनुरोधों के लिए, कृपया आंतरिक डेटा संरक्षण समिति से privacy@yamaha-motor.co.in पर संपर्क करें।",
 
     termsConditionsTitle: "अभियान नियम और मीडिया अधिकार शर्तें",
-    termsSubtitle: "यामाहा डे 2026 \"कांदो फ्रॉम होम\" आधिकारिक अभियान दिशानिर्देश",
+    termsSubtitle: "यामाहा दिवस 2026 \"कांडो फ्रॉम होम\" आधिकारिक अभियान दिशानिर्देश",
     termsSec1Title: "1. पात्रता",
-    termsSec1Body: "कांदो फ्रॉम होम DIY किट पहल यामाहा मोटर इंडिया ग्रुप के सभी सक्रिय कर्मचारियों और उनके निकटतम परिवार के सदस्यों के लिए खुली है।",
-    termsSec2Title: "2. सबमिशन दिशानिर्देश और फ़ाइल विनिर्देश",
-    termsSec2Body: "प्रत्येक कर्मचारी को अपनी वैध कर्मचारी आईडी के विरुद्ध केवल एक सबमिशन की अनुमति है। सबमिशन में फॉर्म 1 (अधिकतम 2 तस्वीरें, 10MB प्रत्येक) और फॉर्म 2 (1 वीडियो, अधिकतम 40MB और सीईओ विचार) शामिल हैं।",
+    termsSec1Body: "कांडो फ्रॉम होम DIY किट पहल यामाहा मोटर इंडिया ग्रुप के सभी सक्रिय कर्मचारियों और उनके निकटतम परिवार के सदस्यों के लिए खुली है।",
+    termsSec2Title: "2. प्रविष्टि दिशानिर्देश और फ़ाइल विनिर्देश",
+    termsSec2Body: "प्रत्येक कर्मचारी को अपनी वैध कर्मचारी आईडी के विरुद्ध केवल एक प्रविष्टि की अनुमति है। प्रविष्टि में फॉर्म 1 (अधिकतम 2 तस्वीरें, 10MB प्रत्येक) और फॉर्म 2 (1 वीडियो, अधिकतम 40MB और सीईओ विचार) शामिल हैं।",
     termsSec3Title: "3. मौलिकता और सुरक्षा",
-    termsSec3Body: "सभी सबमिशन में कर्मचारी और उनके परिवार द्वारा पूरी की गई मूल DIY क्राफ्ट असेंबली होनी चाहिए।",
+    termsSec3Body: "सभी प्रविष्टियों में कर्मचारी और उनके परिवार द्वारा पूरी की गई मूल DIY क्राफ्ट असेंबली होनी चाहिए।",
     termsSec4Title: "4. शॉर्टलिस्टिंग और मान्यता",
-    termsSec4Body: "प्रविष्टियों का मूल्यांकन यामाहा डे 2026 एडमिन समिति द्वारा रचनात्मकता और पारिवारिक भागीदारी के आधार पर किया जाएगा।",
+    termsSec4Body: "प्रविष्टियों का मूल्यांकन यामाहा दिवस 2026 प्रशासन समिति द्वारा रचनात्मकता और पारिवारिक भागीदारी के आधार पर किया जाएगा।",
 
     // Section Headings & Upload Labels
     sec1EmployeeDetailsTitle: "1. कर्मचारी और परिवार विवरण",
-    sec2UploadPhotosTitle: "2. तस्वीरें अपलोड करें (अधिकतम 2 तस्वीरें, 10MB प्रत्येक)",
-    sec2UploadPhotosDesc: "अपने परिवार की कांदो DIY वॉल की 2 उच्च-गुणवत्ता वाली तस्वीरें अपलोड करें (सभी फोटो प्रारूप समर्थित)।",
+    sec2UploadPhotosTitle: "तस्वीरें अपलोड करें (अधिकतम 2 तस्वीरें और 1 वीडियो, अधिकतम 40MB)",
+    sec2UploadPhotosDesc: "अपने परिवार की कांडो DIY वॉल की 2 उच्च-गुणवत्ता वाली तस्वीरें अपलोड करें (सभी फोटो प्रारूप समर्थित)।",
     photo1Label: "फोटो 1 (अनिवार्य, अधिकतम 5MB)*",
     photo2Label: "फोटो 2 (अनिवार्य, अधिकतम 5MB)*",
-    sec2UploadVideoTitle: "कांदो वीडियो अपलोड करें (अनिवार्य, अधिकतम 40MB)*",
+    photoFormatsHint: "सभी फोटो फॉर्मेट स्वीकार्य हैं · अधिकतम 5MB",
+    sec2UploadVideoTitle: "वीडियो अपलोड करें (अनिवार्य, अधिकतम 40MB)*",
+    videoFormatsHint: "सभी वीडियो फॉर्मेट स्वीकार्य हैं · अधिकतम 40MB",
     sec2UploadVideoDesc: "DIY क्राफ्ट वॉल बनाते हुए अपने परिवार का 1 वीडियो अपलोड करें (MP4, WEBM, MOV, अधिकतम 40MB)।",
 
     // Validation Error Messages
@@ -604,8 +655,8 @@ export const translations: Record<Language, Translations> = {
     errCityRequired: "शहर / प्लांट स्थान आवश्यक है।",
     errPhoto1Required: "फोटो 1 अनिवार्य है।",
     errPhoto2Required: "फोटो 2 अनिवार्य है।",
-    errVideoRequired: "कांदो DIY वीडियो जमा करना अनिवार्य है।",
-    errConsentRequired: "सबमिट करने के लिए आपको डेटा प्रोसेसिंग सहमति स्वीकार करनी होगी।",
+    errVideoRequired: "कांडो DIY वीडियो जमा करना अनिवार्य है।",
+    errConsentRequired: "जमा करने के लिए आपको डेटा प्रोसेसिंग सहमति स्वीकार करनी होगी।",
 
     backBtn: "वापस",
     companyNameLabel: "कंपनी का नाम",
@@ -618,15 +669,18 @@ export const translations: Record<Language, Translations> = {
     consentAndWord: "और",
     consentPrivacyLink: "गोपनीयता नीति",
     privacyNoteTitle: "आपकी गोपनीयता मायने रखती है।",
-    form1PrivacyNoteBody: "आपकी जानकारी, तस्वीरें और वीडियो केवल यामाहा डे 2026 गतिविधियों के लिए उपयोग की जाएंगी और संगठन के बाहर साझा नहीं की जाएंगी।",
-    form1SubmitBtn: "DIY कांदो किट सबमिट करें",
-    form1MediaConsentText: "मैं यामाहा को आंतरिक प्रकाशनों में अपनी सबमिशन तस्वीरें प्रदर्शित करने की अनुमति देता हूं।",
+    form1PrivacyNoteBody: "आपकी जानकारी, तस्वीरें और वीडियो केवल यामाहा दिवस 2026 गतिविधियों के लिए उपयोग की जाएंगी और संगठन के बाहर साझा नहीं की जाएंगी।",
+    form1SubmitBtn: "DIY कांडो किट जमा करें",
+    form1MediaConsentText: "मैं यामाहा को आंतरिक प्रकाशनों में अपनी प्रविष्टि की तस्वीरें प्रदर्शित करने की अनुमति देता हूं।",
     form1ThankYouTitle: "धन्यवाद!",
-    form1ThankYouBody: "हमें आपके कांदो पल को देखने का इंतज़ार है।",
+    form1ThankYouBody: "हमें आपके कांडो पल को देखने का इंतज़ार है।",
     form1FooterFamilyText: "हम हर यामाहा कार्रवाई के पीछे के परिवारों का जश्न मनाते हैं।",
-    form2ChairmanTitle: "अध्यक्ष आमंत्रित करते हैं",
+    form2ChairmanTitle: "चेयरमैन आमंत्रित करते हैं",
     form2ChairmanScript: "आपके विचार",
     form2ChairmanSub: "आपके विचार हमें बेहतर बनने में मदद करते हैं, साथ मिलकर।",
+    form2ChairmanQuoteLine1: "भविष्य का निर्माण",
+    form2ChairmanQuoteLine2: "आज हमारे विचारों से होता है।",
+    form2ChairmanQuoteText: "अपने विचार साझा करें और आने वाले कल के लिए एक सशक्त, अधिक प्रेरणादायक यामाहा को आकार देने में मदद करें।",
     form2EmpEinLabel: "कर्मचारी EIN",
     form2PhoneNumberLabel: "फ़ोन नंबर",
     form2EmployeeNameLabel: "कर्मचारी का नाम",
@@ -635,8 +689,8 @@ export const translations: Record<Language, Translations> = {
     form2BrowseOptionalLabel: "ब्राउज़ करें (वैकल्पिक) — अधिकतम आकार: 50MB",
     form2BrowseFileCta: "फ़ाइल ब्राउज़ करने के लिए क्लिक करें (कोई भी प्रारूप, अधिकतम 50MB)",
     form2ConsentSuffix: "मेरी प्रतिक्रिया यामाहा के भीतर आंतरिक रूप से साझा की जा सकती है।",
-    form2SubmitBtn: "सबमिट करें — अध्यक्ष का निमंत्रण",
-    form2PrivacyNoteBody: "आपकी प्रतिक्रिया केवल यामाहा डे 2026 गतिविधियों के लिए उपयोग की जाएगी और संगठन के बाहर साझा नहीं की जाएगी।",
+    form2SubmitBtn: "जमा करें — चेयरमैन का निमंत्रण",
+    form2PrivacyNoteBody: "आपकी प्रतिक्रिया केवल यामाहा दिवस 2026 गतिविधियों के लिए उपयोग की जाएगी और संगठन के बाहर साझा नहीं की जाएगी।",
   },
 
   ta: {
@@ -649,10 +703,14 @@ export const translations: Record<Language, Translations> = {
     privacy: "தனியுரிமைக் கொள்கை",
     adminPortal: "நிர்வாகி போர்டல்",
     changeLanguage: "மொழியை மாற்றவும்",
+    mandatoryField: "* கட்டாயப் புலம்",
 
     // Landing
     createYour: "உருவாக்குங்கள் உங்கள்",
-    kandoMoment: "காண்டோ தருணம் ♡",
+    kandoMoment: "உருவாக்குங்கள். பகிருங்கள். ஊக்குவியுங்கள்.",
+    welcomeToYour: "உங்கள்",
+    kandoSpace: "காண்டோ ஸ்பேஸ்",
+    heroWelcomeSuffix: "க்கு வரவேற்கிறோம்",
     landingSubtitle: "மகிழ்ச்சி, பெருமை மற்றும் ஒற்றுமையின் உணர்வு. இந்த யமஹா தினத்தில், உங்கள் குடும்பத்துடன் ஒரு சிறப்பு தருணத்தை உருவாக்கி யமஹாவுடன் பகிர்ந்து கொள்ளுங்கள்.",
     chooseLanguage: "உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்",
     enterSite: "தளத்திற்குள் செல்லவும் >",
@@ -729,6 +787,15 @@ export const translations: Record<Language, Translations> = {
     cityPlaceholder: "எ.கா. சென்னை / காஞ்சிபுரம் / சூரஜ்பூர்",
     familyCountLabel: "பங்கேற்கும் குடும்ப உறுப்பினர்கள் எண்ணிக்கை *",
     familyCountPlaceholder: "எ.கா. 4",
+    form2SkipBtn: "தவிர்க்கவும் >",
+    noFileSelected: "கோப்பு எதுவும் தேர்ந்தெடுக்கப்படவில்லை",
+    companyNamePlaceholder: "நிறுவனத்தின் பெயரை உள்ளிடவும்",
+    einPlaceholder: "EIN ஐ உள்ளிடவும்",
+    phoneNoEinPlaceholder: "பணியாளர் ஐடி இல்லையெனில் மட்டும் இதை நிரப்பவும்",
+    employeeNamePlaceholder: "பணியாளர் பெயரை உள்ளிடவும்",
+    departmentPlaceholder: "துறையை உள்ளிடவும்",
+    locationPlaceholder: "இருப்பிடத்தை உள்ளிடவும்",
+    thoughtsPlaceholder: "உங்கள் கருத்துக்களை இங்கே எழுதவும்...",
 
     // Media
     mediaUploadTitle: "DIY படைப்பு ஊடகப் பதிவேற்றம்",
@@ -799,11 +866,13 @@ export const translations: Record<Language, Translations> = {
 
     // Section Headings & Upload Labels
     sec1EmployeeDetailsTitle: "1. ஊழியர் மற்றும் குடும்ப விவரங்கள்",
-    sec2UploadPhotosTitle: "2. புகைப்படங்களைப் பதிவேற்றவும் (அதிகபட்சம் 2 புகைப்படங்கள், தலா 10MB)",
+    sec2UploadPhotosTitle: "புகைப்படங்களைப் பதிவேற்றவும் (அதிகபட்சம் 2 புகைப்படங்கள் மற்றும் 1 வீடியோ, அதிகபட்சம் 40MB)",
     sec2UploadPhotosDesc: "உங்கள் குடும்ப காண்டோ DIY சுவரின் 2 உயர்தர புகைப்படங்களைப் பதிவேற்றவும்.",
     photo1Label: "புகைப்படம் 1 (தேவை, அதிகபட்சம் 5MB)*",
     photo2Label: "புகைப்படம் 2 (தேவை, அதிகபட்சம் 5MB)*",
-    sec2UploadVideoTitle: "காண்டோ வீடியோவைப் பதிவேற்றவும் (தேவை, அதிகபட்சம் 40MB)*",
+    photoFormatsHint: "அனைத்து புகைப்பட வடிவங்களும் ஏற்கப்படும் · அதிகபட்சம் 5MB",
+    sec2UploadVideoTitle: "வீடியோவைப் பதிவேற்றவும் (தேவை, அதிகபட்சம் 40MB)*",
+    videoFormatsHint: "அனைத்து வீடியோ வடிவங்களும் ஏற்கப்படும் · அதிகபட்சம் 40MB",
     sec2UploadVideoDesc: "DIY கைவினைச் சுவரை உருவாக்கும் உங்கள் குடும்பத்தின் 1 வீடியோவைப் பதிவேற்றவும் (MP4, WEBM, MOV, 40MB).",
 
     // Validation Error Messages
@@ -839,6 +908,9 @@ export const translations: Record<Language, Translations> = {
     form2ChairmanTitle: "தலைவர் அழைக்கிறார்",
     form2ChairmanScript: "உங்கள் கருத்துக்கள்",
     form2ChairmanSub: "உங்கள் கருத்துக்கள் நாங்கள் இணைந்து சிறப்பாக வளர உதவுகின்றன.",
+    form2ChairmanQuoteLine1: "எதிர்காலம் உருவாகிறது",
+    form2ChairmanQuoteLine2: "இன்று நமது எண்ணங்களால்.",
+    form2ChairmanQuoteText: "உங்கள் கருத்துக்களைப் பகிர்ந்து, நாளைய நாள் இன்னும் வலிமையான, உத்வேகம் தரும் யமஹாவை உருவாக்க உதவுங்கள்.",
     form2EmpEinLabel: "பணியாளர் EIN",
     form2PhoneNumberLabel: "தொலைபேசி எண்",
     form2EmployeeNameLabel: "பணியாளர் பெயர்",

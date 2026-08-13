@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import type { Language } from '../i18n/translations';
-import { AlertTriangle, CheckCircle, Upload, Loader2 } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Loader2 } from 'lucide-react';
 import { useCaptcha } from '../hooks/useCaptcha';
 import '../kando_form2_ui.css';
 
@@ -13,12 +13,20 @@ export const Form2Page: React.FC = () => {
   const [department, setDepartment] = useState('');
   const [location, setLocation] = useState(formData.city || '');
   const [thoughts, setThoughts] = useState('');
-  const [optionalFile, setOptionalFile] = useState<File | null>(null);
   const [dataConsent, setDataConsent] = useState(false);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [duplicateError, setDuplicateError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Skip is only allowed when this Form2 visit is a direct continuation of a
+  // Form1 submission (flag set by Form1Page right before navigating here).
+  const canSkip = sessionStorage.getItem('kando_from_form1') === '1';
+
+  const handleSkip = () => {
+    sessionStorage.removeItem('kando_from_form1');
+    navigateTo('thankyou1');
+  };
 
   // Most employees have an Employee ID; the ~50 without one identify by phone
   // instead. Both fields are checked independently in real time as the user
@@ -79,17 +87,6 @@ export const Form2Page: React.FC = () => {
     return () => { if (phoneCheckTimer.current) clearTimeout(phoneCheckTimer.current); };
   }, [formData.phone, apiBaseUrl]);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 50 * 1024 * 1024) {
-      setErrors(prev => ({ ...prev, optionalFile: 'File size exceeds 50MB limit.' }));
-      return;
-    }
-    setErrors(prev => ({ ...prev, optionalFile: '' }));
-    setOptionalFile(file);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setDuplicateError(null);
@@ -97,6 +94,8 @@ export const Form2Page: React.FC = () => {
 
     if (!formData.empId.trim() && !formData.phone.trim()) {
       newErrors.empId = t.errEmpIdRequired || 'Employee ID is required.';
+    } else if (formData.phone.trim() && formData.phone.trim().length !== 10) {
+      newErrors.phone = 'Please enter a valid 10 digit phone number.';
     } else if (empIdCheckStatus !== 'valid' && phoneCheckStatus !== 'valid') {
       if (empIdCheckStatus === 'checking' || phoneCheckStatus === 'checking') {
         newErrors.empId = 'Please wait, checking eligibility...';
@@ -165,7 +164,6 @@ export const Form2Page: React.FC = () => {
       body.append('location', location.trim());
       body.append('thoughts', thoughts.trim());
       body.append('language', language);
-      if (optionalFile) body.append('optionalFile', optionalFile);
 
       const submitRes = await fetch(`${apiBaseUrl}/api/submissions/form2`, {
         method: 'POST',
@@ -181,9 +179,11 @@ export const Form2Page: React.FC = () => {
 
       const generatedRefId = 'KANDO-2026-' + Math.floor(1000 + Math.random() * 9000);
       setFormData(prev => ({ ...prev, refId: generatedRefId }));
+      sessionStorage.removeItem('kando_from_form1');
       navigateTo('thankyou1');
     } catch (err) {
       console.error('Form 2 submission error:', err);
+      sessionStorage.removeItem('kando_from_form1');
       navigateTo('thankyou1');
     } finally {
       setIsSubmitting(false);
@@ -347,7 +347,7 @@ export const Form2Page: React.FC = () => {
                     type="text"
                     value={companyName}
                     onChange={e => setCompanyName(e.target.value)}
-                    placeholder="Enter company name"
+                    placeholder={t.companyNamePlaceholder}
                     autoComplete="organization"
                   />
                   {errors.companyName && <p className="field-error">{errors.companyName}</p>}
@@ -369,7 +369,7 @@ export const Form2Page: React.FC = () => {
                         value={formData.empId}
                         disabled={phoneCheckStatus === 'valid'}
                         onChange={e => setFormData(prev => ({ ...prev, empId: e.target.value }))}
-                        placeholder="Enter EIN"
+                        placeholder={t.einPlaceholder}
                         autoComplete="off"
                         style={{ paddingRight: '40px', opacity: phoneCheckStatus === 'valid' ? 0.6 : 1 }}
                       />
@@ -392,16 +392,22 @@ export const Form2Page: React.FC = () => {
                       </svg>
                       <span>{t.form2PhoneNumberLabel}*</span>
                     </label>
-                    <div className="id-field-wrap">
+                    <div className="id-field-wrap" style={{ position: 'relative' }}>
+                      <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#8d98ac', fontSize: '0.95em', pointerEvents: 'none' }}>+91</span>
                       <input
-                        className={`input${formData.phone.trim() && (phoneCheckStatus === 'invalid' || errors.empId) ? ' is-invalid' : ''}`}
+                        className={`input${formData.phone.trim() && (phoneCheckStatus === 'invalid' || errors.phone || errors.empId) ? ' is-invalid' : ''}`}
                         id="phoneNumber"
                         type="tel"
+                        inputMode="numeric"
+                        maxLength={10}
                         value={formData.phone}
                         disabled={empIdCheckStatus === 'valid'}
-                        onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                        placeholder="Only if you have no Employee ID"
-                        style={{ paddingRight: '40px', opacity: empIdCheckStatus === 'valid' ? 0.6 : 1 }}
+                        onChange={e => {
+                          const digitsOnly = e.target.value.replace(/\D/g, '').slice(0, 10);
+                          setFormData(prev => ({ ...prev, phone: digitsOnly }));
+                        }}
+                        placeholder={t.phoneNoEinPlaceholder}
+                        style={{ paddingLeft: '42px', paddingRight: '40px', opacity: empIdCheckStatus === 'valid' ? 0.6 : 1 }}
                       />
                       {formData.phone.trim() && (
                         <span className="id-status-icon">
@@ -411,6 +417,7 @@ export const Form2Page: React.FC = () => {
                         </span>
                       )}
                     </div>
+                    {errors.phone && <p className="field-error">{errors.phone}</p>}
                   </div>
 
                   <div className="field">
@@ -426,7 +433,7 @@ export const Form2Page: React.FC = () => {
                       type="text"
                       value={formData.empName}
                       onChange={e => setFormData(prev => ({ ...prev, empName: e.target.value }))}
-                      placeholder="Enter employee name"
+                      placeholder={t.employeeNamePlaceholder}
                       autoComplete="name"
                     />
                     {errors.empName && <p className="field-error">{errors.empName}</p>}
@@ -445,7 +452,7 @@ export const Form2Page: React.FC = () => {
                       type="text"
                       value={department}
                       onChange={e => setDepartment(e.target.value)}
-                      placeholder="Enter department"
+                      placeholder={t.departmentPlaceholder}
                       autoComplete="organization-title"
                     />
                     {errors.department && <p className="field-error">{errors.department}</p>}
@@ -464,7 +471,7 @@ export const Form2Page: React.FC = () => {
                       type="text"
                       value={location}
                       onChange={e => setLocation(e.target.value)}
-                      placeholder="Enter location"
+                      placeholder={t.locationPlaceholder}
                       autoComplete="address-level2"
                     />
                     {errors.location && <p className="field-error">{errors.location}</p>}
@@ -491,7 +498,7 @@ export const Form2Page: React.FC = () => {
                     maxLength={2000}
                     value={thoughts}
                     onChange={e => setThoughts(e.target.value)}
-                    placeholder="Write your thoughts here..."
+                    placeholder={t.thoughtsPlaceholder}
                   />
                   <div className="char-count-row">
                     {errors.thoughts
@@ -499,27 +506,6 @@ export const Form2Page: React.FC = () => {
                       : <span />}
                     <span className={`char-count${thoughts.length > 1800 ? ' warn' : ''}`}>{thoughts.length}/2000</span>
                   </div>
-                </div>
-
-                {/* Optional File Upload */}
-                <div className="field field--thoughts">
-                  <label className="label" htmlFor="optionalFile">
-                    <svg className="icon icon--label" aria-hidden="true">
-                      <use href="#f2-icon-message"></use>
-                    </svg>
-                    <span>{t.form2BrowseOptionalLabel}</span>
-                  </label>
-                  <label className={`upload-label${optionalFile ? ' has-file' : ''}`} htmlFor="optionalFile">
-                    <Upload className="upload-icon" size={20} />
-                    <span>{optionalFile ? optionalFile.name : t.form2BrowseFileCta}</span>
-                  </label>
-                  <input id="optionalFile" type="file" onChange={handleFileChange} style={{ display: 'none' }} />
-                  {errors.optionalFile && <p className="field-error">{errors.optionalFile}</p>}
-                  {optionalFile && (
-                    <p className="field-hint" style={{ color: '#2e7d3a' }}>
-                      ✓ {optionalFile.name} ({(optionalFile.size / (1024 * 1024)).toFixed(2)} MB)
-                    </p>
-                  )}
                 </div>
 
                 {/* CONSENT */}
@@ -547,7 +533,26 @@ export const Form2Page: React.FC = () => {
                   </p>
                 )}
 
-                <div className="actions">
+                <div
+                  className="privacy"
+                  style={{
+                    marginTop: '20px', marginBottom: '16px',
+                    border: '1px solid var(--border, #e2e5ea)', borderRadius: '12px',
+                    padding: '14px 18px', background: 'rgba(0, 48, 135, 0.03)'
+                  }}
+                >
+                  <span className="privacy__badge" aria-hidden="true">
+                    <svg className="icon icon--22">
+                      <use href="#f2-icon-shield-check"></use>
+                    </svg>
+                  </span>
+                  <p className="privacy__text">
+                    <strong>{t.privacyNoteTitle}</strong>
+                    {t.form2PrivacyNoteBody}
+                  </p>
+                </div>
+
+                <div className="actions" style={{ gridTemplateColumns: canSkip ? 'auto auto' : undefined, justifyContent: 'flex-start' }}>
                   <button className="submit" type="submit" disabled={isSubmitting || !canSubmit}>
                     <svg className="icon icon--22" aria-hidden="true">
                       <use href="#f2-icon-send"></use>
@@ -560,17 +565,19 @@ export const Form2Page: React.FC = () => {
                     </span>
                   </button>
 
-                  <div className="privacy">
-                    <span className="privacy__badge" aria-hidden="true">
-                      <svg className="icon icon--22">
-                        <use href="#f2-icon-shield-check"></use>
-                      </svg>
-                    </span>
-                    <p className="privacy__text">
-                      <strong>{t.privacyNoteTitle}</strong>
-                      {t.form2PrivacyNoteBody}
-                    </p>
-                  </div>
+                  {canSkip && (
+                    <button
+                      type="button"
+                      onClick={handleSkip}
+                      style={{
+                        background: 'none', border: 'none', cursor: 'pointer',
+                        color: 'var(--yamaha-blue, #003087)', fontSize: '0.95rem', fontWeight: 700,
+                        padding: '10px 16px', whiteSpace: 'nowrap', order: 3
+                      }}
+                    >
+                      {t.form2SkipBtn}
+                    </button>
+                  )}
                 </div>
               </form>
             </section>
@@ -580,8 +587,8 @@ export const Form2Page: React.FC = () => {
                 <div className="message-card__quote-row">
                   <span className="message-card__quote" aria-hidden="true">"</span>
                   <p className="message-card__lead">
-                    The future is built<br />
-                    by our ideas today.
+                    {t.form2ChairmanQuoteLine1}<br />
+                    {t.form2ChairmanQuoteLine2}
                   </p>
                 </div>
 
@@ -594,7 +601,7 @@ export const Form2Page: React.FC = () => {
                 </div>
 
                 <p className="message-card__text">
-                  Share your thoughts and help shape a stronger, more inspiring Yamaha for tomorrow.
+                  {t.form2ChairmanQuoteText}
                 </p>
               </div>
 
@@ -607,7 +614,7 @@ export const Form2Page: React.FC = () => {
             </aside>
           </div>
 
-          <div className="f2-mandatory-note">* Mandatory field</div>
+          <div className="f2-mandatory-note">{t.mandatoryField}</div>
         </div>
       </main>
 
@@ -621,7 +628,7 @@ export const Form2Page: React.FC = () => {
           </span>
 
           <p className="footer__tagline">
-            <span>Behind every Yamaha action is a family that inspires it.</span>
+            <span>{t.footerQuote}</span>
             <svg className="icon footer__heart" aria-hidden="true">
               <use href="#f2-icon-heart"></use>
             </svg>

@@ -98,7 +98,7 @@ export const HomePage: React.FC = () => {
 
           <div className="kd-hero-copy">
             <h1 className="kd-title">
-              Welcome to Your <span className="kando-script">Kando Space</span>
+              {t.welcomeToYour || 'Welcome to Your'} <span className="kando-script">{t.kandoSpace || 'Kando Space'}</span>{t.heroWelcomeSuffix ? ` ${t.heroWelcomeSuffix}` : ''}
               <svg className="kd-title-heart" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path
                   d="M12 20.5s-7.5-4.6-7.5-9.7A4.3 4.3 0 0 1 12 8.2a4.3 4.3 0 0 1 7.5 2.6c0 5.1-7.5 9.7-7.5 9.7Z"
@@ -428,7 +428,7 @@ export const HomePage: React.FC = () => {
       </main>
 
       {/* ============================== Footer ============================= */}
-      <footer className="kd-footer">
+      <footer className="kd-footer notranslate" translate="no">
         <span>Yamaha Day 2026</span>
         <span className="kd-footer-sep" aria-hidden="true"></span>
         <span>Kando from Home</span>

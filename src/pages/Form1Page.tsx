@@ -162,6 +162,8 @@ export const Form1Page: React.FC = () => {
     // 1. Employee ID (or Phone, if no Employee ID) Validation
     if (!formData.empId.trim() && !formData.phone.trim()) {
       newErrors.empId = t.errEmpIdRequired;
+    } else if (formData.phone.trim() && formData.phone.trim().length !== 10) {
+      newErrors.phone = 'Please enter a valid 10 digit phone number.';
     } else if (empIdCheckStatus !== 'valid' && phoneCheckStatus !== 'valid') {
       if (empIdCheckStatus === 'checking' || phoneCheckStatus === 'checking') {
         newErrors.empId = 'Please wait, checking eligibility...';
@@ -286,7 +288,10 @@ export const Form1Page: React.FC = () => {
       const generatedRefId = 'KANDO-2026-' + Math.floor(1000 + Math.random() * 9000);
       setFormData(prev => ({ ...prev, refId: generatedRefId }));
 
-      navigateTo('thankyou1');
+      // Marks that this Form 2 visit is a continuation of Form 1, so Form2Page
+      // knows it's safe to show the Skip option.
+      sessionStorage.setItem('kando_from_form1', '1');
+      navigateTo('form2');
     } catch (err) {
       console.error('Submission error:', err);
       setDuplicateError('Something went wrong while submitting. Please check your connection and try again.');
@@ -386,7 +391,7 @@ export const Form1Page: React.FC = () => {
                   className={errors.companyName ? 'has-error' : ''}
                   value={companyName}
                   onChange={e => setCompanyName(e.target.value)}
-                  placeholder="Enter company name"
+                  placeholder={t.companyNamePlaceholder}
                   autoComplete="organization"
                 />
                 {errors.companyName && <p className="file-error">{errors.companyName}</p>}
@@ -403,7 +408,7 @@ export const Form1Page: React.FC = () => {
                     value={formData.empId}
                     disabled={phoneCheckStatus === 'valid'}
                     onChange={e => setFormData(prev => ({ ...prev, empId: e.target.value }))}
-                    placeholder="Enter EIN"
+                    placeholder={t.einPlaceholder}
                     autoComplete="off"
                     style={{ paddingRight: '40px' }}
                   />
@@ -424,16 +429,22 @@ export const Form1Page: React.FC = () => {
               {/* Phone Number */}
               <div className="field">
                 <label htmlFor="phone">{t.form1PhoneNumberLabel}*</label>
-                <div style={{ position: 'relative' }}>
+                <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                  <span style={{ position: 'absolute', left: '12px', color: '#8d98ac', fontSize: '0.95em', pointerEvents: 'none' }}>+91</span>
                   <input
                     id="phone"
                     type="tel"
-                    className={formData.phone.trim() && (phoneCheckStatus === 'invalid' || errors.empId) ? 'has-error' : ''}
+                    inputMode="numeric"
+                    maxLength={10}
+                    className={formData.phone.trim() && (phoneCheckStatus === 'invalid' || errors.phone || errors.empId) ? 'has-error' : ''}
                     value={formData.phone}
                     disabled={empIdCheckStatus === 'valid'}
-                    onChange={e => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                    placeholder="Only if you have no Employee ID"
-                    style={{ paddingRight: '40px' }}
+                    onChange={e => {
+                      const digitsOnly = e.target.value.replace(/\D/g, '').slice(0, 10);
+                      setFormData(prev => ({ ...prev, phone: digitsOnly }));
+                    }}
+                    placeholder={t.phoneNoEinPlaceholder}
+                    style={{ paddingLeft: '42px', paddingRight: '40px' }}
                   />
                   {formData.phone.trim() && (
                     <span style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)' }}>
@@ -443,6 +454,7 @@ export const Form1Page: React.FC = () => {
                     </span>
                   )}
                 </div>
+                {errors.phone && <p className="file-error">{errors.phone}</p>}
               </div>
 
               {/* Employee Name */}
@@ -454,7 +466,7 @@ export const Form1Page: React.FC = () => {
                   className={errors.empName ? 'has-error' : ''}
                   value={formData.empName}
                   onChange={e => setFormData(prev => ({ ...prev, empName: e.target.value }))}
-                  placeholder="Enter employee name"
+                  placeholder={t.employeeNamePlaceholder}
                   autoComplete="name"
                 />
                 {errors.empName && <p className="file-error">{errors.empName}</p>}
@@ -469,7 +481,7 @@ export const Form1Page: React.FC = () => {
                   className={errors.department ? 'has-error' : ''}
                   value={department}
                   onChange={e => setDepartment(e.target.value)}
-                  placeholder="Enter department"
+                  placeholder={t.departmentPlaceholder}
                 />
                 {errors.department && <p className="file-error">{errors.department}</p>}
               </div>
@@ -483,7 +495,7 @@ export const Form1Page: React.FC = () => {
                   className={errors.location ? 'has-error' : ''}
                   value={formData.city}
                   onChange={e => setFormData(prev => ({ ...prev, city: e.target.value }))}
-                  placeholder="Enter location"
+                  placeholder={t.locationPlaceholder}
                   autoComplete="address-level2"
                 />
                 {errors.location && <p className="file-error">{errors.location}</p>}
@@ -516,7 +528,7 @@ export const Form1Page: React.FC = () => {
                       )}
                       <span>
                         <strong>{t.photo1Label}</strong>
-                        <small>All photo formats supported · Max 5MB</small>
+                        <small>{t.photoFormatsHint}</small>
                       </span>
                       {photo1Preview ? (
                         <span
@@ -533,7 +545,7 @@ export const Form1Page: React.FC = () => {
                         </svg>
                       )}
                     </label>
-                    <p className="file-name">{formData.photo1 ? formData.photo1.name : 'No file selected'}</p>
+                    <p className="file-name">{formData.photo1 ? formData.photo1.name : t.noFileSelected}</p>
                     {errors.photo1 && <p className="file-error">{errors.photo1}</p>}
                   </div>
 
@@ -558,7 +570,7 @@ export const Form1Page: React.FC = () => {
                       )}
                       <span>
                         <strong>{t.photo2Label}</strong>
-                        <small>All photo formats supported · Max 5MB</small>
+                        <small>{t.photoFormatsHint}</small>
                       </span>
                       {photo2Preview ? (
                         <span
@@ -575,7 +587,7 @@ export const Form1Page: React.FC = () => {
                         </svg>
                       )}
                     </label>
-                    <p className="file-name">{formData.photo2 ? formData.photo2.name : 'No file selected'}</p>
+                    <p className="file-name">{formData.photo2 ? formData.photo2.name : t.noFileSelected}</p>
                     {errors.photo2 && <p className="file-error">{errors.photo2}</p>}
                   </div>
 
@@ -596,7 +608,7 @@ export const Form1Page: React.FC = () => {
                       </svg>
                       <span>
                         <strong>{t.sec2UploadVideoTitle}</strong>
-                        <small>All video formats supported · Max 40MB</small>
+                        <small>{t.videoFormatsHint}</small>
                       </span>
                       {videoPreview ? (
                         <span
@@ -613,7 +625,7 @@ export const Form1Page: React.FC = () => {
                         </svg>
                       )}
                     </label>
-                    <p className="file-name">{video ? video.name : 'No file selected'}</p>
+                    <p className="file-name">{video ? video.name : t.noFileSelected}</p>
                     {errors.video && <p className="file-error">{errors.video}</p>}
                   </div>
                 </div>
@@ -728,7 +740,7 @@ export const Form1Page: React.FC = () => {
           </aside>
         </section>
 
-        <div className="mandatory-note">* Mandatory field</div>
+        <div className="mandatory-note">{t.mandatoryField}</div>
       </main>
 
       {/* ============================== Footer ============================== */}

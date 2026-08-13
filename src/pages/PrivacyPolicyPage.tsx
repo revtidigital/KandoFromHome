@@ -4,31 +4,12 @@ import type { Language } from '../i18n/translations';
 import './PrivacyPolicyPage.css';
 
 const sections = [
-  {
-    title: 'Information We Collect',
-    body: "We may collect information submitted as part of your campaign participation, including personal details, employee information, photographs, videos, written responses and other information voluntarily provided through the campaign forms.",
-  },
-  {
-    title: 'How We Use Your Information',
-    body: "Information submitted through the campaign may be used to manage participation, verify entries, review submissions, communicate campaign-related updates, shortlist entries and support campaign administration.",
-  },
-  {
-    title: 'Photos, Videos & Submitted Content',
-    body: "Photos, videos and other content submitted for the campaign may be reviewed by authorized campaign administrators and used in accordance with the applicable campaign terms, media rights conditions and internal communication requirements.",
-  },
-  {
-    title: 'Data Protection & Security',
-    body: "Reasonable administrative and technical measures should be used to protect submitted information against unauthorized access, loss, misuse or disclosure while it is being handled for campaign purposes.",
-  },
-  {
-    title: 'Information Sharing',
-    body: "Campaign information should only be shared with authorized teams, service providers or stakeholders where required for legitimate campaign operations, evaluation, communication or compliance purposes.",
-  },
-  {
-    title: 'Your Consent',
-    body: "By submitting information through the Kando From Home campaign, participants acknowledge the applicable campaign guidelines, privacy requirements and media rights conditions associated with their submission.",
-  },
-];
+  { titleKey: 'privacySec1Title', bodyKey: 'privacySec1Body' },
+  { titleKey: 'privacySec2Title', bodyKey: 'privacySec2Body' },
+  { titleKey: 'privacySec3Title', bodyKey: 'privacySec3Body' },
+  { titleKey: 'privacySec4Title', bodyKey: 'privacySec4Body' },
+  { titleKey: 'privacySec5Title', bodyKey: 'privacySec5Body' },
+] as const;
 
 export const PrivacyPolicyPage: React.FC = () => {
   const { t, language, setLanguage, navigateTo } = useApp();
@@ -107,21 +88,18 @@ export const PrivacyPolicyPage: React.FC = () => {
 
           <div className="pp-hero-copy">
             <span className="pp-eyebrow">Yamaha Day 2026 • Kando From Home</span>
-            <h1>Privacy Policy</h1>
-            <p>
-              Your privacy matters to us. Please review how information related to your
-              Kando From Home participation is collected, used and protected.
-            </p>
+            <h1>{t.privacyPolicyTitle}</h1>
+            <p>{t.privacySubtitle}</p>
           </div>
         </section>
 
         <section className="pp-privacy-card">
           {sections.map((section, index) => (
-            <article className="pp-privacy-block" key={section.title}>
+            <article className="pp-privacy-block" key={section.titleKey}>
               <div className="pp-number">{String(index + 1).padStart(2, '0')}</div>
               <div className="pp-privacy-content">
-                <h2>{section.title}</h2>
-                <p>{section.body}</p>
+                <h2>{t[section.titleKey].replace(/^\d+\.\s*/, '')}</h2>
+                <p>{t[section.bodyKey]}</p>
               </div>
             </article>
           ))}

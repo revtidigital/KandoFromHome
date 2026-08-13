@@ -193,10 +193,6 @@ export const AdminDashboardPage: React.FC = () => {
     if (user.form1?.photo1Url) items.push({ type: 'image', url: user.form1.photo1Url, title: 'SUBMIT YOUR KANDO ENTRY — Photo 1' });
     if (user.form1?.photo2Url) items.push({ type: 'image', url: user.form1.photo2Url, title: 'SUBMIT YOUR KANDO ENTRY — Photo 2' });
     if (user.form1?.videoUrl) items.push({ type: 'video', url: user.form1.videoUrl, title: 'SUBMIT YOUR KANDO ENTRY — Video' });
-    if (user.form2?.optionalFileUrl) {
-      const isVideo = /\.(mp4|mov|webm|avi|mkv)$/i.test(user.form2.optionalFileUrl);
-      items.push({ type: isVideo ? 'video' : 'image', url: user.form2.optionalFileUrl, title: 'CHAIRMAN INVITES YOUR THOUGHTS — Attachment' });
-    }
     return items;
   };
 
@@ -369,18 +365,6 @@ export const AdminDashboardPage: React.FC = () => {
       console.error('Media download failed:', err);
     } finally {
       setMediaDownloading(false);
-    }
-  };
-
-  const [attachmentDownloading, setAttachmentDownloading] = useState(false);
-  const handleAttachmentDownload = async (url: string) => {
-    setAttachmentDownloading(true);
-    try {
-      await downloadR2File(url, 'attachment');
-    } catch (err) {
-      console.error('Attachment download failed:', err);
-    } finally {
-      setAttachmentDownloading(false);
     }
   };
 
@@ -1410,17 +1394,6 @@ export const AdminDashboardPage: React.FC = () => {
                       <div style={{ fontSize: '0.72rem', color: '#C084FC', fontWeight: 800, textTransform: 'uppercase', marginBottom: '8px' }}>Share Your Thoughts</div>
                       <p style={{ margin: 0, color: palette.text, fontStyle: 'italic', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>"{selectedUserForProfile.form2.thoughts}"</p>
                     </div>
-                  )}
-
-                  {/* Optional file attachment (if any) */}
-                  {selectedUserForProfile.form2.optionalFileUrl && (
-                    <button
-                      onClick={() => handleAttachmentDownload(selectedUserForProfile.form2.optionalFileUrl)}
-                      disabled={attachmentDownloading}
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', border: '1px solid #A855F7', borderRadius: '10px', padding: '10px 18px', color: '#C084FC', fontSize: '0.85rem', fontWeight: 700, background: 'rgba(168,85,247,0.08)', cursor: attachmentDownloading ? 'not-allowed' : 'pointer', opacity: attachmentDownloading ? 0.6 : 1 }}
-                    >
-                      <Download size={16} /> {attachmentDownloading ? 'Downloading…' : 'Download Attached File'}
-                    </button>
                   )}
                 </div>
               ) : (

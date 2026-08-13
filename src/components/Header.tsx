@@ -58,7 +58,9 @@ export const Header: React.FC = () => {
             onClick={() => navigateTo('home')}
             style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}
           >
-            <img src="/yamaha_logo.png" alt="Yamaha" className="site-logo" style={{ height: '34px', width: 'auto', flexShrink: 0 }} />
+            <div style={{ width: '40px', height: '22px', flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+              <img src="/yamaha_logo.png" alt="Yamaha" className="site-logo" style={{ height: '100%', width: '100%', objectFit: 'contain' }} />
+            </div>
 
             <div className="header-divider" style={{ width: '1px', height: '24px', background: 'rgba(255, 255, 255, 0.2)' }} />
 
