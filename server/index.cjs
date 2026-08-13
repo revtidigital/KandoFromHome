@@ -321,7 +321,7 @@ const SettingsSchema = new mongoose.Schema({
   captchaSiteKey: { type: String, default: '' },
   captchaSecretKey: { type: String, default: '' },
   googleAnalyticsId: { type: String, default: '' },
-  customTags: { type: [String], default: ['Shortlisted', 'Featured', 'Flagged', 'Verified'] }
+  customTags: { type: [String], default: [] }
 });
 
 const User = mongoose.model('User', UserSchema);
@@ -544,7 +544,7 @@ app.post('/api/submissions/form1', (req, res, next) => {
     const existingF1 = await Form1.findOne({ userId: user._id });
     if (existingF1) {
       Object.values(req.files).flat().forEach(f => cleanupLocalFile(f.path));
-      return res.status(400).json({ error: 'Form 1 has already been submitted by this user.' });
+      return res.status(400).json({ error: 'SUBMIT YOUR KANDO ENTRY has already been submitted by this user.' });
     }
 
     // User-specific R2 folder: empId_INITIALS (or last4phone_INITIALS if no ID)
@@ -653,7 +653,7 @@ app.post('/api/submissions/form2', (req, res, next) => {
     const existingF2 = await Form2.findOne({ userId: user._id });
     if (existingF2) {
       if (req.file) cleanupLocalFile(req.file.path);
-      return res.status(400).json({ error: 'Form 2 has already been submitted by this user.' });
+      return res.status(400).json({ error: 'CHAIRMAN INVITES YOUR THOUGHTS has already been submitted by this user.' });
     }
 
     const userFolder2 = getUserFolder(cleanEmpId, empName, cleanPhone);
@@ -744,6 +744,42 @@ function r2KeyFromUrl(url) {
   const prefix = `${R2_PUBLIC_URL}/`;
   if (typeof url !== 'string' || !url.startsWith(prefix)) return null;
   return url.slice(prefix.length);
+}
+
+// Exports (CSV/Excel/PDF) are downloaded once and opened later, so their
+// media links need to survive far longer than the 5-minute preview link —
+// sign them for the max SigV4 window (7 days) instead. Falls back to the
+// raw URL untouched if R2 isn't configured or it's a legacy /uploads path,
+// so exports still work rather than breaking outright.
+// Replaces the raw signed R2 URL in given columns with a real Excel hyperlink
+// cell labeled e.g. "View Photo 1" — CSV has no such concept (plain text only),
+// so this only applies to the .xlsx sheet, mirroring the PDF's link buttons.
+function applyMediaHyperlinks(ws, rows, columnLabels) {
+  if (!rows.length) return;
+  const columns = Object.keys(rows[0]);
+  Object.entries(columnLabels).forEach(([columnName, label]) => {
+    const colIndex = columns.indexOf(columnName);
+    if (colIndex === -1) return;
+    rows.forEach((row, rowIndex) => {
+      const url = row[columnName];
+      if (!url) return;
+      const addr = XLSX.utils.encode_cell({ r: rowIndex + 1, c: colIndex });
+      ws[addr] = { t: 's', v: label, l: { Target: url, Tooltip: url } };
+    });
+  });
+}
+
+async function signExportUrl(url) {
+  if (!url || !r2Client) return url || '';
+  const key = r2KeyFromUrl(url);
+  if (!key) return url;
+  try {
+    const command = new GetObjectCommand({ Bucket: R2_BUCKET, Key: key });
+    return await getSignedUrl(r2Client, command, { expiresIn: 604800 });
+  } catch (err) {
+    console.error('Export media URL sign error:', err);
+    return url;
+  }
 }
 
 // Generates a short-lived signed URL so admins can view private R2 media
@@ -1001,7 +1037,8 @@ app.post('/api/admin/tags', async (req, res) => {
     if (!settings) {
       settings = new Settings({});
     }
-    if (!settings.customTags.includes(cleanTag)) {
+    const alreadyExists = settings.customTags.some(t => t.toLowerCase() === cleanTag.toLowerCase());
+    if (!alreadyExists) {
       settings.customTags.push(cleanTag);
       await settings.save();
       await recordAuditLog(req, `Added new system classification tag: "${cleanTag}"`, req.adminUser);
@@ -1020,6 +1057,7 @@ app.delete('/api/admin/tags/:tag', async (req, res) => {
     if (settings) {
       settings.customTags = settings.customTags.filter(t => t !== tagToRemove);
       await settings.save();
+      await User.updateMany({ tags: tagToRemove }, { $pull: { tags: tagToRemove } });
       await recordAuditLog(req, `Removed classification tag: "${tagToRemove}"`, req.adminUser);
     }
     res.json({ success: true, customTags: settings ? settings.customTags : [] });
@@ -1086,27 +1124,27 @@ app.get('/api/admin/export/users', exportLimiter, async (req, res) => {
         'Phone': u.phone || '',
         'City': u.city || '',
         'Family Members': u.familyMembers || '',
-        'Form 1 Status': f1 ? 'Submitted' : 'Not Filled',
-        'Form 1 Phone': f1 ? (f1.phone || '') : '',
-        'Form 1 Company Name': f1 ? f1.companyName : '',
-        'Form 1 Department': f1 ? f1.department : '',
-        'Form 1 Photo 1': f1 ? f1.photo1Url : '',
-        'Form 1 Photo 2': f1 ? f1.photo2Url : '',
-        'Form 1 Video': f1 ? f1.videoUrl : '',
-        'Form 1 CEO Reflection': f1 ? f1.ceoReflection : '',
-        'Form 1 Language': f1 ? f1.language : '',
-        'Form 1 Submitted IP': f1 ? (f1.ip || '') : '',
-        'Form 1 Submitted At': f1 ? new Date(f1.submittedAt).toLocaleString() : '',
-        'Form 2 Status': f2 ? 'Submitted' : 'Not Filled',
-        'Form 2 Phone': f2 ? (f2.phone || '') : '',
-        'Form 2 Company Name': f2 ? f2.companyName : '',
-        'Form 2 Department': f2 ? f2.department : '',
-        'Form 2 Location': f2 ? f2.location : '',
-        'Form 2 Thoughts': f2 ? f2.thoughts : '',
-        'Form 2 Optional File': f2 ? f2.optionalFileUrl : '',
-        'Form 2 Language': f2 ? f2.language : '',
-        'Form 2 Submitted IP': f2 ? (f2.ip || '') : '',
-        'Form 2 Submitted At': f2 ? new Date(f2.submittedAt).toLocaleString() : '',
+        'SUBMIT YOUR KANDO ENTRY Status': f1 ? 'Submitted' : 'Not Filled',
+        'SUBMIT YOUR KANDO ENTRY Phone': f1 ? (f1.phone || '') : '',
+        'SUBMIT YOUR KANDO ENTRY Company Name': f1 ? f1.companyName : '',
+        'SUBMIT YOUR KANDO ENTRY Department': f1 ? f1.department : '',
+        'SUBMIT YOUR KANDO ENTRY Photo 1': f1 ? await signExportUrl(f1.photo1Url) : '',
+        'SUBMIT YOUR KANDO ENTRY Photo 2': f1 ? await signExportUrl(f1.photo2Url) : '',
+        'SUBMIT YOUR KANDO ENTRY Video': f1 ? await signExportUrl(f1.videoUrl) : '',
+        'SUBMIT YOUR KANDO ENTRY CEO Reflection': f1 ? f1.ceoReflection : '',
+        'SUBMIT YOUR KANDO ENTRY Language': f1 ? f1.language : '',
+        'SUBMIT YOUR KANDO ENTRY Submitted IP': f1 ? (f1.ip || '') : '',
+        'SUBMIT YOUR KANDO ENTRY Submitted At': f1 ? new Date(f1.submittedAt).toLocaleString() : '',
+        'CHAIRMAN INVITES YOUR THOUGHTS Status': f2 ? 'Submitted' : 'Not Filled',
+        'CHAIRMAN INVITES YOUR THOUGHTS Phone': f2 ? (f2.phone || '') : '',
+        'CHAIRMAN INVITES YOUR THOUGHTS Company Name': f2 ? f2.companyName : '',
+        'CHAIRMAN INVITES YOUR THOUGHTS Department': f2 ? f2.department : '',
+        'CHAIRMAN INVITES YOUR THOUGHTS Location': f2 ? f2.location : '',
+        'CHAIRMAN INVITES YOUR THOUGHTS Thoughts': f2 ? f2.thoughts : '',
+        'CHAIRMAN INVITES YOUR THOUGHTS Optional File': f2 ? await signExportUrl(f2.optionalFileUrl) : '',
+        'CHAIRMAN INVITES YOUR THOUGHTS Language': f2 ? f2.language : '',
+        'CHAIRMAN INVITES YOUR THOUGHTS Submitted IP': f2 ? (f2.ip || '') : '',
+        'CHAIRMAN INVITES YOUR THOUGHTS Submitted At': f2 ? new Date(f2.submittedAt).toLocaleString() : '',
         'Tags': (u.tags || []).join(', '),
         'Registered At': new Date(u.createdAt).toLocaleString()
       };
@@ -1119,6 +1157,12 @@ app.get('/api/admin/export/users', exportLimiter, async (req, res) => {
     XLSX.utils.book_append_sheet(wb, ws, 'Users');
 
     if (format === 'excel' || format === 'xlsx') {
+      applyMediaHyperlinks(ws, rows, {
+        'SUBMIT YOUR KANDO ENTRY Photo 1': 'View Photo 1',
+        'SUBMIT YOUR KANDO ENTRY Photo 2': 'View Photo 2',
+        'SUBMIT YOUR KANDO ENTRY Video': 'View Video',
+        'CHAIRMAN INVITES YOUR THOUGHTS Optional File': 'View Attachment'
+      });
       const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
       res.setHeader('Content-Disposition', 'attachment; filename="kando_users.xlsx"');
@@ -1165,23 +1209,23 @@ app.get('/api/admin/export/pdf', exportLimiter, async (req, res) => {
               <th>Emp ID</th>
               <th>Employee Name</th>
               <th>City Location</th>
-              <th>Form 1 Phone</th>
-              <th>Form 1 Company</th>
-              <th>Form 1 Department</th>
-              <th>Form 1 Photo 1</th>
-              <th>Form 1 Photo 2</th>
-              <th>Form 1 Video</th>
-              <th>Form 1 CEO Reflection</th>
-              <th>Form 1 Language</th>
-              <th>Form 1 IP</th>
-              <th>Form 2 Phone</th>
-              <th>Form 2 Company</th>
-              <th>Form 2 Department</th>
-              <th>Form 2 Location</th>
-              <th>Form 2 Thoughts</th>
-              <th>Form 2 Attachment</th>
-              <th>Form 2 Language</th>
-              <th>Form 2 IP</th>
+              <th>SUBMIT YOUR KANDO ENTRY Phone</th>
+              <th>SUBMIT YOUR KANDO ENTRY Company</th>
+              <th>SUBMIT YOUR KANDO ENTRY Department</th>
+              <th>SUBMIT YOUR KANDO ENTRY Photo 1</th>
+              <th>SUBMIT YOUR KANDO ENTRY Photo 2</th>
+              <th>SUBMIT YOUR KANDO ENTRY Video</th>
+              <th>SUBMIT YOUR KANDO ENTRY CEO Reflection</th>
+              <th>SUBMIT YOUR KANDO ENTRY Language</th>
+              <th>SUBMIT YOUR KANDO ENTRY IP</th>
+              <th>CHAIRMAN INVITES YOUR THOUGHTS Phone</th>
+              <th>CHAIRMAN INVITES YOUR THOUGHTS Company</th>
+              <th>CHAIRMAN INVITES YOUR THOUGHTS Department</th>
+              <th>CHAIRMAN INVITES YOUR THOUGHTS Location</th>
+              <th>CHAIRMAN INVITES YOUR THOUGHTS Thoughts</th>
+              <th>CHAIRMAN INVITES YOUR THOUGHTS Attachment</th>
+              <th>CHAIRMAN INVITES YOUR THOUGHTS Language</th>
+              <th>CHAIRMAN INVITES YOUR THOUGHTS IP</th>
               <th>Assigned Tag</th>
             </tr>
           </thead>
@@ -1189,10 +1233,15 @@ app.get('/api/admin/export/pdf', exportLimiter, async (req, res) => {
     `;
 
     const esc = (v) => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const link = (url, label) => url ? `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${label}</a>` : '';
 
     for (const u of users) {
       const f1 = await Form1.findOne({ userId: u._id });
       const f2 = await Form2.findOne({ userId: u._id });
+      const f1Photo1Url = f1 ? await signExportUrl(f1.photo1Url) : '';
+      const f1Photo2Url = f1 ? await signExportUrl(f1.photo2Url) : '';
+      const f1VideoUrl = f1 ? await signExportUrl(f1.videoUrl) : '';
+      const f2AttachmentUrl = f2 ? await signExportUrl(f2.optionalFileUrl) : '';
       html += `
         <tr>
           <td><strong>${esc(u.empId || u.phone || '')}</strong></td>
@@ -1201,9 +1250,9 @@ app.get('/api/admin/export/pdf', exportLimiter, async (req, res) => {
           <td>${f1 ? esc(f1.phone) : 'Not Filled'}</td>
           <td>${f1 ? esc(f1.companyName) : ''}</td>
           <td>${f1 ? esc(f1.department) : ''}</td>
-          <td>${f1 ? (f1.photo1Url ? '✓ Uploaded' : '') : ''}</td>
-          <td>${f1 ? (f1.photo2Url ? '✓ Uploaded' : '') : ''}</td>
-          <td>${f1 ? (f1.videoUrl ? '✓ Uploaded' : '') : ''}</td>
+          <td>${link(f1Photo1Url, 'View Photo 1')}</td>
+          <td>${link(f1Photo2Url, 'View Photo 2')}</td>
+          <td>${link(f1VideoUrl, 'View Video')}</td>
           <td>${f1 ? esc(f1.ceoReflection) : ''}</td>
           <td>${f1 ? esc(f1.language) : ''}</td>
           <td>${f1 ? esc(f1.ip) : ''}</td>
@@ -1212,7 +1261,7 @@ app.get('/api/admin/export/pdf', exportLimiter, async (req, res) => {
           <td>${f2 ? esc(f2.department) : ''}</td>
           <td>${f2 ? esc(f2.location) : ''}</td>
           <td>${f2 ? esc(f2.thoughts) : ''}</td>
-          <td>${f2 ? (f2.optionalFileUrl ? '✓ Uploaded' : '') : ''}</td>
+          <td>${link(f2AttachmentUrl, 'View Attachment')}</td>
           <td>${f2 ? esc(f2.language) : ''}</td>
           <td>${f2 ? esc(f2.ip) : ''}</td>
           <td>${esc((u.tags || []).join(', ') || 'None')}</td>
@@ -1269,25 +1318,25 @@ async function buildExportArchive(archive, filterReq) {
       'Name': u.empName,
       'City': u.city || '',
       'Family Members': u.familyMembers || '',
-      'Form 1 Status': f1 ? 'Submitted' : 'Not Filled',
-      'Form 1 Phone': f1 ? (f1.phone || '') : '',
-      'Form 1 Company Name': f1 ? f1.companyName : '',
-      'Form 1 Department': f1 ? f1.department : '',
-      'Form 1 Photo 1': f1 ? f1.photo1Url : '',
-      'Form 1 Photo 2': f1 ? f1.photo2Url : '',
-      'Form 1 Video': f1 ? f1.videoUrl : '',
-      'Form 1 CEO Reflection': f1 ? f1.ceoReflection : '',
-      'Form 1 Language': f1 ? f1.language : '',
-      'Form 1 Submitted IP': f1 ? (f1.ip || '') : '',
-      'Form 2 Status': f2 ? 'Submitted' : 'Not Filled',
-      'Form 2 Phone': f2 ? (f2.phone || '') : '',
-      'Form 2 Company Name': f2 ? f2.companyName : '',
-      'Form 2 Department': f2 ? f2.department : '',
-      'Form 2 Location': f2 ? f2.location : '',
-      'Form 2 Thoughts': f2 ? f2.thoughts : '',
-      'Form 2 Attachment': f2 ? f2.optionalFileUrl : '',
-      'Form 2 Language': f2 ? f2.language : '',
-      'Form 2 Submitted IP': f2 ? (f2.ip || '') : '',
+      'SUBMIT YOUR KANDO ENTRY Status': f1 ? 'Submitted' : 'Not Filled',
+      'SUBMIT YOUR KANDO ENTRY Phone': f1 ? (f1.phone || '') : '',
+      'SUBMIT YOUR KANDO ENTRY Company Name': f1 ? f1.companyName : '',
+      'SUBMIT YOUR KANDO ENTRY Department': f1 ? f1.department : '',
+      'SUBMIT YOUR KANDO ENTRY Photo 1': f1 ? await signExportUrl(f1.photo1Url) : '',
+      'SUBMIT YOUR KANDO ENTRY Photo 2': f1 ? await signExportUrl(f1.photo2Url) : '',
+      'SUBMIT YOUR KANDO ENTRY Video': f1 ? await signExportUrl(f1.videoUrl) : '',
+      'SUBMIT YOUR KANDO ENTRY CEO Reflection': f1 ? f1.ceoReflection : '',
+      'SUBMIT YOUR KANDO ENTRY Language': f1 ? f1.language : '',
+      'SUBMIT YOUR KANDO ENTRY Submitted IP': f1 ? (f1.ip || '') : '',
+      'CHAIRMAN INVITES YOUR THOUGHTS Status': f2 ? 'Submitted' : 'Not Filled',
+      'CHAIRMAN INVITES YOUR THOUGHTS Phone': f2 ? (f2.phone || '') : '',
+      'CHAIRMAN INVITES YOUR THOUGHTS Company Name': f2 ? f2.companyName : '',
+      'CHAIRMAN INVITES YOUR THOUGHTS Department': f2 ? f2.department : '',
+      'CHAIRMAN INVITES YOUR THOUGHTS Location': f2 ? f2.location : '',
+      'CHAIRMAN INVITES YOUR THOUGHTS Thoughts': f2 ? f2.thoughts : '',
+      'CHAIRMAN INVITES YOUR THOUGHTS Attachment': f2 ? await signExportUrl(f2.optionalFileUrl) : '',
+      'CHAIRMAN INVITES YOUR THOUGHTS Language': f2 ? f2.language : '',
+      'CHAIRMAN INVITES YOUR THOUGHTS Submitted IP': f2 ? (f2.ip || '') : '',
       'Tags': (u.tags || []).join(', ')
     });
 
