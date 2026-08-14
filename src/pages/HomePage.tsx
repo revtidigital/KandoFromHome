@@ -397,26 +397,100 @@ export const HomePage: React.FC = () => {
         <section className="kd-quote">
           <div className="kd-quote-rule kd-quote-rule--top"></div>
           <div className="kd-quote-row">
-            <svg className="kd-quote-bow" viewBox="0 0 100 80" aria-hidden="true">
-              <path d="M50 40 C 50 20, 30 6, 12 8 C -2 10, -2 30, 14 36 C 28 41, 42 40, 50 40 Z" fill="#1b3fa0" stroke="#0a1d4e" strokeWidth="1.5" />
-              <path d="M50 40 C 46 24, 28 16, 16 22 C 8 26, 10 38, 22 40 C 32 42, 44 41, 50 40 Z" fill="#264fc2" opacity="0.55" />
-              <path d="M50 40 C 44 56, 22 66, 10 60 C -2 54, 6 38, 22 38 C 32 38, 44 39, 50 40 Z" fill="#15308a" stroke="#0a1d4e" strokeWidth="1.5" />
-              <path d="M50 40 L 12 70" stroke="#0a1d4e" strokeWidth="4" strokeLinecap="round" />
-              <path d="M50 40 L 22 74" stroke="#0a1d4e" strokeWidth="4" strokeLinecap="round" />
-              <circle cx="50" cy="40" r="7" fill="#0a1d4e" />
+            <svg className="kd-quote-bow" viewBox="0 0 140 120" aria-hidden="true">
+              <defs>
+                <linearGradient id="kd-bow-grad-a" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stopColor="#2a52c9" />
+                  <stop offset="55%" stopColor="#12297a" />
+                  <stop offset="100%" stopColor="#0a1d4e" />
+                </linearGradient>
+                <linearGradient id="kd-bow-grad-b" x1="1" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#3a63de" />
+                  <stop offset="55%" stopColor="#1633a0" />
+                  <stop offset="100%" stopColor="#0a1d4e" />
+                </linearGradient>
+              </defs>
+
+              {/* ribbon tails */}
+              <path d="M70 66 L38 118 L54 108 L70 84 Z" fill="url(#kd-bow-grad-a)" stroke="#071640" strokeWidth="1.2" />
+              <path d="M70 66 L102 118 L86 108 L70 84 Z" fill="url(#kd-bow-grad-b)" stroke="#071640" strokeWidth="1.2" />
+
+              {/* left loop */}
+              <path
+                d="M70 62
+                   C 58 30, 20 12, 8 26
+                   C -4 40, 16 62, 44 66
+                   C 56 68, 66 66, 70 62 Z"
+                fill="url(#kd-bow-grad-a)"
+                stroke="#071640"
+                strokeWidth="2"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M62 58 C 48 36, 24 24, 16 32 C 10 40, 22 54, 42 58 C 50 60, 58 60, 62 58 Z"
+                fill="#3a63de"
+                opacity="0.45"
+              />
+
+              {/* right loop */}
+              <path
+                d="M70 62
+                   C 82 30, 120 12, 132 26
+                   C 144 40, 124 62, 96 66
+                   C 84 68, 74 66, 70 62 Z"
+                fill="url(#kd-bow-grad-b)"
+                stroke="#071640"
+                strokeWidth="2"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M78 58 C 92 36, 116 24, 124 32 C 130 40, 118 54, 98 58 C 90 60, 82 60, 78 58 Z"
+                fill="#5a7bea"
+                opacity="0.4"
+              />
+
+              {/* center knot */}
+              <path d="M56 56 C 56 46, 62 40, 70 40 C 78 40, 84 46, 84 56 C 84 66, 78 72, 70 72 C 62 72, 56 66, 56 56 Z" fill="#0a1d4e" stroke="#071640" strokeWidth="1.5" />
             </svg>
 
             <div className="kd-quote-text">
               <p>{t.footerQuote || 'Behind every Yamaha action is a family that inspires it.'}</p>
             </div>
 
-            <svg className="kd-quote-bow kd-quote-bow--right" viewBox="0 0 100 80" aria-hidden="true">
-              <path d="M50 40 C 50 20, 30 6, 12 8 C -2 10, -2 30, 14 36 C 28 41, 42 40, 50 40 Z" fill="#1b3fa0" stroke="#0a1d4e" strokeWidth="1.5" />
-              <path d="M50 40 C 46 24, 28 16, 16 22 C 8 26, 10 38, 22 40 C 32 42, 44 41, 50 40 Z" fill="#264fc2" opacity="0.55" />
-              <path d="M50 40 C 44 56, 22 66, 10 60 C -2 54, 6 38, 22 38 C 32 38, 44 39, 50 40 Z" fill="#15308a" stroke="#0a1d4e" strokeWidth="1.5" />
-              <path d="M50 40 L 12 70" stroke="#0a1d4e" strokeWidth="4" strokeLinecap="round" />
-              <path d="M50 40 L 22 74" stroke="#0a1d4e" strokeWidth="4" strokeLinecap="round" />
-              <circle cx="50" cy="40" r="7" fill="#0a1d4e" />
+            <svg className="kd-quote-bow kd-quote-bow--right" viewBox="0 0 140 120" aria-hidden="true">
+              <path d="M70 66 L38 118 L54 108 L70 84 Z" fill="url(#kd-bow-grad-a)" stroke="#071640" strokeWidth="1.2" />
+              <path d="M70 66 L102 118 L86 108 L70 84 Z" fill="url(#kd-bow-grad-b)" stroke="#071640" strokeWidth="1.2" />
+              <path
+                d="M70 62
+                   C 58 30, 20 12, 8 26
+                   C -4 40, 16 62, 44 66
+                   C 56 68, 66 66, 70 62 Z"
+                fill="url(#kd-bow-grad-a)"
+                stroke="#071640"
+                strokeWidth="2"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M62 58 C 48 36, 24 24, 16 32 C 10 40, 22 54, 42 58 C 50 60, 58 60, 62 58 Z"
+                fill="#3a63de"
+                opacity="0.45"
+              />
+              <path
+                d="M70 62
+                   C 82 30, 120 12, 132 26
+                   C 144 40, 124 62, 96 66
+                   C 84 68, 74 66, 70 62 Z"
+                fill="url(#kd-bow-grad-b)"
+                stroke="#071640"
+                strokeWidth="2"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M78 58 C 92 36, 116 24, 124 32 C 130 40, 118 54, 98 58 C 90 60, 82 60, 78 58 Z"
+                fill="#5a7bea"
+                opacity="0.4"
+              />
+              <path d="M56 56 C 56 46, 62 40, 70 40 C 78 40, 84 46, 84 56 C 84 66, 78 72, 70 72 C 62 72, 56 66, 56 56 Z" fill="#0a1d4e" stroke="#071640" strokeWidth="1.5" />
             </svg>
           </div>
           <div className="kd-quote-rule kd-quote-rule--bottom"></div>
