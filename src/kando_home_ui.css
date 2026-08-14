@@ -2,7 +2,7 @@
    71st Yamaha Day 2026 — "Kando Space" Home Page Stylesheet
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Dancing+Script:wght@600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Dancing+Script:wght@600;700&family=Playfair+Display:ital,wght@1,600;1,700&display=swap');
 
 .kando {
   --navy-900: #061437;
@@ -521,34 +521,26 @@
   flex-wrap: wrap;
 }
 
-.kd-quote-icon {
-  width: 72px;
-  height: 48px;
-  object-fit: contain;
-  flex: none;
-}
-
 .kd-quote-text {
   text-align: center;
 }
 
 .kd-quote-text p {
   margin: 0;
-  font-family: var(--font-script);
+  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
   font-weight: 600;
   font-style: italic;
   font-size: clamp(20px, 2.2vw, 31px);
-  color: #fca51d;
+  color: #f5f1e6;
   letter-spacing: 0.01em;
 }
 
-.kd-quote-text p svg {
-  display: inline-block;
-  width: 0.62em;
-  height: 0.62em;
-  margin-left: 0.24em;
-  color: #fca51d;
-  vertical-align: 0.02em;
+.kd-quote-text p::before {
+  content: '\201C';
+}
+
+.kd-quote-text p::after {
+  content: '\201D';
 }
 
 .kd-quote-rule {
@@ -873,11 +865,6 @@
   .kd-quote {
     padding: 22px 16px 24px;
     gap: 12px;
-  }
-
-  .kd-quote-icon {
-    width: 58px;
-    height: 42px;
   }
 
   .kd-footer {

@@ -396,21 +396,8 @@ export const HomePage: React.FC = () => {
         {/* ============================ Quote band =========================== */}
         <section className="kd-quote">
           <div className="kd-quote-row">
-            <img src="/quote_family_icon.webp" onError={(e) => { (e.target as HTMLImageElement).src = '/quote_family_icon.png'; }} alt="Family" className="kd-quote-icon" />
-
             <div className="kd-quote-text">
-              <p>
-                {t.footerQuote || 'Behind every Yamaha action is a family that inspires it.'}
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path
-                    d="M12 20.5s-7.5-4.6-7.5-9.7A4.3 4.3 0 0 1 12 8.2a4.3 4.3 0 0 1 7.5 2.6c0 5.1-7.5 9.7-7.5 9.7Z"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </p>
+              <p>{t.footerQuote || 'Behind every Yamaha action is a family that inspires it.'}</p>
             </div>
           </div>
           <div className="kd-quote-rule"></div>
