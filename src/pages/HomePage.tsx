@@ -129,16 +129,6 @@ export const HomePage: React.FC = () => {
               </defs>
             </svg>
 
-            <svg className="kd-heart-solo" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path
-                d="M12 20.5s-7.5-4.6-7.5-9.7A4.3 4.3 0 0 1 12 8.2a4.3 4.3 0 0 1 7.5 2.6c0 5.1-7.5 9.7-7.5 9.7Z"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-
             <p className="kd-hero-note">
               {t.landingSubtitle || "This 71st Yamaha Day, let's celebrate the families behind every Yamaha action."}
             </p>
