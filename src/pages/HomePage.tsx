@@ -166,24 +166,22 @@ export const HomePage: React.FC = () => {
                 <div className="kd-card-head">
                   <span className="kd-badge" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none">
-                      <rect
-                        x="3"
-                        y="4.5"
-                        width="18"
-                        height="15"
-                        rx="2.6"
-                        stroke="currentColor"
-                        strokeWidth="1.7"
-                      />
                       <path
-                        d="M3.6 17.4 9 12.3l3.4 3.1 3-2.6 4.9 4.3"
+                        d="M4 11.5 12 4l8 7.5"
                         stroke="currentColor"
                         strokeWidth="1.7"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
                       <path
-                        d="M12.2 12.6s-2.8-1.7-2.8-3.7a1.62 1.62 0 0 1 2.8-1 1.62 1.62 0 0 1 2.8 1c0 2-2.8 3.7-2.8 3.7Z"
+                        d="M6 10v9h12v-9"
+                        stroke="currentColor"
+                        strokeWidth="1.7"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M12 17.2s-3.4-2-3.4-4.4a1.9 1.9 0 0 1 3.4-1.2 1.9 1.9 0 0 1 3.4 1.2c0 2.4-3.4 4.4-3.4 4.4Z"
                         stroke="currentColor"
                         strokeWidth="1.5"
                         strokeLinejoin="round"
