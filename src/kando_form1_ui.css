@@ -432,6 +432,15 @@
   box-shadow: 0 0 0 3px rgba(23, 64, 156, 0.12);
 }
 
+.kando-page-f1 .field input:not([type="file"]):disabled {
+  background: #e9ebef;
+  color: #8d98ac;
+  border-color: #d5d9e0;
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
 .kando-page-f1 .upload-section {
   min-width: 0;
   margin: 1px 0 0;

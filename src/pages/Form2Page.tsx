@@ -9,8 +9,8 @@ export const Form2Page: React.FC = () => {
   const { t, formData, setFormData, navigateTo, language, setLanguage, apiBaseUrl } = useApp();
   const { getCaptchaToken } = useCaptcha(apiBaseUrl);
 
-  const [companyName, setCompanyName] = useState('');
-  const [department, setDepartment] = useState('');
+  const [companyName, setCompanyName] = useState(formData.companyName || '');
+  const [department, setDepartment] = useState(formData.department || '');
   const [location, setLocation] = useState(formData.city || '');
   const [thoughts, setThoughts] = useState('');
   const [dataConsent, setDataConsent] = useState(false);
@@ -311,17 +311,7 @@ export const Form2Page: React.FC = () => {
           </a>
 
           <div className="layout">
-            <section className="form-column" aria-labelledby="form-title">
-              <header className="titles">
-                <h1 id="form-title" className="titles__main">{t.form2ChairmanTitle}</h1>
-                <p className="titles__script">
-                  <span>
-                    <span className="titles__script-firstletter">{t.form2ChairmanScript.charAt(0)}</span>
-                    {t.form2ChairmanScript.slice(1)}
-                  </span>
-                </p>
-              </header>
-
+            <section className="form-column">
               {duplicateError && (
                 <div className="error-banner">
                   <AlertTriangle size={22} style={{ flexShrink: 0 }} />

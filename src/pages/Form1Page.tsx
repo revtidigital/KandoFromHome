@@ -263,6 +263,7 @@ export const Form1Page: React.FC = () => {
       body.append('department', department.trim());
       body.append('location', formData.city.trim());
       body.append('language', language);
+      body.append('mediaConsent', String(mediaConsent));
 
       if (formData.photo1) body.append('photo1', formData.photo1);
       if (formData.photo2) body.append('photo2', formData.photo2);
@@ -282,7 +283,7 @@ export const Form1Page: React.FC = () => {
 
       // Save refId for thank you page
       const generatedRefId = 'KANDO-2026-' + Math.floor(1000 + Math.random() * 9000);
-      setFormData(prev => ({ ...prev, refId: generatedRefId }));
+      setFormData(prev => ({ ...prev, refId: generatedRefId, companyName: companyName.trim(), department: department.trim() }));
 
       // Marks that this Form 2 visit is a continuation of Form 1, so Form2Page
       // knows it's safe to show the Skip option.
@@ -662,7 +663,7 @@ export const Form1Page: React.FC = () => {
                     style={{ accentColor: 'var(--yamaha-blue)', width: '18px', height: '18px', flexShrink: 0, marginTop: '2px' }}
                   />
                   <span style={{ fontSize: '0.87rem', lineHeight: 1.5 }}>
-                    {t.form1MediaConsentText}*
+                    {t.form1MediaConsentText}
                   </span>
                 </label>
                 {errors.mediaConsent && (

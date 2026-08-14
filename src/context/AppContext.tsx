@@ -48,6 +48,8 @@ interface AppContextType {
     email: string;
     phone: string;
     city: string;
+    companyName: string;
+    department: string;
     familyMembers: string;
     video: File | null;
     photo1: File | null;
@@ -208,6 +210,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     email: '',
     phone: '',
     city: '',
+    companyName: '',
+    department: '',
     familyMembers: '',
     video: null as File | null,
     photo1: null as File | null,

@@ -281,6 +281,7 @@ const Form1Schema = new mongoose.Schema({
   photo2Url: { type: String },
   videoUrl: { type: String },
   ceoReflection: { type: String },
+  mediaConsent: { type: Boolean, default: false },
   language: { type: String, default: 'en' },
   submittedAt: { type: Date, default: Date.now },
   ip: { type: String }
@@ -489,7 +490,7 @@ app.post('/api/submissions/form1', (req, res, next) => {
   });
 }, async (req, res) => {
   try {
-    const { empId, phone, empName, companyName, department, location, language, captchaToken } = req.body || {};
+    const { empId, phone, empName, companyName, department, location, language, captchaToken, mediaConsent } = req.body || {};
 
     if (!empName) {
       return res.status(400).json({ error: 'Missing required user details.' });
@@ -584,6 +585,7 @@ app.post('/api/submissions/form1', (req, res, next) => {
       photo1Url,
       photo2Url,
       videoUrl,
+      mediaConsent: mediaConsent === 'true' || mediaConsent === true,
       language: language || 'en',
       ip
     });
@@ -871,15 +873,29 @@ app.get('/api/admin/users', async (req, res) => {
       query.tags = tag;
     }
 
+    // Applied at the query level (not after pagination) so skip/limit and the
+    // totalUsers/totalPages counts stay accurate when this filter is active.
+    if (formType === 'form1' || formType === 'form2' || formType === 'both') {
+      const f1UserIds = await Form1.distinct('userId');
+      const f2UserIds = await Form2.distinct('userId');
+      let matchIds;
+      if (formType === 'form1') {
+        matchIds = f1UserIds;
+      } else if (formType === 'form2') {
+        matchIds = f2UserIds;
+      } else {
+        const f2Set = new Set(f2UserIds.map(String));
+        matchIds = f1UserIds.filter(id => f2Set.has(String(id)));
+      }
+      query._id = { $in: matchIds };
+    }
+
     const totalUsers = await User.countDocuments(query);
     const users = await User.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit).lean();
 
     const result = await Promise.all(users.map(async (user) => {
       const f1 = await Form1.findOne({ userId: user._id }).lean();
       const f2 = await Form2.findOne({ userId: user._id }).lean();
-      
-      if (formType === 'form1' && !f1) return null;
-      if (formType === 'form2' && !f2) return null;
 
       return {
         id: user._id,
@@ -899,6 +915,7 @@ app.get('/api/admin/users', async (req, res) => {
           photo2Url: f1.photo2Url,
           videoUrl: f1.videoUrl || '',
           ceoReflection: f1.ceoReflection || '',
+          mediaConsent: !!f1.mediaConsent,
           language: f1.language,
           ip: f1.ip || ''
         } : null,
@@ -915,10 +932,8 @@ app.get('/api/admin/users', async (req, res) => {
       };
     }));
 
-    const filteredResult = result.filter(item => item !== null);
-
     res.json({
-      users: filteredResult,
+      users: result,
       totalUsers,
       page,
       totalPages: Math.ceil(totalUsers / limit)
@@ -1118,30 +1133,26 @@ app.get('/api/admin/export/users', exportLimiter, async (req, res) => {
       const f1 = await Form1.findOne({ userId: u._id });
       const f2 = await Form2.findOne({ userId: u._id });
       return {
+        'SUBMIT YOUR KANDO ENTRY Status': f1 ? 'Submitted' : 'Not Filled',
         'User ID': u._id.toString(),
         'Emp ID': u.empId,
         'Name': u.empName,
-        'Phone': u.phone || '',
+        'Phone': u.phone ? `\t${u.phone}` : '',
         'City': u.city || '',
-        'Family Members': u.familyMembers || '',
-        'SUBMIT YOUR KANDO ENTRY Status': f1 ? 'Submitted' : 'Not Filled',
-        'SUBMIT YOUR KANDO ENTRY Phone': f1 ? (f1.phone || '') : '',
         'SUBMIT YOUR KANDO ENTRY Company Name': f1 ? f1.companyName : '',
         'SUBMIT YOUR KANDO ENTRY Department': f1 ? f1.department : '',
         'SUBMIT YOUR KANDO ENTRY Photo 1': f1 ? await signExportUrl(f1.photo1Url) : '',
         'SUBMIT YOUR KANDO ENTRY Photo 2': f1 ? await signExportUrl(f1.photo2Url) : '',
         'SUBMIT YOUR KANDO ENTRY Video': f1 ? await signExportUrl(f1.videoUrl) : '',
-        'SUBMIT YOUR KANDO ENTRY CEO Reflection': f1 ? f1.ceoReflection : '',
         'SUBMIT YOUR KANDO ENTRY Language': f1 ? f1.language : '',
         'SUBMIT YOUR KANDO ENTRY Submitted IP': f1 ? (f1.ip || '') : '',
         'SUBMIT YOUR KANDO ENTRY Submitted At': f1 ? new Date(f1.submittedAt).toLocaleString() : '',
+        'Permission to Feature': f1 ? (f1.mediaConsent ? 'Yes' : 'No') : '',
         'CHAIRMAN INVITES YOUR THOUGHTS Status': f2 ? 'Submitted' : 'Not Filled',
-        'CHAIRMAN INVITES YOUR THOUGHTS Phone': f2 ? (f2.phone || '') : '',
         'CHAIRMAN INVITES YOUR THOUGHTS Company Name': f2 ? f2.companyName : '',
         'CHAIRMAN INVITES YOUR THOUGHTS Department': f2 ? f2.department : '',
         'CHAIRMAN INVITES YOUR THOUGHTS Location': f2 ? f2.location : '',
         'CHAIRMAN INVITES YOUR THOUGHTS Thoughts': f2 ? f2.thoughts : '',
-        'CHAIRMAN INVITES YOUR THOUGHTS Optional File': f2 ? await signExportUrl(f2.optionalFileUrl) : '',
         'CHAIRMAN INVITES YOUR THOUGHTS Language': f2 ? f2.language : '',
         'CHAIRMAN INVITES YOUR THOUGHTS Submitted IP': f2 ? (f2.ip || '') : '',
         'CHAIRMAN INVITES YOUR THOUGHTS Submitted At': f2 ? new Date(f2.submittedAt).toLocaleString() : '',
@@ -1160,8 +1171,7 @@ app.get('/api/admin/export/users', exportLimiter, async (req, res) => {
       applyMediaHyperlinks(ws, rows, {
         'SUBMIT YOUR KANDO ENTRY Photo 1': 'View Photo 1',
         'SUBMIT YOUR KANDO ENTRY Photo 2': 'View Photo 2',
-        'SUBMIT YOUR KANDO ENTRY Video': 'View Video',
-        'CHAIRMAN INVITES YOUR THOUGHTS Optional File': 'View Attachment'
+        'SUBMIT YOUR KANDO ENTRY Video': 'View Video'
       });
       const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
@@ -1206,6 +1216,7 @@ app.get('/api/admin/export/pdf', exportLimiter, async (req, res) => {
         <table>
           <thead>
             <tr>
+              <th>SUBMIT YOUR KANDO ENTRY Status</th>
               <th>Emp ID</th>
               <th>Employee Name</th>
               <th>City Location</th>
@@ -1215,15 +1226,15 @@ app.get('/api/admin/export/pdf', exportLimiter, async (req, res) => {
               <th>SUBMIT YOUR KANDO ENTRY Photo 1</th>
               <th>SUBMIT YOUR KANDO ENTRY Photo 2</th>
               <th>SUBMIT YOUR KANDO ENTRY Video</th>
-              <th>SUBMIT YOUR KANDO ENTRY CEO Reflection</th>
               <th>SUBMIT YOUR KANDO ENTRY Language</th>
               <th>SUBMIT YOUR KANDO ENTRY IP</th>
+              <th>Permission to Feature</th>
+              <th>CHAIRMAN INVITES YOUR THOUGHTS Status</th>
               <th>CHAIRMAN INVITES YOUR THOUGHTS Phone</th>
               <th>CHAIRMAN INVITES YOUR THOUGHTS Company</th>
               <th>CHAIRMAN INVITES YOUR THOUGHTS Department</th>
               <th>CHAIRMAN INVITES YOUR THOUGHTS Location</th>
               <th>CHAIRMAN INVITES YOUR THOUGHTS Thoughts</th>
-              <th>CHAIRMAN INVITES YOUR THOUGHTS Attachment</th>
               <th>CHAIRMAN INVITES YOUR THOUGHTS Language</th>
               <th>CHAIRMAN INVITES YOUR THOUGHTS IP</th>
               <th>Assigned Tag</th>
@@ -1241,10 +1252,10 @@ app.get('/api/admin/export/pdf', exportLimiter, async (req, res) => {
       const f1Photo1Url = f1 ? await signExportUrl(f1.photo1Url) : '';
       const f1Photo2Url = f1 ? await signExportUrl(f1.photo2Url) : '';
       const f1VideoUrl = f1 ? await signExportUrl(f1.videoUrl) : '';
-      const f2AttachmentUrl = f2 ? await signExportUrl(f2.optionalFileUrl) : '';
       html += `
         <tr>
-          <td><strong>${esc(u.empId || u.phone || '')}</strong></td>
+          <td>${f1 ? 'Submitted' : 'Not Filled'}</td>
+          <td><strong>${esc(u.empId || '')}</strong></td>
           <td>${esc(u.empName)}</td>
           <td>${esc(u.city || 'N/A')}</td>
           <td>${f1 ? esc(f1.phone) : 'Not Filled'}</td>
@@ -1253,15 +1264,15 @@ app.get('/api/admin/export/pdf', exportLimiter, async (req, res) => {
           <td>${link(f1Photo1Url, 'View Photo 1')}</td>
           <td>${link(f1Photo2Url, 'View Photo 2')}</td>
           <td>${link(f1VideoUrl, 'View Video')}</td>
-          <td>${f1 ? esc(f1.ceoReflection) : ''}</td>
           <td>${f1 ? esc(f1.language) : ''}</td>
           <td>${f1 ? esc(f1.ip) : ''}</td>
+          <td>${f1 ? (f1.mediaConsent ? 'Yes' : 'No') : ''}</td>
+          <td>${f2 ? 'Submitted' : 'Not Filled'}</td>
           <td>${f2 ? esc(f2.phone) : 'Not Filled'}</td>
           <td>${f2 ? esc(f2.companyName) : ''}</td>
           <td>${f2 ? esc(f2.department) : ''}</td>
           <td>${f2 ? esc(f2.location) : ''}</td>
           <td>${f2 ? esc(f2.thoughts) : ''}</td>
-          <td>${link(f2AttachmentUrl, 'View Attachment')}</td>
           <td>${f2 ? esc(f2.language) : ''}</td>
           <td>${f2 ? esc(f2.ip) : ''}</td>
           <td>${esc((u.tags || []).join(', ') || 'None')}</td>
@@ -1310,31 +1321,28 @@ async function buildExportArchive(archive, filterReq) {
     const f1 = await Form1.findOne({ userId: u._id });
     const f2 = await Form2.findOne({ userId: u._id });
 
-    const userKey = u.empId || u.phone || u._id.toString();
+    const userKey = getUserFolder(u.empId, u.empName, u.phone);
 
     rows.push({
+      'SUBMIT YOUR KANDO ENTRY Status': f1 ? 'Submitted' : 'Not Filled',
       'Emp ID': u.empId,
-      'Phone': u.phone || '',
+      'Phone': u.phone ? `\t${u.phone}` : '',
       'Name': u.empName,
       'City': u.city || '',
-      'Family Members': u.familyMembers || '',
-      'SUBMIT YOUR KANDO ENTRY Status': f1 ? 'Submitted' : 'Not Filled',
-      'SUBMIT YOUR KANDO ENTRY Phone': f1 ? (f1.phone || '') : '',
       'SUBMIT YOUR KANDO ENTRY Company Name': f1 ? f1.companyName : '',
       'SUBMIT YOUR KANDO ENTRY Department': f1 ? f1.department : '',
       'SUBMIT YOUR KANDO ENTRY Photo 1': f1 ? await signExportUrl(f1.photo1Url) : '',
       'SUBMIT YOUR KANDO ENTRY Photo 2': f1 ? await signExportUrl(f1.photo2Url) : '',
       'SUBMIT YOUR KANDO ENTRY Video': f1 ? await signExportUrl(f1.videoUrl) : '',
-      'SUBMIT YOUR KANDO ENTRY CEO Reflection': f1 ? f1.ceoReflection : '',
       'SUBMIT YOUR KANDO ENTRY Language': f1 ? f1.language : '',
       'SUBMIT YOUR KANDO ENTRY Submitted IP': f1 ? (f1.ip || '') : '',
+      'Permission to Feature': f1 ? (f1.mediaConsent ? 'Yes' : 'No') : '',
       'CHAIRMAN INVITES YOUR THOUGHTS Status': f2 ? 'Submitted' : 'Not Filled',
-      'CHAIRMAN INVITES YOUR THOUGHTS Phone': f2 ? (f2.phone || '') : '',
+      'CHAIRMAN INVITES YOUR THOUGHTS Phone': f2 && f2.phone ? `\t${f2.phone}` : '',
       'CHAIRMAN INVITES YOUR THOUGHTS Company Name': f2 ? f2.companyName : '',
       'CHAIRMAN INVITES YOUR THOUGHTS Department': f2 ? f2.department : '',
       'CHAIRMAN INVITES YOUR THOUGHTS Location': f2 ? f2.location : '',
       'CHAIRMAN INVITES YOUR THOUGHTS Thoughts': f2 ? f2.thoughts : '',
-      'CHAIRMAN INVITES YOUR THOUGHTS Attachment': f2 ? await signExportUrl(f2.optionalFileUrl) : '',
       'CHAIRMAN INVITES YOUR THOUGHTS Language': f2 ? f2.language : '',
       'CHAIRMAN INVITES YOUR THOUGHTS Submitted IP': f2 ? (f2.ip || '') : '',
       'Tags': (u.tags || []).join(', ')

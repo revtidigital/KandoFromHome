@@ -233,6 +233,15 @@ export const AdminDashboardPage: React.FC = () => {
   const [selectedFormFilter, setSelectedFormFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 25;
+  // The Users Directory table is server-paginated/filtered — allUsers holds
+  // only the current page's results, not the whole dataset. These track the
+  // real totals from the API so pagination and "N users match" text stay
+  // accurate no matter how many thousands of employees are registered.
+  const [usersTotal, setUsersTotal] = useState(0);
+  const [usersTotalPages, setUsersTotalPages] = useState(1);
+  // KPI tiles read from real DB counts (not allUsers.length), since allUsers
+  // is now just one page of results.
+  const [overviewStats, setOverviewStats] = useState({ totalUsers: 0, form1Count: 0, form2Count: 0 });
 
   // Settings & Tags states (Req 2 & 3)
   const [newTagInput, setNewTagInput] = useState('');
@@ -425,15 +434,25 @@ export const AdminDashboardPage: React.FC = () => {
 
     fetchWhitelistCounts();
 
-    fetch(`${apiBaseUrl}/api/admin/users?limit=200`, { headers: adminAuthHeader() })
+    // Real DB-wide counts for the KPI tiles — independent of whatever page of
+    // results the Users Directory table currently has loaded.
+    fetch(`${apiBaseUrl}/api/admin/overview`, { headers: adminAuthHeader() })
       .then(res => res.json())
       .then(data => {
-        if (data && data.users) {
-          setAllUsers(data.users);
-          applyStateFromPath(window.location.pathname, data.users);
+        if (data) {
+          setOverviewStats({
+            totalUsers: data.totalUsers || 0,
+            form1Count: data.form1Count || 0,
+            form2Count: data.form2Count || 0
+          });
         }
       })
       .catch(() => {});
+
+    // Resolves a /admin-dashboard/users/:empId deep link straight from the
+    // server (allUsers may not include that user, since it's now just one
+    // page of results, not the whole dataset).
+    applyStateFromPath(window.location.pathname, []);
 
     fetchAuditLogs();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -449,12 +468,27 @@ export const AdminDashboardPage: React.FC = () => {
     const [segment, empId] = rest.split('/').filter(Boolean);
 
     if (segment === 'users' && empId) {
-      const user = usersList.find((u: any) => userKey(u) === decodeURIComponent(empId));
+      const decoded = decodeURIComponent(empId);
+      const user = usersList.find((u: any) => userKey(u) === decoded);
       if (user) {
         setSelectedUserForProfile(user);
         setActiveTab('user-detail');
         return;
       }
+      // Not in the currently loaded page of results (server-side pagination
+      // means allUsers no longer holds every user) — fetch this one directly
+      // so deep links and refreshes keep working regardless of page/filters.
+      fetch(`${apiBaseUrl}/api/admin/users?search=${encodeURIComponent(decoded)}&limit=5`, { headers: adminAuthHeader() })
+        .then(res => res.json())
+        .then(data => {
+          const match = (data.users || []).find((u: any) => userKey(u) === decoded);
+          if (match) {
+            setSelectedUserForProfile(match);
+            setActiveTab('user-detail');
+          }
+        })
+        .catch(() => {});
+      return;
     }
     if (segment === 'settings' && !isSuperAdmin) {
       setActiveTab('overview');
@@ -482,6 +516,39 @@ export const AdminDashboardPage: React.FC = () => {
     return () => window.removeEventListener('popstate', handlePopState);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allUsers]);
+
+  // Fetches one page of the Users Directory straight from the server —
+  // search/tag/formType/pagination all happen in the DB query, so results
+  // stay correct no matter how many thousands of employees are registered
+  // (previously the whole table was loaded once, capped at 200 users, and
+  // filtered/paginated in the browser — anyone past the first 200 silently
+  // never showed up in search or filters).
+  const fetchUsersPage = (page: number, search: string, tag: string, formType: string) => {
+    const params = new URLSearchParams({ page: String(page), limit: String(itemsPerPage) });
+    if (search) params.set('search', search);
+    if (tag) params.set('tag', tag);
+    if (formType) params.set('formType', formType);
+    return fetch(`${apiBaseUrl}/api/admin/users?${params.toString()}`, { headers: adminAuthHeader() })
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.users) {
+          setAllUsers(data.users);
+          setUsersTotal(data.totalUsers || 0);
+          setUsersTotalPages(data.totalPages || 1);
+        }
+      })
+      .catch(() => {});
+  };
+
+  // Debounced so fast typing in the search box doesn't fire a request per
+  // keystroke; tag/form-filter/page changes are instant (no typing involved).
+  useEffect(() => {
+    const handle = setTimeout(() => {
+      fetchUsersPage(currentPage, searchQuery, selectedTagFilter, selectedFormFilter);
+    }, searchQuery ? 350 : 0);
+    return () => clearTimeout(handle);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, searchQuery, selectedTagFilter, selectedFormFilter]);
 
   const handleLogout = () => {
     adminLogout();
@@ -706,28 +773,11 @@ export const AdminDashboardPage: React.FC = () => {
     }
   };
 
-  // Users Filtered List
-  const filteredUsers = allUsers.filter(u => {
-    const q = searchQuery.toLowerCase();
-    const matchesSearch = !searchQuery ||
-      (u.empName || '').toLowerCase().includes(q) ||
-      (u.empId || '').toLowerCase().includes(q) ||
-      (u.phone || '').toLowerCase().includes(q) ||
-      (u.email || '').toLowerCase().includes(q) ||
-      (u.city && u.city.toLowerCase().includes(q));
-
-    const matchesTag = !selectedTagFilter || (u.tags && u.tags.includes(selectedTagFilter));
-    
-    let matchesForm = true;
-    if (selectedFormFilter === 'form1') matchesForm = !!u.form1;
-    if (selectedFormFilter === 'form2') matchesForm = !!u.form2;
-    if (selectedFormFilter === 'both') matchesForm = !!(u.form1 && u.form2);
-
-    return matchesSearch && matchesTag && matchesForm;
-  });
-
-  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage) || 1;
-  const paginatedUsers = filteredUsers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  // allUsers is already the current page of server-filtered/paginated results
+  // (search/tag/formType/page all applied in the DB query by fetchUsersPage) —
+  // no client-side re-filtering here, so results are correct at any dataset size.
+  const paginatedUsers = allUsers;
+  const totalPages = usersTotalPages;
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: palette.pageBg, color: palette.pageText, fontFamily: 'Outfit, sans-serif' }}>
@@ -882,7 +932,7 @@ export const AdminDashboardPage: React.FC = () => {
                     <Info size={18} color="#00E5FF" />
                   </div>
                 </div>
-                <div style={{ fontSize: '2.5rem', fontWeight: 900, color: '#00E5FF', marginBottom: '12px' }}>{allUsers.length}</div>
+                <div style={{ fontSize: '2.5rem', fontWeight: 900, color: '#00E5FF', marginBottom: '12px' }}>{overviewStats.totalUsers}</div>
                 <button
                   onClick={(e) => { e.stopPropagation(); toggleKpiSubmissions(''); }}
                   style={{ background: 'rgba(0,229,255,0.12)', border: '1px solid #00E5FF', color: '#00E5FF', padding: '6px 12px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', fontSize: '0.78rem' }}
@@ -902,7 +952,7 @@ export const AdminDashboardPage: React.FC = () => {
                   </div>
                 </div>
                 <div style={{ fontSize: '2.5rem', fontWeight: 900, color: '#A855F7', marginBottom: '12px' }}>
-                  {allUsers.filter(u => u.form1).length}
+                  {overviewStats.form1Count}
                 </div>
                 <button
                   onClick={(e) => { e.stopPropagation(); toggleKpiSubmissions('form1'); }}
@@ -923,7 +973,7 @@ export const AdminDashboardPage: React.FC = () => {
                   </div>
                 </div>
                 <div style={{ fontSize: '2.5rem', fontWeight: 900, color: '#22C55E', marginBottom: '12px' }}>
-                  {allUsers.filter(u => u.form2).length}
+                  {overviewStats.form2Count}
                 </div>
                 <button
                   onClick={(e) => { e.stopPropagation(); toggleKpiSubmissions('form2'); }}
@@ -1023,7 +1073,7 @@ export const AdminDashboardPage: React.FC = () => {
                     <span style={{ color: '#00E5FF', fontWeight: 800, fontSize: '0.9rem' }}>
                       {selectedUserIds.size > 0
                         ? `${selectedUserIds.size} user${selectedUserIds.size > 1 ? 's' : ''} selected`
-                        : `Filter applied — ${filteredUsers.length} user${filteredUsers.length !== 1 ? 's' : ''} match`}
+                        : `Filter applied — ${usersTotal} user${usersTotal !== 1 ? 's' : ''} match`}
                     </span>
                     <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
                       <button onClick={() => handleExportData('pdf')} style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid #EF4444', color: '#FCA5A5', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
@@ -1207,7 +1257,7 @@ export const AdminDashboardPage: React.FC = () => {
               {/* PAGINATION BAR (Req 8) */}
               <div style={{ padding: '16px 20px', background: palette.surfaceAlt, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: `1px solid ${palette.border}` }}>
                 <span style={{ fontSize: '0.8rem', color: '#94A3B8' }}>
-                  Showing {paginatedUsers.length} of {filteredUsers.length} entries (25 per page)
+                  Showing {paginatedUsers.length} of {usersTotal} entries (25 per page)
                 </span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} style={{ background: palette.inputBg, border: 'none', color: palette.text, padding: '6px 12px', borderRadius: '6px', cursor: 'pointer' }}>
