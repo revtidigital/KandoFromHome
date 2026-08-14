@@ -479,6 +479,14 @@
   padding-top: 18px;
 }
 
+.kd-card--blue .kd-cta--tight {
+  margin-top: 0;
+}
+
+.kd-card--blue {
+  align-self: center;
+}
+
 .kd-btn {
   width: 100%;
   min-width: 0;
