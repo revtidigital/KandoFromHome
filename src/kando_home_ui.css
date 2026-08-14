@@ -517,8 +517,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 26px;
+  gap: 18px;
   flex-wrap: wrap;
+}
+
+.kd-quote-bow {
+  width: 64px;
+  height: 50px;
+  flex: none;
+}
+
+.kd-quote-bow--right {
+  transform: scaleX(-1);
 }
 
 .kd-quote-text {
@@ -544,10 +554,17 @@
 }
 
 .kd-quote-rule {
-  margin: 8px auto 0;
   height: 1.5px;
-  width: 74%;
+  width: 88%;
   background: linear-gradient(to right, transparent, rgba(217, 169, 79, 0.85), transparent);
+}
+
+.kd-quote-rule--top {
+  margin: 0 auto 14px;
+}
+
+.kd-quote-rule--bottom {
+  margin: 14px auto 0;
 }
 
 /* -------------------------------- Footer --------------------------------- */
@@ -865,6 +882,11 @@
   .kd-quote {
     padding: 22px 16px 24px;
     gap: 12px;
+  }
+
+  .kd-quote-bow {
+    width: 44px;
+    height: 34px;
   }
 
   .kd-footer {

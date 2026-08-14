@@ -395,12 +395,31 @@ export const HomePage: React.FC = () => {
 
         {/* ============================ Quote band =========================== */}
         <section className="kd-quote">
+          <div className="kd-quote-rule kd-quote-rule--top"></div>
           <div className="kd-quote-row">
+            <svg className="kd-quote-bow" viewBox="0 0 100 80" aria-hidden="true">
+              <path d="M50 40 C 50 20, 30 6, 12 8 C -2 10, -2 30, 14 36 C 28 41, 42 40, 50 40 Z" fill="#1b3fa0" stroke="#0a1d4e" strokeWidth="1.5" />
+              <path d="M50 40 C 46 24, 28 16, 16 22 C 8 26, 10 38, 22 40 C 32 42, 44 41, 50 40 Z" fill="#264fc2" opacity="0.55" />
+              <path d="M50 40 C 44 56, 22 66, 10 60 C -2 54, 6 38, 22 38 C 32 38, 44 39, 50 40 Z" fill="#15308a" stroke="#0a1d4e" strokeWidth="1.5" />
+              <path d="M50 40 L 12 70" stroke="#0a1d4e" strokeWidth="4" strokeLinecap="round" />
+              <path d="M50 40 L 22 74" stroke="#0a1d4e" strokeWidth="4" strokeLinecap="round" />
+              <circle cx="50" cy="40" r="7" fill="#0a1d4e" />
+            </svg>
+
             <div className="kd-quote-text">
               <p>{t.footerQuote || 'Behind every Yamaha action is a family that inspires it.'}</p>
             </div>
+
+            <svg className="kd-quote-bow kd-quote-bow--right" viewBox="0 0 100 80" aria-hidden="true">
+              <path d="M50 40 C 50 20, 30 6, 12 8 C -2 10, -2 30, 14 36 C 28 41, 42 40, 50 40 Z" fill="#1b3fa0" stroke="#0a1d4e" strokeWidth="1.5" />
+              <path d="M50 40 C 46 24, 28 16, 16 22 C 8 26, 10 38, 22 40 C 32 42, 44 41, 50 40 Z" fill="#264fc2" opacity="0.55" />
+              <path d="M50 40 C 44 56, 22 66, 10 60 C -2 54, 6 38, 22 38 C 32 38, 44 39, 50 40 Z" fill="#15308a" stroke="#0a1d4e" strokeWidth="1.5" />
+              <path d="M50 40 L 12 70" stroke="#0a1d4e" strokeWidth="4" strokeLinecap="round" />
+              <path d="M50 40 L 22 74" stroke="#0a1d4e" strokeWidth="4" strokeLinecap="round" />
+              <circle cx="50" cy="40" r="7" fill="#0a1d4e" />
+            </svg>
           </div>
-          <div className="kd-quote-rule"></div>
+          <div className="kd-quote-rule kd-quote-rule--bottom"></div>
         </section>
       </main>
 
