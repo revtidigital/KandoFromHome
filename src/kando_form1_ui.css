@@ -290,6 +290,10 @@
   min-width: 0;
 }
 
+.kando-page-f1 .form-column--no-intro {
+  padding-top: 28px;
+}
+
 .kando-page-f1 .mandatory-note {
   position: relative;
   z-index: 2;

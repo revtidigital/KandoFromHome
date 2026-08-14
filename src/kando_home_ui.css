@@ -423,20 +423,8 @@
   color: #3a4a7a;
 }
 
-.kd-card--clickable {
-  cursor: pointer;
-  transition: transform 200ms ease, box-shadow 200ms ease;
-}
-
-.kd-card--clickable:hover,
-.kd-card--clickable:focus-visible {
-  transform: translateY(-4px);
-  box-shadow: 0 32px 68px rgba(3, 10, 35, 0.42);
-}
-
-.kd-card--clickable:focus-visible {
-  outline: 2px solid #fff;
-  outline-offset: 4px;
+.kd-card-desc--center {
+  text-align: center;
 }
 
 /* feature row */
@@ -485,6 +473,10 @@
   padding-top: 34px;
   display: flex;
   justify-content: center;
+}
+
+.kd-cta--tight {
+  padding-top: 18px;
 }
 
 .kd-btn {

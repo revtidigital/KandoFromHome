@@ -138,13 +138,7 @@ export const HomePage: React.FC = () => {
           <div className="kd-cards-wrap">
             <div className="kd-cards">
               {/* ---------------------------- Card 1 ---------------------------- */}
-              <article
-                className="kd-card kd-card--blue kd-card--clickable"
-                role="button"
-                tabIndex={0}
-                onClick={() => navigateTo('form1')}
-                onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') navigateTo('form1'); }}
-              >
+              <article className="kd-card kd-card--blue">
                 <svg
                   className="kd-card-wave"
                   viewBox="0 0 600 190"
@@ -200,17 +194,15 @@ export const HomePage: React.FC = () => {
                   </div>
                 </div>
 
-                <p className="kd-card-desc kd-card-desc--subheading">{t.form1CardDesc || "Share your family's Kando Moment with us."}</p>
+                <div className="kd-cta kd-cta--tight">
+                  <button className="kd-btn kd-btn--blue" type="button" onClick={() => navigateTo('form1')}>
+                    {(t.form1CardBtn || 'Submit Entry').replace(/\s*>\s*$/, '')}
+                  </button>
+                </div>
               </article>
 
               {/* ---------------------------- Card 2 ---------------------------- */}
-              <article
-                className="kd-card kd-card--purple kd-card--clickable"
-                role="button"
-                tabIndex={0}
-                onClick={() => navigateTo('form2')}
-                onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') navigateTo('form2'); }}
-              >
+              <article className="kd-card kd-card--purple">
                 <svg
                   className="kd-card-wave"
                   viewBox="0 0 600 190"
@@ -259,9 +251,11 @@ export const HomePage: React.FC = () => {
                   </div>
                 </div>
 
-                <p className="kd-card-desc kd-card-desc--subheading">
-                  {t.form2CardDesc || 'Share your ideas and suggestions. Your thoughts help us grow better, together.'}
-                </p>
+                <div className="kd-cta kd-cta--tight">
+                  <button className="kd-btn kd-btn--purple" type="button" onClick={() => navigateTo('form2')}>
+                    {(t.form2CardBtn || 'Share Your Thoughts').replace(/\s*>\s*$/, '')}
+                  </button>
+                </div>
               </article>
 
               <div className="kd-or" aria-hidden="true">{t.orDivider}</div>

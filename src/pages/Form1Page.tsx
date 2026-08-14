@@ -347,25 +347,7 @@ export const Form1Page: React.FC = () => {
         </a>
 
         <section className="entry-grid">
-          <div className="form-column">
-            <div className="intro-copy">
-              <div className="headline-row">
-                <h1>{t.form1Title}</h1>
-                <svg className="gold-heart" viewBox="0 0 48 48" aria-hidden="true">
-                  <path d="M24 42S6 31.5 6 16.8C6 9.2 15.3 5.2 20.4 11L24 15l3.6-4C32.7 5.2 42 9.2 42 16.8 42 31.5 24 42 24 42Z" />
-                </svg>
-              </div>
-              <p>{t.form1Subtitle}</p>
-
-              <div className="title-flourish" aria-hidden="true">
-                <span></span>
-                <svg viewBox="0 0 30 28">
-                  <path d="M15 25S3 18 3 8.7C3 4 8.7 1.5 12 5.2L15 8.5l3-3.3C21.3 1.5 27 4 27 8.7 27 18 15 25 15 25Z" />
-                </svg>
-                <span></span>
-              </div>
-            </div>
-
+          <div className="form-column form-column--no-intro">
             {duplicateError && (
               <div style={{
                 display: 'flex', alignItems: 'center', gap: '12px',
@@ -706,11 +688,11 @@ export const Form1Page: React.FC = () => {
             <div className="polaroid-wrap">
               <figure className="polaroid-frame">
                 <img
-                  src="/png.webp"
+                  src="/form1_family.png"
                   alt="A smiling family holding an Our Kando Moment sign"
                   onError={(e) => {
                     const img = e.target as HTMLImageElement;
-                    img.src = img.src.includes('.webp') ? '/png.png' : '/user_form1_right.png';
+                    img.src = '/user_form1_right.png';
                   }}
                 />
               </figure>
