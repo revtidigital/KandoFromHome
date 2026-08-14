@@ -211,10 +211,8 @@
 
 .kando-page-f2 .layout {
   margin-top: -28px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(430px, 545px);
-  align-items: center;
-  gap: clamp(36px, 5vw, 76px);
+  display: flex;
+  justify-content: center;
 }
 
 .kando-page-f2 .f2-mandatory-note {
@@ -227,6 +225,7 @@
 
 .kando-page-f2 .form-column {
   min-width: 0;
+  width: min(100%, 790px);
   padding-top: 18px;
 }
 
@@ -616,80 +615,6 @@
   font-weight: 700;
 }
 
-/* ======================= Message card ======================= */
-.kando-page-f2 .message-card {
-  min-width: 0;
-  overflow: hidden;
-  border-radius: 24px;
-  background: linear-gradient(180deg, var(--card-top) 0%, var(--card-bottom) 100%);
-  box-shadow: var(--shadow-soft);
-}
-
-.kando-page-f2 .message-card__body {
-  min-height: 285px;
-  padding: 48px 62px 56px;
-}
-
-.kando-page-f2 .message-card__quote-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 19px;
-}
-
-.kando-page-f2 .message-card__quote {
-  margin-top: -13px;
-  color: #0c429b;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 83px;
-  font-weight: 600;
-  line-height: 0.75;
-}
-
-.kando-page-f2 .message-card__lead {
-  margin: 10px 0 0;
-  color: var(--navy);
-  font-size: clamp(18px, 1.5vw, 22px);
-  font-weight: 550;
-  line-height: 1.35;
-}
-
-.kando-page-f2 .rule {
-  margin: 25px 0;
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.kando-page-f2 .rule__line {
-  height: 1.5px;
-  flex: 1;
-  background: rgba(221, 169, 31, 0.7);
-}
-
-.kando-page-f2 .rule__heart {
-  width: 20px;
-  height: 20px;
-  color: var(--gold);
-  fill: var(--gold);
-  stroke: var(--gold);
-}
-
-.kando-page-f2 .message-card__text {
-  margin: 0;
-  color: var(--navy);
-  font-size: clamp(16px, 1.28vw, 19px);
-  font-weight: 500;
-  line-height: 1.45;
-}
-
-.kando-page-f2 .message-card__image {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 548 / 462;
-  object-fit: cover;
-  object-position: center;
-}
-
 /* ========================= Footer ========================= */
 .kando-page-f2 .f2-site-footer {
   background: #0d3d87;
@@ -778,14 +703,6 @@
   .kando-page-f2 .f2-page-inner {
     padding-inline: 34px;
   }
-  .kando-page-f2 .layout {
-    grid-template-columns: minmax(0, 1fr) minmax(390px, 455px);
-    gap: 36px;
-  }
-  .kando-page-f2 .message-card__body {
-    min-height: 260px;
-    padding: 38px 42px 28px;
-  }
   .kando-page-f2 .actions {
     grid-template-columns: minmax(290px, 330px) minmax(0, 1fr);
     gap: 20px;
@@ -806,22 +723,9 @@
     font-size: 15px;
   }
   .kando-page-f2 .f2-page-inner { padding-top: 30px; }
-  .kando-page-f2 .layout {
-    margin-top: 24px;
-    grid-template-columns: 1fr;
-    gap: 42px;
-  }
+  .kando-page-f2 .layout { margin-top: 24px; }
   .kando-page-f2 .form-column { padding-top: 0; }
   .kando-page-f2 .form { width: min(100%, 790px); }
-  .kando-page-f2 .message-card {
-    width: min(100%, 650px);
-    margin: 0 auto;
-  }
-  .kando-page-f2 .message-card__body {
-    min-height: 0;
-    padding: 38px 52px 30px;
-  }
-  .kando-page-f2 .message-card__image { aspect-ratio: 548 / 420; }
   .kando-page-f2 .f2-site-footer__inner {
     grid-template-columns: 80px minmax(0, 1fr) 170px;
     gap: 18px;
@@ -913,11 +817,6 @@
     padding-left: 21px;
     font-size: 14px;
   }
-  .kando-page-f2 .message-card { border-radius: 18px; }
-  .kando-page-f2 .message-card__body { padding: 30px 27px 25px; }
-  .kando-page-f2 .message-card__quote { font-size: 65px; }
-  .kando-page-f2 .message-card__quote-row { gap: 12px; }
-  .kando-page-f2 .rule { margin-block: 21px; }
   .kando-page-f2 .footer__tagline { font-size: 18px; }
   .kando-page-f2 .footer__family .icon {
     width: 56px;
@@ -944,9 +843,6 @@
     width: 40px;
     height: 40px;
   }
-  .kando-page-f2 .message-card__body { padding-inline: 22px; }
-  .kando-page-f2 .message-card__lead { font-size: 17px; }
-  .kando-page-f2 .message-card__text { font-size: 15px; }
   .kando-page-f2 .footer__tagline {
     align-items: flex-start;
     font-size: 17px;

@@ -562,37 +562,6 @@ export const Form2Page: React.FC = () => {
                 </div>
               </form>
             </section>
-
-            <aside className="message-card" aria-label="Message from the Chairman">
-              <div className="message-card__body">
-                <div className="message-card__quote-row">
-                  <span className="message-card__quote" aria-hidden="true">"</span>
-                  <p className="message-card__lead">
-                    {t.form2ChairmanQuoteLine1}<br />
-                    {t.form2ChairmanQuoteLine2}
-                  </p>
-                </div>
-
-                <div className="rule" aria-hidden="true">
-                  <span className="rule__line"></span>
-                  <svg className="icon rule__heart">
-                    <use href="#f2-icon-heart"></use>
-                  </svg>
-                  <span className="rule__line"></span>
-                </div>
-
-                <p className="message-card__text">
-                  {t.form2ChairmanQuoteText}
-                </p>
-              </div>
-
-              <img
-                className="message-card__image"
-                src="/form2_card_image.jpg"
-                alt="Navy Yamaha gift box tied with a gold ribbon beside a handwritten thank-you note and a pen."
-                onError={(e) => { (e.target as HTMLImageElement).src = '/form2_card_image.png'; }}
-              />
-            </aside>
           </div>
 
           <div className="f2-mandatory-note">{t.mandatoryField}</div>
