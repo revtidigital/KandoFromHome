@@ -892,10 +892,11 @@ app.get('/api/admin/users', async (req, res) => {
 
     const totalUsers = await User.countDocuments(query);
     const users = await User.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit).lean();
+    const { f1Map, f2Map } = await fetchFormsForUsers(users.map(u => u._id));
 
-    const result = await Promise.all(users.map(async (user) => {
-      const f1 = await Form1.findOne({ userId: user._id }).lean();
-      const f2 = await Form2.findOne({ userId: user._id }).lean();
+    const result = users.map((user) => {
+      const f1 = f1Map.get(String(user._id));
+      const f2 = f2Map.get(String(user._id));
 
       return {
         id: user._id,
@@ -930,7 +931,7 @@ app.get('/api/admin/users', async (req, res) => {
           ip: f2.ip || ''
         } : null
       };
-    }));
+    });
 
     res.json({
       users: result,
@@ -1084,6 +1085,21 @@ app.delete('/api/admin/tags/:tag', async (req, res) => {
 
 // ── EXPORT ENDPOINTS ──
 
+// Bulk-fetches every Form1/Form2 for a set of userIds in 2 queries total
+// (instead of 2 queries PER user in a loop) and returns lookup Maps keyed by
+// userId string. At event scale (thousands of employees) the old N+1 pattern
+// meant a users-list page or export fired thousands of sequential/parallel
+// findOne() calls — this keeps it constant regardless of dataset size.
+async function fetchFormsForUsers(userIds) {
+  const [allF1, allF2] = await Promise.all([
+    Form1.find({ userId: { $in: userIds } }).lean(),
+    Form2.find({ userId: { $in: userIds } }).lean()
+  ]);
+  const f1Map = new Map(allF1.map(f => [String(f.userId), f]));
+  const f2Map = new Map(allF2.map(f => [String(f.userId), f]));
+  return { f1Map, f2Map };
+}
+
 // Shared by all export routes: honors an explicit checkbox selection (ids=)
 // or, when nothing is checked, the same search/tag/form filters currently
 // applied in the Users Directory table — so "Export" always matches what the
@@ -1112,13 +1128,21 @@ async function getUsersForExport(req) {
   let users = await User.find(query).lean();
 
   if (formType === 'form1' || formType === 'form2' || formType === 'both') {
-    users = (await Promise.all(users.map(async u => {
-      const f1 = formType !== 'form2' ? await Form1.findOne({ userId: u._id }).lean() : null;
-      const f2 = formType !== 'form1' ? await Form2.findOne({ userId: u._id }).lean() : null;
-      if (formType === 'form1') return f1 ? u : null;
-      if (formType === 'form2') return f2 ? u : null;
-      return (f1 && f2) ? u : null;
-    }))).filter(Boolean);
+    const userIds = users.map(u => u._id);
+    let matchIds;
+    if (formType === 'form1') {
+      matchIds = new Set((await Form1.distinct('userId', { userId: { $in: userIds } })).map(String));
+    } else if (formType === 'form2') {
+      matchIds = new Set((await Form2.distinct('userId', { userId: { $in: userIds } })).map(String));
+    } else {
+      const [f1Ids, f2Ids] = await Promise.all([
+        Form1.distinct('userId', { userId: { $in: userIds } }),
+        Form2.distinct('userId', { userId: { $in: userIds } })
+      ]);
+      const f2Set = new Set(f2Ids.map(String));
+      matchIds = new Set(f1Ids.map(String).filter(id => f2Set.has(id)));
+    }
+    users = users.filter(u => matchIds.has(String(u._id)));
   }
 
   return users;
@@ -1128,10 +1152,11 @@ app.get('/api/admin/export/users', exportLimiter, async (req, res) => {
   try {
     const format = req.query.format || 'csv';
     const users = await getUsersForExport(req);
+    const { f1Map, f2Map } = await fetchFormsForUsers(users.map(u => u._id));
 
     const rows = await Promise.all(users.map(async u => {
-      const f1 = await Form1.findOne({ userId: u._id });
-      const f2 = await Form2.findOne({ userId: u._id });
+      const f1 = f1Map.get(String(u._id));
+      const f2 = f2Map.get(String(u._id));
       return {
         'SUBMIT YOUR KANDO ENTRY Status': f1 ? 'Submitted' : 'Not Filled',
         'User ID': u._id.toString(),
@@ -1193,6 +1218,7 @@ app.get('/api/admin/export/users', exportLimiter, async (req, res) => {
 app.get('/api/admin/export/pdf', exportLimiter, async (req, res) => {
   try {
     const users = await getUsersForExport(req);
+    const { f1Map, f2Map } = await fetchFormsForUsers(users.map(u => u._id));
     await recordAuditLog(req, 'Generated Candidate Directory PDF Report', req.adminUser);
 
     let html = `
@@ -1247,8 +1273,8 @@ app.get('/api/admin/export/pdf', exportLimiter, async (req, res) => {
     const link = (url, label) => url ? `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${label}</a>` : '';
 
     for (const u of users) {
-      const f1 = await Form1.findOne({ userId: u._id });
-      const f2 = await Form2.findOne({ userId: u._id });
+      const f1 = f1Map.get(String(u._id));
+      const f2 = f2Map.get(String(u._id));
       const f1Photo1Url = f1 ? await signExportUrl(f1.photo1Url) : '';
       const f1Photo2Url = f1 ? await signExportUrl(f1.photo2Url) : '';
       const f1VideoUrl = f1 ? await signExportUrl(f1.videoUrl) : '';
@@ -1315,11 +1341,12 @@ async function appendR2FileToArchive(archive, url, name) {
 // Users Directory table is filtered by, so the zip matches what's on screen.
 async function buildExportArchive(archive, filterReq) {
   const users = await getUsersForExport(filterReq || { query: {} });
+  const { f1Map, f2Map } = await fetchFormsForUsers(users.map(u => u._id));
   const rows = [];
 
   for (const u of users) {
-    const f1 = await Form1.findOne({ userId: u._id });
-    const f2 = await Form2.findOne({ userId: u._id });
+    const f1 = f1Map.get(String(u._id));
+    const f2 = f2Map.get(String(u._id));
 
     const userKey = getUserFolder(u.empId, u.empName, u.phone);
 
