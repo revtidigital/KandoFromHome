@@ -2,7 +2,7 @@
    71st Yamaha Day 2026 — "Kando Space" Home Page Stylesheet
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Dancing+Script:wght@600;700&family=Playfair+Display:ital,wght@1,600;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Dancing+Script:wght@600;700&family=Playfair+Display:ital,wght@1,600;1,700&family=Fraunces:ital,wght@1,700;1,900&display=swap');
 
 .kando {
   --navy-900: #061437;
@@ -415,7 +415,7 @@
 }
 
 .kd-card-desc--subheading {
-  margin: 22px 0 28px;
+  margin: 22px 0 16px;
   padding-bottom: 8px;
   font-size: clamp(16px, 1.5vw, 19px);
   font-weight: 500;
@@ -429,7 +429,7 @@
 
 /* feature row */
 .kd-features {
-  margin: 30px 0 0;
+  margin: 14px 0 0;
   padding: 0;
   list-style: none;
   display: grid;
@@ -437,12 +437,12 @@
 }
 
 .kd-features li {
-  padding: 0 14px;
+  padding: 0 8px;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   font-family: 'Kozuka Gothic Pro', 'Outfit', sans-serif;
   font-size: 14.5px;
   font-weight: 400;
@@ -552,8 +552,8 @@
 
 .kd-quote-text p {
   margin: 0;
-  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
-  font-weight: 600;
+  font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+  font-weight: 900;
   font-style: italic;
   font-size: clamp(20px, 2.2vw, 31px);
   color: #f5f1e6;
@@ -632,7 +632,7 @@
   }
 
   .kd-features li {
-    padding: 0 8px;
+    padding: 0 6px;
   }
 }
 
@@ -821,6 +821,10 @@
     width: 100%;
     height: 340px;
     opacity: 0.22;
+  }
+
+  .kd-hero-photo--right {
+    display: none;
   }
 
   .kd-hero-copy {

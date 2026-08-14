@@ -1325,14 +1325,6 @@ export const AdminDashboardPage: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* CEO Reflection */}
-                  {selectedUserForProfile.form1.ceoReflection && (
-                    <div style={{ background: palette.subtleBg, padding: '16px', borderRadius: '12px', marginBottom: '18px' }}>
-                      <div style={{ fontSize: '0.72rem', color: '#4ADE80', fontWeight: 800, textTransform: 'uppercase', marginBottom: '8px' }}>Reflection Message (SUBMIT YOUR KANDO ENTRY)</div>
-                      <p style={{ margin: 0, color: palette.text, fontStyle: 'italic', lineHeight: 1.6 }}>"{selectedUserForProfile.form1.ceoReflection}"</p>
-                    </div>
-                  )}
-
                   {/* Media Buttons */}
                   <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                     {selectedUserForProfile.form1.photo1Url && (

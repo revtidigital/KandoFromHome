@@ -84,9 +84,9 @@ export const HomePage: React.FC = () => {
           {/* 1st image in left corner */}
           <img
             className="kd-hero-photo kd-hero-photo--left"
-            src="/image_5.webp"
+            src="/image_5.webp?v=2"
             alt="A family crafting blue and white decorations together at home"
-            onError={(e) => { (e.target as HTMLImageElement).src = '/image_5.png'; }}
+            onError={(e) => { (e.target as HTMLImageElement).src = '/image_5.png?v=2'; }}
           />
           {/* 2nd image in right corner */}
           <img
@@ -254,69 +254,6 @@ export const HomePage: React.FC = () => {
                 <p className="kd-card-desc kd-card-desc--subheading">
                   {t.form2CardDesc || 'Share your ideas and suggestions. Your thoughts help us grow better, together.'}
                 </p>
-
-                <ul className="kd-features">
-                  <li>
-                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path
-                        d="M3.4 9.2c0-2.4 2.6-4.3 5.8-4.3s5.8 1.9 5.8 4.3-2.6 4.4-5.8 4.4c-.7 0-1.4-.1-2-.2l-3.1 1.7.8-2.6a4.6 4.6 0 0 1-1.5-3.3Z"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M16.4 9.6c2.5.5 4.2 2.1 4.2 4 0 1.1-.6 2.2-1.5 3l.8 2.5-3.1-1.6c-.6.1-1.3.2-2 .2-2.2 0-4.1-.9-5.1-2.2"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    <span>{t.form2Step1}</span>
-                  </li>
-                  <li>
-                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path
-                        d="M12 3.3a5.5 5.5 0 0 1 3.2 9.9v2.1H8.8v-2.1A5.5 5.5 0 0 1 12 3.3Z"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M9.4 17.6h5.2M10.2 20h3.6"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                      />
-                      <path
-                        d="M3.6 9.2h1.8M18.6 9.2h1.8M5.6 3.9l1.3 1.3M17.1 5.2l1.3-1.3"
-                        stroke="currentColor"
-                        strokeWidth="1.4"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                    <span>{t.form2Step2}</span>
-                  </li>
-                  <li>
-                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <circle cx="12" cy="8.4" r="2.9" stroke="currentColor" strokeWidth="1.5" />
-                      <circle cx="4.9" cy="9.6" r="2.2" stroke="currentColor" strokeWidth="1.5" />
-                      <circle cx="19.1" cy="9.6" r="2.2" stroke="currentColor" strokeWidth="1.5" />
-                      <path
-                        d="M7.3 18.6c0-2.6 2.1-4.4 4.7-4.4s4.7 1.8 4.7 4.4"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                      />
-                      <path
-                        d="M1.7 17.6c0-2 1.4-3.3 3.2-3.3-.7 0-1.3.2-1.9.5M22.3 17.6c0-2-1.4-3.3-3.2-3.3-.7 0-1.3.2-1.9.5"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                    <span>{t.form2Step3}</span>
-                  </li>
-                </ul>
 
                 <div className="kd-cta kd-cta--tight">
                   <button className="kd-btn kd-btn--purple" type="button" onClick={() => navigateTo('form2')}>
