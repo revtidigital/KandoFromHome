@@ -528,7 +528,6 @@ export const Form1Page: React.FC = () => {
                       )}
                       <span>
                         <strong>{t.photo1Label}</strong>
-                        <small>{t.photoFormatsHint}</small>
                       </span>
                       {photo1Preview ? (
                         <span
@@ -570,7 +569,6 @@ export const Form1Page: React.FC = () => {
                       )}
                       <span>
                         <strong>{t.photo2Label}</strong>
-                        <small>{t.photoFormatsHint}</small>
                       </span>
                       {photo2Preview ? (
                         <span
@@ -608,7 +606,6 @@ export const Form1Page: React.FC = () => {
                       </svg>
                       <span>
                         <strong>{t.sec2UploadVideoTitle}</strong>
-                        <small>{t.videoFormatsHint}</small>
                       </span>
                       {videoPreview ? (
                         <span
