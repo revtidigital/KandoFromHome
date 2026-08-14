@@ -391,7 +391,7 @@ export const translations: Record<Language, Translations> = {
     privacySec4Title: "4. Data Retention & Deletion",
     privacySec4Body: "Campaign submissions will be retained for 180 days following the conclusion of 71st Yamaha Day 2026 for archiving and administrative reporting, after which non-featured personal media will be securely purged upon written request from the employee.",
     privacySec5Title: "5. Contact Data Protection Officer",
-    privacySec5Body: "For privacy inquiries or data rights requests, please contact the Internal Data Protection Committee at privacy@yamaha-motor.co.in.",
+    privacySec5Body: "For privacy inquiries or data rights requests, please contact the Internal Data Protection Committee through your HR representative.",
 
     termsConditionsTitle: "Campaign Terms & Media Rights Conditions",
     termsSubtitle: "71st Yamaha Day 2026 \"Kando From Home\" Official Campaign Guidelines",
@@ -621,7 +621,7 @@ export const translations: Record<Language, Translations> = {
     privacySec4Title: "4. डेटा अवधारण और विलोपन",
     privacySec4Body: "अभियान प्रविष्टियों को 71वां यामाहा दिवस 2026 के समापन के बाद 180 दिनों के लिए संग्रहीत किया जाएगा, जिसके बाद कर्मचारी के लिखित अनुरोध पर मीडिया को सुरक्षित रूप से हटा दिया जाएगा।",
     privacySec5Title: "5. डेटा संरक्षण अधिकारी से संपर्क करें",
-    privacySec5Body: "गोपनीयता पूछताछ या डेटा अधिकारों के अनुरोधों के लिए, कृपया आंतरिक डेटा संरक्षण समिति से privacy@yamaha-motor.co.in पर संपर्क करें।",
+    privacySec5Body: "गोपनीयता पूछताछ या डेटा अधिकारों के अनुरोधों के लिए, कृपया अपने HR प्रतिनिधि के माध्यम से आंतरिक डेटा संरक्षण समिति से संपर्क करें।",
 
     termsConditionsTitle: "अभियान नियम और मीडिया अधिकार शर्तें",
     termsSubtitle: "71वां यामाहा दिवस 2026 \"कांडो फ्रॉम होम\" आधिकारिक अभियान दिशानिर्देश",
@@ -851,7 +851,7 @@ export const translations: Record<Language, Translations> = {
     privacySec4Title: "4. தரவு நீக்கம்",
     privacySec4Body: "180 நாட்களுக்குப் பிறகு தரவு நீக்கப்படும்.",
     privacySec5Title: "5. தொடர்பு",
-    privacySec5Body: "privacy@yamaha-motor.co.in ஐத் தொடர்பு கொள்ளவும்.",
+    privacySec5Body: "தயவுசெய்து உங்கள் HR பிரதிநிதி மூலம் தொடர்பு கொள்ளவும்.",
 
     termsConditionsTitle: "பிரச்சார விதிமுறைகள்",
     termsSubtitle: "71வது யமஹா டே 2026 அதிகாரப்பூர்வ வழிகாட்டுதல்கள்",
