@@ -533,17 +533,19 @@ export const Form2Page: React.FC = () => {
                   </p>
                 )}
 
-                <div className="actions" style={{ gridTemplateColumns: canSkip ? 'auto auto' : undefined, justifyContent: 'flex-start' }}>
-                  <button className="submit" type="submit" disabled={isSubmitting || !canSubmit}>
-                    <svg className="icon icon--22" aria-hidden="true">
-                      <use href="#f2-icon-send"></use>
-                    </svg>
+                <div
+                  className="actions"
+                  style={canSkip
+                    ? { gridTemplateColumns: 'auto auto', justifyContent: 'center' }
+                    : { display: 'flex', justifyContent: 'center' }}
+                >
+                  <button
+                    className="submit"
+                    type="submit"
+                    disabled={isSubmitting || !canSubmit}
+                    style={canSkip ? undefined : { maxWidth: 360 }}
+                  >
                     <span className="submit__text">{isSubmitting ? 'Submitting...' : t.form2SubmitBtn}</span>
-                    <span className="submit__arrow" aria-hidden="true">
-                      <svg className="icon icon--16">
-                        <use href="#f2-icon-chevron-right"></use>
-                      </svg>
-                    </span>
                   </button>
 
                   {canSkip && (

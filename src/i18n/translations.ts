@@ -459,7 +459,7 @@ export const translations: Record<Language, Translations> = {
     form2BrowseOptionalLabel: "Browse (Optional) — Max Size: 50MB",
     form2BrowseFileCta: "Click to browse file (any format, max 50MB)",
     form2ConsentSuffix: "My response may be shared internally at Yamaha.",
-    form2SubmitBtn: "SUBMIT — Chairman's Invitation",
+    form2SubmitBtn: "Submit",
     form2PrivacyNoteBody: "Your response will be used only for 71st Yamaha Day 2026 activities and will not be shared outside the organization.",
   },
 
@@ -689,7 +689,7 @@ export const translations: Record<Language, Translations> = {
     form2BrowseOptionalLabel: "ब्राउज़ करें (वैकल्पिक) — अधिकतम आकार: 50MB",
     form2BrowseFileCta: "फ़ाइल ब्राउज़ करने के लिए क्लिक करें (कोई भी प्रारूप, अधिकतम 50MB)",
     form2ConsentSuffix: "मेरी प्रतिक्रिया यामाहा के भीतर आंतरिक रूप से साझा की जा सकती है।",
-    form2SubmitBtn: "जमा करें — चेयरमैन का निमंत्रण",
+    form2SubmitBtn: "जमा करें",
     form2PrivacyNoteBody: "आपकी प्रतिक्रिया केवल 71वां यामाहा दिवस 2026 गतिविधियों के लिए उपयोग की जाएगी और संगठन के बाहर साझा नहीं की जाएगी।",
   },
 
@@ -919,7 +919,7 @@ export const translations: Record<Language, Translations> = {
     form2BrowseOptionalLabel: "உலாவவும் (விருப்பத்தேர்வு) — அதிகபட்ச அளவு: 50MB",
     form2BrowseFileCta: "கோப்பை உலாவ கிளிக் செய்யவும் (எந்த வடிவமும், அதிகபட்சம் 50MB)",
     form2ConsentSuffix: "எனது பதில் யமஹாவுக்குள் பகிரப்படலாம்.",
-    form2SubmitBtn: "சமர்ப்பிக்கவும் — தலைவரின் அழைப்பு",
+    form2SubmitBtn: "சமர்ப்பிக்கவும்",
     form2PrivacyNoteBody: "உங்கள் பதில் 71வது யமஹா டே 2026 நடவடிக்கைகளுக்காக மட்டுமே பயன்படுத்தப்படும், நிறுவனத்திற்கு வெளியே பகிரப்படாது.",
   }
 };
