@@ -73,16 +73,15 @@ export const Form1Page: React.FC = () => {
   const [department, setDepartment] = useState('');
 
   // Submit stays disabled until every required field is filled, the
-  // Employee ID / Phone has been confirmed against the whitelist, and both
-  // consent checkboxes are checked.
+  // Employee ID / Phone has been confirmed against the whitelist, and the
+  // data consent checkbox is checked (media consent is optional).
   const canSubmit = Boolean(
     (empIdCheckStatus === 'valid' || phoneCheckStatus === 'valid') &&
     formData.empName.trim() &&
     formData.photo1 &&
     formData.photo2 &&
     video &&
-    dataConsent &&
-    mediaConsent
+    dataConsent
   );
 
   const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -204,9 +203,6 @@ export const Form1Page: React.FC = () => {
     // 4. Privacy Policy Consent
     if (!dataConsent) {
       newErrors.dataConsent = t.errConsentRequired;
-    }
-    if (!mediaConsent) {
-      newErrors.mediaConsent = t.errConsentRequired;
     }
 
     if (Object.keys(newErrors).length > 0) {
