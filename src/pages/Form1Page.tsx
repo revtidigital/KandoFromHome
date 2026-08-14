@@ -694,21 +694,6 @@ export const Form1Page: React.FC = () => {
                 )}
               </div>
 
-              {/* PRIVACY CARD */}
-              <aside className="privacy-card" aria-label="Privacy information">
-                <div className="privacy-icon" aria-hidden="true">
-                  <svg viewBox="0 0 54 54">
-                    <path className="shield" d="M27 4 46 11v14c0 12-7.8 20.7-19 25C15.8 45.7 8 37 8 25V11l19-7Z" />
-                    <rect x="20" y="23" width="14" height="13" rx="2" />
-                    <path d="M23 23v-4a4 4 0 0 1 8 0v4" />
-                  </svg>
-                </div>
-                <div>
-                  <strong>{t.privacyNoteTitle}</strong>
-                  <p>{t.form1PrivacyNoteBody}</p>
-                </div>
-              </aside>
-
               <button className="submit-button" type="submit" disabled={isSubmitting || !canSubmit}>
                 <svg className="submit-upload-icon" viewBox="0 0 28 28" aria-hidden="true">
                   <path d="M14 18V4m0 0L9 9m5-5 5 5M5 17v7h18v-7" />

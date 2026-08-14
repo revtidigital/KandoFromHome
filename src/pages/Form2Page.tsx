@@ -533,25 +533,6 @@ export const Form2Page: React.FC = () => {
                   </p>
                 )}
 
-                <div
-                  className="privacy"
-                  style={{
-                    marginTop: '20px', marginBottom: '16px',
-                    border: '1px solid var(--border, #e2e5ea)', borderRadius: '12px',
-                    padding: '14px 18px', background: 'rgba(0, 48, 135, 0.03)'
-                  }}
-                >
-                  <span className="privacy__badge" aria-hidden="true">
-                    <svg className="icon icon--22">
-                      <use href="#f2-icon-shield-check"></use>
-                    </svg>
-                  </span>
-                  <p className="privacy__text">
-                    <strong>{t.privacyNoteTitle}</strong>
-                    {t.form2PrivacyNoteBody}
-                  </p>
-                </div>
-
                 <div className="actions" style={{ gridTemplateColumns: canSkip ? 'auto auto' : undefined, justifyContent: 'flex-start' }}>
                   <button className="submit" type="submit" disabled={isSubmitting || !canSubmit}>
                     <svg className="icon icon--22" aria-hidden="true">
