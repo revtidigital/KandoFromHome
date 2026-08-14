@@ -521,16 +521,6 @@
   flex-wrap: wrap;
 }
 
-.kd-quote-bow {
-  width: 110px;
-  height: 94px;
-  flex: none;
-}
-
-.kd-quote-bow--right {
-  transform: scaleX(-1);
-}
-
 .kd-quote-text {
   text-align: center;
 }
@@ -882,11 +872,6 @@
   .kd-quote {
     padding: 22px 16px 24px;
     gap: 12px;
-  }
-
-  .kd-quote-bow {
-    width: 66px;
-    height: 56px;
   }
 
   .kd-footer {
