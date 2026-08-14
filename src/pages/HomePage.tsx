@@ -138,7 +138,13 @@ export const HomePage: React.FC = () => {
           <div className="kd-cards-wrap">
             <div className="kd-cards">
               {/* ---------------------------- Card 1 ---------------------------- */}
-              <article className="kd-card kd-card--blue">
+              <article
+                className="kd-card kd-card--blue kd-card--clickable"
+                role="button"
+                tabIndex={0}
+                onClick={() => navigateTo('form1')}
+                onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') navigateTo('form1'); }}
+              >
                 <svg
                   className="kd-card-wave"
                   viewBox="0 0 600 190"
@@ -194,72 +200,17 @@ export const HomePage: React.FC = () => {
                   </div>
                 </div>
 
-                <p className="kd-card-desc">{t.form1CardDesc || "Share your family's Kando Moment with us."}</p>
-
-                <ul className="kd-features">
-                  <li>
-                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path
-                        d="M3.5 10.3 12 3.6l8.5 6.7v9.1a1 1 0 0 1-1 1h-15a1 1 0 0 1-1-1z"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M12 16.9s-3.2-2-3.2-4.2a1.85 1.85 0 0 1 3.2-1.2 1.85 1.85 0 0 1 3.2 1.2c0 2.2-3.2 4.2-3.2 4.2Z"
-                        stroke="currentColor"
-                        strokeWidth="1.4"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    <span>{t.form1Step1}</span>
-                  </li>
-                  <li>
-                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path
-                        d="M4 8h2.6l1.4-2h8l1.4 2H20a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinejoin="round"
-                      />
-                      <circle cx="12" cy="13.4" r="3.4" stroke="currentColor" strokeWidth="1.5" />
-                    </svg>
-                    <span>{t.form1Step2}</span>
-                  </li>
-                  <li>
-                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path
-                        d="M7.2 18.2A4.2 4.2 0 0 1 7 9.9a5.3 5.3 0 0 1 10.2-1.2 3.8 3.8 0 0 1-.4 9.5"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M12 20.4v-8m0 0-2.6 2.6M12 12.4l2.6 2.6"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    <span>{t.form1Step3}</span>
-                  </li>
-                </ul>
-
-                <div className="kd-cta">
-                  <button
-                    className="kd-btn kd-btn--blue"
-                    type="button"
-                    onClick={() => navigateTo('form1')}
-                  >
-                    {t.form1CardBtn || 'Submit Entry'}
-                  </button>
-                </div>
+                <p className="kd-card-desc kd-card-desc--subheading">{t.form1CardDesc || "Share your family's Kando Moment with us."}</p>
               </article>
 
               {/* ---------------------------- Card 2 ---------------------------- */}
-              <article className="kd-card kd-card--purple">
+              <article
+                className="kd-card kd-card--purple kd-card--clickable"
+                role="button"
+                tabIndex={0}
+                onClick={() => navigateTo('form2')}
+                onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') navigateTo('form2'); }}
+              >
                 <svg
                   className="kd-card-wave"
                   viewBox="0 0 600 190"
@@ -308,82 +259,9 @@ export const HomePage: React.FC = () => {
                   </div>
                 </div>
 
-                <p className="kd-card-desc">
+                <p className="kd-card-desc kd-card-desc--subheading">
                   {t.form2CardDesc || 'Share your ideas and suggestions. Your thoughts help us grow better, together.'}
                 </p>
-
-                <ul className="kd-features">
-                  <li>
-                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path
-                        d="M3.4 9.2c0-2.4 2.6-4.3 5.8-4.3s5.8 1.9 5.8 4.3-2.6 4.4-5.8 4.4c-.7 0-1.4-.1-2-.2l-3.1 1.7.8-2.6a4.6 4.6 0 0 1-1.5-3.3Z"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M16.4 9.6c2.5.5 4.2 2.1 4.2 4 0 1.1-.6 2.2-1.5 3l.8 2.5-3.1-1.6c-.6.1-1.3.2-2 .2-2.2 0-4.1-.9-5.1-2.2"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    <span>{t.form2Step1}</span>
-                  </li>
-                  <li>
-                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path
-                        d="M12 3.3a5.5 5.5 0 0 1 3.2 9.9v2.1H8.8v-2.1A5.5 5.5 0 0 1 12 3.3Z"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M9.4 17.6h5.2M10.2 20h3.6"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                      />
-                      <path
-                        d="M3.6 9.2h1.8M18.6 9.2h1.8M5.6 3.9l1.3 1.3M17.1 5.2l1.3-1.3"
-                        stroke="currentColor"
-                        strokeWidth="1.4"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                    <span>{t.form2Step2}</span>
-                  </li>
-                  <li>
-                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <circle cx="12" cy="8.4" r="2.9" stroke="currentColor" strokeWidth="1.5" />
-                      <circle cx="4.9" cy="9.6" r="2.2" stroke="currentColor" strokeWidth="1.5" />
-                      <circle cx="19.1" cy="9.6" r="2.2" stroke="currentColor" strokeWidth="1.5" />
-                      <path
-                        d="M7.3 18.6c0-2.6 2.1-4.4 4.7-4.4s4.7 1.8 4.7 4.4"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                      />
-                      <path
-                        d="M1.7 17.6c0-2 1.4-3.3 3.2-3.3-.7 0-1.3.2-1.9.5M22.3 17.6c0-2-1.4-3.3-3.2-3.3-.7 0-1.3.2-1.9.5"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                    <span>{t.form2Step3}</span>
-                  </li>
-                </ul>
-
-                <div className="kd-cta">
-                  <button
-                    className="kd-btn kd-btn--purple"
-                    type="button"
-                    onClick={() => navigateTo('form2')}
-                  >
-                    {t.form2CardBtn || 'Share your thoughts'}
-                  </button>
-                </div>
               </article>
 
               <div className="kd-or" aria-hidden="true">{t.orDivider}</div>
