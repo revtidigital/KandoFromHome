@@ -601,25 +601,7 @@ export const Form2Page: React.FC = () => {
 
       {/* ============================== Footer ============================== */}
       <footer className="f2-site-footer">
-        <div className="f2-site-footer__inner">
-          <span className="footer__family" aria-hidden="true">
-            <svg className="icon">
-              <use href="#f2-icon-family"></use>
-            </svg>
-          </span>
-
-          <p className="footer__tagline">
-            <span>{t.footerQuote}</span>
-            <svg className="icon footer__heart" aria-hidden="true">
-              <use href="#f2-icon-heart"></use>
-            </svg>
-          </p>
-
-          <div className="footer__meta">
-            <p className="footer__day">71ST YAMAHA DAY 2026</p>
-            <p className="footer__kando">KANDO FROM HOME</p>
-          </div>
-        </div>
+        <div className="f2-site-footer__inner"></div>
       </footer>
     </div>
   );

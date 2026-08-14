@@ -723,29 +723,7 @@ export const Form1Page: React.FC = () => {
 
       {/* ============================== Footer ============================== */}
       <footer className="page-footer">
-        <div className="footer-inner">
-          <div className="footer-message footer-thanks">
-            <svg viewBox="0 0 54 62" aria-hidden="true">
-              <path d="M27 3 48 11v17c0 14-8.7 24.4-21 29C14.7 52.4 6 42 6 28V11l21-8Z" />
-              <path d="m18 29 6 6 13-15" />
-            </svg>
-            <div>
-              <strong>{t.form1ThankYouTitle}</strong>
-              <p>{t.form1ThankYouBody}</p>
-            </div>
-          </div>
-
-          <div className="footer-message footer-family">
-            <svg viewBox="0 0 92 66" aria-hidden="true">
-              <circle cx="46" cy="15" r="12" />
-              <circle cx="20" cy="23" r="9" />
-              <circle cx="72" cy="23" r="9" />
-              <path d="M28 58V39c0-10 8-17 18-17s18 7 18 17v19l-18 6-18-6Z" />
-              <path d="M28 37c-3-3-6-5-11-5-8 0-13 6-13 14v13h16l8-3M64 37c3-3 6-5 11-5 8 0 13 6 13 14v13H72l-8-3" />
-            </svg>
-            <p>{t.form1FooterFamilyText}</p>
-          </div>
-        </div>
+        <div className="footer-inner"></div>
       </footer>
     </div>
   );
