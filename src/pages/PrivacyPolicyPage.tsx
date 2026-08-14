@@ -89,7 +89,6 @@ export const PrivacyPolicyPage: React.FC = () => {
           <div className="pp-hero-copy">
             <span className="pp-eyebrow">71st Yamaha Day 2026 • Kando From Home</span>
             <h1>{t.privacyPolicyTitle}</h1>
-            <p>{t.privacySubtitle}</p>
           </div>
         </section>
 
