@@ -140,7 +140,7 @@ export const HomePage: React.FC = () => {
             </svg>
 
             <p className="kd-hero-note">
-              {t.landingSubtitle || "This Yamaha Day, let's celebrate the families behind every Yamaha action."}
+              {t.landingSubtitle || "This 71st Yamaha Day, let's celebrate the families behind every Yamaha action."}
             </p>
           </div>
 
@@ -429,7 +429,7 @@ export const HomePage: React.FC = () => {
 
       {/* ============================== Footer ============================= */}
       <footer className="kd-footer notranslate" translate="no">
-        <span>Yamaha Day 2026</span>
+        <span>71st Yamaha Day 2026</span>
         <span className="kd-footer-sep" aria-hidden="true"></span>
         <span>Kando from Home</span>
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">

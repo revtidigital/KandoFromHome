@@ -54,7 +54,7 @@ export const LandingPage: React.FC = () => {
           </div>
 
           {/* TOP RIGHT MICROSITE LOGO */}
-          <img src="/topright_badge.webp" onError={(e) => { (e.target as HTMLImageElement).src = '/topright_badge.png'; }} alt="Yamaha Day 2026 · Kando Together" style={{ height: '52px', width: 'auto' }} />
+          <img src="/topright_badge.webp" onError={(e) => { (e.target as HTMLImageElement).src = '/topright_badge.png'; }} alt="71st Yamaha Day 2026 · Kando Together" style={{ height: '52px', width: 'auto' }} />
         </header>
 
         {/* MAIN BODY AREA — FULL LEFT HALF (52% WIDTH, MAX 720PX) */}
@@ -94,7 +94,7 @@ export const LandingPage: React.FC = () => {
             <div style={{ textAlign: 'center' }}>
               <p className="landing-subtitle">
                 A feeling of joy, pride and togetherness.<br />
-                This Yamaha Day, create a special moment with your family<br />
+                This 71st Yamaha Day, create a special moment with your family<br />
                 and share it with Yamaha.
               </p>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '10px', width: 'min(420px, 90%)', marginLeft: 'auto', marginRight: 'auto' }}>

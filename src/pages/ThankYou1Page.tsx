@@ -215,7 +215,7 @@ export const ThankYou1Page: React.FC = () => {
           <span className="ty1-footer-separator" aria-hidden="true" />
 
           <div className="ty1-footer-day">
-            <strong>YAMAHA DAY 2026</strong>
+            <strong>71ST YAMAHA DAY 2026</strong>
             <span>KANDO FROM HOME</span>
           </div>
         </div>

@@ -93,7 +93,7 @@ export const ThankYou2Page: React.FC = () => {
           </div>
 
           <p style={{ fontSize: '0.95rem', color: '#A0B2D6', maxWidth: '550px', margin: '0 auto 24px auto', lineHeight: 1.5 }}>
-            For successfully creating and sharing their Family DIY Craft wall for <strong>Yamaha Day 2026 · Kando From Home</strong>.
+            For successfully creating and sharing their Family DIY Craft wall for <strong>71st Yamaha Day 2026 · Kando From Home</strong>.
           </p>
 
           <div style={{

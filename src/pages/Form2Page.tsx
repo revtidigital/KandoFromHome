@@ -635,7 +635,7 @@ export const Form2Page: React.FC = () => {
           </p>
 
           <div className="footer__meta">
-            <p className="footer__day">YAMAHA DAY 2026</p>
+            <p className="footer__day">71ST YAMAHA DAY 2026</p>
             <p className="footer__kando">KANDO FROM HOME</p>
           </div>
         </div>

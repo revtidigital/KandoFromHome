@@ -77,7 +77,7 @@ export const TermsConditionsPage: React.FC = () => {
           </div>
 
           <div className="tp-hero-copy">
-            <span className="tp-eyebrow">Yamaha Day 2026 • Kando From Home</span>
+            <span className="tp-eyebrow">71st Yamaha Day 2026 • Kando From Home</span>
             <h1>{t.termsConditionsTitle}</h1>
             <p>{t.termsSubtitle}</p>
           </div>

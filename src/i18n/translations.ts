@@ -234,8 +234,8 @@ export interface Translations {
 
 export const translations: Record<Language, Translations> = {
   en: {
-    siteTitle: "Yamaha Day 2026 · Kando From Home",
-    yamahaDay: "YAMAHA DAY 2026",
+    siteTitle: "71st Yamaha Day 2026 · Kando From Home",
+    yamahaDay: "71ST YAMAHA DAY 2026",
     kandoFromHome: "KANDO FROM HOME",
     copyright: "© 2026 Yamaha Motor India Group. All Rights Reserved.",
     home: "Home",
@@ -251,7 +251,7 @@ export const translations: Record<Language, Translations> = {
     welcomeToYour: "Welcome to Your",
     kandoSpace: "Kando Space",
     heroWelcomeSuffix: "",
-    landingSubtitle: "This Yamaha Day, let's celebrate the families behind every Yamaha action.",
+    landingSubtitle: "This 71st Yamaha Day, let's celebrate the families behind every Yamaha action.",
     chooseLanguage: "CHOOSE YOUR LANGUAGE",
     enterSite: "ENTER SITE >",
     footerQuote: "Behind every Yamaha action is a family that inspires it.",
@@ -270,10 +270,10 @@ export const translations: Record<Language, Translations> = {
     ty1Card2Text: "Encourage your colleagues to create and share their Kando Moments too.",
 
     // Home
-    homeHeroTitle: "Celebrate Yamaha Day 2026 at Home",
+    homeHeroTitle: "Celebrate 71st Yamaha Day 2026 at Home",
     homeHeroDesc: "Kando is a Japanese word for the simultaneous feelings of deep satisfaction and intense excitement that we experience when we encounter something of exceptional value. Build your DIY kit with your loved ones, share your creation, and join thousands of Yamaha families across India!",
     ceoMessageTitle: "A Special Message from Yamaha Leadership",
-    ceoMessageBody: "Dear Yamaha Family, on this Yamaha Day, we honor your dedication and the incredible support of your families. The Kando From Home DIY kit is our tribute to your joint creativity. We look forward to seeing your family's unique Kando moments!",
+    ceoMessageBody: "Dear Yamaha Family, on this 71st Yamaha Day, we honor your dedication and the incredible support of your families. The Kando From Home DIY kit is our tribute to your joint creativity. We look forward to seeing your family's unique Kando moments!",
     howItWorksTitle: "How to Participate",
     step1Title: "Assemble Your DIY Kit",
     step1Desc: "Unpack your Family Day DIY Kit and assemble the craft board together with your family.",
@@ -288,7 +288,7 @@ export const translations: Record<Language, Translations> = {
 
     // Home Cards
     chooseSubmissionFormTitle: "Choose Your Submission Form",
-    chooseSubmissionFormDesc: "Form 1 and Form 2 are independent. You can submit either or both forms for Yamaha Day 2026.",
+    chooseSubmissionFormDesc: "Form 1 and Form 2 are independent. You can submit either or both forms for 71st Yamaha Day 2026.",
     form1Badge: "SUBMIT YOUR KANDO ENTRY",
     form1CardTitle: "DIY Kit Creation & Photos",
     form1CardDesc: "Share your family's Kando Moment with us.",
@@ -349,7 +349,7 @@ export const translations: Record<Language, Translations> = {
     fileSelectedText: "File attached successfully",
 
     // Consents
-    dataConsentText: "I consent to Yamaha Motor India storing and processing my personal data for Yamaha Day 2026.",
+    dataConsentText: "I consent to Yamaha Motor India storing and processing my personal data for 71st Yamaha Day 2026.",
     mediaConsentText: "I grant permission to Yamaha Motor India Group to feature my family's photos & video in internal and promotional showcases.",
     submitForm1Btn: "Submit Form 1 & Proceed to CEO Question",
 
@@ -373,7 +373,7 @@ export const translations: Record<Language, Translations> = {
 
     // Thank You 2
     thankYou2Title: "Congratulations! Your Submission is Complete",
-    thankYou2Subtitle: "Thank you for participating in Yamaha Day 2026 Kando From Home. Your entry has been shortlisted for the admin review process.",
+    thankYou2Subtitle: "Thank you for participating in 71st Yamaha Day 2026 Kando From Home. Your entry has been shortlisted for the admin review process.",
     finalRefIdLabel: "Final Campaign Reference ID",
     certBadgeTitle: "Yamaha Kando Family Certified 2026",
     downloadCertBtn: "Download Digital Kando Certificate (PDF)",
@@ -383,18 +383,18 @@ export const translations: Record<Language, Translations> = {
     privacyPolicyTitle: "Data Privacy & PII Protection Policy",
     privacySubtitle: "Last Updated: 27 July 2026 | Compliant with Digital Personal Data Protection (DPDP) Standards",
     privacySec1Title: "1. Scope of Data Collection",
-    privacySec1Body: "For the Yamaha Day 2026 \"Kando From Home\" campaign, Yamaha Motor India Group collects employee personal information strictly required for identity validation and campaign administration. This includes Employee Full Name, Employee ID, Official Email Address, Contact Number, Plant/City Location, Family Participation Count, and uploaded media files (photos & video).",
+    privacySec1Body: "For the 71st Yamaha Day 2026 \"Kando From Home\" campaign, Yamaha Motor India Group collects employee personal information strictly required for identity validation and campaign administration. This includes Employee Full Name, Employee ID, Official Email Address, Contact Number, Plant/City Location, Family Participation Count, and uploaded media files (photos & video).",
     privacySec2Title: "2. Purpose & Media Consent",
-    privacySec2Body: "Personal data collected is used solely for validating participation, shortlisting winning family DIY entries, issuing digital certificates, and organizing Yamaha Day 2026 events. Uploaded photos and videos will only be featured in internal communications and promotional showcases where explicit consent has been provided during Form 1 submission.",
+    privacySec2Body: "Personal data collected is used solely for validating participation, shortlisting winning family DIY entries, issuing digital certificates, and organizing 71st Yamaha Day 2026 events. Uploaded photos and videos will only be featured in internal communications and promotional showcases where explicit consent has been provided during Form 1 submission.",
     privacySec3Title: "3. Data Storage, Encryption & Security",
     privacySec3Body: "All submitted data is stored securely in encrypted MongoDB databases and server object storage with signed URL access controls. Access is strictly restricted to authorized administrative personnel with role-based access controls and detailed audit logging.",
     privacySec4Title: "4. Data Retention & Deletion",
-    privacySec4Body: "Campaign submissions will be retained for 180 days following the conclusion of Yamaha Day 2026 for archiving and administrative reporting, after which non-featured personal media will be securely purged upon written request from the employee.",
+    privacySec4Body: "Campaign submissions will be retained for 180 days following the conclusion of 71st Yamaha Day 2026 for archiving and administrative reporting, after which non-featured personal media will be securely purged upon written request from the employee.",
     privacySec5Title: "5. Contact Data Protection Officer",
     privacySec5Body: "For privacy inquiries or data rights requests, please contact the Internal Data Protection Committee at privacy@yamaha-motor.co.in.",
 
     termsConditionsTitle: "Campaign Terms & Media Rights Conditions",
-    termsSubtitle: "Yamaha Day 2026 \"Kando From Home\" Official Campaign Guidelines",
+    termsSubtitle: "71st Yamaha Day 2026 \"Kando From Home\" Official Campaign Guidelines",
     termsSec1Title: "1. Eligibility",
     termsSec1Body: "The Kando From Home DIY Kit initiative is open to all active employees of Yamaha Motor India Group and their immediate family members across all corporate offices, manufacturing plants (Surajpur, Chennai, Kanchipuram), and regional sales locations.",
     termsSec2Title: "2. Submission Guidelines & File Specifications",
@@ -402,7 +402,7 @@ export const translations: Record<Language, Translations> = {
     termsSec3Title: "3. Originality & Safety",
     termsSec3Body: "All submissions must feature original DIY craft assembly completed by the employee and their family. Uploaded content must adhere to corporate conduct guidelines and contain no inappropriate material.",
     termsSec4Title: "4. Shortlisting & Recognition",
-    termsSec4Body: "Entries will be evaluated by the Yamaha Day 2026 Admin Committee based on creativity, family participation, and reflection alignment with Yamaha's spirit of Kando.",
+    termsSec4Body: "Entries will be evaluated by the 71st Yamaha Day 2026 Admin Committee based on creativity, family participation, and reflection alignment with Yamaha's spirit of Kando.",
 
     // Section Headings & Upload Labels
     sec1EmployeeDetailsTitle: "1. Employee & Family Details",
@@ -439,7 +439,7 @@ export const translations: Record<Language, Translations> = {
     consentAndWord: "and",
     consentPrivacyLink: "Privacy Policy",
     privacyNoteTitle: "Your privacy matters.",
-    form1PrivacyNoteBody: "Your information, photos and video will be used only for Yamaha Day 2026 activities and will not be shared outside the organization.",
+    form1PrivacyNoteBody: "Your information, photos and video will be used only for 71st Yamaha Day 2026 activities and will not be shared outside the organization.",
     form1SubmitBtn: "Submit DIY Kando Kit",
     form1MediaConsentText: "I grant Yamaha permission to feature my submission photos in internal publications.",
     form1ThankYouTitle: "Thank you!",
@@ -460,12 +460,12 @@ export const translations: Record<Language, Translations> = {
     form2BrowseFileCta: "Click to browse file (any format, max 50MB)",
     form2ConsentSuffix: "My response may be shared internally at Yamaha.",
     form2SubmitBtn: "SUBMIT — Chairman's Invitation",
-    form2PrivacyNoteBody: "Your response will be used only for Yamaha Day 2026 activities and will not be shared outside the organization.",
+    form2PrivacyNoteBody: "Your response will be used only for 71st Yamaha Day 2026 activities and will not be shared outside the organization.",
   },
 
   hi: {
-    siteTitle: "यामाहा दिवस 2026 · कांडो फ्रॉम होम",
-    yamahaDay: "यामाहा दिवस 2026",
+    siteTitle: "71वां यामाहा दिवस 2026 · कांडो फ्रॉम होम",
+    yamahaDay: "71वां यामाहा दिवस 2026",
     kandoFromHome: "कांडो फ्रॉम होम",
     copyright: "© 2026 यामाहा मोटर इंडिया ग्रुप। सर्वाधिकार सुरक्षित।",
     home: "होम",
@@ -481,7 +481,7 @@ export const translations: Record<Language, Translations> = {
     welcomeToYour: "आपके",
     kandoSpace: "कांडो स्पेस",
     heroWelcomeSuffix: "में स्वागत है",
-    landingSubtitle: "आनंद, गर्व और एकजुटता की भावना। इस यामाहा दिवस पर, अपने परिवार के साथ एक विशेष क्षण बनाएं और इसे यामाहा के साथ साझा करें।",
+    landingSubtitle: "आनंद, गर्व और एकजुटता की भावना। इस 71वें यामाहा दिवस पर, अपने परिवार के साथ एक विशेष क्षण बनाएं और इसे यामाहा के साथ साझा करें।",
     chooseLanguage: "अपनी भाषा चुनें",
     enterSite: "साइट में प्रवेश करें >",
     footerQuote: "यामाहा के हर कार्य के पीछे एक परिवार है जो इसे प्रेरित करता है।",
@@ -500,10 +500,10 @@ export const translations: Record<Language, Translations> = {
     ty1Card2Text: "अपने सहयोगियों को भी अपने कांडो मोमेंट्स बनाने और साझा करने के लिए प्रोत्साहित करें।",
 
     // Home
-    homeHeroTitle: "घर पर मनाएं यामाहा दिवस 2026",
+    homeHeroTitle: "घर पर मनाएं 71वां यामाहा दिवस 2026",
     homeHeroDesc: "कांडो (Kando) एक जापानी शब्द है जिसका अर्थ है गहरा संतोष और उत्साह। अपने प्रियजनों के साथ DIY किट बनाएं, अपनी रचना साझा करें, और भारत भर के हजारों यामाहा परिवारों से जुड़ें!",
     ceoMessageTitle: "यामाहा नेतृत्व से एक विशेष संदेश",
-    ceoMessageBody: "प्रिय यामाहा परिवार, इस यामाहा दिवस पर हम आपके समर्पण और आपके परिवारों के अद्भुत समर्थन का सम्मान करते हैं। कांडो फ्रॉम होम DIY किट आपकी संयुक्त रचनात्मकता को हमारी श्रद्धांजलि है।",
+    ceoMessageBody: "प्रिय यामाहा परिवार, इस 71वें यामाहा दिवस पर हम आपके समर्पण और आपके परिवारों के अद्भुत समर्थन का सम्मान करते हैं। कांडो फ्रॉम होम DIY किट आपकी संयुक्त रचनात्मकता को हमारी श्रद्धांजलि है।",
     howItWorksTitle: "भाग कैसे लें",
     step1Title: "अपनी DIY किट असेंबल करें",
     step1Desc: "अपनी फैमिली डे DIY किट खोलें और अपने परिवार के साथ मिलकर क्राफ्ट बोर्ड असेंबल करें।",
@@ -518,7 +518,7 @@ export const translations: Record<Language, Translations> = {
 
     // Home Cards
     chooseSubmissionFormTitle: "अपना प्रविष्टि फॉर्म चुनें",
-    chooseSubmissionFormDesc: "फॉर्म 1 और फॉर्म 2 स्वतंत्र हैं। आप यामाहा दिवस 2026 के लिए इनमें से कोई भी या दोनों फॉर्म जमा कर सकते हैं।",
+    chooseSubmissionFormDesc: "फॉर्म 1 और फॉर्म 2 स्वतंत्र हैं। आप 71वां यामाहा दिवस 2026 के लिए इनमें से कोई भी या दोनों फॉर्म जमा कर सकते हैं।",
     form1Badge: "अपनी कांडो प्रविष्टि जमा करें",
     form1CardTitle: "DIY किट निर्माण और तस्वीरें",
     form1CardDesc: "अपने परिवार का कांडो मोमेंट हमारे साथ साझा करें।",
@@ -579,7 +579,7 @@ export const translations: Record<Language, Translations> = {
     fileSelectedText: "फ़ाइल सफलतापूर्वक संलग्न की गई",
 
     // Consents
-    dataConsentText: "मैं यामाहा दिवस 2026 के लिए अपने व्यक्तिगत डेटा को संग्रहीत और संसाधित करने की सहमति देता हूं।",
+    dataConsentText: "मैं 71वां यामाहा दिवस 2026 के लिए अपने व्यक्तिगत डेटा को संग्रहीत और संसाधित करने की सहमति देता हूं।",
     mediaConsentText: "मैं यामाहा मोटर इंडिया ग्रुप को आंतरिक और प्रचार प्रदर्शनों में अपने परिवार की तस्वीरों और वीडियो को प्रदर्शित करने की अनुमति देता हूं।",
     submitForm1Btn: "फॉर्म 1 जमा करें और सीईओ प्रश्न पर जाएं",
 
@@ -603,7 +603,7 @@ export const translations: Record<Language, Translations> = {
 
     // Thank You 2
     thankYou2Title: "बधाई हो! आपकी प्रविष्टि पूरी हो गई है",
-    thankYou2Subtitle: "यामाहा दिवस 2026 कांडो फ्रॉम होम में भाग लेने के लिए धन्यवाद। आपकी प्रविष्टि को प्रशासनिक समीक्षा के लिए शॉर्टलिस्ट कर लिया गया है।",
+    thankYou2Subtitle: "71वां यामाहा दिवस 2026 कांडो फ्रॉम होम में भाग लेने के लिए धन्यवाद। आपकी प्रविष्टि को प्रशासनिक समीक्षा के लिए शॉर्टलिस्ट कर लिया गया है।",
     finalRefIdLabel: "अंतिम अभियान संदर्भ आईडी",
     certBadgeTitle: "यामाहा कांडो फैमिली सर्टिफाइड 2026",
     downloadCertBtn: "डिजिटल कांडो प्रमाणपत्र डाउनलोड करें (PDF)",
@@ -613,18 +613,18 @@ export const translations: Record<Language, Translations> = {
     privacyPolicyTitle: "डेटा गोपनीयता और PII सुरक्षा नीति",
     privacySubtitle: "अंतिम अद्यतन: 27 जुलाई 2026 | डिजिटल व्यक्तिगत डेटा संरक्षण (DPDP) मानकों के अनुरूप",
     privacySec1Title: "1. डेटा संग्रह का दायरा",
-    privacySec1Body: "यामाहा दिवस 2026 \"कांडो फ्रॉम होम\" अभियान के लिए, यामाहा मोटर इंडिया ग्रुप केवल पहचान सत्यापन और अभियान प्रशासन के लिए आवश्यक कर्मचारी व्यक्तिगत जानकारी एकत्र करता है। इसमें कर्मचारी का पूरा नाम, कर्मचारी आईडी, आधिकारिक ईमेल पता, संपर्क नंबर, प्लांट/शहर का स्थान, परिवार की भागीदारी संख्या और अपलोड की गई मीडिया फ़ाइलें शामिल हैं।",
+    privacySec1Body: "71वां यामाहा दिवस 2026 \"कांडो फ्रॉम होम\" अभियान के लिए, यामाहा मोटर इंडिया ग्रुप केवल पहचान सत्यापन और अभियान प्रशासन के लिए आवश्यक कर्मचारी व्यक्तिगत जानकारी एकत्र करता है। इसमें कर्मचारी का पूरा नाम, कर्मचारी आईडी, आधिकारिक ईमेल पता, संपर्क नंबर, प्लांट/शहर का स्थान, परिवार की भागीदारी संख्या और अपलोड की गई मीडिया फ़ाइलें शामिल हैं।",
     privacySec2Title: "2. उद्देश्य और मीडिया सहमति",
-    privacySec2Body: "एकत्रित व्यक्तिगत डेटा का उपयोग केवल भागीदारी को सत्यापित करने, विजेता पारिवारिक DIY प्रविष्टियों को शॉर्टलिस्ट करने, डिजिटल प्रमाणपत्र जारी करने और यामाहा दिवस 2026 कार्यक्रमों का आयोजन करने के लिए किया जाता है। अपलोड की गई तस्वीरें और वीडियो केवल आंतरिक संचार और प्रचार प्रदर्शनों में दिखाए जाएंगे जहां सहमति प्रदान की गई है।",
+    privacySec2Body: "एकत्रित व्यक्तिगत डेटा का उपयोग केवल भागीदारी को सत्यापित करने, विजेता पारिवारिक DIY प्रविष्टियों को शॉर्टलिस्ट करने, डिजिटल प्रमाणपत्र जारी करने और 71वां यामाहा दिवस 2026 कार्यक्रमों का आयोजन करने के लिए किया जाता है। अपलोड की गई तस्वीरें और वीडियो केवल आंतरिक संचार और प्रचार प्रदर्शनों में दिखाए जाएंगे जहां सहमति प्रदान की गई है।",
     privacySec3Title: "3. डेटा संग्रहण, एन्क्रिप्शन और सुरक्षा",
     privacySec3Body: "सभी जमा किया गया डेटा एन्क्रिप्टेड MongoDB डेटाबेस और सर्वर ऑब्जेक्ट स्टोरेज में सुरक्षित रूप से संग्रहीत किया जाता है। पहुँच केवल अधिकृत प्रशासनिक कर्मियों तक ही सीमित है।",
     privacySec4Title: "4. डेटा अवधारण और विलोपन",
-    privacySec4Body: "अभियान प्रविष्टियों को यामाहा दिवस 2026 के समापन के बाद 180 दिनों के लिए संग्रहीत किया जाएगा, जिसके बाद कर्मचारी के लिखित अनुरोध पर मीडिया को सुरक्षित रूप से हटा दिया जाएगा।",
+    privacySec4Body: "अभियान प्रविष्टियों को 71वां यामाहा दिवस 2026 के समापन के बाद 180 दिनों के लिए संग्रहीत किया जाएगा, जिसके बाद कर्मचारी के लिखित अनुरोध पर मीडिया को सुरक्षित रूप से हटा दिया जाएगा।",
     privacySec5Title: "5. डेटा संरक्षण अधिकारी से संपर्क करें",
     privacySec5Body: "गोपनीयता पूछताछ या डेटा अधिकारों के अनुरोधों के लिए, कृपया आंतरिक डेटा संरक्षण समिति से privacy@yamaha-motor.co.in पर संपर्क करें।",
 
     termsConditionsTitle: "अभियान नियम और मीडिया अधिकार शर्तें",
-    termsSubtitle: "यामाहा दिवस 2026 \"कांडो फ्रॉम होम\" आधिकारिक अभियान दिशानिर्देश",
+    termsSubtitle: "71वां यामाहा दिवस 2026 \"कांडो फ्रॉम होम\" आधिकारिक अभियान दिशानिर्देश",
     termsSec1Title: "1. पात्रता",
     termsSec1Body: "कांडो फ्रॉम होम DIY किट पहल यामाहा मोटर इंडिया ग्रुप के सभी सक्रिय कर्मचारियों और उनके निकटतम परिवार के सदस्यों के लिए खुली है।",
     termsSec2Title: "2. प्रविष्टि दिशानिर्देश और फ़ाइल विनिर्देश",
@@ -632,7 +632,7 @@ export const translations: Record<Language, Translations> = {
     termsSec3Title: "3. मौलिकता और सुरक्षा",
     termsSec3Body: "सभी प्रविष्टियों में कर्मचारी और उनके परिवार द्वारा पूरी की गई मूल DIY क्राफ्ट असेंबली होनी चाहिए।",
     termsSec4Title: "4. शॉर्टलिस्टिंग और मान्यता",
-    termsSec4Body: "प्रविष्टियों का मूल्यांकन यामाहा दिवस 2026 प्रशासन समिति द्वारा रचनात्मकता और पारिवारिक भागीदारी के आधार पर किया जाएगा।",
+    termsSec4Body: "प्रविष्टियों का मूल्यांकन 71वां यामाहा दिवस 2026 प्रशासन समिति द्वारा रचनात्मकता और पारिवारिक भागीदारी के आधार पर किया जाएगा।",
 
     // Section Headings & Upload Labels
     sec1EmployeeDetailsTitle: "1. कर्मचारी और परिवार विवरण",
@@ -669,7 +669,7 @@ export const translations: Record<Language, Translations> = {
     consentAndWord: "और",
     consentPrivacyLink: "गोपनीयता नीति",
     privacyNoteTitle: "आपकी गोपनीयता मायने रखती है।",
-    form1PrivacyNoteBody: "आपकी जानकारी, तस्वीरें और वीडियो केवल यामाहा दिवस 2026 गतिविधियों के लिए उपयोग की जाएंगी और संगठन के बाहर साझा नहीं की जाएंगी।",
+    form1PrivacyNoteBody: "आपकी जानकारी, तस्वीरें और वीडियो केवल 71वां यामाहा दिवस 2026 गतिविधियों के लिए उपयोग की जाएंगी और संगठन के बाहर साझा नहीं की जाएंगी।",
     form1SubmitBtn: "DIY कांडो किट जमा करें",
     form1MediaConsentText: "मैं यामाहा को आंतरिक प्रकाशनों में अपनी प्रविष्टि की तस्वीरें प्रदर्शित करने की अनुमति देता हूं।",
     form1ThankYouTitle: "धन्यवाद!",
@@ -690,12 +690,12 @@ export const translations: Record<Language, Translations> = {
     form2BrowseFileCta: "फ़ाइल ब्राउज़ करने के लिए क्लिक करें (कोई भी प्रारूप, अधिकतम 50MB)",
     form2ConsentSuffix: "मेरी प्रतिक्रिया यामाहा के भीतर आंतरिक रूप से साझा की जा सकती है।",
     form2SubmitBtn: "जमा करें — चेयरमैन का निमंत्रण",
-    form2PrivacyNoteBody: "आपकी प्रतिक्रिया केवल यामाहा दिवस 2026 गतिविधियों के लिए उपयोग की जाएगी और संगठन के बाहर साझा नहीं की जाएगी।",
+    form2PrivacyNoteBody: "आपकी प्रतिक्रिया केवल 71वां यामाहा दिवस 2026 गतिविधियों के लिए उपयोग की जाएगी और संगठन के बाहर साझा नहीं की जाएगी।",
   },
 
   ta: {
-    siteTitle: "யமஹா டே 2026 · காண்டோ ஃப்ரம் ஹோம்",
-    yamahaDay: "யமஹா டே 2026",
+    siteTitle: "71வது யமஹா டே 2026 · காண்டோ ஃப்ரம் ஹோம்",
+    yamahaDay: "71வது யமஹா டே 2026",
     kandoFromHome: "காண்டோ ஃப்ரம் ஹோம்",
     copyright: "© 2026 யமஹா மோட்டார் இந்தியா குரூப். அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.",
     home: "முகப்பு",
@@ -730,7 +730,7 @@ export const translations: Record<Language, Translations> = {
     ty1Card2Text: "உங்கள் சக ஊழியர்களையும் அவர்களின் காண்டோ தருணங்களை உருவாக்கி பகிர ஊக்குவியுங்கள்.",
 
     // Home
-    homeHeroTitle: "வீட்டில் யமஹா டே 2026 ஐக் கொண்டாடுங்கள்",
+    homeHeroTitle: "வீட்டில் 71வது யமஹா டே 2026 ஐக் கொண்டாடுங்கள்",
     homeHeroDesc: "காண்டோ (Kando) என்பது ஜப்பானிய வார்த்தை, இது மிகுந்த திருப்தியையும் உற்சாகத்தையும் குறிக்கிறது. உங்கள் குடும்பத்துடன் DIY கிட் உருவாக்கி யமஹா குடும்பங்களுடன் இணையுங்கள்!",
     ceoMessageTitle: "யமஹா தலைமையின் சிறப்பு செய்தி",
     ceoMessageBody: "அன்பான யமஹா குடும்பமே, இந்த யமஹா நாளில் உங்கள் அர்ப்பணிப்பையும் உங்கள் குடும்பத்தினரின் ஆதரவையும் நாங்கள் கவுரவிக்கிறோம்.",
@@ -809,7 +809,7 @@ export const translations: Record<Language, Translations> = {
     fileSelectedText: "கோப்பு வெற்றிகரமாக இணைக்கப்பட்டது",
 
     // Consents
-    dataConsentText: "யமஹா டே 2026 க்காக எனது தனிப்பட்ட தரவைச் சேமிக்க நான் ஒப்புக்கொள்கிறேன்.",
+    dataConsentText: "71வது யமஹா டே 2026 க்காக எனது தனிப்பட்ட தரவைச் சேமிக்க நான் ஒப்புக்கொள்கிறேன்.",
     mediaConsentText: "எனது குடும்பப் படங்களை விளம்பரங்களில் பயன்படுத்த யமஹா மோட்டார் இந்தியா குழுவிற்கு அனுமதி வழங்குகிறேன்.",
     submitForm1Btn: "படிவம் 1 சமர்ப்பித்து சிஇஓ கேள்விக்குச் செல்லவும்",
 
@@ -833,7 +833,7 @@ export const translations: Record<Language, Translations> = {
 
     // Thank You 2
     thankYou2Title: "வாழ்த்துக்கள்! உங்கள் சமர்ப்பிப்பு முடிந்தது",
-    thankYou2Subtitle: "யமஹா டே 2026 காண்டோ ஃப்ரம் ஹோமில் பங்கேற்றதற்கு நன்றி. உங்கள் பதிவு தேர்வுக்கு பரிசீலிக்கப்படும்.",
+    thankYou2Subtitle: "71வது யமஹா டே 2026 காண்டோ ஃப்ரம் ஹோமில் பங்கேற்றதற்கு நன்றி. உங்கள் பதிவு தேர்வுக்கு பரிசீலிக்கப்படும்.",
     finalRefIdLabel: "இறுதி பிரச்சார குறிப்பு ஐடி",
     certBadgeTitle: "யமஹா காண்டோ சான்றளிக்கப்பட்ட குடும்பம் 2026",
     downloadCertBtn: "டிஜிட்டல் சான்றிதழைப் பதிவிறக்கவும் (PDF)",
@@ -843,7 +843,7 @@ export const translations: Record<Language, Translations> = {
     privacyPolicyTitle: "தரவு தனியுரிமை கொள்கை",
     privacySubtitle: "கடைசியாகப் புதுப்பிக்கப்பட்டது: 27 ஜூலை 2026",
     privacySec1Title: "1. சேகரிக்கப்படும் தரவு",
-    privacySec1Body: "யமஹா டே 2026 பிரச்சாரத்திற்காக பணியாளர் பெயர், ஐடி, மின்னஞ்சல், தொலைபேசி மற்றும் புகைப்படங்கள் சேகரிக்கப்படுகின்றன.",
+    privacySec1Body: "71வது யமஹா டே 2026 பிரச்சாரத்திற்காக பணியாளர் பெயர், ஐடி, மின்னஞ்சல், தொலைபேசி மற்றும் புகைப்படங்கள் சேகரிக்கப்படுகின்றன.",
     privacySec2Title: "2. நோக்கம்",
     privacySec2Body: "சான்றிதழ் வழங்கவும் தேர்வுகளை நடத்தவும் தரவு பயன்படுத்தப்படும்.",
     privacySec3Title: "3. பாதுகாப்பு",
@@ -854,7 +854,7 @@ export const translations: Record<Language, Translations> = {
     privacySec5Body: "privacy@yamaha-motor.co.in ஐத் தொடர்பு கொள்ளவும்.",
 
     termsConditionsTitle: "பிரச்சார விதிமுறைகள்",
-    termsSubtitle: "யமஹா டே 2026 அதிகாரப்பூர்வ வழிகாட்டுதல்கள்",
+    termsSubtitle: "71வது யமஹா டே 2026 அதிகாரப்பூர்வ வழிகாட்டுதல்கள்",
     termsSec1Title: "1. தகுதி",
     termsSec1Body: "யமஹா மோட்டார் இந்தியா குழுமத்தின் அனைத்து ஊழியர்களும் அவர்களின் குடும்பத்தினரும் பங்கேற்கலாம்.",
     termsSec2Title: "2. கோப்பு விவரங்கள்",
@@ -899,7 +899,7 @@ export const translations: Record<Language, Translations> = {
     consentAndWord: "மற்றும்",
     consentPrivacyLink: "தனியுரிமைக் கொள்கை",
     privacyNoteTitle: "உங்கள் தனியுரிமை முக்கியம்.",
-    form1PrivacyNoteBody: "உங்கள் தகவல், படங்கள் மற்றும் வீடியோ யமஹா டே 2026 நடவடிக்கைகளுக்காக மட்டுமே பயன்படுத்தப்படும், நிறுவனத்திற்கு வெளியே பகிரப்படாது.",
+    form1PrivacyNoteBody: "உங்கள் தகவல், படங்கள் மற்றும் வீடியோ 71வது யமஹா டே 2026 நடவடிக்கைகளுக்காக மட்டுமே பயன்படுத்தப்படும், நிறுவனத்திற்கு வெளியே பகிரப்படாது.",
     form1SubmitBtn: "DIY காண்டோ கிட் சமர்ப்பிக்கவும்",
     form1MediaConsentText: "எனது சமர்ப்பிப்பு படங்களை உள் வெளியீடுகளில் காட்ட யமஹாவுக்கு அனுமதி வழங்குகிறேன்.",
     form1ThankYouTitle: "நன்றி!",
@@ -920,6 +920,6 @@ export const translations: Record<Language, Translations> = {
     form2BrowseFileCta: "கோப்பை உலாவ கிளிக் செய்யவும் (எந்த வடிவமும், அதிகபட்சம் 50MB)",
     form2ConsentSuffix: "எனது பதில் யமஹாவுக்குள் பகிரப்படலாம்.",
     form2SubmitBtn: "சமர்ப்பிக்கவும் — தலைவரின் அழைப்பு",
-    form2PrivacyNoteBody: "உங்கள் பதில் யமஹா டே 2026 நடவடிக்கைகளுக்காக மட்டுமே பயன்படுத்தப்படும், நிறுவனத்திற்கு வெளியே பகிரப்படாது.",
+    form2PrivacyNoteBody: "உங்கள் பதில் 71வது யமஹா டே 2026 நடவடிக்கைகளுக்காக மட்டுமே பயன்படுத்தப்படும், நிறுவனத்திற்கு வெளியே பகிரப்படாது.",
   }
 };

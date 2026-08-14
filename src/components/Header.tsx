@@ -47,7 +47,7 @@ export const Header: React.FC = () => {
             <div className="header-divider" style={{ width: '1px', height: '24px', background: 'rgba(255, 255, 255, 0.2)' }} />
 
             <div className="header-subtitle" style={{ display: 'flex', flexDirection: 'column' }}>
-              <span style={{ fontSize: '0.65rem', color: '#00E5FF', fontWeight: 700, letterSpacing: '1px' }}>YAMAHA DAY 2026</span>
+              <span style={{ fontSize: '0.65rem', color: '#00E5FF', fontWeight: 700, letterSpacing: '1px' }}>71ST YAMAHA DAY 2026</span>
               <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-main)' }}>
                 ADMIN PORTAL
               </span>
@@ -65,7 +65,7 @@ export const Header: React.FC = () => {
             <div className="header-divider" style={{ width: '1px', height: '24px', background: 'rgba(255, 255, 255, 0.2)' }} />
 
             <div className="header-subtitle" style={{ display: 'flex', flexDirection: 'column' }}>
-              <span style={{ fontSize: '0.65rem', color: '#D1B07B', fontWeight: 700, letterSpacing: '1px' }}>YAMAHA DAY 2026</span>
+              <span style={{ fontSize: '0.65rem', color: '#D1B07B', fontWeight: 700, letterSpacing: '1px' }}>71ST YAMAHA DAY 2026</span>
               <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-main)' }}>
                 KANDO FROM HOME
               </span>
