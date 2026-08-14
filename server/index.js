@@ -132,6 +132,7 @@ const Form1Schema = new mongoose.Schema({
   photo2Url: { type: String },
   videoUrl: { type: String },
   ceoReflection: { type: String },
+  mediaConsent: { type: Boolean, default: false },
   language: { type: String, default: 'en' },
   submittedAt: { type: Date, default: Date.now },
   ip: { type: String }
@@ -251,7 +252,7 @@ app.post('/api/submissions/form1', (req, res, next) => {
   });
 }, async (req, res) => {
   try {
-    const { empId, empName, email, phone, city, familyMembers, ceoReflection, language } = req.body || {};
+    const { empId, empName, email, phone, city, familyMembers, ceoReflection, language, mediaConsent } = req.body || {};
     
     if (!empId || !empName || !email) {
       return res.status(400).json({ error: 'Missing required user details.' });
@@ -339,6 +340,7 @@ app.post('/api/submissions/form1', (req, res, next) => {
       photo2Url,
       videoUrl,
       ceoReflection: ceoReflection || '',
+      mediaConsent: mediaConsent === 'true' || mediaConsent === true,
       language: language || 'en',
       ip
     });
@@ -480,6 +482,7 @@ app.get('/api/admin/users', async (req, res) => {
           photo2Url: f1.photo2Url,
           videoUrl: f1.videoUrl || '',
           ceoReflection: f1.ceoReflection || '',
+          mediaConsent: !!f1.mediaConsent,
           language: f1.language,
           ip: f1.ip || ''
         } : null,
@@ -658,6 +661,7 @@ app.get('/api/admin/export/users', async (req, res) => {
         'Form 1 CEO Reflection': f1 ? f1.ceoReflection : '',
         'Form 1 Language': f1 ? f1.language : '',
         'Form 1 Submitted At': f1 ? new Date(f1.submittedAt).toLocaleString() : '',
+        'Permission to Feature': f1 ? (f1.mediaConsent ? 'Yes' : 'No') : '',
         'Form 2 Status': f2 ? 'Submitted' : 'Not Filled',
         'Form 2 Company Name': f2 ? f2.companyName : '',
         'Form 2 Department': f2 ? f2.department : '',
@@ -726,6 +730,7 @@ app.get('/api/admin/export/pdf', async (req, res) => {
               <th>City Location</th>
               <th>Form 1 CEO Reflection</th>
               <th>Form 1 Language</th>
+              <th>Permission to Feature</th>
               <th>Form 2 Company</th>
               <th>Form 2 Department</th>
               <th>Form 2 Location</th>
@@ -750,6 +755,7 @@ app.get('/api/admin/export/pdf', async (req, res) => {
           <td>${esc(u.city || 'N/A')}</td>
           <td>${f1 ? esc(f1.ceoReflection) : 'Not Filled'}</td>
           <td>${f1 ? esc(f1.language) : ''}</td>
+          <td>${f1 ? (f1.mediaConsent ? 'Yes' : 'No') : ''}</td>
           <td>${f2 ? esc(f2.companyName) : 'Not Filled'}</td>
           <td>${f2 ? esc(f2.department) : ''}</td>
           <td>${f2 ? esc(f2.location) : ''}</td>
@@ -803,6 +809,7 @@ app.get('/api/admin/export/zip', async (req, res) => {
         'Form 1 Video': f1 ? f1.videoUrl : '',
         'Form 1 CEO Reflection': f1 ? f1.ceoReflection : '',
         'Form 1 Language': f1 ? f1.language : '',
+        'Permission to Feature': f1 ? (f1.mediaConsent ? 'Yes' : 'No') : '',
         'Form 2 Company Name': f2 ? f2.companyName : '',
         'Form 2 Department': f2 ? f2.department : '',
         'Form 2 Location': f2 ? f2.location : '',

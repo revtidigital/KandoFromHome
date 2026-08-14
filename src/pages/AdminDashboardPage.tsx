@@ -1084,6 +1084,7 @@ export const AdminDashboardPage: React.FC = () => {
                     <th style={{ padding: '14px 18px' }}>Employee Name</th>
                     <th style={{ padding: '14px 18px' }}>Registered Date</th>
                     <th style={{ padding: '14px 18px' }}>SUBMIT YOUR KANDO ENTRY</th>
+                    <th style={{ padding: '14px 18px' }}>Permission to Feature</th>
                     <th style={{ padding: '14px 18px' }}>CHAIRMAN INVITES YOUR THOUGHTS</th>
                     <th style={{ padding: '14px 18px' }}>Assets</th>
                     <th style={{ padding: '14px 18px' }}>Assigned Tags</th>
@@ -1133,6 +1134,16 @@ export const AdminDashboardPage: React.FC = () => {
                             </span>
                           ) : (
                             <span style={{ color: '#64748B', fontSize: '0.75rem' }}>Not Filled</span>
+                          )}
+                        </td>
+
+                        <td style={{ padding: '14px 18px' }}>
+                          {user.form1 ? (
+                            <span style={{ background: user.form1.mediaConsent ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)', color: user.form1.mediaConsent ? '#4ADE80' : '#EF4444', padding: '4px 10px', borderRadius: '12px', fontWeight: 700, fontSize: '0.75rem' }}>
+                              {user.form1.mediaConsent ? 'Yes' : 'No'}
+                            </span>
+                          ) : (
+                            <span style={{ color: '#64748B', fontSize: '0.75rem' }}>—</span>
                           )}
                         </td>
 
@@ -1295,6 +1306,10 @@ export const AdminDashboardPage: React.FC = () => {
                     <div style={{ background: palette.subtleBg, padding: '12px', borderRadius: '10px' }}>
                       <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Submitted IP</div>
                       <div style={{ color: palette.text, fontFamily: 'monospace' }}>{selectedUserForProfile.form1.ip || 'N/A'}</div>
+                    </div>
+                    <div style={{ background: palette.subtleBg, padding: '12px', borderRadius: '10px' }}>
+                      <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Permission to Feature</div>
+                      <div style={{ color: selectedUserForProfile.form1.mediaConsent ? '#4ADE80' : '#EF4444', fontWeight: 700 }}>{selectedUserForProfile.form1.mediaConsent ? 'Yes' : 'No'}</div>
                     </div>
                     <div style={{ background: palette.subtleBg, padding: '12px', borderRadius: '10px' }}>
                       <div style={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Photo 1</div>
