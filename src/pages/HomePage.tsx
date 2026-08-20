@@ -132,6 +132,9 @@ export const HomePage: React.FC = () => {
             <p className="kd-hero-note">
               {t.landingSubtitle || "This 71st Yamaha Day, let's celebrate the families behind every Yamaha action."}
             </p>
+            <p className="kd-hero-caption">
+              {t.landingCaption || "Behind every Yamaha achievement is a family, a memory, and a story……"}
+            </p>
           </div>
 
           {/* ============================== Cards =========================== */}
@@ -251,18 +254,30 @@ export const HomePage: React.FC = () => {
                   </div>
                 </div>
 
-                <p className="kd-card-desc kd-card-desc--subheading">
-                  {t.form2CardDesc || 'Share your ideas and suggestions. Your thoughts help us grow better, together.'}
-                </p>
-
                 <div className="kd-cta kd-cta--tight">
                   <button className="kd-btn kd-btn--purple" type="button" onClick={() => navigateTo('form2')}>
                     {(t.form2CardBtn || 'Share Your Thoughts').replace(/\s*>\s*$/, '')}
                   </button>
                 </div>
               </article>
+            </div>
 
-              <div className="kd-or" aria-hidden="true">{t.orDivider}</div>
+            {/* -------------------------- Stats strip -------------------------- */}
+            <div className="kd-stats" role="list">
+              <div className="kd-stat" role="listitem">
+                <span className="kd-stat-number">{t.statFamiliesNumber || '480'}</span>
+                <span className="kd-stat-label">{t.statFamiliesLabel || 'Families Featured'}</span>
+              </div>
+              <div className="kd-stat-divider" aria-hidden="true"></div>
+              <div className="kd-stat" role="listitem">
+                <span className="kd-stat-number">{t.statStoriesNumber || '200'}</span>
+                <span className="kd-stat-label">{t.statStoriesLabel || 'Stories Shared'}</span>
+              </div>
+              <div className="kd-stat-divider" aria-hidden="true"></div>
+              <div className="kd-stat" role="listitem">
+                <span className="kd-stat-number">{t.statIdeasNumber || '130'}</span>
+                <span className="kd-stat-label">{t.statIdeasLabel || 'Ideas Submitted'}</span>
+              </div>
             </div>
           </div>
         </section>

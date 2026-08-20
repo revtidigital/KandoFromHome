@@ -3,6 +3,8 @@ import { useApp } from '../context/AppContext';
 import type { Language } from '../i18n/translations';
 import { AlertTriangle, CheckCircle, Loader2 } from 'lucide-react';
 import { useCaptcha } from '../hooks/useCaptcha';
+import { LOCATIONS } from '../data/locations';
+import { SearchableSelect } from '../components/SearchableSelect';
 import '../kando_form2_ui.css';
 
 export const Form2Page: React.FC = () => {
@@ -105,9 +107,13 @@ export const Form2Page: React.FC = () => {
           : 'This Phone Number was not found in company records.';
       }
     }
+    const alphaOnly = /^[A-Za-z\s]+$/;
     if (!formData.empName.trim()) newErrors.empName = t.errEmpNameRequired || 'Full name is required.';
+    else if (!alphaOnly.test(formData.empName.trim())) newErrors.empName = 'Only alphabets are allowed';
     if (!companyName.trim()) newErrors.companyName = 'Company Name is required';
+    else if (!alphaOnly.test(companyName.trim())) newErrors.companyName = 'Only alphabets are allowed';
     if (!department.trim()) newErrors.department = 'Department is required';
+    else if (!alphaOnly.test(department.trim())) newErrors.department = 'Only alphabets are allowed';
     if (!location.trim()) newErrors.location = 'Location is required';
     if (!thoughts.trim()) newErrors.thoughts = 'Please share your thoughts (required).';
     else if (thoughts.trim().length > 2000) newErrors.thoughts = 'Thoughts must be 2000 characters or less.';
@@ -312,6 +318,10 @@ export const Form2Page: React.FC = () => {
 
           <div className="layout">
             <section className="form-column">
+              <p className="f2-headline">
+                {t.form2CardDesc || 'Share your ideas and suggestions. Your thoughts help us to grow better, together.'}
+              </p>
+
               {duplicateError && (
                 <div className="error-banner">
                   <AlertTriangle size={22} style={{ flexShrink: 0 }} />
@@ -332,7 +342,7 @@ export const Form2Page: React.FC = () => {
                     id="companyName"
                     type="text"
                     value={companyName}
-                    onChange={e => setCompanyName(e.target.value)}
+                    onChange={e => setCompanyName(e.target.value.replace(/[^A-Za-z\s]/g, ''))}
                     placeholder={t.companyNamePlaceholder}
                     autoComplete="organization"
                   />
@@ -418,7 +428,7 @@ export const Form2Page: React.FC = () => {
                       id="employeeName"
                       type="text"
                       value={formData.empName}
-                      onChange={e => setFormData(prev => ({ ...prev, empName: e.target.value }))}
+                      onChange={e => setFormData(prev => ({ ...prev, empName: e.target.value.replace(/[^A-Za-z\s]/g, '') }))}
                       placeholder={t.employeeNamePlaceholder}
                       autoComplete="name"
                     />
@@ -437,7 +447,7 @@ export const Form2Page: React.FC = () => {
                       id="department"
                       type="text"
                       value={department}
-                      onChange={e => setDepartment(e.target.value)}
+                      onChange={e => setDepartment(e.target.value.replace(/[^A-Za-z\s]/g, ''))}
                       placeholder={t.departmentPlaceholder}
                       autoComplete="organization-title"
                     />
@@ -451,14 +461,13 @@ export const Form2Page: React.FC = () => {
                       </svg>
                       <span>{t.locationLabel}*</span>
                     </label>
-                    <input
+                    <SearchableSelect
                       className={`input${errors.location ? ' is-invalid' : ''}`}
                       id="location"
-                      type="text"
                       value={location}
-                      onChange={e => setLocation(e.target.value)}
+                      options={LOCATIONS}
                       placeholder={t.locationPlaceholder}
-                      autoComplete="address-level2"
+                      onChange={loc => setLocation(loc)}
                     />
                     {errors.location && <p className="field-error">{errors.location}</p>}
                   </div>

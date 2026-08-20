@@ -190,20 +190,18 @@ async function uploadFileToR2(filePath, fileName, mimeType, userFolder) {
 }
 
 // Generate user-specific R2 folder name
-// Format: empId_INITIALS (e.g. YMI-101_RS) or last4phone_INITIALS (e.g. 7896_RS)
+// Format: Name_EmpID (e.g. Janvi_Sethi_4444) or Name_PhoneNumber if no Employee ID
 function getUserFolder(empId, empName, phone) {
-  const initials = (empName || 'U')
+  const namePart = (empName || 'User')
     .trim()
+    .replace(/[^A-Za-z\s]/g, '')
     .split(/\s+/)
     .filter(function(w) { return w.length > 0; })
-    .map(function(w) { return w[0].toUpperCase(); })
-    .join('');
-  if (empId && empId.trim()) {
-    return empId.trim() + '_' + initials;
-  }
-  const digits = (phone || '').replace(/\D/g, '');
-  const last4 = digits.slice(-4) || '0000';
-  return last4 + '_' + initials;
+    .join('_') || 'User';
+  const idPart = (empId && empId.trim())
+    ? empId.trim().replace(/[^A-Za-z0-9]/g, '')
+    : (phone || '').replace(/\D/g, '');
+  return idPart ? `${namePart}_${idPart}` : namePart;
 }
 
 // Multer Storage Configuration
@@ -551,9 +549,9 @@ app.post('/api/submissions/form1', (req, res, next) => {
     // User-specific R2 folder: empId_INITIALS (or last4phone_INITIALS if no ID)
     const userFolder = getUserFolder(cleanEmpId, empName, cleanPhone);
 
-    const photo1Name = `${userFolder}_photo1${path.extname(req.files['photo1'][0].originalname).toLowerCase()}`;
-    const photo2Name = req.files['photo2'] ? `${userFolder}_photo2${path.extname(req.files['photo2'][0].originalname).toLowerCase()}` : '';
-    const videoName = req.files['video'] ? `${userFolder}_video${path.extname(req.files['video'][0].originalname).toLowerCase()}` : '';
+    const photo1Name = `${userFolder}_Photo1${path.extname(req.files['photo1'][0].originalname).toLowerCase()}`;
+    const photo2Name = req.files['photo2'] ? `${userFolder}_Photo2${path.extname(req.files['photo2'][0].originalname).toLowerCase()}` : '';
+    const videoName = req.files['video'] ? `${userFolder}_Video${path.extname(req.files['video'][0].originalname).toLowerCase()}` : '';
 
     let photo1Url = `${R2_PUBLIC_URL}/${userFolder}/${photo1Name}`;
     let photo2Url = photo2Name ? `${R2_PUBLIC_URL}/${userFolder}/${photo2Name}` : '';
@@ -666,7 +664,7 @@ app.post('/api/submissions/form2', (req, res, next) => {
         cleanupLocalFile(req.file.path);
         return res.status(400).json({ error: 'File exceeds maximum size limit of 50MB.' });
       }
-      const attachmentName = `${userFolder2}_attachment${path.extname(req.file.originalname).toLowerCase()}`;
+      const attachmentName = `${userFolder2}_Attachment${path.extname(req.file.originalname).toLowerCase()}`;
       optionalFileUrl = `${R2_PUBLIC_URL}/${userFolder2}/${attachmentName}`;
       const r2File = await uploadFileToR2(req.file.path, attachmentName, req.file.mimetype, userFolder2);
       if (r2File) { optionalFileUrl = r2File; cleanupLocalFile(req.file.path); }
@@ -856,7 +854,7 @@ app.get('/api/admin/users', async (req, res) => {
     const limit = parseInt(req.query.limit) || 25;
     const skip = (page - 1) * limit;
 
-    const { search, tag, formType } = req.query;
+    const { search, tag, formType, permissionToFeature } = req.query;
 
     let query = {};
     if (search) {
@@ -888,6 +886,16 @@ app.get('/api/admin/users', async (req, res) => {
         matchIds = f1UserIds.filter(id => f2Set.has(String(id)));
       }
       query._id = { $in: matchIds };
+    }
+
+    if (permissionToFeature === 'yes' || permissionToFeature === 'no') {
+      const consentUserIds = await Form1.distinct('userId', { mediaConsent: permissionToFeature === 'yes' });
+      if (query._id && query._id.$in) {
+        const consentSet = new Set(consentUserIds.map(String));
+        query._id.$in = query._id.$in.filter(id => consentSet.has(String(id)));
+      } else {
+        query._id = { $in: consentUserIds };
+      }
     }
 
     const totalUsers = await User.countDocuments(query);
@@ -966,12 +974,16 @@ app.get('/api/admin/overview', async (req, res) => {
     const totalUsers = await User.countDocuments();
     const form1Count = await Form1.countDocuments();
     const form2Count = await Form2.countDocuments();
+    const permissionYesCount = await Form1.countDocuments({ mediaConsent: true });
+    const permissionNoCount = await Form1.countDocuments({ mediaConsent: false });
     const recentLogs = await AuditLog.find().sort({ timestamp: -1 }).limit(5);
 
     res.json({
       totalUsers,
       form1Count,
       form2Count,
+      permissionYesCount,
+      permissionNoCount,
       recentLogs
     });
   } catch (err) {
@@ -1162,8 +1174,8 @@ app.get('/api/admin/export/users', exportLimiter, async (req, res) => {
         'User ID': u._id.toString(),
         'Emp ID': u.empId,
         'Name': u.empName,
-        'Phone': u.phone ? `\t${u.phone}` : '',
-        'City': u.city || '',
+        'Phone': u.phone ? `="${u.phone}"` : '',
+        'City': f1 ? (u.city || '') : '',
         'SUBMIT YOUR KANDO ENTRY Company Name': f1 ? f1.companyName : '',
         'SUBMIT YOUR KANDO ENTRY Department': f1 ? f1.department : '',
         'SUBMIT YOUR KANDO ENTRY Photo 1': f1 ? await signExportUrl(f1.photo1Url) : '',
@@ -1353,7 +1365,7 @@ async function buildExportArchive(archive, filterReq) {
     rows.push({
       'SUBMIT YOUR KANDO ENTRY Status': f1 ? 'Submitted' : 'Not Filled',
       'Emp ID': u.empId,
-      'Phone': u.phone ? `\t${u.phone}` : '',
+      'Phone': u.phone ? `="${u.phone}"` : '',
       'Name': u.empName,
       'City': u.city || '',
       'SUBMIT YOUR KANDO ENTRY Company Name': f1 ? f1.companyName : '',
@@ -1376,10 +1388,10 @@ async function buildExportArchive(archive, filterReq) {
     });
 
     const empFolder = `media/${userKey}`;
-    if (f1?.photo1Url) await appendR2FileToArchive(archive, f1.photo1Url, `${empFolder}/${userKey}_photo1${path.extname(f1.photo1Url)}`);
-    if (f1?.photo2Url) await appendR2FileToArchive(archive, f1.photo2Url, `${empFolder}/${userKey}_photo2${path.extname(f1.photo2Url)}`);
-    if (f1?.videoUrl) await appendR2FileToArchive(archive, f1.videoUrl, `${empFolder}/${userKey}_video${path.extname(f1.videoUrl)}`);
-    if (f2?.optionalFileUrl) await appendR2FileToArchive(archive, f2.optionalFileUrl, `${empFolder}/${userKey}_attachment${path.extname(f2.optionalFileUrl)}`);
+    if (f1?.photo1Url) await appendR2FileToArchive(archive, f1.photo1Url, `${empFolder}/${userKey}_Photo1${path.extname(f1.photo1Url)}`);
+    if (f1?.photo2Url) await appendR2FileToArchive(archive, f1.photo2Url, `${empFolder}/${userKey}_Photo2${path.extname(f1.photo2Url)}`);
+    if (f1?.videoUrl) await appendR2FileToArchive(archive, f1.videoUrl, `${empFolder}/${userKey}_Video${path.extname(f1.videoUrl)}`);
+    if (f2?.optionalFileUrl) await appendR2FileToArchive(archive, f2.optionalFileUrl, `${empFolder}/${userKey}_Attachment${path.extname(f2.optionalFileUrl)}`);
   }
 
   const ws = XLSX.utils.json_to_sheet(rows);

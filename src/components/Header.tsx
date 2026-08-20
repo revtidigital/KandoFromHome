@@ -1,10 +1,31 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useApp } from '../context/AppContext';
 import type { Language } from '../i18n/translations';
-import { Globe, Sun, Moon } from 'lucide-react';
+import { Globe, Sun, Moon, ChevronDown } from 'lucide-react';
+
+const LANGUAGE_OPTIONS: { value: Language; label: string }[] = [
+  { value: 'en', label: 'English' },
+  { value: 'hi', label: 'हिंदी (Hindi)' },
+  { value: 'ta', label: 'தமிழ் (Tamil)' },
+];
 
 export const Header: React.FC = () => {
   const { language, setLanguage, currentView, navigateTo, publicTheme, setPublicTheme } = useApp();
+  const [langMenuOpen, setLangMenuOpen] = useState(false);
+  const langMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!langMenuOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (langMenuRef.current && !langMenuRef.current.contains(e.target as Node)) {
+        setLangMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [langMenuOpen]);
+
+  const activeLanguageLabel = LANGUAGE_OPTIONS.find(opt => opt.value === language)?.label || 'English';
 
   if (currentView === 'landing' || currentView === 'admin-dashboard') {
     return null;
@@ -76,34 +97,66 @@ export const Header: React.FC = () => {
         {/* Navigation Right — HIDE LANGUAGE SELECTOR ON ADMIN DASHBOARD (Req 5) */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           {!isAdminView && (
-            <div style={{
-              position: 'relative',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              background: 'rgba(255, 255, 255, 0.08)',
-              padding: '6px 12px',
-              borderRadius: '24px',
-              border: '1px solid rgba(209, 176, 123, 0.35)'
-            }}>
-              <Globe size={14} color="#D1B07B" />
-              <select
-                value={language}
-                onChange={(e) => setLanguage(e.target.value as Language)}
+            <div ref={langMenuRef} style={{ position: 'relative' }}>
+              <button
+                type="button"
+                onClick={() => setLangMenuOpen(open => !open)}
                 style={{
-                  background: 'transparent',
-                  border: 'none',
+                  position: 'relative',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  padding: '6px 12px',
+                  borderRadius: '24px',
+                  border: '1px solid rgba(209, 176, 123, 0.35)',
                   color: 'var(--text-main)',
                   fontSize: '0.82rem',
                   fontWeight: 700,
-                  outline: 'none',
                   cursor: 'pointer'
                 }}
               >
-                <option value="en" style={{ background: '#06133B', color: 'white' }}>English</option>
-                <option value="hi" style={{ background: '#06133B', color: 'white' }}>हिंदी (Hindi)</option>
-                <option value="ta" style={{ background: '#06133B', color: 'white' }}>தமிழ் (Tamil)</option>
-              </select>
+                <Globe size={14} color="#D1B07B" />
+                <span>{activeLanguageLabel}</span>
+                <ChevronDown size={14} color="#D1B07B" />
+              </button>
+
+              {langMenuOpen && (
+                <div style={{
+                  position: 'absolute',
+                  top: 'calc(100% + 8px)',
+                  right: 0,
+                  minWidth: '160px',
+                  background: '#06133B',
+                  border: '1px solid rgba(209, 176, 123, 0.35)',
+                  borderRadius: '14px',
+                  boxShadow: '0 12px 30px rgba(0, 0, 0, 0.4)',
+                  overflow: 'hidden',
+                  zIndex: 50
+                }}>
+                  {LANGUAGE_OPTIONS.map(opt => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => { setLanguage(opt.value); setLangMenuOpen(false); }}
+                      style={{
+                        display: 'block',
+                        width: '100%',
+                        textAlign: 'left',
+                        padding: '10px 14px',
+                        background: opt.value === language ? 'rgba(209, 176, 123, 0.18)' : 'transparent',
+                        border: 'none',
+                        color: 'white',
+                        fontSize: '0.82rem',
+                        fontWeight: opt.value === language ? 700 : 500,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 

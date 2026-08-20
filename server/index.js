@@ -441,7 +441,7 @@ app.get('/api/admin/users', async (req, res) => {
     const limit = parseInt(req.query.limit) || 25;
     const skip = (page - 1) * limit;
 
-    const { search, tag, formType } = req.query;
+    const { search, tag, formType, permissionToFeature } = req.query;
 
     let query = {};
     if (search) {
@@ -454,6 +454,11 @@ app.get('/api/admin/users', async (req, res) => {
     }
     if (tag) {
       query.tags = tag;
+    }
+    if (permissionToFeature === 'yes' || permissionToFeature === 'no') {
+      const consentUserIds = (await Form1.find({ mediaConsent: permissionToFeature === 'yes' }).select('userId').lean())
+        .map(f => f.userId);
+      query._id = { $in: consentUserIds };
     }
 
     const totalUsers = await User.countDocuments(query);
@@ -532,12 +537,16 @@ app.get('/api/admin/overview', async (req, res) => {
     const totalUsers = await User.countDocuments();
     const form1Count = await Form1.countDocuments();
     const form2Count = await Form2.countDocuments();
+    const permissionYesCount = await Form1.countDocuments({ mediaConsent: true });
+    const permissionNoCount = await Form1.countDocuments({ mediaConsent: false });
     const recentLogs = await AuditLog.find().sort({ timestamp: -1 }).limit(5);
 
     res.json({
       totalUsers,
       form1Count,
       form2Count,
+      permissionYesCount,
+      permissionNoCount,
       recentLogs
     });
   } catch (err) {

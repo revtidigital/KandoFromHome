@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Users, Tag, Settings as SettingsIcon, History,
   LogOut, Search, Download, Info, ChevronLeft, ChevronRight,
   X, Image as ImageIcon, FileVideo, Plus, ArrowLeft, Lock, BarChart3, AlertTriangle,
-  Sun, Moon, Images, ChevronDown
+  Sun, Moon, Images, ChevronDown, ChevronUp
 } from 'lucide-react';
 
 // Reads the logged-in admin's username straight out of the stored Basic-Auth
@@ -151,10 +151,24 @@ export const AdminDashboardPage: React.FC = () => {
   // table again; clicking a different KPI just re-filters the table that's
   // already open instead of closing and reopening it.
   const toggleKpiSubmissions = (formFilter: string) => {
-    if (showUsersInline && selectedFormFilter === formFilter) {
+    if (showUsersInline && selectedFormFilter === formFilter && !selectedPermissionFilter) {
       setShowUsersInline(false);
     } else {
       setSelectedFormFilter(formFilter);
+      setSelectedPermissionFilter('');
+      setCurrentPage(1);
+      setShowUsersInline(true);
+    }
+  };
+
+  // Same inline-reveal behavior as toggleKpiSubmissions, but for the
+  // Permission to Feature Yes/No KPI tiles.
+  const toggleKpiPermission = (permissionFilter: string) => {
+    if (showUsersInline && selectedPermissionFilter === permissionFilter && !selectedFormFilter) {
+      setShowUsersInline(false);
+    } else {
+      setSelectedPermissionFilter(permissionFilter);
+      setSelectedFormFilter('');
       setCurrentPage(1);
       setShowUsersInline(true);
     }
@@ -212,13 +226,12 @@ export const AdminDashboardPage: React.FC = () => {
     setActiveTab(tab);
     if (tab !== 'users') setSelectedUserForProfile(null);
     if (tab === 'overview') setShowUsersInline(false);
-    // Navigating to the Users tab from the nav (not via a KPI card) should
-    // always land on the unfiltered directory — clear out any filter left
-    // over from a KPI's "View Submissions" click.
+    // Navigating to the Users tab from the nav (not via a KPI card) resets
+    // the free-text search, but the tag/form-submission/permission-to-feature
+    // dropdown filters are persisted (localStorage) and must stay as the
+    // admin last set them — only the dropdowns themselves should change them.
     if (tab === 'users') {
       setSearchQuery('');
-      setSelectedTagFilter('');
-      setSelectedFormFilter('');
       setCurrentPage(1);
     }
     const path = pathForTab(tab);
@@ -229,10 +242,37 @@ export const AdminDashboardPage: React.FC = () => {
 
   // Filters & Pagination for Users table
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTagFilter, setSelectedTagFilter] = useState('');
-  const [selectedFormFilter, setSelectedFormFilter] = useState('');
+  // Persisted to localStorage so they survive reloads/navigation and only
+  // change when the admin explicitly picks a new value from the dropdown.
+  const [selectedTagFilter, setSelectedTagFilter] = useState(() => localStorage.getItem('kando_admin_tagFilter') || '');
+  const [selectedFormFilter, setSelectedFormFilter] = useState(() => localStorage.getItem('kando_admin_formFilter') || '');
+  const [selectedPermissionFilter, setSelectedPermissionFilter] = useState(() => localStorage.getItem('kando_admin_permissionFilter') || '');
+  useEffect(() => { localStorage.setItem('kando_admin_tagFilter', selectedTagFilter); }, [selectedTagFilter]);
+  useEffect(() => { localStorage.setItem('kando_admin_formFilter', selectedFormFilter); }, [selectedFormFilter]);
+  useEffect(() => { localStorage.setItem('kando_admin_permissionFilter', selectedPermissionFilter); }, [selectedPermissionFilter]);
+  // Click-to-sort for the Users table headers — client-side sort applied to
+  // whatever page of allUsers is currently loaded (not persisted, resets on nav).
+  const [sortColumn, setSortColumn] = useState<'empId' | 'empName' | 'registeredDate' | 'form1' | 'permission' | 'form2' | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const handleSortClick = (col: NonNullable<typeof sortColumn>) => {
+    if (sortColumn === col) {
+      setSortDirection(prev => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortColumn(col);
+      setSortDirection('asc');
+    }
+  };
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 25;
+  const [itemsPerPage, setItemsPerPage] = useState(25);
+  const [usersJumpPage, setUsersJumpPage] = useState('');
+  // Audit Logs are fetched in full (backend caps at 200, no page params), so
+  // pagination here is client-side: slice the already-fetched auditLogs array.
+  const [auditPage, setAuditPage] = useState(1);
+  const [auditItemsPerPage, setAuditItemsPerPage] = useState(25);
+  const [auditJumpPage, setAuditJumpPage] = useState('');
+  // Reset to page 1 whenever a fresh audit log list comes in, so the admin
+  // doesn't land on a stale/empty page after switching tabs or a refetch.
+  useEffect(() => { setAuditPage(1); }, [auditLogs]);
   // The Users Directory table is server-paginated/filtered — allUsers holds
   // only the current page's results, not the whole dataset. These track the
   // real totals from the API so pagination and "N users match" text stay
@@ -241,7 +281,7 @@ export const AdminDashboardPage: React.FC = () => {
   const [usersTotalPages, setUsersTotalPages] = useState(1);
   // KPI tiles read from real DB counts (not allUsers.length), since allUsers
   // is now just one page of results.
-  const [overviewStats, setOverviewStats] = useState({ totalUsers: 0, form1Count: 0, form2Count: 0 });
+  const [overviewStats, setOverviewStats] = useState({ totalUsers: 0, form1Count: 0, form2Count: 0, permissionYesCount: 0, permissionNoCount: 0 });
 
   // Settings & Tags states (Req 2 & 3)
   const [newTagInput, setNewTagInput] = useState('');
@@ -443,7 +483,9 @@ export const AdminDashboardPage: React.FC = () => {
           setOverviewStats({
             totalUsers: data.totalUsers || 0,
             form1Count: data.form1Count || 0,
-            form2Count: data.form2Count || 0
+            form2Count: data.form2Count || 0,
+            permissionYesCount: data.permissionYesCount || 0,
+            permissionNoCount: data.permissionNoCount || 0
           });
         }
       })
@@ -498,8 +540,11 @@ export const AdminDashboardPage: React.FC = () => {
       setActiveTab(segment as Tab);
       if (segment === 'users') {
         setSearchQuery('');
-        setSelectedTagFilter('');
-        setSelectedFormFilter('');
+        // Tag/form-submission/permission-to-feature filters are intentionally
+        // NOT reset here — they're persisted to localStorage and should stay
+        // set across reloads/navigation until the admin explicitly changes
+        // them from the dropdown (see toggleKpiSubmissions/toggleKpiPermission
+        // for the one legitimate KPI-tile-click reset case).
         setCurrentPage(1);
       }
       return;
@@ -523,11 +568,12 @@ export const AdminDashboardPage: React.FC = () => {
   // (previously the whole table was loaded once, capped at 200 users, and
   // filtered/paginated in the browser — anyone past the first 200 silently
   // never showed up in search or filters).
-  const fetchUsersPage = (page: number, search: string, tag: string, formType: string) => {
+  const fetchUsersPage = (page: number, search: string, tag: string, formType: string, permissionToFeature: string) => {
     const params = new URLSearchParams({ page: String(page), limit: String(itemsPerPage) });
     if (search) params.set('search', search);
     if (tag) params.set('tag', tag);
     if (formType) params.set('formType', formType);
+    if (permissionToFeature) params.set('permissionToFeature', permissionToFeature);
     return fetch(`${apiBaseUrl}/api/admin/users?${params.toString()}`, { headers: adminAuthHeader() })
       .then(res => res.json())
       .then(data => {
@@ -544,11 +590,11 @@ export const AdminDashboardPage: React.FC = () => {
   // keystroke; tag/form-filter/page changes are instant (no typing involved).
   useEffect(() => {
     const handle = setTimeout(() => {
-      fetchUsersPage(currentPage, searchQuery, selectedTagFilter, selectedFormFilter);
+      fetchUsersPage(currentPage, searchQuery, selectedTagFilter, selectedFormFilter, selectedPermissionFilter);
     }, searchQuery ? 350 : 0);
     return () => clearTimeout(handle);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, searchQuery, selectedTagFilter, selectedFormFilter]);
+  }, [currentPage, itemsPerPage, searchQuery, selectedTagFilter, selectedFormFilter, selectedPermissionFilter]);
 
   const handleLogout = () => {
     adminLogout();
@@ -692,6 +738,7 @@ export const AdminDashboardPage: React.FC = () => {
     if (searchQuery) params.set('search', searchQuery);
     if (selectedTagFilter) params.set('tag', selectedTagFilter);
     if (selectedFormFilter) params.set('formType', selectedFormFilter);
+    if (selectedPermissionFilter) params.set('permissionToFeature', selectedPermissionFilter);
     return params;
   };
 
@@ -737,6 +784,57 @@ export const AdminDashboardPage: React.FC = () => {
     }
   };
 
+  // Per-row export: downloads CSV or CSV+ZIP (media assets) for a single user,
+  // independent of whatever bulk selection/filters are active in the table.
+  const [rowDownloading, setRowDownloading] = useState<string | null>(null);
+  const handleExportSingleUser = async (user: any, format: 'csv' | 'zip') => {
+    const userId = user.id || user._id;
+    const key = `${userId}-${format}`;
+    setRowDownloading(key);
+    const params = new URLSearchParams();
+    params.set('ids', userId);
+    let url = '';
+    let filename = '';
+    const namePart = (user.empName || 'User')
+      .toString()
+      .trim()
+      .replace(/[^A-Za-z\s]/g, '')
+      .split(/\s+/)
+      .filter((w: string) => w.length > 0)
+      .join('_') || 'User';
+    const idPart = (user.empId && user.empId.toString().trim())
+      ? user.empId.toString().trim().replace(/[^A-Za-z0-9]/g, '')
+      : (user.phone || '').toString().replace(/\D/g, '');
+    const fileBase = idPart ? `${namePart}_${idPart}` : namePart;
+    if (format === 'zip') {
+      params.set('format', 'zip');
+      url = `${apiBaseUrl}/api/admin/export/zip?${params.toString()}`;
+      filename = `${fileBase}_Kando_Submission.zip`;
+    } else {
+      params.set('format', 'csv');
+      url = `${apiBaseUrl}/api/admin/export/users?${params.toString()}`;
+      filename = `${fileBase}_Kando.csv`;
+    }
+    try {
+      const res = await fetch(url, { headers: adminAuthHeader() });
+      if (!res.ok) return;
+      const blob = await res.blob();
+      const objectUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = objectUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => window.URL.revokeObjectURL(objectUrl), 60000);
+      fetchAuditLogs();
+    } catch (err) {
+      console.error('Row export error:', err);
+    } finally {
+      setRowDownloading(null);
+    }
+  };
+
   // CSV+ZIP is built server-side and emailed as an R2 download link rather than
   // streamed to the browser — for thousands of users it can take a while and
   // run into GBs, so the admin gets an instant toast instead of a blocked download.
@@ -778,6 +876,65 @@ export const AdminDashboardPage: React.FC = () => {
   // no client-side re-filtering here, so results are correct at any dataset size.
   const paginatedUsers = allUsers;
   const totalPages = usersTotalPages;
+
+  // Client-side sort applied on top of the already-loaded/filtered page of
+  // users, driven by the sortColumn/sortDirection state set from the table
+  // header arrows below.
+  const sortedUsers = React.useMemo(() => {
+    if (!sortColumn) return paginatedUsers;
+    const dir = sortDirection === 'asc' ? 1 : -1;
+    const arr = [...paginatedUsers];
+    arr.sort((a: any, b: any) => {
+      switch (sortColumn) {
+        case 'empId': {
+          const av = String(a.empId || a.phone || '').toLowerCase();
+          const bv = String(b.empId || b.phone || '').toLowerCase();
+          return av.localeCompare(bv) * dir;
+        }
+        case 'empName': {
+          const av = String(a.empName || '').toLowerCase();
+          const bv = String(b.empName || '').toLowerCase();
+          return av.localeCompare(bv) * dir;
+        }
+        case 'registeredDate': {
+          const av = new Date(a.createdAt || a.submittedAt || 0).getTime();
+          const bv = new Date(b.createdAt || b.submittedAt || 0).getTime();
+          return (av - bv) * dir;
+        }
+        case 'form1': {
+          const av = a.form1 ? 1 : 0;
+          const bv = b.form1 ? 1 : 0;
+          return (av - bv) * dir;
+        }
+        case 'permission': {
+          // Yes > No > — (no form1 submitted)
+          const rank = (u: any) => (!u.form1 ? -1 : (u.form1.mediaConsent ? 1 : 0));
+          return (rank(a) - rank(b)) * dir;
+        }
+        case 'form2': {
+          const av = a.form2 ? 1 : 0;
+          const bv = b.form2 ? 1 : 0;
+          return (av - bv) * dir;
+        }
+        default:
+          return 0;
+      }
+    });
+    return arr;
+  }, [paginatedUsers, sortColumn, sortDirection]);
+
+  const renderSortArrow = (col: NonNullable<typeof sortColumn>) => {
+    const active = sortColumn === col;
+    return (
+      <span
+        onClick={(e) => { e.stopPropagation(); handleSortClick(col); }}
+        title="Click to sort"
+        style={{ cursor: 'pointer', display: 'inline-flex', marginLeft: '6px', verticalAlign: 'middle', color: active ? '#00E5FF' : '#64748B' }}
+      >
+        {active && sortDirection === 'desc' ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
+      </span>
+    );
+  };
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: palette.pageBg, color: palette.pageText, fontFamily: 'Outfit, sans-serif' }}>
@@ -919,8 +1076,8 @@ export const AdminDashboardPage: React.FC = () => {
               <p style={{ color: '#94A3B8', fontSize: '0.9rem', marginTop: '4px' }}>Real-time Campaign Metrics & Performance KPIs</p>
             </div>
 
-            {/* 3 KPI CARDS WITH INFO ICONS (Req 13) */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', marginBottom: '32px' }}>
+            {/* KPI CARDS WITH INFO ICONS (Req 13) */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '16px', marginBottom: '32px' }}>
               
               <div
                 onClick={() => toggleKpiSubmissions('')}
@@ -980,6 +1137,48 @@ export const AdminDashboardPage: React.FC = () => {
                   style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid #22C55E', color: '#4ADE80', padding: '6px 12px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', fontSize: '0.78rem' }}
                 >
                   {showUsersInline && selectedFormFilter === 'form2' ? 'Hide Submissions' : 'View Submissions'}
+                </button>
+              </div>
+
+              <div
+                onClick={() => toggleKpiPermission('yes')}
+                style={{ background: palette.surfaceAlt, border: '1.5px solid rgba(34,197,94,0.3)', borderRadius: '16px', padding: '24px', cursor: 'pointer' }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                  <span style={{ color: palette.mutedText, fontSize: '0.9rem', fontWeight: 700 }}>Permission to Feature: Yes</span>
+                  <div title="Click to view users who gave permission to feature" style={{ cursor: 'pointer' }}>
+                    <Info size={18} color="#22C55E" />
+                  </div>
+                </div>
+                <div style={{ fontSize: '2.5rem', fontWeight: 900, color: '#22C55E', marginBottom: '12px' }}>
+                  {overviewStats.permissionYesCount}
+                </div>
+                <button
+                  onClick={(e) => { e.stopPropagation(); toggleKpiPermission('yes'); }}
+                  style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid #22C55E', color: '#4ADE80', padding: '6px 12px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', fontSize: '0.78rem' }}
+                >
+                  {showUsersInline && selectedPermissionFilter === 'yes' ? 'Hide Submissions' : 'View Submissions'}
+                </button>
+              </div>
+
+              <div
+                onClick={() => toggleKpiPermission('no')}
+                style={{ background: palette.surfaceAlt, border: '1.5px solid rgba(239,68,68,0.3)', borderRadius: '16px', padding: '24px', cursor: 'pointer' }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                  <span style={{ color: palette.mutedText, fontSize: '0.9rem', fontWeight: 700 }}>Permission to Feature: No</span>
+                  <div title="Click to view users who did not give permission to feature" style={{ cursor: 'pointer' }}>
+                    <Info size={18} color="#EF4444" />
+                  </div>
+                </div>
+                <div style={{ fontSize: '2.5rem', fontWeight: 900, color: '#EF4444', marginBottom: '12px' }}>
+                  {overviewStats.permissionNoCount}
+                </div>
+                <button
+                  onClick={(e) => { e.stopPropagation(); toggleKpiPermission('no'); }}
+                  style={{ background: 'rgba(239,68,68,0.12)', border: '1px solid #EF4444', color: '#FCA5A5', padding: '6px 12px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', fontSize: '0.78rem' }}
+                >
+                  {showUsersInline && selectedPermissionFilter === 'no' ? 'Hide Submissions' : 'View Submissions'}
                 </button>
               </div>
 
@@ -1063,17 +1262,30 @@ export const AdminDashboardPage: React.FC = () => {
                     <option value="form2">CHAIRMAN INVITES YOUR THOUGHTS Submitted</option>
                     <option value="both">Both Completed</option>
                   </select>
+
+                  {/* Permission to Feature Filter */}
+                  <select
+                    value={selectedPermissionFilter}
+                    onChange={e => { setSelectedPermissionFilter(e.target.value); setCurrentPage(1); }}
+                    style={{ padding: '9px 12px', borderRadius: '8px', background: palette.surfaceAlt, border: `1px solid ${palette.borderStrong}`, color: palette.text, fontSize: '0.85rem', outline: 'none' }}
+                  >
+                    <option value="">All Permission to Feature</option>
+                    <option value="yes">Permission to Feature: Yes</option>
+                    <option value="no">Permission to Feature: No</option>
+                  </select>
                 </div>
 
                 {/* SCOPED EXPORT TOOLBAR — appears above the table whenever rows are checked
                     OR a search/tag/form filter is active, so export always matches what's
                     actually on screen instead of silently exporting everyone. */}
-                {(selectedUserIds.size > 0 || !!searchQuery || !!selectedTagFilter || !!selectedFormFilter) && (
+                {(selectedUserIds.size > 0 || !!searchQuery || !!selectedTagFilter || !!selectedFormFilter || !!selectedPermissionFilter) && (
                   <div style={{ background: 'rgba(0,229,255,0.1)', border: '1px solid #00E5FF', borderRadius: '14px', padding: '14px 18px', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
                     <span style={{ color: '#00E5FF', fontWeight: 800, fontSize: '0.9rem' }}>
                       {selectedUserIds.size > 0
                         ? `${selectedUserIds.size} user${selectedUserIds.size > 1 ? 's' : ''} selected`
-                        : `Filter applied — ${usersTotal} user${usersTotal !== 1 ? 's' : ''} match`}
+                        : usersTotal === 0
+                          ? 'No entries found for this filter'
+                          : `Filter applied — ${usersTotal} user${usersTotal !== 1 ? 's' : ''} match`}
                     </span>
                     <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
                       <button onClick={() => handleExportData('pdf')} style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid #EF4444', color: '#FCA5A5', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
@@ -1093,7 +1305,7 @@ export const AdminDashboardPage: React.FC = () => {
                           if (selectedUserIds.size > 0) {
                             setSelectedUserIds(new Set());
                           } else {
-                            setSearchQuery(''); setSelectedTagFilter(''); setSelectedFormFilter(''); setCurrentPage(1);
+                            setSearchQuery(''); setSelectedTagFilter(''); setSelectedFormFilter(''); setSelectedPermissionFilter(''); setCurrentPage(1);
                           }
                         }}
                         style={{ background: 'transparent', border: `1px solid ${palette.borderStrong}`, color: '#94A3B8', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem' }}
@@ -1108,11 +1320,12 @@ export const AdminDashboardPage: React.FC = () => {
 
             {/* USERS TABLE — 25 ENTRIES PER PAGE (Req 8) */}
             <div style={{ background: palette.surface, borderRadius: '16px', border: `1px solid ${palette.border}`, overflow: 'hidden' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
+              <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', minWidth: '1400px', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
                 <thead>
                   <tr style={{ background: palette.surfaceAlt, color: '#00E5FF', borderBottom: `1px solid ${palette.border}` }}>
                     {activeTab === 'users' && (
-                      <th style={{ padding: '14px 12px', width: '36px' }}>
+                      <th style={{ padding: '14px 12px', width: '48px', minWidth: '48px', maxWidth: '48px', boxSizing: 'border-box', position: 'sticky', left: 0, zIndex: 2, background: palette.surfaceAlt }}>
                         <input
                           type="checkbox"
                           checked={paginatedUsers.length > 0 && paginatedUsers.every(u => selectedUserIds.has(u.id || u._id))}
@@ -1130,26 +1343,27 @@ export const AdminDashboardPage: React.FC = () => {
                         />
                       </th>
                     )}
-                    <th style={{ padding: '14px 18px' }}>Emp ID / Phone</th>
-                    <th style={{ padding: '14px 18px' }}>Employee Name</th>
-                    <th style={{ padding: '14px 18px' }}>Registered Date</th>
-                    <th style={{ padding: '14px 18px' }}>SUBMIT YOUR KANDO ENTRY</th>
-                    <th style={{ padding: '14px 18px' }}>Permission to Feature</th>
-                    <th style={{ padding: '14px 18px' }}>CHAIRMAN INVITES YOUR THOUGHTS</th>
+                    <th style={{ padding: '14px 18px', position: 'sticky', left: '48px', zIndex: 2, background: palette.surfaceAlt, borderRight: `1px solid ${palette.border}` }}>Emp ID / Phone{renderSortArrow('empId')}</th>
+                    <th style={{ padding: '14px 18px' }}>Employee Name{renderSortArrow('empName')}</th>
+                    <th style={{ padding: '14px 18px' }}>Registered Date{renderSortArrow('registeredDate')}</th>
+                    <th style={{ padding: '14px 18px' }}>SUBMIT YOUR KANDO ENTRY{renderSortArrow('form1')}</th>
+                    <th style={{ padding: '14px 18px' }}>Permission to Feature{renderSortArrow('permission')}</th>
+                    <th style={{ padding: '14px 18px' }}>CHAIRMAN INVITES YOUR THOUGHTS{renderSortArrow('form2')}</th>
                     <th style={{ padding: '14px 18px' }}>Assets</th>
                     <th style={{ padding: '14px 18px' }}>Assigned Tags</th>
+                    <th style={{ padding: '14px 18px' }}>Download</th>
                     <th style={{ padding: '14px 18px', textAlign: 'right' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {paginatedUsers.map(user => {
+                  {sortedUsers.map(user => {
                     const currentTags: string[] = user.tags || [];
                     const userId = user.id || (user as any)._id;
                     const assets = getUserAssets(user);
                     return (
                       <tr key={userId} style={{ borderBottom: `1px solid ${palette.borderFaint}` }}>
                         {activeTab === 'users' && (
-                          <td style={{ padding: '14px 12px' }}>
+                          <td style={{ padding: '14px 12px', width: '48px', minWidth: '48px', maxWidth: '48px', boxSizing: 'border-box', position: 'sticky', left: 0, zIndex: 2, background: palette.surface }}>
                             <input
                               type="checkbox"
                               checked={selectedUserIds.has(userId)}
@@ -1159,7 +1373,7 @@ export const AdminDashboardPage: React.FC = () => {
                           </td>
                         )}
 
-                        <td style={{ padding: '14px 18px', fontWeight: 800, color: '#00E5FF' }}>
+                        <td style={{ padding: '14px 18px', fontWeight: 800, color: '#00E5FF', position: 'sticky', left: '48px', zIndex: 2, background: palette.surface, borderRight: `1px solid ${palette.border}` }}>
                           {user.empId || user.phone || '—'}
                         </td>
 
@@ -1231,6 +1445,18 @@ export const AdminDashboardPage: React.FC = () => {
                           />
                         </td>
 
+                        {/* PER-ROW DOWNLOAD (always CSV + ZIP media archive) */}
+                        <td style={{ padding: '14px 18px' }}>
+                          <button
+                            onClick={() => handleExportSingleUser(user, 'zip')}
+                            disabled={rowDownloading === `${userId}-zip`}
+                            title="Download this user's CSV + media ZIP"
+                            style={{ background: 'rgba(168,85,247,0.12)', border: '1px solid #A855F7', color: '#C084FC', padding: '5px 10px', borderRadius: '8px', fontSize: '0.72rem', fontWeight: 700, cursor: rowDownloading === `${userId}-zip` ? 'not-allowed' : 'pointer', opacity: rowDownloading === `${userId}-zip` ? 0.6 : 1, display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                          >
+                            <Download size={12} /> {rowDownloading === `${userId}-zip` ? '...' : 'Download'}
+                          </button>
+                        </td>
+
                         <td style={{ padding: '14px 18px', textAlign: 'right' }}>
                           <button
                             onClick={() => handleOpenUserProfile(user)}
@@ -1253,12 +1479,27 @@ export const AdminDashboardPage: React.FC = () => {
                   })}
                 </tbody>
               </table>
+              </div>
 
               {/* PAGINATION BAR (Req 8) */}
               <div style={{ padding: '16px 20px', background: palette.surfaceAlt, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: `1px solid ${palette.border}` }}>
-                <span style={{ fontSize: '0.8rem', color: '#94A3B8' }}>
-                  Showing {paginatedUsers.length} of {usersTotal} entries (25 per page)
-                </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span style={{ fontSize: '0.8rem', color: '#94A3B8' }}>
+                    Showing {paginatedUsers.length} of {usersTotal} entries
+                  </span>
+                  <select
+                    value={itemsPerPage}
+                    onChange={(e) => {
+                      setItemsPerPage(Number(e.target.value));
+                      setCurrentPage(1);
+                    }}
+                    style={{ background: palette.surfaceAlt, color: palette.text, border: `1px solid ${palette.borderStrong}`, borderRadius: '6px', padding: '4px 8px', fontSize: '0.8rem', cursor: 'pointer' }}
+                  >
+                    <option value={25} style={{ background: palette.surfaceAlt, color: palette.text }}>25</option>
+                    <option value={50} style={{ background: palette.surfaceAlt, color: palette.text }}>50</option>
+                    <option value={100} style={{ background: palette.surfaceAlt, color: palette.text }}>100</option>
+                  </select>
+                </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} style={{ background: palette.inputBg, border: 'none', color: palette.text, padding: '6px 12px', borderRadius: '6px', cursor: 'pointer' }}>
                     <ChevronLeft size={16} />
@@ -1267,6 +1508,32 @@ export const AdminDashboardPage: React.FC = () => {
                   <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} style={{ background: palette.inputBg, border: 'none', color: palette.text, padding: '6px 12px', borderRadius: '6px', cursor: 'pointer' }}>
                     <ChevronRight size={16} />
                   </button>
+                  <span style={{ fontSize: '0.8rem', color: '#94A3B8', marginLeft: '6px' }}>Go to page</span>
+                  <input
+                    type="number"
+                    min={1}
+                    max={totalPages}
+                    value={usersJumpPage}
+                    placeholder="#"
+                    onChange={(e) => setUsersJumpPage(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        const n = parseInt(usersJumpPage, 10);
+                        if (!Number.isNaN(n)) {
+                          setCurrentPage(Math.min(Math.max(1, n), totalPages));
+                        }
+                        setUsersJumpPage('');
+                      }
+                    }}
+                    onBlur={() => {
+                      const n = parseInt(usersJumpPage, 10);
+                      if (!Number.isNaN(n)) {
+                        setCurrentPage(Math.min(Math.max(1, n), totalPages));
+                      }
+                      setUsersJumpPage('');
+                    }}
+                    style={{ width: '56px', background: palette.surfaceAlt, color: palette.text, border: `1px solid ${palette.borderStrong}`, borderRadius: '6px', padding: '5px 8px', fontSize: '0.8rem', outline: 'none' }}
+                  />
                 </div>
               </div>
 
@@ -1689,19 +1956,86 @@ export const AdminDashboardPage: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {(auditLogs.length > 0 ? auditLogs : [
-                    { id: '1', timestamp: new Date().toLocaleString(), ip: '147.93.31.18', detail: 'System Admin Logged in', username: 'SuperAdmin' },
-                    { id: '2', timestamp: new Date(Date.now() - 3600000).toLocaleString(), ip: '147.93.31.18', detail: 'Updated Settings: Captcha toggled', username: 'Admin' }
-                  ]).map(log => (
-                    <tr key={log.id || (log as any)._id} style={{ borderBottom: `1px solid ${palette.borderFaint}` }}>
-                      <td style={{ padding: '14px 18px', color: palette.textMuted2, fontSize: '0.8rem' }}>{new Date(log.timestamp).toLocaleString()}</td>
-                      <td style={{ padding: '14px 18px', color: '#00E5FF', fontWeight: 700, fontSize: '0.8rem' }}>{log.ip || '127.0.0.1'}</td>
-                      <td style={{ padding: '14px 18px', color: palette.text }}>{log.detail}</td>
-                      <td style={{ padding: '14px 18px', color: '#94A3B8' }}>{log.username || 'Admin'}</td>
-                    </tr>
-                  ))}
+                  {(() => {
+                    const displayLogs = auditLogs.length > 0 ? auditLogs : [
+                      { id: '1', timestamp: new Date().toLocaleString(), ip: '147.93.31.18', detail: 'System Admin Logged in', username: 'SuperAdmin' },
+                      { id: '2', timestamp: new Date(Date.now() - 3600000).toLocaleString(), ip: '147.93.31.18', detail: 'Updated Settings: Captcha toggled', username: 'Admin' }
+                    ];
+                    const pageStart = (auditPage - 1) * auditItemsPerPage;
+                    return displayLogs.slice(pageStart, pageStart + auditItemsPerPage).map(log => (
+                      <tr key={log.id || (log as any)._id} style={{ borderBottom: `1px solid ${palette.borderFaint}` }}>
+                        <td style={{ padding: '14px 18px', color: palette.textMuted2, fontSize: '0.8rem' }}>{new Date(log.timestamp).toLocaleString()}</td>
+                        <td style={{ padding: '14px 18px', color: '#00E5FF', fontWeight: 700, fontSize: '0.8rem' }}>{log.ip || '127.0.0.1'}</td>
+                        <td style={{ padding: '14px 18px', color: palette.text }}>{log.detail}</td>
+                        <td style={{ padding: '14px 18px', color: '#94A3B8' }}>{log.username || 'Admin'}</td>
+                      </tr>
+                    ));
+                  })()}
                 </tbody>
               </table>
+
+              {/* AUDIT LOGS PAGINATION BAR (client-side — matches Users Directory pagination pattern) */}
+              {(() => {
+                const auditTotalPages = Math.max(1, Math.ceil((auditLogs.length > 0 ? auditLogs.length : 2) / auditItemsPerPage));
+                const pageStart = (auditPage - 1) * auditItemsPerPage;
+                const shownCount = Math.min(auditItemsPerPage, (auditLogs.length > 0 ? auditLogs.length : 2) - pageStart);
+                return (
+                  <div style={{ padding: '16px 20px', background: palette.surfaceAlt, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: `1px solid ${palette.border}` }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <span style={{ fontSize: '0.8rem', color: '#94A3B8' }}>
+                        Showing {Math.max(shownCount, 0)} of {auditLogs.length > 0 ? auditLogs.length : 2} entries ({auditItemsPerPage} per page)
+                      </span>
+                      <select
+                        value={auditItemsPerPage}
+                        onChange={(e) => {
+                          setAuditItemsPerPage(Number(e.target.value));
+                          setAuditPage(1);
+                        }}
+                        style={{ background: palette.surfaceAlt, color: palette.text, border: `1px solid ${palette.borderStrong}`, borderRadius: '6px', padding: '4px 8px', fontSize: '0.8rem', cursor: 'pointer' }}
+                      >
+                        <option value={25} style={{ background: palette.surfaceAlt, color: palette.text }}>25</option>
+                        <option value={50} style={{ background: palette.surfaceAlt, color: palette.text }}>50</option>
+                        <option value={100} style={{ background: palette.surfaceAlt, color: palette.text }}>100</option>
+                      </select>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <button onClick={() => setAuditPage(p => Math.max(1, p - 1))} disabled={auditPage === 1} style={{ background: palette.inputBg, border: 'none', color: palette.text, padding: '6px 12px', borderRadius: '6px', cursor: 'pointer' }}>
+                        <ChevronLeft size={16} />
+                      </button>
+                      <span style={{ fontSize: '0.85rem', fontWeight: 700 }}>Page {auditPage} of {auditTotalPages}</span>
+                      <button onClick={() => setAuditPage(p => Math.min(auditTotalPages, p + 1))} disabled={auditPage === auditTotalPages} style={{ background: palette.inputBg, border: 'none', color: palette.text, padding: '6px 12px', borderRadius: '6px', cursor: 'pointer' }}>
+                        <ChevronRight size={16} />
+                      </button>
+                      <span style={{ fontSize: '0.8rem', color: '#94A3B8', marginLeft: '6px' }}>Go to page</span>
+                      <input
+                        type="number"
+                        min={1}
+                        max={auditTotalPages}
+                        value={auditJumpPage}
+                        placeholder="#"
+                        onChange={(e) => setAuditJumpPage(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            const n = parseInt(auditJumpPage, 10);
+                            if (!Number.isNaN(n)) {
+                              setAuditPage(Math.min(Math.max(1, n), auditTotalPages));
+                            }
+                            setAuditJumpPage('');
+                          }
+                        }}
+                        onBlur={() => {
+                          const n = parseInt(auditJumpPage, 10);
+                          if (!Number.isNaN(n)) {
+                            setAuditPage(Math.min(Math.max(1, n), auditTotalPages));
+                          }
+                          setAuditJumpPage('');
+                        }}
+                        style={{ width: '56px', background: palette.surfaceAlt, color: palette.text, border: `1px solid ${palette.borderStrong}`, borderRadius: '6px', padding: '5px 8px', fontSize: '0.8rem', outline: 'none' }}
+                      />
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         )}

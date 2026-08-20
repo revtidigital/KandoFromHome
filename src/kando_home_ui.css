@@ -186,6 +186,7 @@
 
 .kd-hero-photo--left {
   left: 0;
+  top: 40px;
   -webkit-mask-image: linear-gradient(to right, #000 45%, transparent 100%);
   mask-image: linear-gradient(to right, #000 45%, transparent 100%);
 }
@@ -262,6 +263,18 @@
   text-wrap: pretty;
 }
 
+.kd-hero-caption {
+  margin: 10px auto 0;
+  max-width: 420px;
+  font-family: 'Kozuka Gothic Pro', 'Outfit', sans-serif;
+  font-size: 14px;
+  font-style: italic;
+  line-height: 1.5;
+  color: var(--gold, #e1aa66);
+  opacity: 0.85;
+  text-wrap: pretty;
+}
+
 /* -------------------------------- Cards ---------------------------------- */
 
 .kd-cards-wrap {
@@ -303,6 +316,58 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 10px 30px rgba(3, 10, 35, 0.35);
+}
+
+.kd-stats {
+  position: relative;
+  z-index: 2;
+  margin: 44px auto 0;
+  max-width: 900px;
+  padding: 28px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 36px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border: 1px solid rgba(217, 169, 79, 0.28);
+  box-shadow: 0 20px 46px rgba(3, 10, 35, 0.35);
+}
+
+.kd-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-width: 0;
+}
+
+.kd-stat-number {
+  font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+  font-weight: 900;
+  font-size: clamp(28px, 4vw, 40px);
+  line-height: 1.1;
+  color: var(--gold-light);
+  letter-spacing: 0.01em;
+}
+
+.kd-stat-label {
+  margin-top: 6px;
+  font-family: 'Kozuka Gothic Pro', 'Outfit', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #e8eefc;
+  opacity: 0.9;
+}
+
+.kd-stat-divider {
+  width: 1.5px;
+  align-self: stretch;
+  min-height: 46px;
+  background: linear-gradient(180deg, transparent, rgba(217, 169, 79, 0.85), transparent);
+  flex-shrink: 0;
 }
 
 .kd-card {
@@ -479,14 +544,6 @@
   padding-top: 18px;
 }
 
-.kd-card--blue .kd-cta--tight {
-  margin-top: 0;
-}
-
-.kd-card--blue {
-  align-self: center;
-}
-
 .kd-btn {
   width: 100%;
   min-width: 0;
@@ -618,6 +675,11 @@
     gap: 86px;
   }
 
+  .kd-stats {
+    max-width: 720px;
+    gap: 24px;
+  }
+
   .kd-card {
     padding: 30px 26px 28px;
   }
@@ -639,7 +701,7 @@
 @media (max-width: 980px) {
   .kd-cards {
     grid-template-columns: 1fr;
-    gap: 0;
+    gap: 28px;
     max-width: 720px;
   }
 
@@ -647,29 +709,20 @@
     grid-row: 1;
   }
 
-  .kd-or {
-    position: relative;
-    top: auto;
-    left: auto;
-    grid-row: 2;
-    justify-self: center;
-    transform: none;
-    width: auto;
-    min-width: 64px;
-    height: 64px;
-    padding: 0 12px;
-    margin: 20px 0;
-    font-size: 18px;
-  }
-
   .kd-card--purple {
-    grid-row: 3;
+    grid-row: 2;
   }
 
   .kd-hero-photo {
     width: 55%;
     height: 440px;
     opacity: 0.4;
+  }
+
+  .kd-stats {
+    margin-top: 36px;
+    padding: 24px 20px;
+    gap: 18px;
   }
 }
 
@@ -749,6 +802,23 @@
     border-left: 0;
     border-top: 1px solid #dfe4f2;
     padding-top: 20px;
+  }
+
+  .kd-stats {
+    flex-direction: column;
+    gap: 16px;
+    padding: 22px 22px;
+    border-radius: 16px;
+  }
+
+  .kd-stat-divider {
+    width: 70%;
+    height: 2px;
+    min-height: 0;
+    margin: 0 auto;
+    align-self: center;
+    background: linear-gradient(90deg, rgba(217, 169, 79, 0), rgba(217, 169, 79, 0.9) 20%, rgba(217, 169, 79, 0.9) 80%, rgba(217, 169, 79, 0));
+    flex-shrink: 0;
   }
 
   .kd-footer {
@@ -858,15 +928,7 @@
 
   .kd-cards {
     padding: 0 14px;
-  }
-
-  .kd-or {
-    width: auto;
-    min-width: 56px;
-    height: 56px;
-    padding: 0 10px;
-    margin: 16px 0;
-    font-size: 14px;
+    gap: 20px;
   }
 
   .kd-card {
@@ -896,6 +958,17 @@
     padding: 14px 18px;
     font-size: 14px;
     gap: 10px;
+  }
+
+  .kd-stats {
+    margin-top: 28px;
+    padding: 20px 18px;
+    gap: 14px;
+  }
+
+  .kd-stat-label {
+    font-size: 11.5px;
+    letter-spacing: 0.06em;
   }
 
   .kd-quote {

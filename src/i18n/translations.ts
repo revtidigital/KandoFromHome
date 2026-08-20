@@ -20,9 +20,16 @@ export interface Translations {
   kandoSpace: string;
   heroWelcomeSuffix: string;
   landingSubtitle: string;
+  landingCaption: string;
   chooseLanguage: string;
   enterSite: string;
   footerQuote: string;
+  statFamiliesNumber: string;
+  statFamiliesLabel: string;
+  statStoriesNumber: string;
+  statStoriesLabel: string;
+  statIdeasNumber: string;
+  statIdeasLabel: string;
 
   // Thank You (Form 1)
   ty1Title: string;
@@ -251,7 +258,14 @@ export const translations: Record<Language, Translations> = {
     welcomeToYour: "Welcome to Your",
     kandoSpace: "Kando Space",
     heroWelcomeSuffix: "",
-    landingSubtitle: "This 71st Yamaha Day, let's celebrate the families behind every Yamaha action.",
+    landingSubtitle: "Celebrating the people behind every Yamaha journey.",
+    landingCaption: "Behind every Yamaha achievement is a family, a memory, and a story.",
+    statFamiliesNumber: "480",
+    statFamiliesLabel: "Families Featured",
+    statStoriesNumber: "200",
+    statStoriesLabel: "Stories Shared",
+    statIdeasNumber: "130",
+    statIdeasLabel: "Ideas Submitted",
     chooseLanguage: "CHOOSE YOUR LANGUAGE",
     enterSite: "ENTER SITE >",
     footerQuote: "Behind every Yamaha action is a family that inspires it.",
@@ -289,14 +303,14 @@ export const translations: Record<Language, Translations> = {
     // Home Cards
     chooseSubmissionFormTitle: "Choose Your Submission Form",
     chooseSubmissionFormDesc: "Form 1 and Form 2 are independent. You can submit either or both forms for 71st Yamaha Day 2026.",
-    form1Badge: "Share your family's Kando Moment with us.",
+    form1Badge: "Share your Families Kando moment",
     form1CardTitle: "DIY Kit Creation & Photos",
-    form1CardDesc: "Share your family's Kando Moment with us.",
+    form1CardDesc: "Share your Families Kando moment",
     form1CardBtn: "SUBMIT ENTRY >",
     form1Step1: "Create your Kando display at home",
     form1Step2: "Click a family photo",
     form1Step3: "Upload and share your Kando Moment",
-    form2Badge: "CHAIRMAN INVITES YOUR THOUGHTS",
+    form2Badge: "Chairman's Corner",
     form2CardTitle: "Family Kando Video Submission",
     form2CardDesc: "Share your ideas and suggestions. Your thoughts help us to grow better, together.",
     form2CardBtn: "SHARE YOUR THOUGHTS >",
@@ -481,7 +495,14 @@ export const translations: Record<Language, Translations> = {
     welcomeToYour: "आपके",
     kandoSpace: "कांडो स्पेस",
     heroWelcomeSuffix: "में स्वागत है",
-    landingSubtitle: "आनंद, गर्व और एकजुटता की भावना। इस 71वें यामाहा दिवस पर, अपने परिवार के साथ एक विशेष क्षण बनाएं और इसे यामाहा के साथ साझा करें।",
+    landingSubtitle: "हर यामाहा सफ़र के पीछे के लोगों का उत्सव मनाते हुए।",
+    landingCaption: "हर यामाहा उपलब्धि के पीछे एक परिवार, एक याद और एक कहानी होती है।",
+    statFamiliesNumber: "480",
+    statFamiliesLabel: "परिवार शामिल हुए",
+    statStoriesNumber: "200",
+    statStoriesLabel: "कहानियाँ साझा हुईं",
+    statIdeasNumber: "130",
+    statIdeasLabel: "विचार सबमिट हुए",
     chooseLanguage: "अपनी भाषा चुनें",
     enterSite: "साइट में प्रवेश करें >",
     footerQuote: "यामाहा के हर कार्य के पीछे एक परिवार है जो इसे प्रेरित करता है।",
@@ -526,7 +547,7 @@ export const translations: Record<Language, Translations> = {
     form1Step1: "अपने घर पर कांडो डिस्प्ले बनाएं",
     form1Step2: "एक पारिवारिक फोटो क्लिक करें",
     form1Step3: "अपलोड करें और अपना कांडो मोमेंट साझा करें",
-    form2Badge: "चेयरमैन आपके विचार आमंत्रित करते हैं",
+    form2Badge: "चेयरमैन आपके विचार आवाहन करते हैं",
     form2CardTitle: "पारिवारिक कांडो वीडियो प्रविष्टि",
     form2CardDesc: "अपने विचार और सुझाव साझा करें। आपके विचार हमें और बेहतर बनने में मदद करते हैं।",
     form2CardBtn: "अपने विचार साझा करें >",
@@ -711,7 +732,14 @@ export const translations: Record<Language, Translations> = {
     welcomeToYour: "உங்கள்",
     kandoSpace: "காண்டோ ஸ்பேஸ்",
     heroWelcomeSuffix: "க்கு வரவேற்கிறோம்",
-    landingSubtitle: "மகிழ்ச்சி, பெருமை மற்றும் ஒற்றுமையின் உணர்வு. இந்த யமஹா தினத்தில், உங்கள் குடும்பத்துடன் ஒரு சிறப்பு தருணத்தை உருவாக்கி யமஹாவுடன் பகிர்ந்து கொள்ளுங்கள்.",
+    landingSubtitle: "ஒவ்வொரு யமஹா பயணத்தின் பின்னணியில் இருக்கும் மக்களைக் கொண்டாடுகிறோம்.",
+    landingCaption: "ஒவ்வொரு யமஹா சாதனையின் பின்னணியிலும் ஒரு குடும்பம், ஒரு நினைவு, ஒரு கதை இருக்கிறது.",
+    statFamiliesNumber: "480",
+    statFamiliesLabel: "குடும்பங்கள் இடம்பெற்றன",
+    statStoriesNumber: "200",
+    statStoriesLabel: "கதைகள் பகிரப்பட்டன",
+    statIdeasNumber: "130",
+    statIdeasLabel: "யோசனைகள் சமர்ப்பிக்கப்பட்டன",
     chooseLanguage: "உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்",
     enterSite: "தளத்திற்குள் செல்லவும் >",
     footerQuote: "ஒவ்வொரு யமஹா செயலின் பின்னாலும் அதை ஊக்குவிக்கும் ஒரு குடும்பம் உள்ளது.",

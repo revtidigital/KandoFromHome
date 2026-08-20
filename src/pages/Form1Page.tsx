@@ -3,6 +3,8 @@ import { useApp } from '../context/AppContext';
 import type { Language } from '../i18n/translations';
 import { AlertTriangle, CheckCircle, Loader2, X } from 'lucide-react';
 import { useCaptcha } from '../hooks/useCaptcha';
+import { LOCATIONS } from '../data/locations';
+import { SearchableSelect } from '../components/SearchableSelect';
 import '../kando_form1_ui.css';
 
 export const Form1Page: React.FC = () => {
@@ -173,17 +175,26 @@ export const Form1Page: React.FC = () => {
       }
     }
 
+    // Alphabets-only pattern (letters and spaces)
+    const alphaOnly = /^[A-Za-z\s]+$/;
+
     // 2. Full Name Validation
     if (!formData.empName.trim()) {
       newErrors.empName = t.errEmpNameRequired;
+    } else if (!alphaOnly.test(formData.empName.trim())) {
+      newErrors.empName = 'Only alphabets are allowed';
     }
 
     // 2b. Company Name / Department / Location Validation
     if (!companyName.trim()) {
       newErrors.companyName = 'Company Name is required';
+    } else if (!alphaOnly.test(companyName.trim())) {
+      newErrors.companyName = 'Only alphabets are allowed';
     }
     if (!department.trim()) {
       newErrors.department = 'Department is required';
+    } else if (!alphaOnly.test(department.trim())) {
+      newErrors.department = 'Only alphabets are allowed';
     }
     if (!formData.city.trim()) {
       newErrors.location = 'Location is required';
@@ -369,7 +380,7 @@ export const Form1Page: React.FC = () => {
                   type="text"
                   className={errors.companyName ? 'has-error' : ''}
                   value={companyName}
-                  onChange={e => setCompanyName(e.target.value)}
+                  onChange={e => setCompanyName(e.target.value.replace(/[^A-Za-z\s]/g, ''))}
                   placeholder={t.companyNamePlaceholder}
                   autoComplete="organization"
                 />
@@ -444,7 +455,7 @@ export const Form1Page: React.FC = () => {
                   type="text"
                   className={errors.empName ? 'has-error' : ''}
                   value={formData.empName}
-                  onChange={e => setFormData(prev => ({ ...prev, empName: e.target.value }))}
+                  onChange={e => setFormData(prev => ({ ...prev, empName: e.target.value.replace(/[^A-Za-z\s]/g, '') }))}
                   placeholder={t.employeeNamePlaceholder}
                   autoComplete="name"
                 />
@@ -459,7 +470,7 @@ export const Form1Page: React.FC = () => {
                   type="text"
                   className={errors.department ? 'has-error' : ''}
                   value={department}
-                  onChange={e => setDepartment(e.target.value)}
+                  onChange={e => setDepartment(e.target.value.replace(/[^A-Za-z\s]/g, ''))}
                   placeholder={t.departmentPlaceholder}
                 />
                 {errors.department && <p className="file-error">{errors.department}</p>}
@@ -468,14 +479,13 @@ export const Form1Page: React.FC = () => {
               {/* Location */}
               <div className="field">
                 <label htmlFor="location">{t.locationLabel}*</label>
-                <input
+                <SearchableSelect
                   id="location"
-                  type="text"
                   className={errors.location ? 'has-error' : ''}
                   value={formData.city}
-                  onChange={e => setFormData(prev => ({ ...prev, city: e.target.value }))}
+                  options={LOCATIONS}
                   placeholder={t.locationPlaceholder}
-                  autoComplete="address-level2"
+                  onChange={loc => setFormData(prev => ({ ...prev, city: loc }))}
                 />
                 {errors.location && <p className="file-error">{errors.location}</p>}
               </div>

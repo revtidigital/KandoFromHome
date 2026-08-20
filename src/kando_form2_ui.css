@@ -229,6 +229,16 @@
   padding-top: 18px;
 }
 
+.kando-page-f2 .f2-headline {
+  margin: 0 0 20px;
+  color: var(--navy);
+  font-family: "Montserrat", sans-serif;
+  font-size: clamp(18px, 1.8vw, 22px);
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
+}
+
 .kando-page-f2 .titles {
   margin: 0 0 26px;
   text-align: center;
@@ -856,4 +866,61 @@
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
   }
+}
+
+.kando-page-f2 .searchable-select {
+  width: 100%;
+}
+
+.kando-page-f2 .searchable-select__input {
+  padding-right: 42px !important;
+}
+
+.kando-page-f2 .searchable-select__arrow {
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  transform: translateY(-50%);
+  color: var(--muted);
+  pointer-events: none;
+  transition: transform 0.2s ease;
+}
+
+.kando-page-f2 .searchable-select__arrow--open {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.kando-page-f2 .searchable-select__list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  max-height: 240px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: #ffffff;
+  border: 1px solid #d9e0ea;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(18, 63, 143, 0.14);
+}
+
+.kando-page-f2 .searchable-select__option {
+  padding: 10px 12px;
+  font-size: 14px;
+  color: var(--navy);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.kando-page-f2 .searchable-select__option:hover {
+  background: rgba(18, 63, 143, 0.06);
+}
+
+.kando-page-f2 .searchable-select__empty {
+  padding: 10px 12px;
+  font-size: 14px;
+  color: var(--muted);
 }
