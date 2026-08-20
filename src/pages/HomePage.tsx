@@ -1,10 +1,23 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useApp } from '../context/AppContext';
 import type { Language } from '../i18n/translations';
 import '../kando_home_ui.css';
 
 export const HomePage: React.FC = () => {
-  const { t, language, setLanguage, navigateTo } = useApp();
+  const { t, language, setLanguage, navigateTo, apiBaseUrl } = useApp();
+
+  const [stats, setStats] = useState({ families: 480, stories: 200, ideas: 130 });
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`${apiBaseUrl}/api/public-stats`)
+      .then(res => res.json())
+      .then(data => {
+        if (!cancelled) setStats(data);
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [apiBaseUrl]);
 
   return (
     <div className="kando">
@@ -265,17 +278,17 @@ export const HomePage: React.FC = () => {
             {/* -------------------------- Stats strip -------------------------- */}
             <div className="kd-stats" role="list">
               <div className="kd-stat" role="listitem">
-                <span className="kd-stat-number">{t.statFamiliesNumber || '480'}</span>
+                <span className="kd-stat-number">{stats.families}</span>
                 <span className="kd-stat-label">{t.statFamiliesLabel || 'Families Featured'}</span>
               </div>
               <div className="kd-stat-divider" aria-hidden="true"></div>
               <div className="kd-stat" role="listitem">
-                <span className="kd-stat-number">{t.statStoriesNumber || '200'}</span>
+                <span className="kd-stat-number">{stats.stories}</span>
                 <span className="kd-stat-label">{t.statStoriesLabel || 'Stories Shared'}</span>
               </div>
               <div className="kd-stat-divider" aria-hidden="true"></div>
               <div className="kd-stat" role="listitem">
-                <span className="kd-stat-number">{t.statIdeasNumber || '130'}</span>
+                <span className="kd-stat-number">{stats.ideas}</span>
                 <span className="kd-stat-label">{t.statIdeasLabel || 'Ideas Submitted'}</span>
               </div>
             </div>

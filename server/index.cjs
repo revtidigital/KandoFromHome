@@ -359,6 +359,24 @@ app.get('/api/public-settings', async (req, res) => {
   }
 });
 
+// Homepage stats. Families Featured = distinct users with at least one Form1
+// or Form2 submission (a User doc is only created on first submission, so
+// this is just a User count — one family counts once even if both forms
+// were filled). Stories Shared / Ideas Submitted map 1:1 to Form1 / Form2.
+app.get('/api/public-stats', async (req, res) => {
+  try {
+    const [families, stories, ideas] = await Promise.all([
+      User.countDocuments(),
+      Form1.countDocuments(),
+      Form2.countDocuments()
+    ]);
+    res.json({ families, stories, ideas });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ families: 0, stories: 0, ideas: 0 });
+  }
+});
+
 // Verifies a reCAPTCHA v3 token with Google and requires a minimum score.
 // Returns true when captcha protection is off/unconfigured, so this can be
 // called unconditionally from both submission routes.
