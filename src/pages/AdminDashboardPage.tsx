@@ -597,6 +597,12 @@ export const AdminDashboardPage: React.FC = () => {
   }, [currentPage, itemsPerPage, searchQuery, selectedTagFilter, selectedFormFilter, selectedPermissionFilter]);
 
   const handleLogout = () => {
+    // Filters are persisted to localStorage so they survive reloads within a
+    // session, but they shouldn't carry over into the next login — clear them
+    // here so a fresh login always starts with a clean Users Directory view.
+    localStorage.removeItem('kando_admin_tagFilter');
+    localStorage.removeItem('kando_admin_formFilter');
+    localStorage.removeItem('kando_admin_permissionFilter');
     adminLogout();
     navigateTo('landing');
   };
@@ -1288,18 +1294,22 @@ export const AdminDashboardPage: React.FC = () => {
                           : `Filter applied — ${usersTotal} user${usersTotal !== 1 ? 's' : ''} match`}
                     </span>
                     <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
-                      <button onClick={() => handleExportData('pdf')} style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid #EF4444', color: '#FCA5A5', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
-                        <Download size={14} /> PDF
-                      </button>
-                      <button onClick={() => handleExportData('csv')} style={{ background: 'rgba(0,229,255,0.12)', border: '1px solid #00E5FF', color: '#00E5FF', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
-                        <Download size={14} /> CSV
-                      </button>
-                      <button onClick={() => handleExportData('excel')} style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid #22C55E', color: '#4ADE80', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
-                        <Download size={14} /> Excel
-                      </button>
-                      <button onClick={() => setEmailExportOpen(true)} style={{ background: 'rgba(168,85,247,0.12)', border: '1px solid #A855F7', color: '#C084FC', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
-                        <Download size={14} /> CSV + ZIP
-                      </button>
+                      {!(selectedUserIds.size === 0 && usersTotal === 0) && (
+                        <>
+                          <button onClick={() => handleExportData('pdf')} style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid #EF4444', color: '#FCA5A5', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
+                            <Download size={14} /> PDF
+                          </button>
+                          <button onClick={() => handleExportData('csv')} style={{ background: 'rgba(0,229,255,0.12)', border: '1px solid #00E5FF', color: '#00E5FF', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
+                            <Download size={14} /> CSV
+                          </button>
+                          <button onClick={() => handleExportData('excel')} style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid #22C55E', color: '#4ADE80', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
+                            <Download size={14} /> Excel
+                          </button>
+                          <button onClick={() => setEmailExportOpen(true)} style={{ background: 'rgba(168,85,247,0.12)', border: '1px solid #A855F7', color: '#C084FC', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
+                            <Download size={14} /> CSV + ZIP
+                          </button>
+                        </>
+                      )}
                       <button
                         onClick={() => {
                           if (selectedUserIds.size > 0) {

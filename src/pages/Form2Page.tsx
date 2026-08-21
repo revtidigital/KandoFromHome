@@ -94,15 +94,22 @@ export const Form2Page: React.FC = () => {
     setDuplicateError(null);
     const newErrors: Record<string, string> = {};
 
-    if (!formData.empId.trim() && !formData.phone.trim()) {
+    // A disabled field's leftover value (from before the other field was
+    // confirmed) must never be treated as user input.
+    const einDisabled = phoneCheckStatus === 'valid';
+    const phoneDisabled = empIdCheckStatus === 'valid';
+    const activeEmpId = einDisabled ? '' : formData.empId.trim();
+    const activePhone = phoneDisabled ? '' : formData.phone.trim();
+
+    if (!activeEmpId && !activePhone) {
       newErrors.empId = t.errEmpIdRequired || 'Employee ID is required.';
-    } else if (formData.phone.trim() && formData.phone.trim().length !== 10) {
+    } else if (activePhone && activePhone.length !== 10) {
       newErrors.phone = 'Please enter a valid 10 digit phone number.';
     } else if (empIdCheckStatus !== 'valid' && phoneCheckStatus !== 'valid') {
       if (empIdCheckStatus === 'checking' || phoneCheckStatus === 'checking') {
         newErrors.empId = 'Please wait, checking eligibility...';
       } else {
-        newErrors.empId = formData.empId.trim()
+        newErrors.empId = activeEmpId
           ? 'This Employee ID was not found in company records.'
           : 'This Phone Number was not found in company records.';
       }
@@ -143,8 +150,8 @@ export const Form2Page: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      const cleanEmpId = formData.empId.trim();
-      const cleanPhone = formData.phone.trim();
+      const cleanEmpId = activeEmpId;
+      const cleanPhone = activePhone;
       const identityLabel = cleanEmpId ? `Employee ID "${cleanEmpId}"` : `Phone Number "${cleanPhone}"`;
 
       // Check duplicate Form 2

@@ -477,6 +477,11 @@ async function resolveEligibleIdentity(rawEmpId, rawPhone) {
   if (cleanEmpId) {
     const allowed = await AllowedEmployee.findOne({ empId: cleanEmpId });
     if (!allowed) return { ok: false, error: 'This Employee ID was not found in company records. Please check and try again.' };
+    // Employee ID is the identity anchor here, so any Phone Number value the
+    // client sent alongside it (e.g. a stray/incorrect number typed before
+    // the ID was confirmed, whose field then gets disabled in the UI) must
+    // be discarded rather than persisted as if it were validated.
+    return { ok: true, cleanEmpId, cleanPhone: '' };
   } else {
     const allowed = await AllowedPhone.findOne({ phone: cleanPhone });
     if (!allowed) return { ok: false, error: 'This Phone Number was not found in company records. Please check and try again.' };
@@ -1135,7 +1140,7 @@ async function fetchFormsForUsers(userIds) {
 // applied in the Users Directory table — so "Export" always matches what the
 // admin is actually looking at instead of silently exporting everyone.
 async function getUsersForExport(req) {
-  const { ids, search, tag, formType } = req.query;
+  const { ids, search, tag, formType, permissionToFeature } = req.query;
 
   if (ids) {
     const idList = Array.isArray(ids) ? ids.map(String) : ids.toString().split(',').map(s => s.trim());
@@ -1175,8 +1180,24 @@ async function getUsersForExport(req) {
     users = users.filter(u => matchIds.has(String(u._id)));
   }
 
+  if (permissionToFeature === 'yes' || permissionToFeature === 'no') {
+    const userIds = users.map(u => u._id);
+    const consentUserIds = await Form1.distinct('userId', {
+      userId: { $in: userIds },
+      mediaConsent: permissionToFeature === 'yes'
+    });
+    const consentSet = new Set(consentUserIds.map(String));
+    users = users.filter(u => consentSet.has(String(u._id)));
+  }
+
   return users;
 }
+
+// Employee ID is the identity anchor when present — the Phone field is
+// disabled/unused on the form in that case — so exports must not surface
+// whatever value happens to sit in the Phone field (including stale data
+// from before this empId-vs-phone exclusivity rule existed).
+const exportPhone = (empId, phone) => (empId ? '' : (phone || ''));
 
 app.get('/api/admin/export/users', exportLimiter, async (req, res) => {
   try {
@@ -1192,7 +1213,7 @@ app.get('/api/admin/export/users', exportLimiter, async (req, res) => {
         'User ID': u._id.toString(),
         'Emp ID': u.empId,
         'Name': u.empName,
-        'Phone': u.phone ? `="${u.phone}"` : '',
+        'Phone': exportPhone(u.empId, u.phone) ? `="${exportPhone(u.empId, u.phone)}"` : '',
         'City': f1 ? (u.city || '') : '',
         'SUBMIT YOUR KANDO ENTRY Company Name': f1 ? f1.companyName : '',
         'SUBMIT YOUR KANDO ENTRY Department': f1 ? f1.department : '',
@@ -1313,8 +1334,8 @@ app.get('/api/admin/export/pdf', exportLimiter, async (req, res) => {
           <td>${f1 ? 'Submitted' : 'Not Filled'}</td>
           <td><strong>${esc(u.empId || '')}</strong></td>
           <td>${esc(u.empName)}</td>
-          <td>${esc(u.city || 'N/A')}</td>
-          <td>${f1 ? esc(f1.phone) : 'Not Filled'}</td>
+          <td>${f1 ? esc(u.city || 'N/A') : ''}</td>
+          <td>${f1 ? esc(exportPhone(f1.empId, f1.phone)) : 'Not Filled'}</td>
           <td>${f1 ? esc(f1.companyName) : ''}</td>
           <td>${f1 ? esc(f1.department) : ''}</td>
           <td>${link(f1Photo1Url, 'View Photo 1')}</td>
@@ -1324,7 +1345,7 @@ app.get('/api/admin/export/pdf', exportLimiter, async (req, res) => {
           <td>${f1 ? esc(f1.ip) : ''}</td>
           <td>${f1 ? (f1.mediaConsent ? 'Yes' : 'No') : ''}</td>
           <td>${f2 ? 'Submitted' : 'Not Filled'}</td>
-          <td>${f2 ? esc(f2.phone) : 'Not Filled'}</td>
+          <td>${f2 ? esc(exportPhone(f2.empId, f2.phone)) : 'Not Filled'}</td>
           <td>${f2 ? esc(f2.companyName) : ''}</td>
           <td>${f2 ? esc(f2.department) : ''}</td>
           <td>${f2 ? esc(f2.location) : ''}</td>
@@ -1383,7 +1404,7 @@ async function buildExportArchive(archive, filterReq) {
     rows.push({
       'SUBMIT YOUR KANDO ENTRY Status': f1 ? 'Submitted' : 'Not Filled',
       'Emp ID': u.empId,
-      'Phone': u.phone ? `="${u.phone}"` : '',
+      'Phone': exportPhone(u.empId, u.phone) ? `="${exportPhone(u.empId, u.phone)}"` : '',
       'Name': u.empName,
       'City': u.city || '',
       'SUBMIT YOUR KANDO ENTRY Company Name': f1 ? f1.companyName : '',
@@ -1395,7 +1416,7 @@ async function buildExportArchive(archive, filterReq) {
       'SUBMIT YOUR KANDO ENTRY Submitted IP': f1 ? (f1.ip || '') : '',
       'Permission to Feature': f1 ? (f1.mediaConsent ? 'Yes' : 'No') : '',
       'CHAIRMAN INVITES YOUR THOUGHTS Status': f2 ? 'Submitted' : 'Not Filled',
-      'CHAIRMAN INVITES YOUR THOUGHTS Phone': f2 && f2.phone ? `\t${f2.phone}` : '',
+      'CHAIRMAN INVITES YOUR THOUGHTS Phone': f2 && exportPhone(f2.empId, f2.phone) ? `\t${exportPhone(f2.empId, f2.phone)}` : '',
       'CHAIRMAN INVITES YOUR THOUGHTS Company Name': f2 ? f2.companyName : '',
       'CHAIRMAN INVITES YOUR THOUGHTS Department': f2 ? f2.department : '',
       'CHAIRMAN INVITES YOUR THOUGHTS Location': f2 ? f2.location : '',
