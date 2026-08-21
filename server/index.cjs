@@ -1464,6 +1464,82 @@ app.get('/api/admin/export/zip', exportLimiter, async (req, res) => {
   }
 });
 
+// Same CSV+media export, but instead of the server fetching every photo/video
+// from R2 and re-streaming them itself (heavy CPU/bandwidth on Cloudways at
+// scale), this just returns the R2 object keys + CSV text. The browser posts
+// that manifest straight to the kando-export Cloudflare Worker, which reads
+// R2 directly (edge-side, via an R2 binding) and streams the zip back —
+// media never passes through this server at all.
+async function buildExportManifest(filterReq) {
+  const users = await getUsersForExport(filterReq || { query: {} });
+  const { f1Map, f2Map } = await fetchFormsForUsers(users.map(u => u._id));
+  const rows = [];
+  const files = [];
+
+  for (const u of users) {
+    const f1 = f1Map.get(String(u._id));
+    const f2 = f2Map.get(String(u._id));
+    const userKey = getUserFolder(u.empId, u.empName, u.phone);
+
+    rows.push({
+      'SUBMIT YOUR KANDO ENTRY Status': f1 ? 'Submitted' : 'Not Filled',
+      'Emp ID': u.empId,
+      'Phone': exportPhone(u.empId, u.phone) ? `="${exportPhone(u.empId, u.phone)}"` : '',
+      'Name': u.empName,
+      'City': u.city || '',
+      'SUBMIT YOUR KANDO ENTRY Company Name': f1 ? f1.companyName : '',
+      'SUBMIT YOUR KANDO ENTRY Department': f1 ? f1.department : '',
+      'SUBMIT YOUR KANDO ENTRY Photo 1': f1 ? await signExportUrl(f1.photo1Url) : '',
+      'SUBMIT YOUR KANDO ENTRY Photo 2': f1 ? await signExportUrl(f1.photo2Url) : '',
+      'SUBMIT YOUR KANDO ENTRY Video': f1 ? await signExportUrl(f1.videoUrl) : '',
+      'SUBMIT YOUR KANDO ENTRY Language': f1 ? f1.language : '',
+      'SUBMIT YOUR KANDO ENTRY Submitted IP': f1 ? (f1.ip || '') : '',
+      'Permission to Feature': f1 ? (f1.mediaConsent ? 'Yes' : 'No') : '',
+      'CHAIRMAN INVITES YOUR THOUGHTS Status': f2 ? 'Submitted' : 'Not Filled',
+      'CHAIRMAN INVITES YOUR THOUGHTS Phone': f2 && exportPhone(f2.empId, f2.phone) ? `\t${exportPhone(f2.empId, f2.phone)}` : '',
+      'CHAIRMAN INVITES YOUR THOUGHTS Company Name': f2 ? f2.companyName : '',
+      'CHAIRMAN INVITES YOUR THOUGHTS Department': f2 ? f2.department : '',
+      'CHAIRMAN INVITES YOUR THOUGHTS Location': f2 ? f2.location : '',
+      'CHAIRMAN INVITES YOUR THOUGHTS Thoughts': f2 ? f2.thoughts : '',
+      'CHAIRMAN INVITES YOUR THOUGHTS Language': f2 ? f2.language : '',
+      'CHAIRMAN INVITES YOUR THOUGHTS Submitted IP': f2 ? (f2.ip || '') : '',
+      'Tags': (u.tags || []).join(', ')
+    });
+
+    const empFolder = `media/${userKey}`;
+    const addFile = (url, suffix) => {
+      const key = r2KeyFromUrl(url);
+      if (!key) return;
+      files.push({ key, name: `${empFolder}/${userKey}_${suffix}${path.extname(url)}` });
+    };
+    if (f1?.photo1Url) addFile(f1.photo1Url, 'Photo1');
+    if (f1?.photo2Url) addFile(f1.photo2Url, 'Photo2');
+    if (f1?.videoUrl) addFile(f1.videoUrl, 'Video');
+    if (f2?.optionalFileUrl) addFile(f2.optionalFileUrl, 'Attachment');
+  }
+
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const csvContent = XLSX.utils.sheet_to_csv(ws);
+  return { csvContent, files };
+}
+
+const EXPORT_WORKER_URL = process.env.EXPORT_WORKER_URL || '';
+const EXPORT_WORKER_SECRET = process.env.EXPORT_WORKER_SECRET || '';
+
+app.get('/api/admin/export/manifest', exportLimiter, async (req, res) => {
+  try {
+    if (!EXPORT_WORKER_URL || !EXPORT_WORKER_SECRET) {
+      return res.status(503).json({ error: 'Export worker not configured.' });
+    }
+    const { csvContent, files } = await buildExportManifest(req);
+    await recordAuditLog(req, `Exported CSV + ZIP Media Assets Archive (via edge worker)`, req.adminUser);
+    res.json({ csvContent, files, workerUrl: EXPORT_WORKER_URL, exportSecret: EXPORT_WORKER_SECRET });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
 // Builds the same zip but uploads it straight to R2 (never touching local disk),
 // then emails the requester a presigned download link instead of the file itself
 // — large exports (5000 users, photos + video) can run into GBs, way past any

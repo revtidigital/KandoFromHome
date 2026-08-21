@@ -1,0 +1,8 @@
+{
+  "main_module": "worker.js",
+  "compatibility_date": "2024-09-01",
+  "bindings": [
+    { "type": "r2_bucket", "name": "BUCKET", "bucket_name": "kandosfromhome" },
+    { "type": "secret_text", "name": "EXPORT_SECRET", "text": "change_me" }
+  ]
+}

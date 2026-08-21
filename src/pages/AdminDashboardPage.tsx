@@ -751,14 +751,39 @@ export const AdminDashboardPage: React.FC = () => {
   // Export handlers (CSV, Excel, PDF Report & ZIP Media Archive)
   // Uses fetch + blob (not a plain <a href> / window.open) so the admin auth header
   // actually reaches the protected /api/admin/export/* endpoints.
+  // Media zip is built by the kando-export Cloudflare Worker directly from R2
+  // (edge-side) — the browser fetches a manifest (CSV text + R2 keys) from
+  // this server, then POSTs it straight to the Worker, so no photo/video
+  // bytes ever pass through Cloudways.
+  const downloadZipViaWorker = async (params: URLSearchParams, filename: string) => {
+    const manifestRes = await fetch(`${apiBaseUrl}/api/admin/export/manifest?${params.toString()}`, { headers: adminAuthHeader() });
+    if (!manifestRes.ok) return;
+    const { csvContent, files, workerUrl, exportSecret } = await manifestRes.json();
+    const zipRes = await fetch(workerUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Export-Secret': exportSecret },
+      body: JSON.stringify({ csvContent, files, filename })
+    });
+    if (!zipRes.ok) return;
+    const blob = await zipRes.blob();
+    const objectUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = objectUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(() => window.URL.revokeObjectURL(objectUrl), 60000);
+  };
+
   const handleExportData = async (format: 'csv' | 'excel' | 'pdf' | 'zip') => {
     const params = buildExportParams();
     let url = '';
     let filename = 'kando_export';
     if (format === 'zip') {
-      params.set('format', 'zip');
-      url = `${apiBaseUrl}/api/admin/export/zip?${params.toString()}`;
-      filename = 'kando_submissions_assets.zip';
+      await downloadZipViaWorker(params, 'kando_submissions_assets.zip');
+      fetchAuditLogs();
+      return;
     } else if (format === 'pdf') {
       url = `${apiBaseUrl}/api/admin/export/pdf?${params.toString()}`;
       filename = 'kando_users_report.html';
@@ -813,9 +838,16 @@ export const AdminDashboardPage: React.FC = () => {
       : (user.phone || '').toString().replace(/\D/g, '');
     const fileBase = idPart ? `${namePart}_${idPart}` : namePart;
     if (format === 'zip') {
-      params.set('format', 'zip');
-      url = `${apiBaseUrl}/api/admin/export/zip?${params.toString()}`;
       filename = `${fileBase}_Kando_Submission.zip`;
+      try {
+        await downloadZipViaWorker(params, filename);
+        fetchAuditLogs();
+      } catch (err) {
+        console.error('Row export error:', err);
+      } finally {
+        setRowDownloading(null);
+      }
+      return;
     } else {
       params.set('format', 'csv');
       url = `${apiBaseUrl}/api/admin/export/users?${params.toString()}`;
