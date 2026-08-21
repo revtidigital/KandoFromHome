@@ -747,7 +747,10 @@ app.post('/api/admin/whitelist/employees', requireSuperAdmin, whitelistUpload.si
 app.post('/api/admin/whitelist/phones', requireSuperAdmin, whitelistUpload.single('file'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded.' });
-    const phones = parseWhitelistFile(req.file.buffer);
+    // Strip spaces/dashes some spreadsheets add when formatting phone
+    // numbers (e.g. "9012 345 678"), then dedupe — otherwise a stored value
+    // with stray whitespace never matches the plain-digit form input.
+    const phones = [...new Set(parseWhitelistFile(req.file.buffer).map(p => p.replace(/[\s-]/g, '')))];
     await AllowedPhone.deleteMany({});
     if (phones.length) await AllowedPhone.insertMany(phones.map(phone => ({ phone })), { ordered: false });
     await recordAuditLog(req, `Uploaded Phone Number whitelist (${phones.length} entries)`, req.adminUser);
