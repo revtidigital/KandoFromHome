@@ -1256,7 +1256,7 @@ export const AdminDashboardPage: React.FC = () => {
                       <Download size={14} /> Excel
                     </button>
                     <button
-                      onClick={() => handleExportData('zip')}
+                      onClick={() => setEmailExportOpen(true)}
                       style={{ background: 'rgba(168,85,247,0.12)', border: '1px solid #A855F7', color: '#C084FC', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}
                     >
                       <Download size={14} /> CSV + ZIP Media Assets
@@ -1337,7 +1337,7 @@ export const AdminDashboardPage: React.FC = () => {
                           <button onClick={() => handleExportData('excel')} style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid #22C55E', color: '#4ADE80', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
                             <Download size={14} /> Excel
                           </button>
-                          <button onClick={() => handleExportData('zip')} style={{ background: 'rgba(168,85,247,0.12)', border: '1px solid #A855F7', color: '#C084FC', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
+                          <button onClick={() => setEmailExportOpen(true)} style={{ background: 'rgba(168,85,247,0.12)', border: '1px solid #A855F7', color: '#C084FC', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
                             <Download size={14} /> CSV + ZIP
                           </button>
                         </>
