@@ -5,7 +5,6 @@ const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const { PassThrough } = require('stream');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const archiverModule = require('archiver');
@@ -118,7 +117,6 @@ app.use('/uploads', express.static(uploadsDir, {
 
 const { S3Client, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
-const { Upload } = require('@aws-sdk/lib-storage');
 
 // Cloudflare R2 Configuration
 const R2_ACCOUNT_ID = process.env.R2_ACCOUNT_ID || 'b272577e002d6d57aafa1d19eac41046';
@@ -1540,26 +1538,26 @@ app.get('/api/admin/export/manifest', exportLimiter, async (req, res) => {
   }
 });
 
-// Builds the same zip but uploads it straight to R2 (never touching local disk),
-// then emails the requester a presigned download link instead of the file itself
-// — large exports (5000 users, photos + video) can run into GBs, way past any
-// email attachment limit.
+// Builds the CSV+media zip and emails a presigned download link instead of
+// the file itself (large exports can run into GBs, way past any email
+// attachment limit). The zip itself is built and stored by the kando-export
+// Cloudflare Worker (server-to-server call, not the browser) — this
+// function only does the cheap Mongo query + sends the email, so the
+// heavy R2 fetch/zip work never runs on Cloudways.
 async function buildAndEmailExport(email, filterReq) {
   const timestamp = Date.now();
   const key = `exports/kando_export_${timestamp}.zip`;
 
-  // archiver's ZipArchive isn't a real Node Readable (lib-storage rejects it
-  // outright), so pipe it through an actual PassThrough stream for the upload.
-  const archive = getZipArchive();
-  const passThrough = new PassThrough();
-  archive.pipe(passThrough);
+  const { csvContent, files } = await buildExportManifest(filterReq);
 
-  const upload = new Upload({
-    client: r2Client,
-    params: { Bucket: R2_BUCKET, Key: key, Body: passThrough, ContentType: 'application/zip' }
+  const workerRes = await fetch(EXPORT_WORKER_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Export-Secret': EXPORT_WORKER_SECRET },
+    body: JSON.stringify({ csvContent, files, storeKey: key })
   });
-
-  await Promise.all([upload.done(), buildExportArchive(archive, filterReq)]);
+  if (!workerRes.ok) {
+    throw new Error(`Export worker failed: ${workerRes.status} ${await workerRes.text()}`);
+  }
 
   const signedUrl = await getSignedUrl(
     r2Client,
@@ -1589,6 +1587,9 @@ app.post('/api/admin/export/zip-email', exportLimiter, async (req, res) => {
   }
   if (!mailTransporter) {
     return res.status(503).json({ error: 'Email is not configured on the server.' });
+  }
+  if (!EXPORT_WORKER_URL || !EXPORT_WORKER_SECRET) {
+    return res.status(503).json({ error: 'Export worker not configured.' });
   }
 
   // Respond immediately — building the zip and sending the email can take a
