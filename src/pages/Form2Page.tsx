@@ -371,7 +371,7 @@ export const Form2Page: React.FC = () => {
                         type="text"
                         value={formData.empId}
                         disabled={phoneCheckStatus === 'valid'}
-                        onChange={e => setFormData(prev => ({ ...prev, empId: e.target.value }))}
+                        onChange={e => setFormData(prev => ({ ...prev, empId: e.target.value.toUpperCase() }))}
                         placeholder={t.einPlaceholder}
                         autoComplete="off"
                         style={{ paddingRight: '40px', opacity: phoneCheckStatus === 'valid' ? 0.6 : 1 }}

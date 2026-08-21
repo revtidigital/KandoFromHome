@@ -399,7 +399,7 @@ async function verifyCaptcha(token, remoteIp) {
 // Real-time eligibility checks against the client-provided whitelist, used by
 // both forms as the admin types their Employee ID / Phone Number.
 app.get('/api/validate-empid', validateLimiter, async (req, res) => {
-  const empId = (req.query.id || '').toString().trim();
+  const empId = (req.query.id || '').toString().trim().toUpperCase();
   if (!empId) return res.json({ valid: false });
   const found = await AllowedEmployee.findOne({ empId });
   res.json({ valid: !!found });
@@ -470,7 +470,9 @@ app.get('/api/check-submission', async (req, res) => {
 // phone number instead — either way, they must appear in the client-supplied
 // whitelist to submit.
 async function resolveEligibleIdentity(rawEmpId, rawPhone) {
-  const cleanEmpId = (rawEmpId || '').toString().trim();
+  // Uppercase to match the whitelist normalization — employees may type
+  // their ID in lowercase (e.g. on mobile) and should still be recognized.
+  const cleanEmpId = (rawEmpId || '').toString().trim().toUpperCase();
   const cleanPhone = (rawPhone || '').toString().trim();
   if (!cleanEmpId && !cleanPhone) {
     return { ok: false, error: 'Employee ID is required. If you don\'t have one, enter your Phone Number instead.' };
@@ -729,7 +731,9 @@ app.use('/api/admin', requireAdmin);
 app.post('/api/admin/whitelist/employees', requireSuperAdmin, whitelistUpload.single('file'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded.' });
-    const empIds = parseWhitelistFile(req.file.buffer);
+    // Uppercase so lookups are case-insensitive (employees may type IDs in
+    // lowercase, e.g. on mobile) — also collapses case-only duplicates.
+    const empIds = [...new Set(parseWhitelistFile(req.file.buffer).map(id => id.toUpperCase()))];
     await AllowedEmployee.deleteMany({});
     if (empIds.length) await AllowedEmployee.insertMany(empIds.map(empId => ({ empId })), { ordered: false });
     await recordAuditLog(req, `Uploaded Employee ID whitelist (${empIds.length} entries)`, req.adminUser);

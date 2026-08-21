@@ -404,7 +404,7 @@ export const Form1Page: React.FC = () => {
                     className={formData.empId.trim() && (empIdCheckStatus === 'invalid' || errors.empId) ? 'has-error' : ''}
                     value={formData.empId}
                     disabled={phoneCheckStatus === 'valid'}
-                    onChange={e => setFormData(prev => ({ ...prev, empId: e.target.value }))}
+                    onChange={e => setFormData(prev => ({ ...prev, empId: e.target.value.toUpperCase() }))}
                     placeholder={t.einPlaceholder}
                     autoComplete="off"
                     style={{ paddingRight: '40px' }}
