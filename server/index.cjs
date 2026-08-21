@@ -344,18 +344,19 @@ async function recordAuditLog(req, detail, username = 'SuperAdmin') {
 
 // ── API ROUTES ──
 
-// Public settings the forms need before rendering — captcha site key only,
-// never the secret key (that stays server-side for verification).
+// Public settings the forms need before rendering — captcha site key and GA
+// measurement ID only, never the captcha secret key (stays server-side).
 app.get('/api/public-settings', async (req, res) => {
   try {
     const settings = await Settings.findOne();
     res.json({
       captchaEnabled: !!(settings?.captchaEnabled && settings?.captchaSiteKey && settings?.captchaSecretKey),
-      captchaSiteKey: settings?.captchaSiteKey || ''
+      captchaSiteKey: settings?.captchaSiteKey || '',
+      googleAnalyticsId: settings?.googleAnalyticsId || ''
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ captchaEnabled: false, captchaSiteKey: '' });
+    res.status(500).json({ captchaEnabled: false, captchaSiteKey: '', googleAnalyticsId: '' });
   }
 });
 

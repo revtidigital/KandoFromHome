@@ -1,5 +1,6 @@
 import React from 'react';
 import { AppProvider, useApp } from './context/AppContext';
+import { useGoogleAnalytics } from './hooks/useGoogleAnalytics';
 import { LandingPage } from './pages/LandingPage';
 import { HomePage } from './pages/HomePage';
 import { Form1Page } from './pages/Form1Page';
@@ -12,7 +13,8 @@ import { AdminLoginPage } from './pages/AdminLoginPage';
 import { AdminDashboardPage } from './pages/AdminDashboardPage';
 
 const MainRouter: React.FC = () => {
-  const { currentView, isAdminLoggedIn } = useApp();
+  const { currentView, isAdminLoggedIn, apiBaseUrl } = useApp();
+  useGoogleAnalytics(apiBaseUrl, currentView);
 
   switch (currentView) {
     case 'landing':

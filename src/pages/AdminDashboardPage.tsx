@@ -289,7 +289,7 @@ export const AdminDashboardPage: React.FC = () => {
   const [captchaEnabled, setCaptchaEnabled] = useState(false);
   const [captchaSiteKey, setCaptchaSiteKey] = useState('');
   const [captchaSecretKey, setCaptchaSecretKey] = useState('');
-  const [gaId, setGaId] = useState('G-YAMAHA2026KANDO');
+  const [gaId, setGaId] = useState('');
   
   const [captchaStatusMsg, setCaptchaStatusMsg] = useState('');
   const [gaStatusMsg, setGaStatusMsg] = useState('');
