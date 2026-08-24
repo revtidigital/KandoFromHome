@@ -10,6 +10,7 @@ const rateLimit = require('express-rate-limit');
 const archiverModule = require('archiver');
 const XLSX = require('xlsx');
 const nodemailer = require('nodemailer');
+const cron = require('node-cron');
 
 const createArchiver = typeof archiverModule === 'function' ? archiverModule : (archiverModule.default || archiverModule.create);
 // zlib level 9 is fine for the small on-demand browser download, but the
@@ -1613,6 +1614,33 @@ app.post('/api/admin/export/zip-email', exportLimiter, async (req, res) => {
     console.error('Email export failed:', err);
   });
 });
+
+// Daily submission-count digest — sent 3x/day so the client can track
+// progress without logging into the admin dashboard themselves.
+async function sendSubmissionStatsEmail() {
+  if (!mailTransporter) return;
+  const [totalUsers, form1Count, form2Count] = await Promise.all([
+    User.countDocuments(),
+    Form1.countDocuments(),
+    Form2.countDocuments()
+  ]);
+  await mailTransporter.sendMail({
+    from: `Kando From Home <${SMTP_USER}>`,
+    to: 'meghansh.agarwal@revtidigital.com',
+    subject: `Kando From Home — Submission Update (${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' })})`,
+    html: `
+      <p>Latest submission counts:</p>
+      <ul>
+        <li><b>Total Users:</b> ${totalUsers}</li>
+        <li><b>SUBMIT YOUR KANDO ENTRY (Form 1) submitted:</b> ${form1Count}</li>
+        <li><b>CHAIRMAN INVITES YOUR THOUGHTS (Form 2) submitted:</b> ${form2Count}</li>
+      </ul>
+    `
+  });
+}
+cron.schedule('0 11,15,18 * * *', () => {
+  sendSubmissionStatsEmail().catch(err => console.error('Submission stats email failed:', err));
+}, { timezone: 'Asia/Kolkata' });
 
 // SPA Fallback to index.html for client routing (Exclude /api routes!)
 app.use((req, res) => {
