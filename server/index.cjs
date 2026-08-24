@@ -10,6 +10,13 @@ const rateLimit = require('express-rate-limit');
 const archiverModule = require('archiver');
 const XLSX = require('xlsx');
 const nodemailer = require('nodemailer');
+const { Agent: UndiciAgent } = require('undici');
+
+// Large exports can take several minutes for the Cloudflare Worker to zip and
+// store in R2 before it responds — Node's default undici headers timeout
+// (~300s) is too short and kills the connection before the worker replies,
+// which is why unfiltered/full exports never emailed while small ones did.
+const exportWorkerAgent = new UndiciAgent({ headersTimeout: 20 * 60 * 1000, bodyTimeout: 20 * 60 * 1000 });
 
 const createArchiver = typeof archiverModule === 'function' ? archiverModule : (archiverModule.default || archiverModule.create);
 function getZipArchive() {
@@ -1553,7 +1560,8 @@ async function buildAndEmailExport(email, filterReq) {
   const workerRes = await fetch(EXPORT_WORKER_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'X-Export-Secret': EXPORT_WORKER_SECRET },
-    body: JSON.stringify({ csvContent, files, storeKey: key })
+    body: JSON.stringify({ csvContent, files, storeKey: key }),
+    dispatcher: exportWorkerAgent
   });
   if (!workerRes.ok) {
     throw new Error(`Export worker failed: ${workerRes.status} ${await workerRes.text()}`);
