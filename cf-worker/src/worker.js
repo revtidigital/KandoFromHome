@@ -49,11 +49,22 @@ export default {
       input: csvContent,
     });
 
-    for (const f of files) {
-      if (!f?.key || !f?.name) continue;
-      const obj = await env.BUCKET.get(f.key);
+    // Fetching each object one-at-a-time made large exports (100+ files) hang
+    // for minutes — R2 gets are I/O-bound so running a bounded number
+    // concurrently cuts wall time roughly CONCURRENCY-fold with no extra CPU
+    // cost, while still capping how many R2 connections are open at once.
+    const CONCURRENCY = 16;
+    const validFiles = files.filter(f => f?.key && f?.name);
+    const fetched = new Array(validFiles.length);
+    for (let i = 0; i < validFiles.length; i += CONCURRENCY) {
+      const batch = validFiles.slice(i, i + CONCURRENCY);
+      const results = await Promise.all(batch.map(f => env.BUCKET.get(f.key)));
+      results.forEach((obj, j) => { fetched[i + j] = obj; });
+    }
+    for (let i = 0; i < validFiles.length; i++) {
+      const obj = fetched[i];
       if (!obj) continue; // skip missing objects rather than failing the whole export
-      entries.push({ name: f.name, input: obj.body, size: obj.size });
+      entries.push({ name: validFiles[i].name, input: obj.body, size: obj.size });
     }
 
     // client-zip streams input->output with no re-compression (store method

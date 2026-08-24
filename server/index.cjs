@@ -10,20 +10,17 @@ const rateLimit = require('express-rate-limit');
 const archiverModule = require('archiver');
 const XLSX = require('xlsx');
 const nodemailer = require('nodemailer');
-const { Agent: UndiciAgent } = require('undici');
-
-// Large exports can take several minutes for the Cloudflare Worker to zip and
-// store in R2 before it responds — Node's default undici headers timeout
-// (~300s) is too short and kills the connection before the worker replies,
-// which is why unfiltered/full exports never emailed while small ones did.
-const exportWorkerAgent = new UndiciAgent({ headersTimeout: 20 * 60 * 1000, bodyTimeout: 20 * 60 * 1000 });
 
 const createArchiver = typeof archiverModule === 'function' ? archiverModule : (archiverModule.default || archiverModule.create);
-function getZipArchive() {
+// zlib level 9 is fine for the small on-demand browser download, but the
+// background email export can run over far more media — photos/videos are
+// already compressed, so re-compressing them just burns CPU for no size
+// benefit. Store mode (level 0) streams through untouched and is much faster.
+function getZipArchive(zlibLevel = 9) {
   if (typeof createArchiver === 'function') {
-    return createArchiver('zip', { zlib: { level: 9 } });
+    return createArchiver('zip', { zlib: { level: zlibLevel } });
   }
-  return new archiverModule.ZipArchive({ zlib: { level: 9 } });
+  return new archiverModule.ZipArchive({ zlib: { level: zlibLevel } });
 }
 
 const app = express();
@@ -124,6 +121,8 @@ app.use('/uploads', express.static(uploadsDir, {
 
 const { S3Client, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
+const { Upload } = require('@aws-sdk/lib-storage');
+const { PassThrough } = require('stream');
 
 // Cloudflare R2 Configuration
 const R2_ACCOUNT_ID = process.env.R2_ACCOUNT_ID || 'b272577e002d6d57aafa1d19eac41046';
@@ -1547,25 +1546,32 @@ app.get('/api/admin/export/manifest', exportLimiter, async (req, res) => {
 
 // Builds the CSV+media zip and emails a presigned download link instead of
 // the file itself (large exports can run into GBs, way past any email
-// attachment limit). The zip itself is built and stored by the kando-export
-// Cloudflare Worker (server-to-server call, not the browser) — this
-// function only does the cheap Mongo query + sends the email, so the
-// heavy R2 fetch/zip work never runs on Cloudways.
+// attachment limit). Runs entirely on Cloudways: each R2 object is streamed
+// straight into the archive (store mode, no re-compression) and the archive
+// output is streamed straight into R2 via a multipart upload — the full zip
+// is never buffered in memory or on disk, so memory use stays flat no matter
+// how large the export gets.
+// (Previously this called out to a Cloudflare Worker to build+store the zip,
+// but the Worker's Free-plan CPU limit made anything beyond a handful of
+// files hang/500 — this keeps zip-building on the origin instead.)
 async function buildAndEmailExport(email, filterReq) {
   const timestamp = Date.now();
   const key = `exports/kando_export_${timestamp}.zip`;
 
-  const { csvContent, files } = await buildExportManifest(filterReq);
+  const archive = getZipArchive(0); // store mode — media is already compressed
+  const passthrough = new PassThrough();
+  archive.pipe(passthrough);
+  archive.on('error', (err) => passthrough.destroy(err));
 
-  const workerRes = await fetch(EXPORT_WORKER_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Export-Secret': EXPORT_WORKER_SECRET },
-    body: JSON.stringify({ csvContent, files, storeKey: key }),
-    dispatcher: exportWorkerAgent
+  const upload = new Upload({
+    client: r2Client,
+    params: { Bucket: R2_BUCKET, Key: key, Body: passthrough, ContentType: 'application/zip' }
   });
-  if (!workerRes.ok) {
-    throw new Error(`Export worker failed: ${workerRes.status} ${await workerRes.text()}`);
-  }
+
+  const [, ] = await Promise.all([
+    upload.done(),
+    buildExportArchive(archive, filterReq)
+  ]);
 
   const signedUrl = await getSignedUrl(
     r2Client,
@@ -1595,9 +1601,6 @@ app.post('/api/admin/export/zip-email', exportLimiter, async (req, res) => {
   }
   if (!mailTransporter) {
     return res.status(503).json({ error: 'Email is not configured on the server.' });
-  }
-  if (!EXPORT_WORKER_URL || !EXPORT_WORKER_SECRET) {
-    return res.status(503).json({ error: 'Export worker not configured.' });
   }
 
   // Respond immediately — building the zip and sending the email can take a
