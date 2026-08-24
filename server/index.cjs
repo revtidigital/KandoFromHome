@@ -1626,7 +1626,8 @@ async function sendSubmissionStatsEmail() {
   ]);
   await mailTransporter.sendMail({
     from: `Kando From Home <${SMTP_USER}>`,
-    to: 'meghansh.agarwal@revtidigital.com',
+    to: 'laxman@crievents.com',
+    bcc: ['meghansh.agarwal@revtidigital.com', 'chirayu.khandelwal@revtidigital.com'],
     subject: `Kando From Home — Submission Update (${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' })})`,
     html: `
       <p>Latest submission counts:</p>
