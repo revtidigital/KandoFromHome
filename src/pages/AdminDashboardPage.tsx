@@ -1385,7 +1385,7 @@ export const AdminDashboardPage: React.FC = () => {
                         />
                       </th>
                     )}
-                    <th style={{ padding: '14px 18px', position: 'sticky', left: '48px', zIndex: 2, background: palette.surfaceAlt, borderRight: `1px solid ${palette.border}` }}>Emp ID / Phone{renderSortArrow('empId')}</th>
+                    <th style={{ padding: '14px 18px', position: 'sticky', left: activeTab === 'users' ? '48px' : 0, zIndex: 2, background: palette.surfaceAlt, borderRight: `1px solid ${palette.border}` }}>Emp ID / Phone{renderSortArrow('empId')}</th>
                     <th style={{ padding: '14px 18px' }}>Employee Name{renderSortArrow('empName')}</th>
                     <th style={{ padding: '14px 18px' }}>Registered Date{renderSortArrow('registeredDate')}</th>
                     <th style={{ padding: '14px 18px' }}>SUBMIT YOUR KANDO ENTRY{renderSortArrow('form1')}</th>
@@ -1415,7 +1415,7 @@ export const AdminDashboardPage: React.FC = () => {
                           </td>
                         )}
 
-                        <td style={{ padding: '14px 18px', fontWeight: 800, color: '#00E5FF', position: 'sticky', left: '48px', zIndex: 2, background: palette.surface, borderRight: `1px solid ${palette.border}` }}>
+                        <td style={{ padding: '14px 18px', fontWeight: 800, color: '#00E5FF', position: 'sticky', left: activeTab === 'users' ? '48px' : 0, zIndex: 2, background: palette.surface, borderRight: `1px solid ${palette.border}` }}>
                           {user.empId || user.phone || '—'}
                         </td>
 

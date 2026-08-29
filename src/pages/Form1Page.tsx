@@ -183,7 +183,7 @@ export const Form1Page: React.FC = () => {
     }
 
     // Alphabets-only pattern (letters and spaces) - Unicode-aware so Hindi/Tamil scripts are accepted
-    const alphaOnly = /^[\p{L}\s]+$/u;
+    const alphaOnly = /^[\p{L}\p{M}\s]+$/u;
 
     // 2. Full Name Validation
     if (!formData.empName.trim()) {
@@ -387,7 +387,7 @@ export const Form1Page: React.FC = () => {
                   type="text"
                   className={errors.companyName ? 'has-error' : ''}
                   value={companyName}
-                  onChange={e => setCompanyName(e.target.value.replace(/[^\p{L}\s]/gu, ''))}
+                  onChange={e => setCompanyName(e.target.value.replace(/[^\p{L}\p{M}\s]/gu, ''))}
                   placeholder={t.companyNamePlaceholder}
                   autoComplete="organization"
                 />
@@ -462,7 +462,7 @@ export const Form1Page: React.FC = () => {
                   type="text"
                   className={errors.empName ? 'has-error' : ''}
                   value={formData.empName}
-                  onChange={e => setFormData(prev => ({ ...prev, empName: e.target.value.replace(/[^\p{L}\s]/gu, '') }))}
+                  onChange={e => setFormData(prev => ({ ...prev, empName: e.target.value.replace(/[^\p{L}\p{M}\s]/gu, '') }))}
                   placeholder={t.employeeNamePlaceholder}
                   autoComplete="name"
                 />
@@ -477,7 +477,7 @@ export const Form1Page: React.FC = () => {
                   type="text"
                   className={errors.department ? 'has-error' : ''}
                   value={department}
-                  onChange={e => setDepartment(e.target.value.replace(/[^\p{L}\s]/gu, ''))}
+                  onChange={e => setDepartment(e.target.value.replace(/[^\p{L}\p{M}\s]/gu, ''))}
                   placeholder={t.departmentPlaceholder}
                 />
                 {errors.department && <p className="file-error">{errors.department}</p>}

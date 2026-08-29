@@ -114,7 +114,7 @@ export const Form2Page: React.FC = () => {
           : 'This Phone Number was not found in company records.';
       }
     }
-    const alphaOnly = /^[\p{L}\s]+$/u;
+    const alphaOnly = /^[\p{L}\p{M}\s]+$/u;
     if (!formData.empName.trim()) newErrors.empName = t.errEmpNameRequired || 'Full name is required.';
     else if (!alphaOnly.test(formData.empName.trim())) newErrors.empName = 'Only alphabets are allowed';
     if (!companyName.trim()) newErrors.companyName = 'Company Name is required';
@@ -349,7 +349,7 @@ export const Form2Page: React.FC = () => {
                     id="companyName"
                     type="text"
                     value={companyName}
-                    onChange={e => setCompanyName(e.target.value.replace(/[^\p{L}\s]/gu, ''))}
+                    onChange={e => setCompanyName(e.target.value.replace(/[^\p{L}\p{M}\s]/gu, ''))}
                     placeholder={t.companyNamePlaceholder}
                     autoComplete="organization"
                   />
@@ -435,7 +435,7 @@ export const Form2Page: React.FC = () => {
                       id="employeeName"
                       type="text"
                       value={formData.empName}
-                      onChange={e => setFormData(prev => ({ ...prev, empName: e.target.value.replace(/[^\p{L}\s]/gu, '') }))}
+                      onChange={e => setFormData(prev => ({ ...prev, empName: e.target.value.replace(/[^\p{L}\p{M}\s]/gu, '') }))}
                       placeholder={t.employeeNamePlaceholder}
                       autoComplete="name"
                     />
@@ -454,7 +454,7 @@ export const Form2Page: React.FC = () => {
                       id="department"
                       type="text"
                       value={department}
-                      onChange={e => setDepartment(e.target.value.replace(/[^\p{L}\s]/gu, ''))}
+                      onChange={e => setDepartment(e.target.value.replace(/[^\p{L}\p{M}\s]/gu, ''))}
                       placeholder={t.departmentPlaceholder}
                       autoComplete="organization-title"
                     />
