@@ -1283,7 +1283,7 @@ export const AdminDashboardPage: React.FC = () => {
                     onChange={e => { setSelectedTagFilter(e.target.value); setCurrentPage(1); }}
                     style={{ padding: '9px 12px', borderRadius: '8px', background: palette.surfaceAlt, border: `1px solid ${palette.borderStrong}`, color: palette.text, fontSize: '0.85rem', outline: 'none' }}
                   >
-                    <option value="">All Classification Tags</option>
+                    <option value="">Additional filter if required (Tags)</option>
                     {customTags.map(tag => (
                       <option key={tag} value={tag}>{tag}</option>
                     ))}
@@ -1392,7 +1392,7 @@ export const AdminDashboardPage: React.FC = () => {
                     <th style={{ padding: '14px 18px' }}>Permission to Feature{renderSortArrow('permission')}</th>
                     <th style={{ padding: '14px 18px' }}>CHAIRMAN INVITES YOUR THOUGHTS{renderSortArrow('form2')}</th>
                     <th style={{ padding: '14px 18px' }}>Assets</th>
-                    <th style={{ padding: '14px 18px' }}>Assigned Tags</th>
+                    <th style={{ padding: '14px 18px' }}>Additional filter if required (Tags)</th>
                     <th style={{ padding: '14px 18px' }}>Download</th>
                     <th style={{ padding: '14px 18px', textAlign: 'right' }}>Actions</th>
                   </tr>
