@@ -3,47 +3,17 @@ import { useApp } from '../context/AppContext';
 import type { Language } from '../i18n/translations';
 import { AlertTriangle, CheckCircle, Loader2 } from 'lucide-react';
 import { useCaptcha } from '../hooks/useCaptcha';
-import { useLocationOptions } from '../hooks/useLocationOptions';
-import { SearchableSelect } from '../components/SearchableSelect';
 import '../kando_form2_ui.css';
-
-const ENGLISH_ONLY = /^[A-Za-z0-9\s,.'-]+$/;
 
 export const Form2Page: React.FC = () => {
   const { t, formData, setFormData, navigateTo, language, setLanguage, apiBaseUrl } = useApp();
   const { getCaptchaToken } = useCaptcha(apiBaseUrl);
-  const locationOptions = useLocationOptions(t.otherOptionLabel);
 
   const [companyName, setCompanyName] = useState(formData.companyName || '');
   const [department, setDepartment] = useState(formData.department || '');
   const [location, setLocation] = useState(formData.city || '');
-  const [otherLocation, setOtherLocation] = useState('');
-  const [isOtherMode, setIsOtherMode] = useState(false);
-  const [citySelectValue, setCitySelectValue] = useState(formData.city || '');
   const [thoughts, setThoughts] = useState('');
   const [dataConsent, setDataConsent] = useState(false);
-  const cityInitRef = useRef(false);
-
-  // formData.city is shared across Form1/Form2, so a location typed via
-  // "Other" on one form should show up pre-filled (and re-detected as Other)
-  // on the other. Runs once the merged option list is available.
-  useEffect(() => {
-    if (cityInitRef.current) return;
-    if (!formData.city) { cityInitRef.current = true; return; }
-    const isKnownOption = locationOptions.some(
-      opt => opt !== t.otherOptionLabel && opt.toLowerCase() === formData.city.toLowerCase()
-    );
-    if (!isKnownOption) {
-      setIsOtherMode(true);
-      setCitySelectValue(t.otherOptionLabel);
-      setOtherLocation(formData.city);
-      setLocation(formData.city);
-    } else {
-      setCitySelectValue(formData.city);
-      setLocation(formData.city);
-    }
-    cityInitRef.current = true;
-  }, [locationOptions, formData.city, t.otherOptionLabel]);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [duplicateError, setDuplicateError] = useState<string | null>(null);
@@ -149,24 +119,18 @@ export const Form2Page: React.FC = () => {
     else if (!alphaOnly.test(companyName.trim())) newErrors.companyName = 'Only alphabets are allowed';
     if (!department.trim()) newErrors.department = 'Department is required';
     else if (!alphaOnly.test(department.trim())) newErrors.department = 'Only alphabets are allowed';
-    if (!location.trim()) {
-      newErrors.location = 'Location is required';
-    } else if (isOtherMode && !ENGLISH_ONLY.test(location.trim())) {
-      newErrors.location = t.otherLocationEnglishOnlyError;
-    }
     if (!thoughts.trim()) newErrors.thoughts = 'Please share your thoughts (required).';
     else if (thoughts.trim().length > 2000) newErrors.thoughts = 'Thoughts must be 2000 characters or less.';
     if (!dataConsent) newErrors.dataConsent = 'You must agree to the Terms & Conditions to proceed.';
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      const fieldOrder = ['companyName', 'empId', 'empName', 'department', 'location', 'thoughts', 'dataConsent'];
+      const fieldOrder = ['companyName', 'empId', 'empName', 'department', 'thoughts', 'dataConsent'];
       const fieldToElementId: Record<string, string> = {
         companyName: 'companyName',
         empId: 'employeeEin',
         empName: 'employeeName',
         department: 'department',
-        location: 'location',
         thoughts: 'userThoughts',
         dataConsent: 'dataConsentCheckbox'
       };
@@ -207,7 +171,6 @@ export const Form2Page: React.FC = () => {
       body.append('companyName', companyName.trim());
       body.append('department', department.trim());
       body.append('location', location.trim());
-      body.append('isOtherLocation', String(isOtherMode));
       body.append('thoughts', thoughts.trim());
       body.append('language', language);
 
@@ -499,54 +462,19 @@ export const Form2Page: React.FC = () => {
                       <svg className="icon icon--label" aria-hidden="true">
                         <use href="#f2-icon-map-pin"></use>
                       </svg>
-                      <span>{t.locationLabel}*</span>
+                      <span>{t.locationLabel}</span>
                     </label>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <SearchableSelect
-                          className={`input${errors.location ? ' is-invalid' : ''}`}
-                          id="location"
-                          value={citySelectValue}
-                          options={locationOptions}
-                          placeholder={t.locationPlaceholder}
-                          onChange={loc => {
-                            setCitySelectValue(loc);
-                            if (loc === t.otherOptionLabel) {
-                              setIsOtherMode(true);
-                              setOtherLocation('');
-                              setLocation('');
-                              setFormData(prev => ({ ...prev, city: '' }));
-                            } else {
-                              setIsOtherMode(false);
-                              setOtherLocation('');
-                              setLocation(loc);
-                              setFormData(prev => ({ ...prev, city: loc }));
-                            }
-                          }}
-                        />
-                      </div>
-                      {isOtherMode && (
-                        <input
-                          type="text"
-                          id="location-other"
-                          className={`input${errors.location ? ' is-invalid' : ''}`}
-                          style={{ flex: 1, minWidth: 0 }}
-                          value={otherLocation}
-                          placeholder={t.otherLocationPlaceholder}
-                          onChange={e => {
-                            // Strip non-English characters as the user types, so
-                            // switching the form to Hindi/Tamil doesn't let a
-                            // Devanagari/Tamil-script location slip into this
-                            // shared, cross-language location list.
-                            const filtered = e.target.value.replace(/[^A-Za-z0-9\s,.'-]/g, '');
-                            setOtherLocation(filtered);
-                            setLocation(filtered);
-                            setFormData(prev => ({ ...prev, city: filtered }));
-                          }}
-                        />
-                      )}
-                    </div>
-                    {errors.location && <p className="field-error">{errors.location}</p>}
+                    <input
+                      type="text"
+                      className="input"
+                      id="location"
+                      value={location}
+                      placeholder={t.locationPlaceholder}
+                      onChange={e => {
+                        setLocation(e.target.value);
+                        setFormData(prev => ({ ...prev, city: e.target.value }));
+                      }}
+                    />
                   </div>
                 </div>
 
