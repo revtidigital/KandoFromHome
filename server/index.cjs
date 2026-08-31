@@ -275,7 +275,11 @@ const UserSchema = new mongoose.Schema({
 });
 
 const Form1Schema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  // unique enforces one submission per employee at the DB level — the
+  // findOne-then-create check in the route above is only a fast-path/nicer
+  // error message, not the actual guarantee (two near-simultaneous requests
+  // could otherwise both pass that check before either insert lands).
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
   empId: { type: String },
   phone: { type: String },
   companyName: { type: String, default: '' },
@@ -291,7 +295,9 @@ const Form1Schema = new mongoose.Schema({
 });
 
 const Form2Schema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  // unique enforces one submission per employee at the DB level — see the
+  // matching comment on Form1Schema.userId.
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
   empId: { type: String },
   phone: { type: String },
   companyName: { type: String, default: '' },
@@ -328,6 +334,12 @@ const SettingsSchema = new mongoose.Schema({
   customTags: { type: [String], default: [] }
 });
 
+// Locations typed via the "Other" option in the Location dropdown, so future
+// submitters can pick them from the list instead of retyping them.
+const CustomLocationSchema = new mongoose.Schema({
+  value: { type: String, required: true, unique: true, trim: true }
+}, { timestamps: true });
+
 const User = mongoose.model('User', UserSchema);
 const Form1 = mongoose.model('Form1', Form1Schema);
 const Form2 = mongoose.model('Form2', Form2Schema);
@@ -335,6 +347,19 @@ const AllowedEmployee = mongoose.model('AllowedEmployee', AllowedEmployeeSchema)
 const AllowedPhone = mongoose.model('AllowedPhone', AllowedPhoneSchema);
 const AuditLog = mongoose.model('AuditLog', AuditLogSchema);
 const Settings = mongoose.model('Settings', SettingsSchema);
+const CustomLocation = mongoose.model('CustomLocation', CustomLocationSchema);
+
+// Fire-and-forget: remember a user-typed "Other" location for future dropdowns.
+function recordCustomLocation(value) {
+  const trimmed = (value || '').trim();
+  if (!trimmed) return;
+  const escaped = trimmed.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  CustomLocation.findOneAndUpdate(
+    { value: { $regex: `^${escaped}$`, $options: 'i' } },
+    { $setOnInsert: { value: trimmed } },
+    { upsert: true }
+  ).catch(err => console.error('CustomLocation upsert error:', err));
+}
 
 // Helper for adding audit log (append-only)
 async function recordAuditLog(req, detail, username = 'SuperAdmin') {
@@ -362,6 +387,17 @@ app.get('/api/public-settings', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ captchaEnabled: false, captchaSiteKey: '', googleAnalyticsId: '' });
+  }
+});
+
+// User-typed "Other" locations, merged client-side with the static dropdown list.
+app.get('/api/locations', async (req, res) => {
+  try {
+    const docs = await CustomLocation.find({}, 'value').sort({ value: 1 }).lean();
+    res.json({ locations: docs.map(d => d.value) });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ locations: [] });
   }
 });
 
@@ -442,7 +478,13 @@ app.get('/api/check-empid', async (req, res) => {
 // Check if user already submitted
 app.get('/api/check-submission', async (req, res) => {
   try {
-    const { empId, email, phone } = req.query;
+    // Coerce to string first — req.query values can be objects (e.g.
+    // ?empId[$ne]=null via Express's bracket-notation query parsing), which
+    // would otherwise be passed straight into the Mongo query below and let
+    // an unauthenticated caller inject operators like $ne/$gt/$regex.
+    const empId = req.query.empId !== undefined ? String(req.query.empId).trim() : '';
+    const email = req.query.email !== undefined ? String(req.query.email).trim() : '';
+    const phone = req.query.phone !== undefined ? String(req.query.phone).trim() : '';
     if (!empId && !email && !phone) return res.json({ submitted: false });
 
     // Only match on fields that were actually provided — email/phone are
@@ -519,7 +561,7 @@ app.post('/api/submissions/form1', (req, res, next) => {
   });
 }, async (req, res) => {
   try {
-    const { empId, phone, empName, companyName, department, location, language, captchaToken, mediaConsent } = req.body || {};
+    const { empId, phone, empName, companyName, department, location, language, captchaToken, mediaConsent, isOtherLocation } = req.body || {};
 
     if (!empName) {
       return res.status(400).json({ error: 'Missing required user details.' });
@@ -570,6 +612,8 @@ app.post('/api/submissions/form1', (req, res, next) => {
         city: (location || '').trim()
       });
     }
+
+    if (isOtherLocation === 'true') recordCustomLocation(location);
 
     const existingF1 = await Form1.findOne({ userId: user._id });
     if (existingF1) {
@@ -623,6 +667,12 @@ app.post('/api/submissions/form1', (req, res, next) => {
 
     res.json({ success: true, submissionId: submission._id });
   } catch (err) {
+    // E11000 on the unique userId index — a second, near-simultaneous request
+    // for the same employee lost the race to Form1.create() (the earlier
+    // findOne "already submitted" check only catches the non-racing case).
+    if (err && err.code === 11000) {
+      return res.status(400).json({ error: 'SUBMIT YOUR KANDO ENTRY has already been submitted by this user.' });
+    }
     console.error('Form1 error:', err);
     console.error(err);
     res.status(500).json({ error: 'Internal server error.' });
@@ -642,7 +692,7 @@ app.post('/api/submissions/form2', (req, res, next) => {
   });
 }, async (req, res) => {
   try {
-    const { empId, phone, empName, companyName, department, location, thoughts, language, captchaToken } = req.body || {};
+    const { empId, phone, empName, companyName, department, location, thoughts, language, captchaToken, isOtherLocation } = req.body || {};
 
     if (!empName) {
       return res.status(400).json({ error: 'Missing required user details.' });
@@ -680,6 +730,8 @@ app.post('/api/submissions/form2', (req, res, next) => {
         city: location || ''
       });
     }
+
+    if (isOtherLocation === 'true') recordCustomLocation(location);
 
     const existingF2 = await Form2.findOne({ userId: user._id });
     if (existingF2) {
@@ -720,6 +772,11 @@ app.post('/api/submissions/form2', (req, res, next) => {
 
     res.json({ success: true, submissionId: submission._id });
   } catch (err) {
+    // E11000 on the unique userId index — see the matching comment in the
+    // Form1 handler above.
+    if (err && err.code === 11000) {
+      return res.status(400).json({ error: 'CHAIRMAN INVITES YOUR THOUGHTS has already been submitted by this user.' });
+    }
     console.error('Form2 error:', err);
     console.error(err);
     res.status(500).json({ error: 'Internal server error.' });
