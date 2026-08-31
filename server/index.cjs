@@ -516,6 +516,22 @@ app.get('/api/check-submission', async (req, res) => {
 // Most employees identify by Employee ID; the ~50 with no ID identify by
 // phone number instead — either way, they must appear in the client-supplied
 // whitelist to submit.
+// Mirrors the frontend's ENGLISH_ONLY check (Form1Page/Form2Page) — the
+// dropdown-typed "Other" location must stay English-only regardless of the
+// form's selected display language (Hindi/Tamil/etc.), since it's merged
+// into a shared, cross-language location list. This is enforced here too
+// because the frontend check is bypassable via a direct API call.
+const ENGLISH_ONLY_LOCATION = /^[A-Za-z0-9\s,.'-]+$/;
+function validateOtherLocation(isOtherLocation, location) {
+  if (isOtherLocation !== 'true') return { ok: true };
+  const trimmed = (location || '').toString().trim();
+  if (!trimmed) return { ok: false, error: 'Please enter your location.' };
+  if (!ENGLISH_ONLY_LOCATION.test(trimmed)) {
+    return { ok: false, error: 'Please type your location using English letters only.' };
+  }
+  return { ok: true };
+}
+
 async function resolveEligibleIdentity(rawEmpId, rawPhone) {
   // Uppercase to match the whitelist normalization — employees may type
   // their ID in lowercase (e.g. on mobile) and should still be recognized.
@@ -565,6 +581,12 @@ app.post('/api/submissions/form1', (req, res, next) => {
 
     if (!empName) {
       return res.status(400).json({ error: 'Missing required user details.' });
+    }
+
+    const otherLocationCheck = validateOtherLocation(isOtherLocation, location);
+    if (!otherLocationCheck.ok) {
+      if (req.files) Object.values(req.files).flat().forEach(f => cleanupLocalFile(f.path));
+      return res.status(400).json({ error: otherLocationCheck.error });
     }
 
     const submitIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
@@ -704,6 +726,12 @@ app.post('/api/submissions/form2', (req, res, next) => {
     if (thoughts.trim().length > 2000) {
       if (req.file) cleanupLocalFile(req.file.path);
       return res.status(400).json({ error: 'Thoughts must be 2000 characters or less.' });
+    }
+
+    const otherLocationCheck = validateOtherLocation(isOtherLocation, location);
+    if (!otherLocationCheck.ok) {
+      if (req.file) cleanupLocalFile(req.file.path);
+      return res.status(400).json({ error: otherLocationCheck.error });
     }
 
     const submitIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';

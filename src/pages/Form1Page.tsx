@@ -546,8 +546,13 @@ export const Form1Page: React.FC = () => {
                       value={otherLocation}
                       placeholder={t.otherLocationPlaceholder}
                       onChange={e => {
-                        setOtherLocation(e.target.value);
-                        setFormData(prev => ({ ...prev, city: e.target.value }));
+                        // Strip non-English characters as the user types, so
+                        // switching the form to Hindi/Tamil doesn't let a
+                        // Devanagari/Tamil-script location slip into this
+                        // shared, cross-language location list.
+                        const filtered = e.target.value.replace(/[^A-Za-z0-9\s,.'-]/g, '');
+                        setOtherLocation(filtered);
+                        setFormData(prev => ({ ...prev, city: filtered }));
                       }}
                     />
                   )}
