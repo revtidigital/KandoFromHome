@@ -194,6 +194,33 @@ export const AdminDashboardPage: React.FC = () => {
   // Row selection for scoped export — when non-empty, exports only these
   // users; otherwise exports honor whatever filter is currently applied.
   const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(new Set());
+  const [selectAllLoading, setSelectAllLoading] = useState(false);
+  // The header checkbox selects every user matching the current filter
+  // across ALL pages, not just the ~25 rows currently loaded in the browser —
+  // fetches the full matching id list from the server rather than only
+  // toggling paginatedUsers.
+  const handleSelectAllToggle = async (checked: boolean) => {
+    if (!checked) {
+      setSelectedUserIds(new Set());
+      return;
+    }
+    setSelectAllLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (searchQuery) params.set('search', searchQuery);
+      if (selectedTagFilter) params.set('tag', selectedTagFilter);
+      if (selectedFormFilter) params.set('formType', selectedFormFilter);
+      if (selectedPermissionFilter) params.set('permissionToFeature', selectedPermissionFilter);
+      if (selectedLanguageFilter) params.set('language', selectedLanguageFilter);
+      const res = await fetch(`${apiBaseUrl}/api/admin/users/ids?${params.toString()}`, { headers: adminAuthHeader() });
+      const data = await res.json();
+      setSelectedUserIds(new Set((data.ids || []).map(String)));
+    } catch {
+      // Leave the current selection unchanged on failure.
+    } finally {
+      setSelectAllLoading(false);
+    }
+  };
   const toggleUserSelected = (id: string) => {
     setSelectedUserIds(prev => {
       const next = new Set(prev);
@@ -1342,13 +1369,22 @@ export const AdminDashboardPage: React.FC = () => {
                     actually on screen instead of silently exporting everyone. */}
                 {(selectedUserIds.size > 0 || !!searchQuery || !!selectedTagFilter || !!selectedFormFilter || !!selectedPermissionFilter || !!selectedLanguageFilter) && (
                   <div style={{ background: 'rgba(0,229,255,0.1)', border: '1px solid #00E5FF', borderRadius: '14px', padding: '14px 18px', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
-                    <span style={{ color: '#00E5FF', fontWeight: 800, fontSize: '0.9rem' }}>
-                      {selectedUserIds.size > 0
-                        ? `${selectedUserIds.size} user${selectedUserIds.size > 1 ? 's' : ''} selected`
-                        : usersTotal === 0
-                          ? 'No entries found for this filter'
-                          : `Filter applied — ${usersTotal} user${usersTotal !== 1 ? 's' : ''} match`}
-                    </span>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                      <span style={{ color: '#00E5FF', fontWeight: 800, fontSize: '0.9rem' }}>
+                        {selectedUserIds.size > 0
+                          ? `${selectedUserIds.size} user${selectedUserIds.size > 1 ? 's' : ''} selected`
+                          : usersTotal === 0
+                            ? 'No entries found for this filter'
+                            : `Filter applied — ${usersTotal} user${usersTotal !== 1 ? 's' : ''} match`}
+                      </span>
+                      {usersTotal > 0 && (
+                        <span style={{ color: '#94A3B8', fontWeight: 600, fontSize: '0.78rem' }}>
+                          {selectAllLoading
+                            ? 'Selecting all matching users…'
+                            : `${selectedUserIds.size} selected out of ${usersTotal}`}
+                        </span>
+                      )}
+                    </div>
                     <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
                       {!(selectedUserIds.size === 0 && usersTotal === 0) && (
                         <>
@@ -1394,18 +1430,11 @@ export const AdminDashboardPage: React.FC = () => {
                       <th style={{ padding: '14px 12px', width: '48px', minWidth: '48px', maxWidth: '48px', boxSizing: 'border-box', position: 'sticky', left: 0, zIndex: 2, background: palette.surfaceAlt }}>
                         <input
                           type="checkbox"
-                          checked={paginatedUsers.length > 0 && paginatedUsers.every(u => selectedUserIds.has(u.id || u._id))}
-                          onChange={(e) => {
-                            setSelectedUserIds(prev => {
-                              const next = new Set(prev);
-                              paginatedUsers.forEach(u => {
-                                const id = u.id || u._id;
-                                if (e.target.checked) next.add(id); else next.delete(id);
-                              });
-                              return next;
-                            });
-                          }}
-                          style={{ accentColor: '#00E5FF', cursor: 'pointer', width: '16px', height: '16px' }}
+                          checked={usersTotal > 0 && selectedUserIds.size === usersTotal}
+                          disabled={selectAllLoading}
+                          title="Select every user matching the current filter, across all pages"
+                          onChange={(e) => handleSelectAllToggle(e.target.checked)}
+                          style={{ accentColor: '#00E5FF', cursor: selectAllLoading ? 'wait' : 'pointer', width: '16px', height: '16px' }}
                         />
                       </th>
                     )}

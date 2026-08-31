@@ -969,73 +969,95 @@ app.post('/api/admin/audit-log', async (req, res) => {
 });
 
 // Admin Get Users Table
+// Shared by /api/admin/users (paginated table) and /api/admin/users/ids
+// (full matching-id list for "select all across pages") so the two can
+// never drift into matching different sets of users.
+async function buildUsersQuery(reqQuery) {
+  const { search, tag, formType, permissionToFeature, language: languageFilter } = reqQuery;
+
+  let query = {};
+  if (search) {
+    const safeSearch = escapeRegex(search.toString()).slice(0, 100);
+    query.$or = [
+      { empName: new RegExp(safeSearch, 'i') },
+      { empId: new RegExp(safeSearch, 'i') },
+      { phone: new RegExp(safeSearch, 'i') },
+      { email: new RegExp(safeSearch, 'i') },
+      { city: new RegExp(safeSearch, 'i') }
+    ];
+  }
+  if (tag) {
+    query.tags = tag;
+  }
+
+  // Applied at the query level (not after pagination) so skip/limit and the
+  // totalUsers/totalPages counts stay accurate when this filter is active.
+  if (formType === 'form1' || formType === 'form2' || formType === 'both') {
+    const f1UserIds = await Form1.distinct('userId');
+    const f2UserIds = await Form2.distinct('userId');
+    let matchIds;
+    if (formType === 'form1') {
+      matchIds = f1UserIds;
+    } else if (formType === 'form2') {
+      matchIds = f2UserIds;
+    } else {
+      const f2Set = new Set(f2UserIds.map(String));
+      matchIds = f1UserIds.filter(id => f2Set.has(String(id)));
+    }
+    query._id = { $in: matchIds };
+  }
+
+  if (permissionToFeature === 'yes' || permissionToFeature === 'no') {
+    const consentUserIds = await Form1.distinct('userId', { mediaConsent: permissionToFeature === 'yes' });
+    if (query._id && query._id.$in) {
+      const consentSet = new Set(consentUserIds.map(String));
+      query._id.$in = query._id.$in.filter(id => consentSet.has(String(id)));
+    } else {
+      query._id = { $in: consentUserIds };
+    }
+  }
+
+  // A user can submit Form1 and Form2 in different languages (e.g. Form1
+  // in English, Form2 in Hindi) — language lives per-submission, not on
+  // the User doc, so this matches anyone whose Form1 OR Form2 was filled
+  // in the selected language rather than trying to pick one "the" language.
+  if (['en', 'hi', 'ta'].includes(languageFilter)) {
+    const [f1LangIds, f2LangIds] = await Promise.all([
+      Form1.distinct('userId', { language: languageFilter }),
+      Form2.distinct('userId', { language: languageFilter })
+    ]);
+    const langMatchSet = new Set([...f1LangIds, ...f2LangIds].map(String));
+    if (query._id && query._id.$in) {
+      query._id.$in = query._id.$in.filter(id => langMatchSet.has(String(id)));
+    } else {
+      query._id = { $in: [...langMatchSet] };
+    }
+  }
+
+  return query;
+}
+
+// Every matching user's id, unpaginated — powers the Users Directory's
+// "select all" checkbox, which must select every filtered row across every
+// page, not just whatever page happens to currently be loaded in the browser.
+app.get('/api/admin/users/ids', async (req, res) => {
+  try {
+    const query = await buildUsersQuery(req.query);
+    const ids = await User.find(query).distinct('_id');
+    res.json({ ids });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
 app.get('/api/admin/users', async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 25;
     const skip = (page - 1) * limit;
 
-    const { search, tag, formType, permissionToFeature, language: languageFilter } = req.query;
-
-    let query = {};
-    if (search) {
-      const safeSearch = escapeRegex(search.toString()).slice(0, 100);
-      query.$or = [
-        { empName: new RegExp(safeSearch, 'i') },
-        { empId: new RegExp(safeSearch, 'i') },
-        { phone: new RegExp(safeSearch, 'i') },
-        { email: new RegExp(safeSearch, 'i') },
-        { city: new RegExp(safeSearch, 'i') }
-      ];
-    }
-    if (tag) {
-      query.tags = tag;
-    }
-
-    // Applied at the query level (not after pagination) so skip/limit and the
-    // totalUsers/totalPages counts stay accurate when this filter is active.
-    if (formType === 'form1' || formType === 'form2' || formType === 'both') {
-      const f1UserIds = await Form1.distinct('userId');
-      const f2UserIds = await Form2.distinct('userId');
-      let matchIds;
-      if (formType === 'form1') {
-        matchIds = f1UserIds;
-      } else if (formType === 'form2') {
-        matchIds = f2UserIds;
-      } else {
-        const f2Set = new Set(f2UserIds.map(String));
-        matchIds = f1UserIds.filter(id => f2Set.has(String(id)));
-      }
-      query._id = { $in: matchIds };
-    }
-
-    if (permissionToFeature === 'yes' || permissionToFeature === 'no') {
-      const consentUserIds = await Form1.distinct('userId', { mediaConsent: permissionToFeature === 'yes' });
-      if (query._id && query._id.$in) {
-        const consentSet = new Set(consentUserIds.map(String));
-        query._id.$in = query._id.$in.filter(id => consentSet.has(String(id)));
-      } else {
-        query._id = { $in: consentUserIds };
-      }
-    }
-
-    // A user can submit Form1 and Form2 in different languages (e.g. Form1
-    // in English, Form2 in Hindi) — language lives per-submission, not on
-    // the User doc, so this matches anyone whose Form1 OR Form2 was filled
-    // in the selected language rather than trying to pick one "the" language.
-    if (['en', 'hi', 'ta'].includes(languageFilter)) {
-      const [f1LangIds, f2LangIds] = await Promise.all([
-        Form1.distinct('userId', { language: languageFilter }),
-        Form2.distinct('userId', { language: languageFilter })
-      ]);
-      const langMatchSet = new Set([...f1LangIds, ...f2LangIds].map(String));
-      if (query._id && query._id.$in) {
-        query._id.$in = query._id.$in.filter(id => langMatchSet.has(String(id)));
-      } else {
-        query._id = { $in: [...langMatchSet] };
-      }
-    }
-
+    const query = await buildUsersQuery(req.query);
     const totalUsers = await User.countDocuments(query);
     const users = await User.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit).lean();
     const { f1Map, f2Map } = await fetchFormsForUsers(users.map(u => u._id));
