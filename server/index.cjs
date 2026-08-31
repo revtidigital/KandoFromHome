@@ -1370,9 +1370,9 @@ app.get('/api/admin/export/users', exportLimiter, async (req, res) => {
       return res.send(buffer);
     } else {
       const csv = XLSX.utils.sheet_to_csv(ws);
-      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
       res.setHeader('Content-Disposition', 'attachment; filename="kando_users.csv"');
-      return res.send(csv);
+      return res.send('﻿' + csv);
     }
   } catch (err) {
     console.error(err);
@@ -1391,6 +1391,7 @@ app.get('/api/admin/export/pdf', exportLimiter, async (req, res) => {
       <!DOCTYPE html>
       <html>
       <head>
+        <meta charset="utf-8">
         <title>Yamaha Kando Day 2026 - Users Report</title>
         <style>
           body { font-family: Arial, sans-serif; padding: 20px; color: #111; }
@@ -1479,7 +1480,7 @@ app.get('/api/admin/export/pdf', exportLimiter, async (req, res) => {
       </html>
     `;
 
-    res.setHeader('Content-Type', 'text/html');
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.send(html);
   } catch (err) {
     console.error(err);
