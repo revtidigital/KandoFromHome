@@ -975,7 +975,7 @@ app.get('/api/admin/users', async (req, res) => {
     const limit = parseInt(req.query.limit) || 25;
     const skip = (page - 1) * limit;
 
-    const { search, tag, formType, permissionToFeature } = req.query;
+    const { search, tag, formType, permissionToFeature, language: languageFilter } = req.query;
 
     let query = {};
     if (search) {
@@ -1016,6 +1016,23 @@ app.get('/api/admin/users', async (req, res) => {
         query._id.$in = query._id.$in.filter(id => consentSet.has(String(id)));
       } else {
         query._id = { $in: consentUserIds };
+      }
+    }
+
+    // A user can submit Form1 and Form2 in different languages (e.g. Form1
+    // in English, Form2 in Hindi) — language lives per-submission, not on
+    // the User doc, so this matches anyone whose Form1 OR Form2 was filled
+    // in the selected language rather than trying to pick one "the" language.
+    if (['en', 'hi', 'ta'].includes(languageFilter)) {
+      const [f1LangIds, f2LangIds] = await Promise.all([
+        Form1.distinct('userId', { language: languageFilter }),
+        Form2.distinct('userId', { language: languageFilter })
+      ]);
+      const langMatchSet = new Set([...f1LangIds, ...f2LangIds].map(String));
+      if (query._id && query._id.$in) {
+        query._id.$in = query._id.$in.filter(id => langMatchSet.has(String(id)));
+      } else {
+        query._id = { $in: [...langMatchSet] };
       }
     }
 
@@ -1238,7 +1255,7 @@ async function fetchFormsForUsers(userIds) {
 // applied in the Users Directory table — so "Export" always matches what the
 // admin is actually looking at instead of silently exporting everyone.
 async function getUsersForExport(req) {
-  const { ids, search, tag, formType, permissionToFeature } = req.query;
+  const { ids, search, tag, formType, permissionToFeature, language: languageFilter } = req.query;
 
   if (ids) {
     const idList = Array.isArray(ids) ? ids.map(String) : ids.toString().split(',').map(s => s.trim());
@@ -1286,6 +1303,18 @@ async function getUsersForExport(req) {
     });
     const consentSet = new Set(consentUserIds.map(String));
     users = users.filter(u => consentSet.has(String(u._id)));
+  }
+
+  // Matches the same "Form1 OR Form2 in this language" semantics as the
+  // /api/admin/users language filter — language lives per-submission.
+  if (['en', 'hi', 'ta'].includes(languageFilter)) {
+    const userIds = users.map(u => u._id);
+    const [f1LangIds, f2LangIds] = await Promise.all([
+      Form1.distinct('userId', { userId: { $in: userIds }, language: languageFilter }),
+      Form2.distinct('userId', { userId: { $in: userIds }, language: languageFilter })
+    ]);
+    const langMatchSet = new Set([...f1LangIds, ...f2LangIds].map(String));
+    users = users.filter(u => langMatchSet.has(String(u._id)));
   }
 
   return users;
@@ -1678,7 +1707,7 @@ async function buildAndEmailExport(email, filterReq) {
 }
 
 app.post('/api/admin/export/zip-email', exportLimiter, async (req, res) => {
-  const { email, ids, search, tag, formType } = req.body || {};
+  const { email, ids, search, tag, formType, permissionToFeature, language } = req.body || {};
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return res.status(400).json({ error: 'A valid email address is required.' });
   }
@@ -1695,7 +1724,7 @@ app.post('/api/admin/export/zip-email', exportLimiter, async (req, res) => {
 
   recordAuditLog(req, `Requested CSV + ZIP export via email to ${email}`, req.adminUser).catch(() => {});
 
-  buildAndEmailExport(email, { query: { ids, search, tag, formType } }).catch(err => {
+  buildAndEmailExport(email, { query: { ids, search, tag, formType, permissionToFeature, language } }).catch(err => {
     console.error('Email export failed:', err);
   });
 });

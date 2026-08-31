@@ -136,6 +136,9 @@ const TagMultiSelect: React.FC<{
   );
 };
 
+const LANGUAGE_LABELS: Record<string, string> = { en: 'English', hi: 'Hindi', ta: 'Tamil' };
+const formatSubmissionLanguage = (lang?: string) => (lang ? LANGUAGE_LABELS[lang] || lang : '—');
+
 export const AdminDashboardPage: React.FC = () => {
   const {
     adminLogout, navigateTo,
@@ -247,9 +250,13 @@ export const AdminDashboardPage: React.FC = () => {
   const [selectedTagFilter, setSelectedTagFilter] = useState(() => localStorage.getItem('kando_admin_tagFilter') || '');
   const [selectedFormFilter, setSelectedFormFilter] = useState(() => localStorage.getItem('kando_admin_formFilter') || '');
   const [selectedPermissionFilter, setSelectedPermissionFilter] = useState(() => localStorage.getItem('kando_admin_permissionFilter') || '');
+  // A user can fill Form1 and Form2 in different languages, so this filters
+  // on "Form1 OR Form2 was submitted in this language", matching the backend.
+  const [selectedLanguageFilter, setSelectedLanguageFilter] = useState(() => localStorage.getItem('kando_admin_languageFilter') || '');
   useEffect(() => { localStorage.setItem('kando_admin_tagFilter', selectedTagFilter); }, [selectedTagFilter]);
   useEffect(() => { localStorage.setItem('kando_admin_formFilter', selectedFormFilter); }, [selectedFormFilter]);
   useEffect(() => { localStorage.setItem('kando_admin_permissionFilter', selectedPermissionFilter); }, [selectedPermissionFilter]);
+  useEffect(() => { localStorage.setItem('kando_admin_languageFilter', selectedLanguageFilter); }, [selectedLanguageFilter]);
   // Click-to-sort for the Users table headers — client-side sort applied to
   // whatever page of allUsers is currently loaded (not persisted, resets on nav).
   const [sortColumn, setSortColumn] = useState<'empId' | 'empName' | 'registeredDate' | 'form1' | 'permission' | 'form2' | null>(null);
@@ -568,12 +575,13 @@ export const AdminDashboardPage: React.FC = () => {
   // (previously the whole table was loaded once, capped at 200 users, and
   // filtered/paginated in the browser — anyone past the first 200 silently
   // never showed up in search or filters).
-  const fetchUsersPage = (page: number, search: string, tag: string, formType: string, permissionToFeature: string) => {
+  const fetchUsersPage = (page: number, search: string, tag: string, formType: string, permissionToFeature: string, language: string) => {
     const params = new URLSearchParams({ page: String(page), limit: String(itemsPerPage) });
     if (search) params.set('search', search);
     if (tag) params.set('tag', tag);
     if (formType) params.set('formType', formType);
     if (permissionToFeature) params.set('permissionToFeature', permissionToFeature);
+    if (language) params.set('language', language);
     return fetch(`${apiBaseUrl}/api/admin/users?${params.toString()}`, { headers: adminAuthHeader() })
       .then(res => res.json())
       .then(data => {
@@ -590,11 +598,11 @@ export const AdminDashboardPage: React.FC = () => {
   // keystroke; tag/form-filter/page changes are instant (no typing involved).
   useEffect(() => {
     const handle = setTimeout(() => {
-      fetchUsersPage(currentPage, searchQuery, selectedTagFilter, selectedFormFilter, selectedPermissionFilter);
+      fetchUsersPage(currentPage, searchQuery, selectedTagFilter, selectedFormFilter, selectedPermissionFilter, selectedLanguageFilter);
     }, searchQuery ? 350 : 0);
     return () => clearTimeout(handle);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, itemsPerPage, searchQuery, selectedTagFilter, selectedFormFilter, selectedPermissionFilter]);
+  }, [currentPage, itemsPerPage, searchQuery, selectedTagFilter, selectedFormFilter, selectedPermissionFilter, selectedLanguageFilter]);
 
   const handleLogout = () => {
     // Filters are persisted to localStorage so they survive reloads within a
@@ -745,6 +753,7 @@ export const AdminDashboardPage: React.FC = () => {
     if (selectedTagFilter) params.set('tag', selectedTagFilter);
     if (selectedFormFilter) params.set('formType', selectedFormFilter);
     if (selectedPermissionFilter) params.set('permissionToFeature', selectedPermissionFilter);
+    if (selectedLanguageFilter) params.set('language', selectedLanguageFilter);
     return params;
   };
 
@@ -889,7 +898,9 @@ export const AdminDashboardPage: React.FC = () => {
           ids: scopeParams.get('ids') || undefined,
           search: scopeParams.get('search') || undefined,
           tag: scopeParams.get('tag') || undefined,
-          formType: scopeParams.get('formType') || undefined
+          formType: scopeParams.get('formType') || undefined,
+          permissionToFeature: scopeParams.get('permissionToFeature') || undefined,
+          language: scopeParams.get('language') || undefined
         })
       });
       const data = await res.json();
@@ -1311,12 +1322,25 @@ export const AdminDashboardPage: React.FC = () => {
                     <option value="yes">Permission to Feature: Yes</option>
                     <option value="no">Permission to Feature: No</option>
                   </select>
+
+                  {/* Language Filter — matches Form1 OR Form2 submitted in this
+                      language, since a user can fill each form in a different one. */}
+                  <select
+                    value={selectedLanguageFilter}
+                    onChange={e => { setSelectedLanguageFilter(e.target.value); setCurrentPage(1); }}
+                    style={{ padding: '9px 12px', borderRadius: '8px', background: palette.surfaceAlt, border: `1px solid ${palette.borderStrong}`, color: palette.text, fontSize: '0.85rem', outline: 'none' }}
+                  >
+                    <option value="">All Languages</option>
+                    <option value="en">English</option>
+                    <option value="hi">Hindi</option>
+                    <option value="ta">Tamil</option>
+                  </select>
                 </div>
 
                 {/* SCOPED EXPORT TOOLBAR — appears above the table whenever rows are checked
                     OR a search/tag/form filter is active, so export always matches what's
                     actually on screen instead of silently exporting everyone. */}
-                {(selectedUserIds.size > 0 || !!searchQuery || !!selectedTagFilter || !!selectedFormFilter || !!selectedPermissionFilter) && (
+                {(selectedUserIds.size > 0 || !!searchQuery || !!selectedTagFilter || !!selectedFormFilter || !!selectedPermissionFilter || !!selectedLanguageFilter) && (
                   <div style={{ background: 'rgba(0,229,255,0.1)', border: '1px solid #00E5FF', borderRadius: '14px', padding: '14px 18px', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
                     <span style={{ color: '#00E5FF', fontWeight: 800, fontSize: '0.9rem' }}>
                       {selectedUserIds.size > 0
@@ -1347,7 +1371,7 @@ export const AdminDashboardPage: React.FC = () => {
                           if (selectedUserIds.size > 0) {
                             setSelectedUserIds(new Set());
                           } else {
-                            setSearchQuery(''); setSelectedTagFilter(''); setSelectedFormFilter(''); setSelectedPermissionFilter(''); setCurrentPage(1);
+                            setSearchQuery(''); setSelectedTagFilter(''); setSelectedFormFilter(''); setSelectedPermissionFilter(''); setSelectedLanguageFilter(''); setCurrentPage(1);
                           }
                         }}
                         style={{ background: 'transparent', border: `1px solid ${palette.borderStrong}`, color: '#94A3B8', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem' }}
@@ -1389,8 +1413,10 @@ export const AdminDashboardPage: React.FC = () => {
                     <th style={{ padding: '14px 18px' }}>Employee Name{renderSortArrow('empName')}</th>
                     <th style={{ padding: '14px 18px' }}>Registered Date{renderSortArrow('registeredDate')}</th>
                     <th style={{ padding: '14px 18px' }}>SUBMIT YOUR KANDO ENTRY{renderSortArrow('form1')}</th>
+                    <th style={{ padding: '14px 18px' }}>SUBMIT YOUR KANDO ENTRY Language</th>
                     <th style={{ padding: '14px 18px' }}>Permission to Feature{renderSortArrow('permission')}</th>
                     <th style={{ padding: '14px 18px' }}>CHAIRMAN INVITES YOUR THOUGHTS{renderSortArrow('form2')}</th>
+                    <th style={{ padding: '14px 18px' }}>CHAIRMAN INVITES YOUR THOUGHTS Language</th>
                     <th style={{ padding: '14px 18px' }}>Assets</th>
                     <th style={{ padding: '14px 18px' }}>Additional filter if required (Tags)</th>
                     <th style={{ padding: '14px 18px' }}>Download</th>
@@ -1443,6 +1469,10 @@ export const AdminDashboardPage: React.FC = () => {
                           )}
                         </td>
 
+                        <td style={{ padding: '14px 18px', color: palette.textMuted2, fontSize: '0.8rem' }}>
+                          {formatSubmissionLanguage(user.form1?.language)}
+                        </td>
+
                         <td style={{ padding: '14px 18px' }}>
                           {user.form1 ? (
                             <span style={{ background: user.form1.mediaConsent ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)', color: user.form1.mediaConsent ? '#4ADE80' : '#EF4444', padding: '4px 10px', borderRadius: '12px', fontWeight: 700, fontSize: '0.75rem' }}>
@@ -1461,6 +1491,10 @@ export const AdminDashboardPage: React.FC = () => {
                           ) : (
                             <span style={{ color: '#64748B', fontSize: '0.75rem' }}>Not Filled</span>
                           )}
+                        </td>
+
+                        <td style={{ padding: '14px 18px', color: palette.textMuted2, fontSize: '0.8rem' }}>
+                          {formatSubmissionLanguage(user.form2?.language)}
                         </td>
 
                         {/* ASSETS — every Form 1 / Form 2 upload, opened in a gallery modal with arrows */}
