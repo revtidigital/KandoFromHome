@@ -3,13 +3,39 @@ import { useApp } from '../context/AppContext';
 import type { Language } from '../i18n/translations';
 import { AlertTriangle, CheckCircle, Loader2, X } from 'lucide-react';
 import { useCaptcha } from '../hooks/useCaptcha';
-import { LOCATIONS } from '../data/locations';
+import { useLocationOptions } from '../hooks/useLocationOptions';
 import { SearchableSelect } from '../components/SearchableSelect';
 import '../kando_form1_ui.css';
+
+const ENGLISH_ONLY = /^[A-Za-z0-9\s,.'-]+$/;
 
 export const Form1Page: React.FC = () => {
   const { t, formData, setFormData, navigateTo, language, setLanguage, apiBaseUrl } = useApp();
   const { getCaptchaToken } = useCaptcha(apiBaseUrl);
+  const locationOptions = useLocationOptions(t.otherOptionLabel, apiBaseUrl);
+  const [otherLocation, setOtherLocation] = useState('');
+  const [isOtherMode, setIsOtherMode] = useState(false);
+  const [citySelectValue, setCitySelectValue] = useState(formData.city || '');
+  const cityInitRef = useRef(false);
+
+  // formData.city is shared across Form1/Form2, so a location typed via
+  // "Other" on one form should show up pre-filled (and re-detected as Other)
+  // on the other. Runs once the merged option list is available.
+  useEffect(() => {
+    if (cityInitRef.current) return;
+    if (!formData.city) { cityInitRef.current = true; return; }
+    const isKnownOption = locationOptions.some(
+      opt => opt !== t.otherOptionLabel && opt.toLowerCase() === formData.city.toLowerCase()
+    );
+    if (!isKnownOption) {
+      setIsOtherMode(true);
+      setCitySelectValue(t.otherOptionLabel);
+      setOtherLocation(formData.city);
+    } else {
+      setCitySelectValue(formData.city);
+    }
+    cityInitRef.current = true;
+  }, [locationOptions, formData.city, t.otherOptionLabel]);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [duplicateError, setDuplicateError] = useState<string | null>(null);
@@ -205,6 +231,8 @@ export const Form1Page: React.FC = () => {
     }
     if (!formData.city.trim()) {
       newErrors.location = 'Location is required';
+    } else if (isOtherMode && !ENGLISH_ONLY.test(formData.city.trim())) {
+      newErrors.location = t.otherLocationEnglishOnlyError;
     }
 
     // 3. Photo & Video Mandatory Validation
@@ -280,6 +308,7 @@ export const Form1Page: React.FC = () => {
       body.append('companyName', companyName.trim());
       body.append('department', department.trim());
       body.append('location', formData.city.trim());
+      body.append('isOtherLocation', String(isOtherMode));
       body.append('language', language);
       body.append('mediaConsent', String(mediaConsent));
 
@@ -486,14 +515,43 @@ export const Form1Page: React.FC = () => {
               {/* Location */}
               <div className="field">
                 <label htmlFor="location">{t.locationLabel}*</label>
-                <SearchableSelect
-                  id="location"
-                  className={errors.location ? 'has-error' : ''}
-                  value={formData.city}
-                  options={LOCATIONS}
-                  placeholder={t.locationPlaceholder}
-                  onChange={loc => setFormData(prev => ({ ...prev, city: loc }))}
-                />
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <SearchableSelect
+                      id="location"
+                      className={errors.location ? 'has-error' : ''}
+                      value={citySelectValue}
+                      options={locationOptions}
+                      placeholder={t.locationPlaceholder}
+                      onChange={loc => {
+                        setCitySelectValue(loc);
+                        if (loc === t.otherOptionLabel) {
+                          setIsOtherMode(true);
+                          setOtherLocation('');
+                          setFormData(prev => ({ ...prev, city: '' }));
+                        } else {
+                          setIsOtherMode(false);
+                          setOtherLocation('');
+                          setFormData(prev => ({ ...prev, city: loc }));
+                        }
+                      }}
+                    />
+                  </div>
+                  {isOtherMode && (
+                    <input
+                      type="text"
+                      id="location-other"
+                      className={errors.location ? 'has-error' : ''}
+                      style={{ flex: 1, minWidth: 0 }}
+                      value={otherLocation}
+                      placeholder={t.otherLocationPlaceholder}
+                      onChange={e => {
+                        setOtherLocation(e.target.value);
+                        setFormData(prev => ({ ...prev, city: e.target.value }));
+                      }}
+                    />
+                  )}
+                </div>
                 {errors.location && <p className="file-error">{errors.location}</p>}
               </div>
 

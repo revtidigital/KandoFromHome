@@ -110,6 +110,9 @@ export interface Translations {
   employeeNamePlaceholder: string;
   departmentPlaceholder: string;
   locationPlaceholder: string;
+  otherOptionLabel: string;
+  otherLocationPlaceholder: string;
+  otherLocationEnglishOnlyError: string;
   thoughtsPlaceholder: string;
 
   // Media Uploads
@@ -349,6 +352,9 @@ export const translations: Record<Language, Translations> = {
     employeeNamePlaceholder: "Enter employee name",
     departmentPlaceholder: "Enter department",
     locationPlaceholder: "Enter location",
+    otherOptionLabel: "Other",
+    otherLocationPlaceholder: "Type your location in English",
+    otherLocationEnglishOnlyError: "Please type your location using English letters only",
     thoughtsPlaceholder: "Write your thoughts here...",
 
     // Media
@@ -586,6 +592,9 @@ export const translations: Record<Language, Translations> = {
     employeeNamePlaceholder: "कर्मचारी का नाम दर्ज करें",
     departmentPlaceholder: "विभाग दर्ज करें",
     locationPlaceholder: "स्थान दर्ज करें",
+    otherOptionLabel: "Other",
+    otherLocationPlaceholder: "अपना स्थान अंग्रेज़ी में टाइप करें",
+    otherLocationEnglishOnlyError: "कृपया अपना स्थान केवल अंग्रेज़ी अक्षरों में टाइप करें",
     thoughtsPlaceholder: "अपने विचार यहाँ लिखें...",
 
     // Media
@@ -823,6 +832,9 @@ export const translations: Record<Language, Translations> = {
     employeeNamePlaceholder: "பணியாளர் பெயரை உள்ளிடவும்",
     departmentPlaceholder: "துறையை உள்ளிடவும்",
     locationPlaceholder: "இருப்பிடத்தை உள்ளிடவும்",
+    otherOptionLabel: "Other",
+    otherLocationPlaceholder: "உங்கள் இருப்பிடத்தை ஆங்கிலத்தில் தட்டச்சு செய்யவும்",
+    otherLocationEnglishOnlyError: "தயவுசெய்து உங்கள் இருப்பிடத்தை ஆங்கில எழுத்துக்களில் மட்டும் தட்டச்சு செய்யவும்",
     thoughtsPlaceholder: "உங்கள் கருத்துக்களை இங்கே எழுதவும்...",
 
     // Media
