@@ -1539,10 +1539,19 @@ async function appendR2FileToArchive(archive, url, name) {
 // Shared by the direct-download route and the background email-export job.
 // `filterReq` carries the same ids/search/tag/formType query params the
 // Users Directory table is filtered by, so the zip matches what's on screen.
+const LANGUAGE_FOLDER_LABELS = { en: 'English', hi: 'Hindi', ta: 'Tamil' };
+
 async function buildExportArchive(archive, filterReq) {
   const users = await getUsersForExport(filterReq || { query: {} });
   const { f1Map, f2Map } = await fetchFormsForUsers(users.map(u => u._id));
   const rows = [];
+
+  // When a single language is already selected as a filter, every included
+  // user matches it — the English/Hindi/Tamil grouping folders would be
+  // redundant, so media goes straight into each user's own folder at the
+  // zip root instead.
+  const languageFilterValue = filterReq?.query?.language;
+  const singleLanguageSelected = ['en', 'hi', 'ta'].includes(languageFilterValue);
 
   for (const u of users) {
     const f1 = f1Map.get(String(u._id));
@@ -1550,7 +1559,7 @@ async function buildExportArchive(archive, filterReq) {
 
     const userKey = getUserFolder(u.empId, u.empName, u.phone);
 
-    rows.push({
+    const row = {
       'SUBMIT YOUR KANDO ENTRY Status': f1 ? 'Submitted' : 'Not Filled',
       'Emp ID': u.empId,
       'Phone': exportPhone(u.empId, u.phone) ? `="${exportPhone(u.empId, u.phone)}"` : '',
@@ -1573,15 +1582,40 @@ async function buildExportArchive(archive, filterReq) {
       'CHAIRMAN INVITES YOUR THOUGHTS Language': f2 ? f2.language : '',
       'CHAIRMAN INVITES YOUR THOUGHTS Submitted IP': f2 ? (f2.ip || '') : '',
       'Tags': (u.tags || []).join(', ')
-    });
+    };
+    rows.push(row);
 
-    const empFolder = `media/${userKey}`;
-    if (f1?.photo1Url) await appendR2FileToArchive(archive, f1.photo1Url, `${empFolder}/${userKey}_Photo1${path.extname(f1.photo1Url)}`);
-    if (f1?.photo2Url) await appendR2FileToArchive(archive, f1.photo2Url, `${empFolder}/${userKey}_Photo2${path.extname(f1.photo2Url)}`);
-    if (f1?.videoUrl) await appendR2FileToArchive(archive, f1.videoUrl, `${empFolder}/${userKey}_Video${path.extname(f1.videoUrl)}`);
-    if (f2?.optionalFileUrl) await appendR2FileToArchive(archive, f2.optionalFileUrl, `${empFolder}/${userKey}_Attachment${path.extname(f2.optionalFileUrl)}`);
+    // A user who filled Form1 and Form2 in different languages (e.g. Form1
+    // in English, Form2 in Hindi) gets a full copy of their folder under
+    // BOTH language folders — each form's language is equally "their"
+    // language, so there's no single correct one to pick.
+    let targetFolders;
+    if (singleLanguageSelected) {
+      targetFolders = [null]; // no language wrapper — straight to the zip root
+    } else {
+      const langs = new Set();
+      if (f1?.language) langs.add(f1.language);
+      if (f2?.language) langs.add(f2.language);
+      targetFolders = [...langs].map(l => LANGUAGE_FOLDER_LABELS[l] || l);
+    }
+
+    for (const langFolder of targetFolders) {
+      const userFolderPath = langFolder ? `${langFolder}/${userKey}` : userKey;
+
+      // Per-user CSV — just this one row, so opening a single user's folder
+      // is self-contained without needing the top-level summary.
+      const userCsv = XLSX.utils.sheet_to_csv(XLSX.utils.json_to_sheet([row]));
+      archive.append(userCsv, { name: `${userFolderPath}/${userKey}.csv` });
+
+      if (f1?.photo1Url) await appendR2FileToArchive(archive, f1.photo1Url, `${userFolderPath}/${userKey}_Photo1${path.extname(f1.photo1Url)}`);
+      if (f1?.photo2Url) await appendR2FileToArchive(archive, f1.photo2Url, `${userFolderPath}/${userKey}_Photo2${path.extname(f1.photo2Url)}`);
+      if (f1?.videoUrl) await appendR2FileToArchive(archive, f1.videoUrl, `${userFolderPath}/${userKey}_Video${path.extname(f1.videoUrl)}`);
+      if (f2?.optionalFileUrl) await appendR2FileToArchive(archive, f2.optionalFileUrl, `${userFolderPath}/${userKey}_Attachment${path.extname(f2.optionalFileUrl)}`);
+    }
   }
 
+  // Always present at the zip root regardless of language grouping below —
+  // one combined CSV covering every user included in this export.
   const ws = XLSX.utils.json_to_sheet(rows);
   const csvContent = XLSX.utils.sheet_to_csv(ws);
   archive.append(csvContent, { name: 'users_summary.csv' });
@@ -1616,13 +1650,19 @@ async function buildExportManifest(filterReq) {
   const { f1Map, f2Map } = await fetchFormsForUsers(users.map(u => u._id));
   const rows = [];
   const files = [];
+  const textFiles = [];
+
+  // Same folder-grouping rule as buildExportArchive (the email/direct-download
+  // export path) — see the comment there for the reasoning.
+  const languageFilterValue = filterReq?.query?.language;
+  const singleLanguageSelected = ['en', 'hi', 'ta'].includes(languageFilterValue);
 
   for (const u of users) {
     const f1 = f1Map.get(String(u._id));
     const f2 = f2Map.get(String(u._id));
     const userKey = getUserFolder(u.empId, u.empName, u.phone);
 
-    rows.push({
+    const row = {
       'SUBMIT YOUR KANDO ENTRY Status': f1 ? 'Submitted' : 'Not Filled',
       'Emp ID': u.empId,
       'Phone': exportPhone(u.empId, u.phone) ? `="${exportPhone(u.empId, u.phone)}"` : '',
@@ -1645,23 +1685,39 @@ async function buildExportManifest(filterReq) {
       'CHAIRMAN INVITES YOUR THOUGHTS Language': f2 ? f2.language : '',
       'CHAIRMAN INVITES YOUR THOUGHTS Submitted IP': f2 ? (f2.ip || '') : '',
       'Tags': (u.tags || []).join(', ')
-    });
-
-    const empFolder = `media/${userKey}`;
-    const addFile = (url, suffix) => {
-      const key = r2KeyFromUrl(url);
-      if (!key) return;
-      files.push({ key, name: `${empFolder}/${userKey}_${suffix}${path.extname(url)}` });
     };
-    if (f1?.photo1Url) addFile(f1.photo1Url, 'Photo1');
-    if (f1?.photo2Url) addFile(f1.photo2Url, 'Photo2');
-    if (f1?.videoUrl) addFile(f1.videoUrl, 'Video');
-    if (f2?.optionalFileUrl) addFile(f2.optionalFileUrl, 'Attachment');
+    rows.push(row);
+
+    let targetFolders;
+    if (singleLanguageSelected) {
+      targetFolders = [null];
+    } else {
+      const langs = new Set();
+      if (f1?.language) langs.add(f1.language);
+      if (f2?.language) langs.add(f2.language);
+      targetFolders = [...langs].map(l => LANGUAGE_FOLDER_LABELS[l] || l);
+    }
+
+    for (const langFolder of targetFolders) {
+      const userFolderPath = langFolder ? `${langFolder}/${userKey}` : userKey;
+
+      textFiles.push({ name: `${userFolderPath}/${userKey}.csv`, content: XLSX.utils.sheet_to_csv(XLSX.utils.json_to_sheet([row])) });
+
+      const addFile = (url, suffix) => {
+        const key = r2KeyFromUrl(url);
+        if (!key) return;
+        files.push({ key, name: `${userFolderPath}/${userKey}_${suffix}${path.extname(url)}` });
+      };
+      if (f1?.photo1Url) addFile(f1.photo1Url, 'Photo1');
+      if (f1?.photo2Url) addFile(f1.photo2Url, 'Photo2');
+      if (f1?.videoUrl) addFile(f1.videoUrl, 'Video');
+      if (f2?.optionalFileUrl) addFile(f2.optionalFileUrl, 'Attachment');
+    }
   }
 
   const ws = XLSX.utils.json_to_sheet(rows);
   const csvContent = XLSX.utils.sheet_to_csv(ws);
-  return { csvContent, files };
+  return { csvContent, files, textFiles };
 }
 
 const EXPORT_WORKER_URL = process.env.EXPORT_WORKER_URL || '';
@@ -1672,9 +1728,9 @@ app.get('/api/admin/export/manifest', exportLimiter, async (req, res) => {
     if (!EXPORT_WORKER_URL || !EXPORT_WORKER_SECRET) {
       return res.status(503).json({ error: 'Export worker not configured.' });
     }
-    const { csvContent, files } = await buildExportManifest(req);
+    const { csvContent, files, textFiles } = await buildExportManifest(req);
     await recordAuditLog(req, `Exported CSV + ZIP Media Assets Archive (via edge worker)`, req.adminUser);
-    res.json({ csvContent, files, workerUrl: EXPORT_WORKER_URL, exportSecret: EXPORT_WORKER_SECRET });
+    res.json({ csvContent, files, textFiles, workerUrl: EXPORT_WORKER_URL, exportSecret: EXPORT_WORKER_SECRET });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Internal server error.' });

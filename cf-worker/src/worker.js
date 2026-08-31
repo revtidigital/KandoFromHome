@@ -36,7 +36,7 @@ export default {
       return new Response('Invalid JSON body', { status: 400, headers: CORS_HEADERS });
     }
 
-    const { files, csvContent, filename, storeKey } = body || {};
+    const { files, csvContent, textFiles, filename, storeKey } = body || {};
     if (!Array.isArray(files) || typeof csvContent !== 'string') {
       return new Response('Expected { files: [{key,name}], csvContent }', { status: 400, headers: CORS_HEADERS });
     }
@@ -48,6 +48,16 @@ export default {
       name: 'users_summary.csv',
       input: csvContent,
     });
+
+    // Per-user CSVs (one row each) — plain text, no R2 fetch needed, so
+    // these go straight in alongside the top-level summary above.
+    if (Array.isArray(textFiles)) {
+      for (const tf of textFiles) {
+        if (tf?.name && typeof tf.content === 'string') {
+          entries.push({ name: tf.name, input: tf.content });
+        }
+      }
+    }
 
     // Fetching each object one-at-a-time made large exports (100+ files) hang
     // for minutes — R2 gets are I/O-bound so running a bounded number

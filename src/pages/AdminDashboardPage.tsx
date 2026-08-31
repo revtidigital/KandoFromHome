@@ -794,11 +794,11 @@ export const AdminDashboardPage: React.FC = () => {
   const downloadZipViaWorker = async (params: URLSearchParams, filename: string) => {
     const manifestRes = await fetch(`${apiBaseUrl}/api/admin/export/manifest?${params.toString()}`, { headers: adminAuthHeader() });
     if (!manifestRes.ok) return;
-    const { csvContent, files, workerUrl, exportSecret } = await manifestRes.json();
+    const { csvContent, files, textFiles, workerUrl, exportSecret } = await manifestRes.json();
     const zipRes = await fetch(workerUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-Export-Secret': exportSecret },
-      body: JSON.stringify({ csvContent, files, filename })
+      body: JSON.stringify({ csvContent, files, textFiles, filename })
     });
     if (!zipRes.ok) return;
     const blob = await zipRes.blob();
