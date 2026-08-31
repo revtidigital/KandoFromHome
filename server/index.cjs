@@ -334,12 +334,6 @@ const SettingsSchema = new mongoose.Schema({
   customTags: { type: [String], default: [] }
 });
 
-// Locations typed via the "Other" option in the Location dropdown, so future
-// submitters can pick them from the list instead of retyping them.
-const CustomLocationSchema = new mongoose.Schema({
-  value: { type: String, required: true, unique: true, trim: true }
-}, { timestamps: true });
-
 const User = mongoose.model('User', UserSchema);
 const Form1 = mongoose.model('Form1', Form1Schema);
 const Form2 = mongoose.model('Form2', Form2Schema);
@@ -347,19 +341,6 @@ const AllowedEmployee = mongoose.model('AllowedEmployee', AllowedEmployeeSchema)
 const AllowedPhone = mongoose.model('AllowedPhone', AllowedPhoneSchema);
 const AuditLog = mongoose.model('AuditLog', AuditLogSchema);
 const Settings = mongoose.model('Settings', SettingsSchema);
-const CustomLocation = mongoose.model('CustomLocation', CustomLocationSchema);
-
-// Fire-and-forget: remember a user-typed "Other" location for future dropdowns.
-function recordCustomLocation(value) {
-  const trimmed = (value || '').trim();
-  if (!trimmed) return;
-  const escaped = trimmed.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  CustomLocation.findOneAndUpdate(
-    { value: { $regex: `^${escaped}$`, $options: 'i' } },
-    { $setOnInsert: { value: trimmed } },
-    { upsert: true }
-  ).catch(err => console.error('CustomLocation upsert error:', err));
-}
 
 // Helper for adding audit log (append-only)
 async function recordAuditLog(req, detail, username = 'SuperAdmin') {
@@ -387,17 +368,6 @@ app.get('/api/public-settings', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ captchaEnabled: false, captchaSiteKey: '', googleAnalyticsId: '' });
-  }
-});
-
-// User-typed "Other" locations, merged client-side with the static dropdown list.
-app.get('/api/locations', async (req, res) => {
-  try {
-    const docs = await CustomLocation.find({}, 'value').sort({ value: 1 }).lean();
-    res.json({ locations: docs.map(d => d.value) });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ locations: [] });
   }
 });
 
@@ -635,8 +605,6 @@ app.post('/api/submissions/form1', (req, res, next) => {
       });
     }
 
-    if (isOtherLocation === 'true') recordCustomLocation(location);
-
     const existingF1 = await Form1.findOne({ userId: user._id });
     if (existingF1) {
       Object.values(req.files).flat().forEach(f => cleanupLocalFile(f.path));
@@ -758,8 +726,6 @@ app.post('/api/submissions/form2', (req, res, next) => {
         city: location || ''
       });
     }
-
-    if (isOtherLocation === 'true') recordCustomLocation(location);
 
     const existingF2 = await Form2.findOne({ userId: user._id });
     if (existingF2) {

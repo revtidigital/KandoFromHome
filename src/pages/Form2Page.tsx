@@ -12,7 +12,7 @@ const ENGLISH_ONLY = /^[A-Za-z0-9\s,.'-]+$/;
 export const Form2Page: React.FC = () => {
   const { t, formData, setFormData, navigateTo, language, setLanguage, apiBaseUrl } = useApp();
   const { getCaptchaToken } = useCaptcha(apiBaseUrl);
-  const locationOptions = useLocationOptions(t.otherOptionLabel, apiBaseUrl);
+  const locationOptions = useLocationOptions(t.otherOptionLabel);
 
   const [companyName, setCompanyName] = useState(formData.companyName || '');
   const [department, setDepartment] = useState(formData.department || '');
