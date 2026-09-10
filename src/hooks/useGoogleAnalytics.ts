@@ -24,18 +24,30 @@ export function useGoogleAnalytics(apiBaseUrl: string, currentView: string) {
         scriptLoaded.current = true;
         gaIdRef.current = id;
 
+        // CRITICAL FIX: Google's gtag.js expects dataLayer entries to be an Arguments object
+        // (Object.prototype.toString.call === "[object Arguments]" or hasOwnProperty("callee")).
+        // Pushing a standard JavaScript Array (...args) causes gtag.js to silently drop and ignore every call!
+        window.dataLayer = window.dataLayer || [];
+        function gtag() {
+          // eslint-disable-next-line prefer-rest-params
+          window.dataLayer!.push(arguments);
+        }
+        window.gtag = gtag as unknown as (...args: unknown[]) => void;
+
         const script = document.createElement('script');
         script.async = true;
         script.src = `https://www.googletagmanager.com/gtag/js?id=${id}`;
         document.head.appendChild(script);
 
-        window.dataLayer = window.dataLayer || [];
-        window.gtag = function gtag(...args: unknown[]) { window.dataLayer!.push(args); };
         window.gtag('js', new Date());
         // send_page_view: false — we send page_view manually below so
         // navigation (which never triggers a real URL change here) is tracked.
         window.gtag('config', id, { send_page_view: false });
-        window.gtag('event', 'page_view', { page_title: currentView, page_path: `/${currentView}` });
+        window.gtag('event', 'page_view', {
+          page_title: document.title || currentView,
+          page_location: window.location.href,
+          page_path: window.location.pathname || `/${currentView}`
+        });
       })
       .catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -43,6 +55,10 @@ export function useGoogleAnalytics(apiBaseUrl: string, currentView: string) {
 
   useEffect(() => {
     if (!gaIdRef.current || !window.gtag) return;
-    window.gtag('event', 'page_view', { page_title: currentView, page_path: `/${currentView}` });
+    window.gtag('event', 'page_view', {
+      page_title: document.title || currentView,
+      page_location: window.location.href,
+      page_path: window.location.pathname || `/${currentView}`
+    });
   }, [currentView]);
 }
