@@ -1783,6 +1783,14 @@ async function sendSubmissionStatsEmail() {
     Form1.countDocuments(),
     Form2.countDocuments()
   ]);
+  const [form1Users, form2Users] = await Promise.all([
+    Form1.distinct('userId'),
+    Form2.distinct('userId')
+  ]);
+  const form2Set = new Set(form2Users.map(String));
+  const bothCount = form1Users.filter(id => form2Set.has(String(id))).length;
+  const onlyForm1Count = form1Count - bothCount;
+  const onlyForm2Count = form2Count - bothCount;
   await mailTransporter.sendMail({
     from: `Kando From Home <${SMTP_USER}>`,
     to: 'laxman@crievents.com',
@@ -1794,6 +1802,9 @@ async function sendSubmissionStatsEmail() {
         <li><b>Total Users:</b> ${totalUsers}</li>
         <li><b>SUBMIT YOUR KANDO ENTRY (Form 1) submitted:</b> ${form1Count}</li>
         <li><b>CHAIRMAN INVITES YOUR THOUGHTS (Form 2) submitted:</b> ${form2Count}</li>
+        <li><b>Both SUBMIT YOUR KANDO ENTRY & CHAIRMAN INVITES YOUR THOUGHTS submitted:</b> ${bothCount}</li>
+        <li><b>Only SUBMIT YOUR KANDO ENTRY submitted:</b> ${onlyForm1Count}</li>
+        <li><b>Only CHAIRMAN INVITES YOUR THOUGHTS submitted:</b> ${onlyForm2Count}</li>
       </ul>
     `
   });
