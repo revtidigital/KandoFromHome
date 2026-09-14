@@ -1793,7 +1793,7 @@ async function sendSubmissionStatsEmail() {
   const onlyForm2Count = form2Count - bothCount;
   await mailTransporter.sendMail({
     from: `Kando From Home <${SMTP_USER}>`,
-    to: 'laxman@crievents.com',
+    to: ['laxman@crievents.com', 'RRathan@yamaha-motor-india.com', 'vjosh@yamaha-motor-india.com'],
     bcc: ['meghansh.agarwal@revtidigital.com', 'chirayu.khandelwal@revtidigital.com'],
     subject: `Kando From Home — Submission Update (${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' })})`,
     html: `
@@ -1809,9 +1809,12 @@ async function sendSubmissionStatsEmail() {
     `
   });
 }
-cron.schedule('0 11,15,18 * * *', () => {
-  sendSubmissionStatsEmail().catch(err => console.error('Submission stats email failed:', err));
-}, { timezone: 'Asia/Kolkata' });
+// Disabled 2026-09-01: Cloudways (kandofromhome.com) is the live deployment and
+// runs this same cron — running it here too was sending the client duplicate
+// digest emails from both instances.
+// cron.schedule('0 11,15,18 * * *', () => {
+//   sendSubmissionStatsEmail().catch(err => console.error('Submission stats email failed:', err));
+// }, { timezone: 'Asia/Kolkata' });
 
 // SPA Fallback to index.html for client routing (Exclude /api routes!)
 app.use((req, res) => {
