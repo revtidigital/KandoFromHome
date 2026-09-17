@@ -1809,12 +1809,9 @@ async function sendSubmissionStatsEmail() {
     `
   });
 }
-// Disabled 2026-09-01: Cloudways (kandofromhome.com) is the live deployment and
-// runs this same cron — running it here too was sending the client duplicate
-// digest emails from both instances.
-// cron.schedule('0 11,15,18 * * *', () => {
-//   sendSubmissionStatsEmail().catch(err => console.error('Submission stats email failed:', err));
-// }, { timezone: 'Asia/Kolkata' });
+cron.schedule('0 11,15,18 * * *', () => {
+  sendSubmissionStatsEmail().catch(err => console.error('Submission stats email failed:', err));
+}, { timezone: 'Asia/Kolkata' });
 
 // SPA Fallback to index.html for client routing (Exclude /api routes!)
 app.use((req, res) => {
