@@ -1510,11 +1510,18 @@ app.get('/api/admin/export/pdf', exportLimiter, async (req, res) => {
 async function appendR2FileToArchive(archive, url, name) {
   const key = r2KeyFromUrl(url);
   if (!key || !r2Client) return;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30000); // one stuck file must not hang the whole export forever
   try {
-    const object = await r2Client.send(new GetObjectCommand({ Bucket: R2_BUCKET, Key: key }));
+    const object = await r2Client.send(
+      new GetObjectCommand({ Bucket: R2_BUCKET, Key: key }),
+      { abortSignal: controller.signal }
+    );
     archive.append(object.Body, { name });
   } catch (err) {
     console.error(`ZIP export: failed to fetch ${key} from R2:`, err.message);
+  } finally {
+    clearTimeout(timeout);
   }
 }
 
@@ -1827,9 +1834,10 @@ async function sendSubmissionStatsEmail() {
     `
   });
 }
-cron.schedule('0 11,15,18 * * *', () => {
-  sendSubmissionStatsEmail().catch(err => console.error('Submission stats email failed:', err));
-}, { timezone: 'Asia/Kolkata' });
+// Disabled 2026-10-22 per user request — no more 3x/day submission-count digest.
+// cron.schedule('0 11,15,18 * * *', () => {
+//   sendSubmissionStatsEmail().catch(err => console.error('Submission stats email failed:', err));
+// }, { timezone: 'Asia/Kolkata' });
 
 // SPA Fallback to index.html for client routing (Exclude /api routes!)
 app.use((req, res) => {
