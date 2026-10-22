@@ -265,6 +265,7 @@ mongoose.connect(MONGO_URI)
 // instead, so both are sparse-unique (only indexed when actually present).
 const UserSchema = new mongoose.Schema({
   empId: { type: String, unique: true, sparse: true },
+  uniqueId: { type: String, unique: true, sparse: true },
   empName: { type: String, required: true },
   email: { type: String, default: '' },
   phone: { type: String, unique: true, sparse: true },
@@ -333,6 +334,15 @@ const SettingsSchema = new mongoose.Schema({
   googleAnalyticsId: { type: String, default: '' },
   customTags: { type: [String], default: [] }
 });
+
+// New users get the next sequential YMH-### id, continuing from whatever the
+// highest existing one is — the 254 pre-event users were backfilled directly
+// in the DB as YMH-001..YMH-254, so this just keeps counting up from there.
+async function generateNextUniqueId() {
+  const last = await User.findOne({ uniqueId: { $exists: true, $ne: null } }).sort({ uniqueId: -1 }).lean();
+  const lastNum = last?.uniqueId ? parseInt(last.uniqueId.replace('YMH-', ''), 10) : 0;
+  return `YMH-${String(lastNum + 1).padStart(3, '0')}`;
+}
 
 const User = mongoose.model('User', UserSchema);
 const Form1 = mongoose.model('Form1', Form1Schema);
@@ -599,6 +609,7 @@ app.post('/api/submissions/form1', (req, res, next) => {
     if (!user) {
       user = await User.create({
         empId: cleanEmpId || undefined,
+        uniqueId: await generateNextUniqueId(),
         phone: cleanPhone || undefined,
         empName: empName.trim(),
         city: (location || '').trim()
@@ -721,6 +732,7 @@ app.post('/api/submissions/form2', (req, res, next) => {
     if (!user) {
       user = await User.create({
         empId: cleanEmpId || undefined,
+        uniqueId: await generateNextUniqueId(),
         phone: cleanPhone || undefined,
         empName: empName.trim(),
         city: location || ''
@@ -1035,6 +1047,7 @@ app.get('/api/admin/users', async (req, res) => {
       return {
         id: user._id,
         empId: user.empId,
+        uniqueId: user.uniqueId || '',
         empName: user.empName,
         email: user.email,
         phone: user.phone || 'N/A',
@@ -1328,6 +1341,7 @@ app.get('/api/admin/export/users', exportLimiter, async (req, res) => {
         'User ID': u._id.toString(),
         'Emp ID': u.empId,
         'Name': u.empName,
+        'Unique ID': u.uniqueId || '',
         'Phone': exportPhone(u.empId, u.phone) ? `="${exportPhone(u.empId, u.phone)}"` : '',
         'City': f1 ? (u.city || '') : '',
         'SUBMIT YOUR KANDO ENTRY Company Name': f1 ? f1.companyName : '',
@@ -1412,6 +1426,7 @@ app.get('/api/admin/export/pdf', exportLimiter, async (req, res) => {
               <th>SUBMIT YOUR KANDO ENTRY Status</th>
               <th>Emp ID</th>
               <th>Employee Name</th>
+              <th>Unique ID</th>
               <th>City Location</th>
               <th>SUBMIT YOUR KANDO ENTRY Phone</th>
               <th>SUBMIT YOUR KANDO ENTRY Company</th>
@@ -1450,6 +1465,7 @@ app.get('/api/admin/export/pdf', exportLimiter, async (req, res) => {
           <td>${f1 ? 'Submitted' : 'Not Filled'}</td>
           <td><strong>${esc(u.empId || '')}</strong></td>
           <td>${esc(u.empName)}</td>
+          <td>${esc(u.uniqueId || '')}</td>
           <td>${f1 ? esc(u.city || 'N/A') : ''}</td>
           <td>${f1 ? esc(exportPhone(f1.empId, f1.phone)) : 'Not Filled'}</td>
           <td>${f1 ? esc(f1.companyName) : ''}</td>
@@ -1531,6 +1547,7 @@ async function buildExportArchive(archive, filterReq) {
       'Emp ID': u.empId,
       'Phone': exportPhone(u.empId, u.phone) ? `="${exportPhone(u.empId, u.phone)}"` : '',
       'Name': u.empName,
+      'Unique ID': u.uniqueId || '',
       'City': u.city || '',
       'SUBMIT YOUR KANDO ENTRY Company Name': f1 ? f1.companyName : '',
       'SUBMIT YOUR KANDO ENTRY Department': f1 ? f1.department : '',
@@ -1634,6 +1651,7 @@ async function buildExportManifest(filterReq) {
       'Emp ID': u.empId,
       'Phone': exportPhone(u.empId, u.phone) ? `="${exportPhone(u.empId, u.phone)}"` : '',
       'Name': u.empName,
+      'Unique ID': u.uniqueId || '',
       'City': u.city || '',
       'SUBMIT YOUR KANDO ENTRY Company Name': f1 ? f1.companyName : '',
       'SUBMIT YOUR KANDO ENTRY Department': f1 ? f1.department : '',

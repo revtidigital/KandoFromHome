@@ -1440,6 +1440,7 @@ export const AdminDashboardPage: React.FC = () => {
                     )}
                     <th style={{ padding: '14px 18px', position: 'sticky', left: activeTab === 'users' ? '48px' : 0, zIndex: 2, background: palette.surfaceAlt, borderRight: `1px solid ${palette.border}` }}>Emp ID / Phone{renderSortArrow('empId')}</th>
                     <th style={{ padding: '14px 18px' }}>Employee Name{renderSortArrow('empName')}</th>
+                    <th style={{ padding: '14px 18px' }}>Unique ID</th>
                     <th style={{ padding: '14px 18px' }}>Registered Date{renderSortArrow('registeredDate')}</th>
                     <th style={{ padding: '14px 18px' }}>SUBMIT YOUR KANDO ENTRY{renderSortArrow('form1')}</th>
                     <th style={{ padding: '14px 18px' }}>SUBMIT YOUR KANDO ENTRY Language</th>
@@ -1482,6 +1483,10 @@ export const AdminDashboardPage: React.FC = () => {
                           >
                             {user.empName}
                           </div>
+                        </td>
+
+                        <td style={{ padding: '14px 18px', color: palette.textMuted2, fontSize: '0.85rem', fontWeight: 600 }}>
+                          {(user as any).uniqueId || '—'}
                         </td>
 
                         <td style={{ padding: '14px 18px', color: palette.textMuted2, fontSize: '0.8rem' }}>
